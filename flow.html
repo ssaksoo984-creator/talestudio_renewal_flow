@@ -86,7 +86,7 @@ h2 { font-size: 13px; text-transform: uppercase; letter-spacing: .06em; color: v
 
   <div class="split">
     <section class="pane" aria-label="플로우차트">
-      <div class="pane-h"><b>플로우 <span class="mono" id="planTag" style="color:var(--mut);font-weight:400"></span></b><span class="zoom"><button class="btn" id="zout" aria-label="축소">−</button><button class="btn" id="zfit">맞춤</button><button class="btn" id="zin" aria-label="확대">＋</button></span></div>
+      <div class="pane-h"><b>플로우 <span class="mono" id="planTag" style="color:var(--mut);font-weight:400"></span></b><span class="seg-plan sm" id="stageSeg" aria-label="단계별 보기"></span><span class="zoom"><button class="btn" id="zout" aria-label="축소">−</button><button class="btn" id="zfit">맞춤</button><button class="btn" id="zin" aria-label="확대">＋</button></span></div>
       <div class="flow-box" id="flow"><div class="loading">플로우를 그리는 중…</div></div>
     </section>
     <div class="side">
@@ -139,6 +139,7 @@ h2 { font-size: 13px; text-transform: uppercase; letter-spacing: .06em; color: v
     opt = opt || {};
     var n = byId[id]; if (!n) return;
     cur = id;
+    if (V.stage() && V.stage() !== n.stage) { V.setStage(n.stage).then(function () { V.mark(cur, true); }); paintStages(); }
     V.mark(id, opt.scroll);
     if (!opt.fromProto && P.current() !== id) P.show(id);
     var scr = P.screenFor(id);
@@ -191,6 +192,17 @@ h2 { font-size: 13px; text-transform: uppercase; letter-spacing: .06em; color: v
   paintPlans(); V.setPlan(plan); P.setPlan(plan);
   $('planSeg').addEventListener('click', function (e) { var b = e.target.closest('[data-plan]'); if (b) setPlan(b.dataset.plan); });
 
+
+  // 플로우 단계별 보기: 전체 / Producer / Writer / Artist / Storyboard / Director
+  function paintStages() {
+    var cur0 = V.stage();
+    $('stageSeg').innerHTML = '<button data-stage="" aria-pressed="' + !cur0 + '">전체</button>' + F.stages.map(function (s) {
+      return '<button data-stage="' + s.id + '" aria-pressed="' + (cur0 === s.id) + '">' + esc(s.name.split(' ')[0]) + '</button>';
+    }).join('');
+  }
+  function showStage(id) { V.setStage(id || null).then(function () { V.mark(cur, true); }); paintStages(); }
+  $('stageSeg').addEventListener('click', function (e) { var b = e.target.closest('[data-stage]'); if (b) showStage(b.dataset.stage); });
+  paintStages();
   P.mount($('screen'), { onNavigate: function (id) { if (byId[id]) select(id, { scroll: true, fromProto: true }); } });
   V.mount($('flow'), { onSelect: function (id) { select(id, { scroll: true }); } });
   $('zin').onclick = V.zoomIn; $('zout').onclick = V.zoomOut; $('zfit').onclick = V.fit;

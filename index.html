@@ -45,6 +45,7 @@ body.docked .drawer { width: var(--dockw); box-shadow: none }
 
 <aside class="drawer" id="drawer" aria-label="플로우" hidden>
   <div class="drawer-h"><b>플로우 <span class="lgd" style="font-weight:400;font-size:12px;color:var(--mut)"><i></i>지금 화면</span></b>
+    <span class="seg-plan sm" id="stageSeg" aria-label="단계별 보기"></span>
     <span class="zoom"><button class="btn" id="zout" aria-label="축소">−</button><button class="btn" id="zfit">맞춤</button><button class="btn" id="zin" aria-label="확대">＋</button><button class="btn" id="closeFlow" aria-label="플로우 닫기">닫기 ✕</button></span></div>
   <div class="flow-box" id="flow"><div class="loading">플로우를 그리는 중…</div></div>
   <div class="drawer-f"><div class="w-dock-info" id="nodeInfo"></div><span class="sub">여기서 갈 수 있는 곳 · 노드를 눌러도 이동해요</span><div class="next" id="nextList"></div></div>
@@ -72,6 +73,11 @@ body.docked .drawer { width: var(--dockw); box-shadow: none }
     $('hereId').textContent = id;
     $('hereLabel').textContent = n.label;
     $('hereType').textContent = TYPE[n.type] + ' · ' + V.stageName[n.stage];
+    // 1안/2안은 Producer · Writer에만 있다
+    $('planSeg').hidden = ['entry', 'writer'].indexOf(n.stage) < 0;
+    barH();
+    // 단계별로 보고 있으면 지금 화면의 단계로 따라간다
+    if (mounted && V.stage() && V.stage() !== n.stage) { V.setStage(n.stage).then(function () { V.mark(cur, true); }); paintStages(); }
     $('back').disabled = !trail.length;
     $('toIndex').href = 'flow.html#' + id;
     $('nodeInfo').innerHTML = (n.desc ? '<p>' + esc(n.desc) + '</p>' : '') +
@@ -118,6 +124,17 @@ body.docked .drawer { width: var(--dockw); box-shadow: none }
   paintPlan(); V.setPlan(plan); P.setPlan(plan);
   $('planSeg').addEventListener('click', function (e) { var b = e.target.closest('[data-plan]'); if (b) setPlan(b.dataset.plan); barH(); });
 
+
+  // 플로우 단계별 보기: 전체 / Producer / Writer / Artist / Storyboard / Director
+  function paintStages() {
+    var cur0 = V.stage();
+    $('stageSeg').innerHTML = '<button data-stage="" aria-pressed="' + !cur0 + '">전체</button>' + F.stages.map(function (s) {
+      return '<button data-stage="' + s.id + '" aria-pressed="' + (cur0 === s.id) + '">' + esc(s.name.split(' ')[0]) + '</button>';
+    }).join('');
+  }
+  function showStage(id) { V.setStage(id || null).then(function () { V.mark(cur, true); }); paintStages(); }
+  $('stageSeg').addEventListener('click', function (e) { var b = e.target.closest('[data-stage]'); if (b) showStage(b.dataset.stage); });
+  paintStages();
   P.mount($('screen'), { onNavigate: function (id) { update(id, true); } });
   $('toggleFlow').onclick = function () { openFlow($('drawer').hidden); };
   $('closeFlow').onclick = function () { openFlow(false); $('toggleFlow').focus(); };

@@ -82,7 +82,7 @@
   }
 
   var CURVE = 'stepAfter'; // 직각으로 꺾이는 선
-  var box = null, opts = {}, cur = null, zoom = 1, gen = 0, plan = 'A';
+  var box = null, opts = {}, cur = null, zoom = 1, gen = 0, plan = 'A', only = null;
   function inPlan(p) { return !p || p === plan; }
   function render() {
     if (!box) return Promise.resolve();
@@ -91,10 +91,11 @@
     mermaid.initialize({ startOnLoad: false, theme: 'base', securityLevel: 'strict', flowchart: { htmlLabels: true, curve: CURVE, nodeSpacing: 26, rankSpacing: 36, padding: 8 },
       themeVariables: { fontFamily: css('--font'), fontSize: '13px', primaryColor: css('--surface'), primaryTextColor: css('--ink'), primaryBorderColor: css('--mut'), lineColor: css('--mut'), edgeLabelBackground: css('--surface'), titleColor: css('--ink') } });
     var g0 = ++gen;
-    box.innerHTML = F.stages.map(function (s) {
+    var shown = F.stages.filter(function (s) { return !only || s.id === only; });
+    box.innerHTML = shown.map(function (s) {
       return '<section class="stage" id="st-' + s.id + '"><h3>' + esc(s.name) + (s.tbd ? ' <span class="tbd">이름 미정</span>' : '') + ' <small>' + esc(s.sub) + '</small></h3><div class="stage-svg"></div></section>';
     }).join('');
-    return F.stages.reduce(function (p, s) {
+    return shown.reduce(function (p, s) {
       return p.then(function () {
         if (g0 !== gen) return;
         return mermaid.render('fs' + g0 + s.id, definition(s)).then(function (r) {
@@ -163,6 +164,10 @@
     mark: mark,
     setPlan: function (p) { if (p === plan) return Promise.resolve(); plan = p; return render(); },
     plan: function () { return plan; },
+    // 단계 하나만 보기 (null = 전체)
+    setStage: function (id) { if (id === only) return Promise.resolve(); only = id; return render(); },
+    stage: function () { return only; },
+    stageOf: function (id) { return byId[id] ? byId[id].stage : null; },
     visible: function (id) { var n = byId[id]; return !!n && inPlan(n.plan); },
     setZoom: function (z) { zoom = z; applyZoom(); },
     zoomIn: function () { zoom = Math.min(2, zoom + .15); applyZoom(); },

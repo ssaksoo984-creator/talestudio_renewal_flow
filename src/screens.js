@@ -113,7 +113,7 @@
   function rail(on) {
     var i = STAGES.indexOf(on);
     return '<nav class="w-rail" aria-label="단계">' + STAGES.map(function (s, k) {
-      return '<span class="' + (k === i ? 'on' : k < i ? 'done' : '') + '">' + s + '</span>';
+      return '<button class="' + (k === i ? 'on' : k < i ? 'done' : '') + '" data-act="jumpStage" data-arg="' + s + '"' + (k === i ? ' aria-current="step"' : '') + '>' + s + '</button>';
     }).join('') + '</nav>';
   }
   function bar(on) {
@@ -506,6 +506,16 @@
       (h && (h.tone || h.note) ? '<p class="w-tone">톤 ' + esc(TONES[h.tone]) + (h.note ? ' · ' + esc(h.note) : '') + '</p>' : '') + '</div>' +
       '<div class="w-row-a">' + acts + '</div></li>';
   }
+  function imgCards() {
+    return '<div class="w-acards">' + objs().map(function (o, i) {
+      var h = o.cur >= 0 ? o.hist[o.cur] : null, isNew = st.newItems.indexOf(o.n) >= 0;
+      return '<div class="w-acard' + (o.isBg ? ' bg' : '') + (isNew ? ' is-new' : '') + '">' + thumb(o, h, true) +
+        '<div class="w-acard-b"><b>' + esc(o.n) + ' <small>' + (o.isBg ? '배경' : '인물') + (isNew ? ' · 새로' : '') + '</small></b>' +
+        (o.isBg ? '' : '<div class="w-row-st">' + o.states.map(function (x) { return '<span>' + esc(x) + '</span>'; }).join('') + '</div>') +
+        (h && (h.tone || h.note) ? '<p class="w-tone">톤 ' + esc(TONES[h.tone]) + (h.note ? ' · ' + esc(h.note) : '') + '</p>' : '') +
+        A(h ? '다시 만들기' : '만들기', 'openTone', 'sm', ' data-arg="' + i + '"') + '</div></div>';
+    }).join('') + '</div>';
+  }
   function rows(mode) { return '<ul class="w-rows">' + objs().map(function (o, i) { return row(o, i, mode); }).join('') + '</ul>'; }
   function styleRow(bind, cur) {
     return '<div class="w-styles" role="radiogroup">' + STYLES.map(function (s, i) {
@@ -518,7 +528,7 @@
       '<div class="w-diag"><b>AI 진단</b>' + (st.newItems.length ? '새로 들어온 것: ' + esc(st.newItems.join(', ')) + '. ' : '산문의 인물과 장소를 모두 찾았어요. ') +
       (unnamed ? '"지나가던 사람들"처럼 이름 없는 인물은 따로 뽑지 않았어요. 필요하면 산문에서 이름을 붙여 주세요.' : '') + '</div>' +
       rows('text') + '<p class="w-note">상태 추가(씬마다 다른 옷·나이)는 Storyboard 단계에서 할 수 있어요.</p>' +
-      '<div class="w-foot">' + B('빠진 인물·배경이 있어요', 'R1') + B('목록이 맞아요 · 스타일 고르기 →', 'A2', 'pri') + '</div>';
+      '<div class="w-foot">' + B('빠진 인물·배경이 있어요', 'R1') + B('목록이 맞아요 · 그림 만들기 →', 'A2', 'pri') + '</div>';
     return studio('Artist', main, { noChat: true });
   }
   function A0() { return A1() + busy('인물·배경을 뽑고 있어요', ['산문 읽기', '인물 · 배경 찾기', '인물별 상태 세분화']); }
@@ -526,24 +536,21 @@
     return modal('산문으로 돌아갈까요?', '<p>인물·배경은 산문에서 나와요. 산문에 넣어야 목록에 생겨요.</p>' + list(lose), B('아니오', no) + A('예, 산문으로', 'rollback', 'warn', ' data-arg="' + from + '"'));
   }
   function R1() { return A1() + rollbackModal('Artist', [['잃는 것', '없음 (아직 그림이 없어요)'], ['다음', 'Writer 산문이 다시 열려요 → 고치고 다시 브레이크다운']], 'A1'); }
+  // 처음 만들 때도 재생성과 같은 스타일 팝업: 스타일 고르고 [만들기]
   function A2() {
-    var main = '<div class="w-title"><h3>Artist · 스타일</h3><span class="w-mut">이 작품의 스타일은 하나예요</span></div>' + styleRow('style', st.style) + rows('text') +
-      '<div class="w-foot"><span class="w-mut">인물 ' + st.chars.length + ' · 배경 ' + st.bgs.length + ' · 예상 크레딧 표시 자리</span>' + B(esc(STYLES[st.style][0]) + ' 스타일로 생성', 'A3', 'acc') + '</div>';
-    return studio('Artist', main, { noChat: true });
+    var n = st.chars.reduce(function (x, c) { return x + c.states.length; }, 0);
+    return A1() + modal('어떤 스타일로 만들까요?', '<p>이 작품의 스타일은 하나예요. 나중에 [재생성하기]로 다른 스타일을 다시 고를 수 있고, 이전 버전은 기록에 남아요.</p>' +
+      styleRow('style', st.style) + list([['만드는 것', '인물 시트 ' + st.chars.length + ' (상태 ' + n + ') · 배경 ' + st.bgs.length], ['스타일', esc(STYLES[st.style][0])], ['예상 크레딧', '표시 자리']]),
+      B('취소', 'A1') + A(esc(STYLES[st.style][0]) + '로 만들기', 'generate', 'acc'), true);
   }
-  function A3() {
-    var n = st.chars.reduce(function (a, c) { return a + c.states.length; }, 0);
-    return A2() + modal(STYLES[st.style][0] + ' 스타일로 만들까요?', list([['만드는 것', '인물 시트 ' + st.chars.length + ' (상태 ' + n + ') · 배경 ' + st.bgs.length], ['스타일', esc(STYLES[st.style][0]) + ' — 작품에 하나뿐인 값이에요'], ['예상 크레딧', '표시 자리']]),
-      B('아니오', 'A2') + A('예, 만들기', 'generate', 'acc'));
-  }
-  function A4() { return (st.versions.length ? A5() : A2()) + busy('그림을 만들고 있어요', objs().map(function (o) { return o.n; })); }
+  function A4() { return (st.versions.length ? A5() : A1()) + busy('그림을 만들고 있어요', objs().map(function (o) { return o.n; })); }
   function A5() {
     if (!st.versions.length) newVersion(st.style);
     var v = st.versions[st.ver];
     var main = '<div class="w-title"><h3>Artist</h3><span class="w-mut">인물 ' + st.chars.length + ' · 배경 ' + st.bgs.length + '</span></div>' +
       '<div class="w-stybar"><i style="background:' + styleBg(st.style) + '"></i><b>' + esc(STYLES[st.style][0]) + '</b><span class="w-mut">작품 스타일 · v' + v.n + '</span>' +
       '<span class="w-tbar-sp"></span>' + B('불러오기 · 기록 ' + st.versions.length, 'AV', 'sm', st.versions.length > 1 ? '' : ' disabled title="재생성하면 이전 버전이 여기 남아요"') + B('재생성하기', 'A6', 'sm') + '</div>' +
-      rows('img') +
+      imgCards() +
       '<div class="w-foot">' + B('＋ 인물·배경 추가', 'R2') + B('완료하기 →', 'A9', 'pri') + '</div>';
     return studio('Artist', main, { ph: '예: 민호 넥타이를 더 느슨하게' });
   }
@@ -647,7 +654,7 @@
   }
 
   var SCREENS = { EB1: EB1, EBX: EBX, EB2: EB2, EB3: EB3, EB4: EB4, EB5: EB5, EB6: EB6, EB7: EB7, E1: E1, E1e: E1e, EF: EF, EFe: EFe, E2: E2, E2e: E2e, E3: E3, E4: E4, E5: E5, W1: W1, W1r: W1r, WC1: WC1, WC2: WC2, WC3: WC3, W2: W2, W4: W4, W5: W5, W6: W6, WP: WP, WN: WN, W3: W3,
-    A0: A0, A1: A1, R1: R1, A2: A2, A3: A3, A4: A4, A5: A5, A6: A6, A7: A7, A8: A8, R2: R2, A9: A9, AV: AV,
+    A0: A0, A1: A1, R1: R1, A2: A2, A4: A4, A5: A5, A6: A6, A7: A7, A8: A8, R2: R2, A9: A9, AV: AV,
     S0: S0, S1: S1, S2: S2, S3: S3, S4: S4, R3: R3, S5: S5, S6: S6, S7: S7, D1: D1 };
   // 갈림 노드는 그 갈림을 묻는 화면으로
   var DECISION_SCREEN = { E1n: function () { return entryId(); }, EFq: 'EF', E2q: function () { return isB() ? 'EB3' : 'E3'; }, E5q: function () { return isB() ? 'EB7' : 'E4'; }, W1q: 'W1', WPq: 'WP', A1q: 'A1', A5q: 'A5', S1q: 'S1', S4q: 'S4' };
@@ -846,6 +853,10 @@
       return 'S6';
     },
     skip: function () { return finishBusy(true); },
+    // 목업 보기용: 위쪽 단계 탭을 누르면 그 단계 첫 화면으로
+    jumpStage: function (name) {
+      return { Producer: entryId(), Writer: 'W1', Artist: st.versions.length ? 'A5' : 'A1', Storyboard: 'S1', Director: 'D1', Editor: 'D1' }[name];
+    },
     reset: function () { var p = st.plan; st = initial(); st.plan = p; return p === 'B' ? 'EB1' : 'E1'; },
     bStart: function () {
       if (!st.file && /예시/.test(st.idea) && ideaLen() < MIN_LEN + 10) { st.idea = ''; st.lenErr = false; return 'EBX'; }

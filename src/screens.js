@@ -81,10 +81,11 @@
       chars: [
         { n: '민호', d: '20대 후반 직장인. 흰 셔츠, 느슨한 넥타이, 피곤한 눈.', states: ['기본: 흰 셔츠', '파생: 셔츠에 콜라 얼룩 (S2)'], tone: 0, note: '' },
         { n: '팀장', d: '40대. 회색 정장, 단정한 머리, 무표정.', states: ['기본: 회색 정장'], tone: 0, note: '' },
+        { n: '틴장', d: '뒤도 안 돌아보는 사람. (AI가 따로 뽑음)', states: ['기본'], tone: 0, note: '' },
       ],
       bgs: [{ n: '회사 복도 자판기 앞', d: '낮, 형광등, 리놀륨 바닥, 빨간 자판기 한 대.', tone: 0 }],
       newItems: [],
-      style: 1, styleLocked: false, generated: false, versions: [], ver: 0, regenStyle: null, styleRefs: [], renaming: false, acMode: null, afilter: 'all', editMode: null, removed: null,
+      style: 1, styleLocked: false, generated: false, versions: [], ver: 0, regenStyle: null, styleRefs: [], renaming: false, acMode: null, afilter: 'all', editMode: null, ents: null, ignored: [], issueOk: false,
       target: 0, toneDraft: 0, tweak: '',
       shots: [
         { sc: 1, len: 3, cam: 0, desc: '민호가 버튼을 누른다', who: [0], lines: [] },
@@ -140,7 +141,7 @@
     return null;
   }
   function modal(title, body, acts, wide) {
-    return '<div class="w-back"><div class="w-modal' + (wide ? ' wide' : '') + '" role="dialog" aria-modal="true" aria-label="' + esc(title) + '"><h4>' + esc(title) + '</h4>' + body + '<div class="w-acts">' + acts + '</div></div></div>';
+    return '<div class="w-back"><div class="w-modal' + (wide ? ' wide' + (wide === 'xl' ? ' xl' : '') : '') + '" role="dialog" aria-modal="true" aria-label="' + esc(title) + '"><h4>' + esc(title) + '</h4>' + body + '<div class="w-acts">' + acts + '</div></div></div>';
   }
   function list(rows) { return '<dl class="w-list">' + rows.map(function (r) { return '<div><dt>' + r[0] + '</dt><dd>' + r[1] + '</dd></div>'; }).join('') + '</dl>'; }
   // 선택지: bind 경로에 i(번호) 또는 값을 저장
@@ -467,15 +468,28 @@
       A('채팅으로 말할게요', 'chatFree', 'sm') + '</div><p class="w-note">고친 걸 적용하면 다시 물어볼게요. 언제든 [브레이크다운하기]로 넘어갈 수도 있어요.</p>') });
   }
   function W3() { if (!st.rw) st.rw = { runtime: st.runtime, mood: st.mood, seed: st.seed }; return W1(); }
-  /* ── 브레이크다운 전: 산문에서 인물·장소 표시 ── */
-  // AI가 찾은 인물·장소를 산문에 표시하고, 애매한 말(오타 · 호칭 · 대명사 · 무리)은 점선으로 묻는다.
-  // 사용자가 표시를 고치고 같은 것끼리 합친 뒤, 표시한 대로 뽑는다.
+  /* ── 산문 재점검: Artist 목록 위에 산문을 팝업으로 열어 인물·장소 표시를 고친다 ── */
+  // AI가 인식한 말마다 인물·장소로 표시하고, 애매한 말(오타 · 호칭 · 대명사 · 무리)은 점선으로 묻는다.
+  // 산문은 잠긴 채로 표시만 고치고, 같은 것끼리 합친 뒤 [목록에 반영]하면 목록이 표시대로 다시 채워진다.
   var SUSPECT = ['틴장', '김 대리', '호야', '경비 아저씨', '그녀', '사장님', '동료들', '지나가던 사람들', '사무실 복도', '옥상', '편의점', '회의실', '고양이', '경비원', '청소부', '신입'];
   var PLACE_ALIAS = { '회사 복도 자판기 앞': ['회사 복도', '복도', '자판기 앞'] };
+  // 같은 인물·장소로 의심되는 짝 (목업용)
+  var DUP_HINT = { '틴장': '팀장', '김 대리': '김민호', '호야': '민호', '사무실 복도': '회사 복도 자판기 앞' };
   function initEnts() {
     st.ents = st.chars.map(function (c) { return { name: c.n, type: 'char', aliases: (c.aliases || [c.n]).slice() }; })
       .concat(st.bgs.map(function (b) { return { name: b.n, type: 'place', aliases: (b.aliases || PLACE_ALIAS[b.n] || [b.n]).slice() }; }));
-    st.ignored = st.ignored || []; st.sug = null; st.mergeSel = []; st.mergeName = null;
+    st.sug = null; st.mergeSel = []; st.mergeName = null;
+  }
+  // AI 목록 점검: 산문에 나오는데 목록에 없는 말 / 같은 인물로 보이는 둘
+  function issues() {
+    if (!st.ents) initEnts();
+    var text = st.prose.join(' '), r = { miss: [], dup: [] };
+    var has = function (w) { return st.ents.some(function (e) { return e.aliases.indexOf(w) >= 0; }); };
+    st.ents.forEach(function (e) { var d = DUP_HINT[e.name]; if (d && st.ents.some(function (x) { return x.name === d; })) r.dup.push(d + ' · ' + e.name); });
+    SUSPECT.concat(EXTRA_PEOPLE.map(function (p) { return p[0]; })).forEach(function (w) {
+      if (text.indexOf(w) >= 0 && st.ignored.indexOf(w) < 0 && !has(w) && r.miss.indexOf(w) < 0) r.miss.push(w);
+    });
+    return r;
   }
   function tagProse() {
     var ali = []; st.ents.forEach(function (e, i) { e.aliases.forEach(function (a) { ali.push([a, i]); }); });
@@ -508,14 +522,15 @@
         A('빼기', 'entDrop', 'sm w-link', ' data-arg="' + i + '"') + '</li>';
     }).join('') + '</ul>';
     var sameType = st.mergeSel.length > 1 && st.mergeSel.every(function (i) { return st.ents[i].type === st.ents[st.mergeSel[0]].type; });
-    var main = '<div class="w-title"><h3>인물 · 장소 표시</h3><span class="w-mut">브레이크다운 전 확인 · 표시한 대로 Artist 목록이 만들어져요</span></div>' +
-      (nSug ? '<div class="w-diag"><b>AI</b>확인이 필요한 말이 ' + nSug + '개 있어요. 점선으로 된 말을 눌러 인물·장소인지, 이미 있는 것과 같은지 알려 주세요. 빠진 말은 산문에서 드래그해서 표시할 수 있어요.</div>' : '<div class="w-diag"><b>AI</b>표시가 끝났어요. 같은 인물·장소가 둘로 나뉘어 있으면 오른쪽에서 골라 합쳐 주세요.</div>') +
+    var body = '<p class="w-mut">🔒 산문은 잠긴 채로 표시만 고쳐요. [목록에 반영]하면 Artist 목록이 이 표시대로 다시 채워져요.</p>' +
+      (nSug ? '<div class="w-diag"><b>AI</b>확인이 필요한 말이 ' + nSug + '개 있어요. 점선으로 된 말을 눌러 인물·장소인지, 이미 있는 것과 같은지 알려 주세요. 빠진 말은 산문에서 드래그해서 표시할 수 있어요.</div>' : '<div class="w-diag"><b>AI</b>확인할 말은 다 정했어요. 같은 인물·장소가 둘로 나뉘어 있으면 오른쪽에서 골라 합쳐 주세요.</div>') +
       '<div class="w-wt"><div class="w-wt-p">' + sugBox + '<article class="w-prose w-tgprose">' + tagProse() + '</article>' +
         '<p class="w-note"><span class="w-tg char">인물</span> <span class="w-tg place">장소</span> <span class="w-tg sug">확인 필요</span> · 말을 드래그하면 새로 표시할 수 있어요</p></div>' +
       '<aside class="w-wt-l"><div class="w-q-t">뽑을 목록 <small>' + st.ents.length + '개</small></div>' + listH +
         (st.mergeSel.length > 1 ? (sameType ? B(st.mergeSel.length + '개 하나로 합치기', 'WTm', 'acc sm') : '<p class="w-note">인물과 장소는 합칠 수 없어요.</p>') : '<p class="w-note">같은 인물·장소가 둘 이상이면 체크해서 합치세요.</p>') + '</aside></div>' +
-      '<div class="w-foot">' + B('← 산문으로', 'W1') + A('이대로 브레이크다운 →', 'extract', 'pri', nSug ? ' disabled title="점선으로 된 말을 먼저 정해 주세요"' : '') + '</div>';
-    return bar('Writer') + '<div class="w-main w-wt-main">' + main + '</div>';
+      '<p class="w-note">산문에 없는 인물·배경이 필요하면 산문을 다시 써야 해요.</p>';
+    return A1() + modal('산문 재점검', body,
+      A('취소', 'recheckCancel') + A('산문 다시 쓰기', 'recheckRewrite') + A('목록에 반영', 'extract', 'pri', nSug ? ' disabled title="점선으로 된 말을 먼저 정해 주세요"' : ''), 'xl');
   }
   function WTm() {
     var all = []; st.mergeSel.forEach(function (i) { st.ents[i].aliases.forEach(function (a) { if (all.indexOf(a) < 0) all.push(a); }); });
@@ -526,7 +541,7 @@
       B('취소', 'WT') + A('합치기', 'mergeDo', 'acc'));
   }
   function W6() {
-    return W1() + modal('산문을 확정할까요?', list([['다음', 'AI가 산문에서 찾은 인물·장소를 표시해 보여줘요. 확인하고 합친 뒤 뽑아요'], ['🔒 산문', '브레이크다운하면 잠겨요'], ['나중에 인물·배경을 늘리려면', '여기 산문으로 돌아와야 해요']]),
+    return W1() + modal('산문을 확정할까요?', list([['다음', 'Artist가 산문에서 인물·배경을 뽑아요'], ['🔒 산문', '브레이크다운하면 잠겨요'], ['나중에 인물·배경을 늘리려면', '여기 산문으로 돌아와야 해요']]),
       B('아니오', st.proseLocked ? 'W1r' : 'W1') + A('예, 확정하기', 'breakdown', 'pri'));
   }
 
@@ -585,7 +600,7 @@
     var n = { all: st.chars.length + st.bgs.length, char: st.chars.length, bg: st.bgs.length };
     return '<div class="w-fbar"><span class="w-tabs">' + [['all', '모두'], ['char', '인물'], ['bg', '배경']].map(function (f) {
       return '<button class="' + (st.afilter === f[0] ? 'on' : '') + '" data-act="afilter" data-arg="' + f[0] + '" aria-pressed="' + (st.afilter === f[0]) + '">' + f[1] + ' ' + n[f[0]] + '</button>';
-    }).join('') + '</span><span class="w-mut w-fbar-note">목록은 산문에서 나와요. 새 인물·배경은 산문에 넣어야 생겨요 ' + B('산문으로 →', st.versions.length ? 'R2' : 'R1', 'w-link') + '</span></div>';
+    }).join('') + '</span><span class="w-mut w-fbar-note">목록은 산문에서 나와요. 새 인물·배경은 산문에 넣어야 생겨요 ' + B('산문으로 →', st.versions.length ? 'R2' : 'A1c', 'w-link') + '</span></div>';
   }
   function imgCards() {
     return '<div class="w-acards">' + objs().map(function (o, i) {
@@ -605,21 +620,22 @@
       return '<button class="w-sty' + (i === cur ? ' on' : '') + '" role="radio" aria-checked="' + (i === cur) + '" data-bind="' + bind + '" data-val="' + i + '"><i style="background:' + styleBg(i) + '"></i>' + esc(s[0]) + (bind === 'regenStyle' && i === st.style ? '<small>지금</small>' : '') + '</button>';
     }).join('') + '</div>';
   }
-  // 산문에 나오는 이름 중 목록에 없는 것 (목업용: 아는 이름 후보로 검사)
-  function missingNames() {
-    var text = st.prose.join(' ') + ' ' + st.idea, have = []; objs().forEach(function (o) { have.push(o.n); (o.aliases || []).forEach(function (a) { have.push(a); }); });
-    return ['민호', '팀장'].concat(EXTRA_PEOPLE.map(function (p) { return p[0]; })).filter(function (n) { return text.indexOf(n) >= 0 && have.indexOf(n) < 0; });
-  }
   function A1() {
     var unnamed = /사람들|누군가|행인/.test(st.prose.join(' '));
-    var miss = missingNames();
+    var is = st.issueOk ? { miss: [], dup: [] } : issues(), bad = is.miss.length + is.dup.length;
     var main = '<div class="w-title"><h3>Artist · 브레이크다운</h3><span class="w-mut">확정 산문에서 뽑은 인물 ' + st.chars.length + ' · 배경 ' + st.bgs.length + '</span></div>' +
-      '<div class="w-diag"><b>AI 진단</b>' + (st.newItems.length ? '새로 들어온 것: ' + esc(st.newItems.join(', ')) + '. ' : '산문의 인물과 장소를 모두 찾았어요. ') +
+      '<div class="w-diag"><b>AI 진단</b>' + (st.newItems.length ? '새로 들어온 것: ' + esc(st.newItems.join(', ')) + '. ' : bad ? '목록을 뽑았어요. 아래 점검 안내를 확인해 주세요. ' : '산문의 인물과 장소를 모두 찾았어요. ') +
       (unnamed ? '"지나가던 사람들"처럼 이름 없는 인물은 따로 뽑지 않았어요. 필요하면 산문에서 이름을 붙여 주세요.' : '') + '</div>' +
-      (miss.length ? '<div class="w-err w-miss" role="alert">브레이크다운 오류: 산문에는 <b>' + esc(miss.join(', ')) + '</b>이(가) 나오는데 목록에 없어요.<div class="w-card-acts">' + A('다시 뽑기', 'rebreak', 'sm') + A('목록에 넣기 (산문에 있는 이름만)', 'addMissing', 'sm') + '</div></div>' : '') +
+      (bad ? '<div class="w-err w-miss" role="alert"><b>AI 점검</b> ' + (is.miss.length ? '산문에는 <b>' + esc(is.miss.join(', ')) + '</b>이(가) 나오는데 목록에 없어요. ' : '') +
+        (is.dup.length ? '<b>' + esc(is.dup.join(', ')) + '</b>은(는) 같은 인물일 수 있어요. ' : '') + '산문을 재점검할까요, 다시 쓸래요?' +
+        '<div class="w-card-acts">' + A('산문 재점검', 'recheck', 'pri sm') + B('산문 다시 쓰기', 'R1', 'sm') + A('그대로 둘게요', 'issueOk', 'sm w-link') + '</div></div>' : '') +
       filterBar() + rows('text') + '<p class="w-note">상태 추가(씬마다 다른 옷·나이)는 Storyboard 단계에서 할 수 있어요.</p>' +
-      '<div class="w-foot">' + B('빠진 인물·배경이 있어요', 'R1') + B('목록이 맞아요 · 그림 만들기 →', 'A2', 'pri', miss.length ? ' disabled title="빠진 이름을 먼저 정리해 주세요"' : '') + '</div>';
+      '<div class="w-foot">' + B('빠진 인물·배경이 있어요', 'A1c') + B('목록이 맞아요 · 그림 만들기 →', 'A2', 'pri', bad ? ' disabled title="AI 점검 안내를 먼저 정리해 주세요"' : '') + '</div>';
     return studio('Artist', main, { noChat: true });
+  }
+  function A1c() {
+    return A1() + modal('산문을 다시 쓸래요? 재점검할까요?', list([['산문 재점검', '산문에 이미 나오는데 목록에 없거나, 한 사람이 둘로 나뉘었을 때. 산문은 잠긴 채로 말마다 표시만 고쳐요'], ['산문 다시 쓰기', '산문에 없는 인물·배경을 넣을 때. 산문이 다시 열려요 (아직 그림이 없어 잃는 건 없어요)']]),
+      B('취소', 'A1') + B('산문 다시 쓰기', 'R1') + A('산문 재점검', 'recheck', 'pri'));
   }
   function A0() { return A1() + busy('인물·배경을 뽑고 있어요', ['산문 읽기', '인물 · 배경 찾기', '인물별 상태 세분화']); }
   function rollbackModal(from, lose, no) {
@@ -794,11 +810,11 @@
       '<p class="w-note">함께 확인: Director가 Artist 인물 시트를 참조하는지 (오류 13), 러프 마네킹이 인물로 이어지지 않는지 (오류 12).</p>' + A('처음부터 다시', 'reset') + '</div>';
   }
 
-  var SCREENS = { EB1: EB1, EBX: EBX, EB2: EB2, EB3: EB3, EB4: EB4, EB5: EB5, EB6: EB6, EB7: EB7, E1: E1, E1e: E1e, EF: EF, EFe: EFe, E2: E2, E2e: E2e, E3: E3, E4: E4, E5: E5, W1: W1, W1r: W1r, WC1: WC1, WC2: WC2, WC3: WC3, W2: W2, W4: W4, W5: W5, W6: W6, WT: WT, WTm: WTm, WP: WP, WN: WN, W3: W3,
+  var SCREENS = { A1c: A1c, WT: WT, WTm: WTm, EB1: EB1, EBX: EBX, EB2: EB2, EB3: EB3, EB4: EB4, EB5: EB5, EB6: EB6, EB7: EB7, E1: E1, E1e: E1e, EF: EF, EFe: EFe, E2: E2, E2e: E2e, E3: E3, E4: E4, E5: E5, W1: W1, W1r: W1r, WC1: WC1, WC2: WC2, WC3: WC3, W2: W2, W4: W4, W5: W5, W6: W6, WP: WP, WN: WN, W3: W3,
     A0: A0, A1: A1, R1: R1, A2: A2, A4: A4, A5: A5, A6: A6, A7: A7, A8: A8, R2: R2, A9: A9, AV: AV, AC1: AC1, AC2: AC2, AC3: AC3, AX: AX, AY: AY,
     S0: S0, S1: S1, S2: S2, S3: S3, S4: S4, R3: R3, S5: S5, S6: S6, S7: S7, D1: D1 };
   // 갈림 노드는 그 갈림을 묻는 화면으로
-  var DECISION_SCREEN = { E1n: function () { return entryId(); }, EFq: 'EF', E2q: function () { return isB() ? 'EB3' : 'E3'; }, E5q: function () { return isB() ? 'EB7' : 'E4'; }, W1q: 'W1', WPq: 'WP', A1q: 'A1', A5q: 'A5', S1q: 'S1', S4q: 'S4' };
+  var DECISION_SCREEN = { E1n: function () { return entryId(); }, EFq: 'EF', E2q: function () { return isB() ? 'EB3' : 'E3'; }, E5q: function () { return isB() ? 'EB7' : 'E4'; }, W1q: 'W1', WPq: 'WP', A1m: 'A1', A1e: 'A1', A1d: 'A1', A5q: 'A5', S1q: 'S1', S4q: 'S4' };
   // AI 작업이 끝나면 가는 곳
   var BUSY_NEXT = {
     E2: function () { if (st.file && st.file.noText) return 'E2e'; if (isB()) return st.file ? 'EB2' : nextQ(); return 'E3'; },
@@ -948,16 +964,21 @@
     saveDirect: function () { st.prose = st.draft.filter(function (p) { return p.trim(); }); if (st.titleDraft && st.titleDraft.trim()) st.title = st.titleDraft.trim(); say('Writer', 'Writer', '직접 고친 산문을 저장했어요.'); return 'WP'; },
     rwOpenGo: function () { st.rw = { runtime: st.runtime, mood: st.mood, seed: st.seed }; return 'W3'; },
     chatFree: function () { st.focusChat = true; return 'W1'; },
-    breakdown: function () { st.back = ''; initEnts(); return 'WT'; },
-    // 표시한 대로 뽑는다: 인물·장소 목록을 표시에서 만들고, 이미 있던 것은 그림·설명을 그대로 둔다
+    breakdown: function () { st.back = ''; st.proseLocked = true; st.ents = null; st.issueOk = false; return 'A0'; },
+    // 재점검 팝업 열기 · 닫기: 닫으면 고친 표시를 되돌린다
+    recheck: function () { if (!st.ents) initEnts(); st.entsBak = JSON.parse(JSON.stringify(st.ents)); st.ignoredBak = st.ignored.slice(); st.sug = null; st.mergeSel = []; return 'WT'; },
+    recheckCancel: function () { if (st.entsBak) { st.ents = st.entsBak; st.ignored = st.ignoredBak; } st.entsBak = null; st.sug = null; st.mergeSel = []; return 'A1'; },
+    recheckRewrite: function () { ACTS.recheckCancel(); return 'R1'; },
+    issueOk: function () { st.issueOk = true; },
+    // 표시한 대로 목록을 다시 채운다: 이미 있던 것은 설명·그림을 그대로 두고, 산문은 바꾸지 않는다
     extract: function () {
       var oldC = st.chars, oldB = st.bgs, before = oldC.concat(oldB).map(function (o) { return o.n; });
       function keep(list, e, d) { var o = list.filter(function (x) { return x.n === e.name; })[0]; if (o) { o.aliases = e.aliases; return o; } return { n: e.name, d: d, states: ['기본'], tone: 0, note: '', aliases: e.aliases }; }
       st.chars = st.ents.filter(function (e) { return e.type === 'char'; }).map(function (e) { return keep(oldC, e, '산문에서 표시한 인물. 설명은 AI가 산문을 읽고 채워요.'); });
       st.bgs = st.ents.filter(function (e) { return e.type === 'place'; }).map(function (e) { return keep(oldB, e, '산문에서 표시한 장소.'); });
       st.newItems = st.ents.map(function (e) { return e.name; }).filter(function (n) { return before.indexOf(n) < 0; });
-      st.proseLocked = true; st.sug = null; st.mergeSel = [];
-      return 'A0';
+      st.sug = null; st.mergeSel = []; st.entsBak = null; st.issueOk = false;
+      return 'A1';
     },
     sugOpen: function (w) { st.sug = w; },
     sugClose: function () { st.sug = null; },
@@ -1000,8 +1021,6 @@
     },
     editMode: function (m) { st.editMode = m; },
     afilter: function (f) { st.afilter = f; },
-    rebreak: function () { st.pending = function () { if (st.removed) { st.chars.push(st.removed); st.removed = null; } say('Artist', 'Artist', '다시 뽑았어요. 빠졌던 인물이 목록에 들어왔어요.'); }; return 'A0'; },
-    addMissing: function () { missingNames().forEach(function (n) { var back = st.removed && st.removed.n === n ? st.removed : null; st.chars.push(back || { n: n, d: '산문에 나오는 인물. 설명은 다시 뽑거나 직접 적어 주세요.', states: ['기본'], tone: 0, note: '' }); }); st.removed = null; },
     addRef: function (key) { var r = refsOf(key); r.push((key === 'style' ? '그림체' : '참고') + '_' + (r.length + 1) + '.jpg'); },
     delRef: function (a) { var kv = a.split(':'); refsOf(kv[0]).splice(+kv[1], 1); },
     acPick: function (m) { st.acMode = m; return m === 'edit' ? 'AC2' : 'AC3'; },

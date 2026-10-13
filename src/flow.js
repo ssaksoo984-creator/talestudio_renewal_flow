@@ -3,22 +3,24 @@
  * type: screen(화면) · modal(팝업/확인창) · decision(예/아니오 갈림) · ai(AI 작업 중, 전체 잠금) · ext(이번 범위 밖)
  * vs: 지금 제품과 비교 — keep(유지) · change(바뀜) · new(새로)
  * screen: 프로토타입에서 열 화면 ID (없으면 자기 ID)
- * plan: 'A' | 'B' — 그 안에만 있는 노드·엣지 (없으면 두 안 공통). Writer 단계만 나뉜다.
+ * plan: 'A' | 'B' — 그 안에만 있는 노드·엣지 (없으면 두 안 공통). Producer와 Writer만 나뉘고, Artist부터는 같다.
+ * twin: 안을 바꿀 때 지금 노드에 맞는 다른 안의 노드.
  * edges: [from, to, label, kind, plan]  kind: go · yes · no · back(롤백) */
 window.FLOW = {
   updated: '2026-10-13',
   stages: [
-    { id: 'entry', name: 'Producer', sub: '아이디어 · 파일 · 화면 비율' },
-    { id: 'writer', name: 'Writer', sub: '산문 작업공간 · 1안/2안 비교' },
+    { id: 'entry', name: 'Producer', sub: '아이디어 · 산문 조건 · 화면 비율 · 1안 폼 / 2안 채팅' },
+    { id: 'writer', name: 'Writer', sub: '산문 작업공간 · 1안 조건 패널 / 2안 채팅' },
     { id: 'artist', name: 'Artist', sub: '브레이크다운 · 스타일 · 인물·배경' },
     { id: 'board', name: 'Storyboard', sub: '이름 미정 · 기존 Writer 08~15 자리', tbd: true },
     { id: 'after', name: 'Director → Editor', sub: '이번 범위 밖 · 기존 유지' },
   ],
 
   plans: [
-    { id: 'A', name: '1안 · 대시보드 + 채팅', text: '산문 위에 조건 패널(러닝타임 · 장르·분위기 · 소재)이 늘 보이고, 값을 바꿔 [AI 다시 쓰기]를 누른다. 채팅은 옆에서 자유롭게 요청한다. 조건 패널이 하나뿐인 기준이라, 채팅에서 바꾼 조건도 패널에 반영된다.' },
-    { id: 'B', name: '2안 · 채팅 중심', text: '조건 패널이 없다. 고치는 길은 에이전트 채팅 하나다. [AI 다시 쓰기] 버튼은 채팅에 "뭐가 마음에 안 드세요?" 카드를 띄우는 바로가기다. 조건은 채팅 카드 안에서 고른다.' },
+    { id: 'A', name: '1안 · 화면에서 고르기', text: 'Producer는 한 화면 폼(이야기 재료 · 장르·분위기 · 길이 · 바꿈 정도 · 화면 비율)에서 고르고 [시작]. Writer는 산문 위 조건 패널로 다시 쓰고, 채팅은 옆에서 자유 요청.' },
+    { id: 'B', name: '2안 · 채팅으로 만들기', text: 'Producer는 아이디어를 보내면 에이전트가 장르·분위기 → 길이 → 바꿈 정도 → 화면 비율을 하나씩 물어본다. 버튼으로 골라도 되고 말로 해도 된다. 말에서 읽은 값은 건너뛴다. Writer도 채팅으로 고친다.' },
   ],
+  twin: { E1: 'EB1', E1q: 'EB1q', E3: 'EB2', E4: 'EB7', W3: 'W1', EB1: 'E1', EB1q: 'E1q', EB2: 'E3', EB3: 'E1', EB4: 'E1', EB5: 'E1', EB6: 'E1', EB7: 'E4' },
 
   principles: [
     { id: 'lock-ai', title: 'AI가 일하는 동안은 전체 잠금', text: 'AI 에이전트가 작업을 시작하면 화면 전체를 크게 로딩으로 덮고 모든 입력을 비활성화한다. 끝나야 고칠 수 있다. 동시 작업은 없다.' },
@@ -30,13 +32,32 @@ window.FLOW = {
 
   nodes: [
     /* ── Producer (진입: 아이디어 · 파일 · 화면 비율) ── */
-    { id: 'E1', stage: 'entry', type: 'screen', vs: 'change', label: 'Producer 시작 화면',
+    { id: 'E1', stage: 'entry', type: 'screen', plan: 'A', vs: 'change', label: 'Producer 시작 화면',
       desc: '"무엇을 만들어 볼까요?" 한 화면에서 이야기 재료 · 산문 조건 · 화면 비율을 정한다. 산문 조건(장르·분위기, 길이, 바꿈 정도)은 Writer에서 다시 바꿀 수 있고, 화면 비율만 잠긴다. 채팅 언어는 사이트 언어로 고정.',
       items: ['이야기 재료: 아이디어·줄거리 글 + 파일 첨부', '장르·분위기: 코미디 · 드라마 · 로맨스 · 스릴러 · 호러', '길이: 15초 이하 / 15~60초 / 1~5분 / 5~20분', '바꿈 정도 (AI가 내 글을 얼마나 바꿀지) 4단계: 1 그대로 · 2 빈칸만 채우기 · 3 다듬기 · 4 새로 쓰기 — 단계마다 "지켜요 / 바꿔요"를 못박아 보여줌', '1·2단계는 지킬 원문(대본 파일, 또는 60자 넘는 줄거리)이 있을 때만 열림', '🔒 화면 비율 4개 중 하나', '[시작] 버튼 하나 — 입력하면 바로 켜짐'],
       removed: ['"무엇을 만들고 싶으세요?" 형식 고르기 (단편/광고/MV…)', '채팅 언어 고르기', '대사 언어 고르기', '러닝타임 자동 채움'],
       open: ['"바꿈 정도"라는 이름이 맞는지. 후보: 바꿈 정도 · AI 손길 · 원문 지키기.'],
       fixes: [6, 10] },
-    { id: 'E1q', stage: 'entry', type: 'decision', label: '이미지 첨부?', screen: 'E1' },
+    { id: 'E1q', stage: 'entry', type: 'decision', plan: 'A', label: '이미지 첨부?', screen: 'E1' },
+    /* ── Producer 2안: 채팅으로 만들기 ── */
+    { id: 'EB1', stage: 'entry', type: 'screen', vs: 'new', plan: 'B', label: 'Producer 채팅 시작',
+      desc: '채팅 하나로 시작한다. "무엇을 만들어 볼까요?"에 아이디어를 적거나 파일을 올려 보낸다. 말에 장르·길이·바꿈 정도·비율이 들어 있으면 미리 채우고 그 질문은 건너뛴다.',
+      items: ['아이디어 입력 + 파일 첨부 + [보내기]', '예: "회사 자판기가 고장 나는 1분짜리 코미디" → 장르·길이는 건너뛰고 나머지만 물어봄'],
+      fixes: [10] },
+    { id: 'EB1q', stage: 'entry', type: 'decision', plan: 'B', label: '이미지 첨부?', screen: 'EB1' },
+    { id: 'EB2', stage: 'entry', type: 'screen', vs: 'new', plan: 'B', label: '자료 확인 카드',
+      desc: '파일을 올렸을 때만. "~로 읽었어요" + 이미지면 용도를 버튼으로 묻는다. [맞아요] / [종류가 달라요].' },
+    { id: 'EB3', stage: 'entry', type: 'screen', vs: 'new', plan: 'B', label: '장르·분위기 카드',
+      desc: '버튼 하나로 답하면 바로 다음 질문. 말로 답해도 된다. 이미 말에서 읽었으면 건너뛴다.' },
+    { id: 'EB4', stage: 'entry', type: 'screen', vs: 'new', plan: 'B', label: '길이 카드',
+      desc: '15초 이하 / 15~60초 / 1~5분 / 5~20분. "1분짜리"처럼 말해도 된다.' },
+    { id: 'EB5', stage: 'entry', type: 'screen', vs: 'new', plan: 'B', label: '바꿈 정도 카드',
+      desc: '4단계 버튼마다 지켜요 / 바꿔요를 한 줄로 보여준다. 1·2단계는 지킬 원문이 있을 때만.' },
+    { id: 'EB6', stage: 'entry', type: 'screen', vs: 'new', plan: 'B', label: '화면 비율 카드',
+      desc: '고르면 끝까지 못 바꾼다는 것을 카드 안에서 먼저 말한다. 실제 잠금은 정리 카드의 [시작]에서.' },
+    { id: 'EB7', stage: 'entry', type: 'screen', vs: 'new', plan: 'B', label: '정리 카드 · 이대로 시작?', lock: '화면 비율',
+      desc: '정한 것을 한 장으로 보여주고 [시작]. 고치려면 위쪽 요약 칩을 누르거나 말로 한다. 그 질문만 다시 묻고 여기로 돌아온다.' },
+
     { id: 'E1m', stage: 'entry', type: 'modal', vs: 'keep', label: '이미지 권리 동의',
       desc: '기존 권리 동의 창 그대로.' },
     { id: 'E1mq', stage: 'entry', type: 'decision', label: '동의?', screen: 'E1m' },
@@ -44,10 +65,10 @@ window.FLOW = {
       desc: '올린 자료를 읽고 종류를 판별한다. 유저 플로우 정리본의 1-1 · 1-2 · 1-3 · 2-1 · 2-2 · 2-3.',
       items: ['1-1 영상까지 고려된 대본', '1-2 일반 대본', '1-3 아이디어 노트', '2-1 캐릭터 시트·컨셉 아트', '2-2 웹툰', '2-3 참조용 사진'] },
     { id: 'E2q', stage: 'entry', type: 'decision', label: '파일이 있나?', screen: 'E3' },
-    { id: 'E3', stage: 'entry', type: 'screen', vs: 'new', label: '자료 읽은 결과 확인',
+    { id: 'E3', stage: 'entry', type: 'screen', plan: 'A', vs: 'new', label: '자료 읽은 결과 확인',
       desc: '파일을 올렸을 때만 뜬다. AI가 판별한 자료 종류를 보여주고, 글 파일이면 고른 바꿈 정도가 이 자료에 맞는지 알려준다(안 맞으면 추천 단계로 바꾸기). 이미지 파일이면 용도를 묻는다.',
       items: ['대본(1-1): 추천 1단계 그대로 / 일반 대본(1-2): 추천 2단계 빈칸만 채우기 / 아이디어 노트(1-3): 추천 4단계 새로 쓰기', '캐릭터 시트(2-1): 인물로 / 배경으로', '웹툰(2-2): 그대로 / 다른 스타일로 / 그림체만 / 아이디어로', '사진(2-3): 이 느낌의 영상 / 아이디어로', '판별이 틀리면 [종류가 달라요]'] },
-    { id: 'E4', stage: 'entry', type: 'modal', vs: 'new', label: '시작 확인 · 화면 비율 잠금', lock: '화면 비율',
+    { id: 'E4', stage: 'entry', type: 'modal', plan: 'A', vs: 'new', label: '시작 확인 · 화면 비율 잠금', lock: '화면 비율',
       desc: '"시작하면 화면 비율은 바꿀 수 없어요." 무엇이 잠기는지 보여주고 확인받는다.' },
     { id: 'E5', stage: 'entry', type: 'ai', vs: 'keep', label: 'AI가 산문 초안 쓰는 중',
       desc: '자료와 AI 개입 정도로 산문 트리트먼트 초안을 쓴다. 지금 제품에서는 Writer 01~04가 하는 일.',
@@ -145,18 +166,31 @@ window.FLOW = {
   ],
 
   edges: [
-    ['E1', 'E1q', '시작'],
-    ['E1q', 'E1m', '예', 'yes'],
-    ['E1q', 'E2', '아니오', 'no'],
+    ['E1', 'E1q', '시작', 'go', 'A'],
+    ['EB1', 'EB1q', '보내기', 'go', 'B'],
+    ['EB1q', 'E1m', '예', 'yes', 'B'],
+    ['EB1q', 'E2', '아니오', 'no', 'B'],
+    ['E1q', 'E1m', '예', 'yes', 'A'],
+    ['E1q', 'E2', '아니오', 'no', 'A'],
     ['E1m', 'E1mq', ''],
     ['E1mq', 'E2', '예', 'yes'],
-    ['E1mq', 'E1', '아니오 · 이미지 빼기', 'no'],
+    ['E1mq', 'E1', '아니오 · 이미지 빼기', 'no', 'A'],
+    ['E1mq', 'EB1', '아니오 · 이미지 빼기', 'no', 'B'],
     ['E2', 'E2q', ''],
-    ['E2q', 'E4', '파일 없음', 'go'],
-    ['E2q', 'E3', '파일 있음', 'go'],
-    ['E3', 'E4', '다음'],
-    ['E4', 'E5q', '예 · 잠금', 'yes'],
-    ['E4', 'E1', '아니오', 'no'],
+    ['E2q', 'E4', '파일 없음', 'go', 'A'],
+    ['E2q', 'EB3', '파일 없음', 'go', 'B'],
+    ['E2q', 'E3', '파일 있음', 'go', 'A'],
+    ['E2q', 'EB2', '파일 있음', 'go', 'B'],
+    ['EB2', 'EB3', '맞아요', 'go', 'B'],
+    ['EB3', 'EB4', '답함', 'go', 'B'],
+    ['EB4', 'EB5', '답함', 'go', 'B'],
+    ['EB5', 'EB6', '답함', 'go', 'B'],
+    ['EB6', 'EB7', '답함', 'go', 'B'],
+    ['EB7', 'E5q', '시작 · 잠금', 'yes', 'B'],
+    ['EB7', 'EB3', '요약 칩 눌러 고치기', 'no', 'B'],
+    ['E3', 'E4', '다음', 'go', 'A'],
+    ['E4', 'E5q', '예 · 잠금', 'yes', 'A'],
+    ['E4', 'E1', '아니오', 'no', 'A'],
     ['E5q', 'E5', '아니오', 'no'],
     ['E5q', 'W1r', '예 · 원본 그대로', 'yes'],
     ['E5', 'W1', ''],
@@ -225,7 +259,7 @@ window.FLOW = {
 
   /* 결정이 필요한 것 — 수민 */
   questions: [
-    { id: 'q-plan', node: 'W1', text: 'Writer 산문 작업공간을 1안(조건 패널 + 채팅)으로 할지 2안(채팅 중심)으로 할지. 위쪽 1안/2안 전환으로 비교.' },
+    { id: 'q-plan', node: 'E1', text: 'Producer·Writer를 1안(화면에서 고르기)으로 할지 2안(채팅으로 만들기)으로 할지. Artist부터는 같다. 위쪽 1안/2안 전환으로 비교.' },
     { id: 'q-name', node: 'S1', text: '3단계 이름. 후보: Storyboard(추천) · DOP · Shot Designer. 산문 단계가 Writer가 되었으니 여기는 Writer가 아니다.' },
     { id: 'q-ai-level', node: 'E1', text: 'AI 개입 정도를 "바꿈 정도" 4단계(그대로 · 빈칸만 채우기 · 다듬기 · 새로 쓰기)로, 단계마다 지키는 것과 바꾸는 것을 못박아 보여줄지. 이름도 함께.' },
     { id: 'q-preserve', node: 'W1r', text: '대본 그대로(1-1-a)일 때 Writer 산문 화면을 건너뛸지, 읽기 전용으로 보여줄지.' },

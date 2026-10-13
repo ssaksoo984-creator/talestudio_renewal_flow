@@ -45,7 +45,7 @@
         '회사 복도, 오후 세 시. 민호가 자판기 버튼을 누르지만 아무것도 나오지 않는다. 동전 반환 레버를 당겨 봐도 조용하다. 민호는 자판기를 툭 친다.',
         '자판기가 덜컹거리더니 캔이 우르르 쏟아진다. 지나가던 팀장이 하나를 집어 들고 "고마워" 하고 간다. 바닥에 굴러다니는 캔 사이에서 민호는 멍하니 서 있다.',
       ],
-      plan: 'A', draft: [], runtime: 0, mood: 0, seed: 0, request: '', variants: [], vpick: 0, vnote: '', parts: [], partNote: '', partMode: false,
+      plan: 'A', bAns: {}, bPre: {}, bHint: '', bSent: false, draft: [], runtime: 0, mood: 0, seed: 0, request: '', variants: [], vpick: 0, vnote: '', parts: [], partNote: '', partMode: false,
       proseLocked: false, back: '', descEdit: -1,
       chars: [
         { n: '민호', d: '20대 후반 직장인. 흰 셔츠, 느슨한 넥타이, 피곤한 눈.', states: ['기본: 흰 셔츠', '파생: 셔츠에 콜라 얼룩 (S2)'], tone: 0, note: '' },
@@ -155,12 +155,13 @@
       '<section class="w-grp lock"><div class="w-grp-h">🔒 화면 비율 <small>시작하면 끝까지 바꿀 수 없어요</small></div>' + opts('ratio', RATIOS, RATIOS.map(function (r) { return r[0]; }).indexOf(st.ratio), 1) + '</section>' +
       '<div class="w-foot"><span class="w-mut">채팅은 사이트 언어(한국어)로 진행해요.</span>' + A('시작', 'start', 'pri', can ? ' data-need="idea|file"' : ' data-need="idea|file" disabled') + '</div></div>';
   }
+  var entryBase = function () { return st.plan === 'B' ? EB1() : E1(); };
   function E1m() {
-    return E1() + modal('이미지를 쓸 권리가 있나요?', '<p>올린 이미지를 생성에 참조해요. 직접 만들었거나 쓸 권리가 있는 이미지만 올려 주세요.</p>' +
+    return entryBase() + modal('이미지를 쓸 권리가 있나요?', '<p>올린 이미지를 생성에 참조해요. 직접 만들었거나 쓸 권리가 있는 이미지만 올려 주세요.</p>' +
       '<span class="w-chip">📎 ' + esc(st.file ? st.file.name : '이미지') + '</span>',
       A('아니오 · 이미지 빼기', 'denyImage') + B('예, 동의해요', 'E2', 'pri'));
   }
-  function E2() { return E1() + busy('자료를 읽고 있어요', ['파일 열기', '글인지 이미지인지 보기', '종류 판별']); }
+  function E2() { return entryBase() + busy('자료를 읽고 있어요', ['파일 열기', '글인지 이미지인지 보기', '종류 판별']); }
   function E3() {
     var k = KINDS[st.kind];
     var head = '<div class="w-read"><span class="w-chip">📎 ' + esc(st.file ? st.file.name : '') + '</span><b>' + esc(st.kind + ' ' + k.name) + '</b>' + A('종류가 달라요', 'cycleKind', 'w-link') + '</div>';
@@ -186,6 +187,97 @@
       ['자료', src], ['채팅 언어', '한국어 (사이트 언어)']]) + '<p class="w-note">장르·분위기와 길이는 Writer에서 다시 바꿀 수 있어요.</p>',
       B('아니오, 고칠래요', 'E1') + A('예, 시작', 'confirmStart', 'pri'));
   }
+
+  /* ── Producer 2안: 채팅으로 만들기 ── */
+  var BQ = ['mood', 'runtime', 'level', 'ratio'];
+  var BQ_SCREEN = { file: 'EB2', mood: 'EB3', runtime: 'EB4', level: 'EB5', ratio: 'EB6', confirm: 'EB7' };
+  var BQ_NAME = { mood: '장르·분위기', runtime: '길이', level: '바꿈 정도', ratio: '화면 비율' };
+  var BQ_Q = { mood: '어떤 장르·분위기로 할까요?', runtime: '길이는 어느 정도로 할까요?', level: '내 글을 AI가 얼마나 바꿔도 될까요?', ratio: '화면 비율을 골라 주세요.' };
+  function nextQ() { for (var i = 0; i < BQ.length; i++) if (!st.bAns[BQ[i]]) return BQ_SCREEN[BQ[i]]; return 'EB7'; }
+  function ansText(k) {
+    if (k === 'mood') return MOODS[st.mood];
+    if (k === 'runtime') return RUNTIMES[st.runtime][0];
+    if (k === 'level') return (st.level + 1) + '단계 ' + LEVELS[st.level].n;
+    if (k === 'ratio') return st.ratio;
+    if (k === 'file') { var k2 = KINDS[st.kind]; return k2.name + (k2.o ? ' · ' + k2.o[st.use][0] : ''); }
+    return '';
+  }
+  // 글에서 장르·길이·바꿈 정도·비율을 읽어 미리 채운다 (목업용 간단한 규칙)
+  function parseInto(t) {
+    var got = [];
+    MOODS.forEach(function (m, i) { if (t.indexOf(m) >= 0) { st.mood = i; got.push('mood'); } });
+    var m = t.match(/(\d+)\s*(초|분)/);
+    if (m) { var sec = +m[1] * (m[2] === '분' ? 60 : 1); st.runtime = sec <= 15 ? 0 : sec <= 60 ? 1 : sec <= 300 ? 2 : 3; got.push('runtime'); }
+    else if (/숏폼|쇼츠/.test(t)) { st.runtime = 0; got.push('runtime'); } else if (/단편/.test(t)) { st.runtime = 3; got.push('runtime'); }
+    if (/그대로/.test(t)) { st.level = 0; got.push('level'); } else if (/빈칸/.test(t)) { st.level = 1; got.push('level'); } else if (/다듬/.test(t)) { st.level = 2; got.push('level'); } else if (/새로/.test(t)) { st.level = 3; got.push('level'); }
+    if (got.indexOf('level') >= 0 && !levelOk(st.level)) { st.level = recLevel(); }
+    var r = t.match(/16:9|9:16|1:1|2\.39:1/); if (r) { st.ratio = r[0]; got.push('ratio'); } else if (/세로/.test(t)) { st.ratio = '9:16'; got.push('ratio'); } else if (/가로/.test(t)) { st.ratio = '16:9'; got.push('ratio'); }
+    got = got.filter(function (k, i) { return got.indexOf(k) === i; });
+    got.forEach(function (k) { st.bAns[k] = true; });
+    return got;
+  }
+  function bubble(who, html, me) { return '<div class="w-b' + (me ? ' me' : '') + '">' + (me ? '' : '<b>' + who + '</b>') + '<div>' + html + '</div></div>'; }
+  function qr(key, arr, cur) {
+    return '<div class="w-qr">' + arr.map(function (o, i) {
+      var t = Array.isArray(o) ? o : [o, ''];
+      return '<button class="w-opt' + (i === cur ? ' on' : '') + '" data-act="bAnswer" data-arg="' + key + ':' + i + '">' + esc(t[0]) + (t[1] ? '<small>' + esc(t[1]) + '</small>' : '') + '</button>';
+    }).join('') + '</div>';
+  }
+  function bCard(key) {
+    var rec = recLevel();
+    if (key === 'file') {
+      var k = KINDS[st.kind];
+      return bubble('Producer', '📎 <b>' + esc(st.file ? st.file.name : '') + '</b>을(를) <b>' + esc(st.kind + ' ' + k.name) + '</b>(으)로 읽었어요.' +
+        (k.o ? '<div class="w-q-t" style="margin-top:6px">' + esc(k.q) + '</div>' + qr('use', k.o, st.use) : '<div class="w-qr">' + A('맞아요', 'bFileOk', 'pri sm') + A('종류가 달라요', 'cycleKind', 'sm') + '</div>') +
+        (k.note ? '<p class="w-note">' + esc(k.note) + '</p>' : ''));
+    }
+    if (key === 'mood') return bubble('Producer', '어떤 장르·분위기로 할까요?' + qr('mood', MOODS, -1));
+    if (key === 'runtime') return bubble('Producer', '길이는 어느 정도로 할까요?' + qr('runtime', RUNTIMES, -1));
+    if (key === 'level') return bubble('Producer', '내 글을 AI가 얼마나 바꿔도 될까요?' +
+      '<div class="w-qr col">' + LEVELS.map(function (l, i) {
+        return '<button class="w-opt lv" data-act="bAnswer" data-arg="level:' + i + '"' + (levelOk(i) ? '' : ' disabled') + '><b>' + (i + 1) + ' ' + esc(l.n) + (i === rec ? ' <em>추천</em>' : '') + '</b><small>지켜요 ' + esc(l.keep) + ' · 바꿔요 ' + esc(l.change) + '</small></button>';
+      }).join('') + '</div>' + (hasText() ? '' : '<p class="w-note">1·2단계는 지킬 원문이 있어야 해요.</p>'));
+    if (key === 'ratio') return bubble('Producer', '화면 비율을 골라 주세요. <b class="w-lock">🔒 고르면 끝까지 바꿀 수 없어요.</b>' + qr('ratio', RATIOS, -1));
+    if (key === 'confirm') {
+      return bubble('Producer', '이렇게 시작할게요.' + list([['장르·분위기', esc(ansText('mood'))], ['길이', esc(ansText('runtime'))], ['바꿈 정도', esc(ansText('level')) + ' — ' + esc(LEVELS[st.level].s)], ['🔒 화면 비율', esc(st.ratio) + ' · 끝까지 바꿀 수 없어요'], ['자료', st.file ? esc(st.file.name) : '아이디어 글만']]) +
+        '<div class="w-qr">' + A('시작', 'confirmStart', 'pri sm') + '</div><p class="w-note">고치고 싶으면 위쪽 항목을 누르거나 "길이는 1분으로"처럼 말해 주세요.</p>');
+    }
+    return '';
+  }
+  function chatStage(curKey) {
+    var order = (st.file ? ['file'] : []).concat(BQ, ['confirm']);
+    var h = bubble('Producer', '무엇을 만들어 볼까요? 아이디어나 줄거리를 적거나, 대본·이미지 파일을 올려 주세요.');
+    if (curKey) {
+      h += bubble('', esc(st.idea) + (st.file ? '<br><span class="w-chip">📎 ' + esc(st.file.name) + '</span>' : ''), true);
+      var pre = BQ.filter(function (k) { return st.bPre[k]; });
+      if (pre.length) h += bubble('Producer', '말씀에서 ' + pre.map(function (k) { return BQ_NAME[k] + ' <b>' + esc(ansText(k)) + '</b>'; }).join(', ') + '을(를) 읽었어요. 나머지만 물어볼게요.');
+      for (var i = 0; i < order.length; i++) {
+        var k = order[i];
+        if (k === curKey) { if (st.bHint) h += bubble('Producer', esc(st.bHint)); h += bCard(k); break; }
+        if (st.bPre[k]) continue;
+        h += bubble('Producer', k === 'file' ? '자료를 이렇게 읽었어요.' : BQ_Q[k]) + bubble('', esc(ansText(k)), true);
+      }
+    }
+    var sum = '<div class="w-sum" aria-label="지금까지 정한 것">' + BQ.map(function (k) {
+      var on = st.bAns[k];
+      return '<button class="w-sum-c' + (on ? ' on' : '') + (k === curKey ? ' cur' : '') + '" data-act="bReask" data-arg="' + k + '"' + (on ? '' : ' disabled') + '><i>' + (k === 'ratio' ? '🔒 ' : '') + BQ_NAME[k] + '</i>' + (on ? esc(ansText(k)) : '—') + '</button>';
+    }).join('') + '</div>';
+    var input = curKey
+      ? '<div class="w-cin"><input id="chat-in" data-bind="chatDraft" data-enter="bSend" value="' + esc(st.chatDraft) + '" placeholder="골라도 되고, 말로 해도 돼요. 예: 1분짜리 호러로" aria-label="채팅 입력"><button class="w-btn pri" data-act="bSend" data-need="chatDraft">보내기</button></div>'
+      : '<div class="w-cin first"><textarea class="w-ta sm" id="idea" data-bind="idea" rows="2" aria-label="아이디어" placeholder="예: 회사 자판기가 고장 나는 1분짜리 코미디">' + esc(st.idea) + '</textarea>' +
+        '<div class="w-cin-row">' + (st.file ? '<span class="w-chip">📎 ' + esc(st.file.name) + '<button class="w-x" data-act="clearFile" aria-label="파일 빼기">×</button></span>' : '') +
+        '<label class="w-btn sm">파일 첨부<input type="file" id="file-in" hidden></label>' +
+        '<span class="w-samples">' + SAMPLE_FILES.map(function (x) { return '<button class="w-tab" data-act="sample" data-arg="' + x[0] + '">' + x[0] + '</button>'; }).join('') + '</span>' +
+        '<span style="flex:1"></span>' + A('보내기', 'bStart', 'pri', ' data-need="idea|file"') + '</div></div>';
+    return bar('Producer') + '<div class="w-chatstage">' + (curKey ? sum : '') + '<div class="w-thread">' + h + '</div>' + input + '</div>';
+  }
+  function EB1() { return chatStage(null); }
+  function EB2() { return chatStage('file'); }
+  function EB3() { return chatStage('mood'); }
+  function EB4() { return chatStage('runtime'); }
+  function EB5() { return chatStage('level'); }
+  function EB6() { return chatStage('ratio'); }
+  function EB7() { return chatStage('confirm'); }
   function E5() { return W1() + busy('산문 초안을 쓰고 있어요', ['자료 정리', '이야기 뼈대', '씬 스토리 쓰기']); }
 
   /* ── Writer (산문 작업공간) — 1안: 조건 패널 + 채팅 / 2안: 채팅 중심 ── */
@@ -394,14 +486,14 @@
       '<p class="w-note">함께 확인: Director가 Artist 인물 시트를 참조하는지 (오류 13), 러프 마네킹이 인물로 이어지지 않는지 (오류 12).</p>' + A('처음부터 다시', 'reset') + '</div>';
   }
 
-  var SCREENS = { E1: E1, E1m: E1m, E2: E2, E3: E3, E4: E4, E5: E5, W1: W1, W1r: W1r, WC1: WC1, WC2: WC2, WC3: WC3, W2: W2, W4: W4, W5: W5, W6: W6,
+  var SCREENS = { EB1: EB1, EB2: EB2, EB3: EB3, EB4: EB4, EB5: EB5, EB6: EB6, EB7: EB7, E1: E1, E1m: E1m, E2: E2, E3: E3, E4: E4, E5: E5, W1: W1, W1r: W1r, WC1: WC1, WC2: WC2, WC3: WC3, W2: W2, W4: W4, W5: W5, W6: W6,
     A0: A0, A1: A1, R1: R1, A2: A2, A3: A3, A4: A4, A5: A5, A6: A6, A7: A7, A8: A8, R2: R2, A9: A9,
     S0: S0, S1: S1, S2: S2, S3: S3, S4: S4, R3: R3, S5: S5, S6: S6, S7: S7, D1: D1 };
   // 갈림 노드는 그 갈림을 묻는 화면으로
-  var DECISION_SCREEN = { E1q: 'E1', E1mq: 'E1m', E2q: 'E3', E5q: 'E4', W1q: 'W1', W3: 'W1', A1q: 'A1', A5q: 'A5', S1q: 'S1', S4q: 'S4' };
+  var DECISION_SCREEN = { EB1q: 'EB1', E1q: 'E1', E1mq: 'E1m', E2q: 'E3', E5q: 'E4', W1q: 'W1', W3: 'W1', A1q: 'A1', A5q: 'A5', S1q: 'S1', S4q: 'S4' };
   // AI 작업이 끝나면 가는 곳
   var BUSY_NEXT = {
-    E2: function () { return st.file ? 'E3' : 'E4'; },
+    E2: function () { if (st.plan === 'B') return st.file ? 'EB2' : nextQ(); return st.file ? 'E3' : 'E4'; },
     E5: 'W1', W2: 'W4', A0: 'A1', A4: 'A5', A8: 'A5', S0: 'S1', S3: 'S1', S6: 'S1',
   };
   var preserve = function () { return !!st.file && ((!st.file.image && st.level === 0) || (st.kind === '2-2' && st.use < 2)); };
@@ -458,7 +550,7 @@
     sample: function (k) { var f = SAMPLE_FILES.filter(function (s) { return s[0] === k; })[0]; st.file = { name: f[1], image: k.charAt(0) === '2' }; st.kind = k; st.use = 0; st.level = recLevel(); },
     clearFile: function () { st.file = null; st.kind = '1-3'; if (!levelOk(st.level)) st.level = recLevel(); },
     start: function () { if (!levelOk(st.level)) st.level = recLevel(); return st.file && st.file.image ? 'E1m' : 'E2'; },
-    denyImage: function () { st.file = null; st.kind = '1-3'; return 'E1'; },
+    denyImage: function () { st.file = null; st.kind = '1-3'; return st.plan === 'B' ? 'EB1' : 'E1'; },
     cycleKind: function () { var img = st.file && st.file.image; var ks = Object.keys(KINDS).filter(function (k) { return (k.charAt(0) === '2') === !!img; }); st.kind = ks[(ks.indexOf(st.kind) + 1) % ks.length]; st.use = 0; },
     useRec: function () { st.level = KINDS[st.kind].rec; },
     confirmStart: function () {
@@ -546,7 +638,31 @@
       return 'S6';
     },
     skip: function () { return finishBusy(true); },
-    reset: function () { var p = st.plan; st = initial(); st.plan = p; return 'E1'; },
+    reset: function () { var p = st.plan; st = initial(); st.plan = p; return p === 'B' ? 'EB1' : 'E1'; },
+    bStart: function () {
+      if (!st.idea.trim() && !st.file) return;
+      st.bAns = {}; st.bPre = {}; st.bHint = ''; st.bSent = true;
+      parseInto(st.idea).forEach(function (k) { st.bPre[k] = true; });
+      if (!levelOk(st.level)) st.level = recLevel();
+      return st.file && st.file.image ? 'E1m' : 'E2';
+    },
+    bAnswer: function (a) {
+      var kv = a.split(':'), k = kv[0], v = +kv[1];
+      if (k === 'ratio') st.ratio = RATIOS[v][0]; else st[k] = v;
+      if (k === 'use') { st.bAns.file = true; return nextQ(); }
+      st.bAns[k] = true; st.bPre[k] = false; st.bHint = '';
+      return nextQ();
+    },
+    bFileOk: function () { st.bAns.file = true; if (!st.bAns.level) st.level = recLevel(); return nextQ(); },
+    bReask: function (k) { st.bAns[k] = false; st.bPre[k] = false; return BQ_SCREEN[k]; },
+    bSend: function () {
+      var t = st.chatDraft.trim(); if (!t) return;
+      st.chatDraft = '';
+      var got = parseInto(t);
+      got.forEach(function (k) { st.bPre[k] = false; });
+      st.bHint = got.length ? '"' + t + '" — ' + got.map(function (k) { return BQ_NAME[k] + ' ' + ansText(k); }).join(', ') + '(으)로 정했어요.' : '"' + t + '" — 잘 못 알아들었어요. 버튼으로 골라 주세요.';
+      return got.length ? nextQ() : null;
+    },
   };
 
   /* ── 엔진 ── */

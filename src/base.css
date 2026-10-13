@@ -265,3 +265,30 @@ a.btn { text-decoration: none; display: inline-block }
 .w-dock-info p { margin: 0 }
 .w-dock-info ul { margin: 0; padding-left: 16px; color: var(--mut) }
 .w-dock-info .open li { color: var(--lock) }
+
+/* ── Producer 2안: 채팅으로 만들기 ── */
+.w-chatstage { max-width: 760px; margin: 0 auto; padding: 16px 18px 20px; display: grid; gap: 12px; min-height: 560px; grid-template-rows: auto 1fr auto }
+.w-thread { display: grid; gap: 10px; align-content: start }
+.w-b { display: grid; gap: 4px; max-width: 88%; justify-self: start; background: var(--w-panel); border: 1px solid var(--w-line); border-radius: 12px 12px 12px 4px; padding: 9px 12px; font-size: 13px }
+.w-b > b { font-size: 11px; color: var(--w-acc) }
+.w-b.me { justify-self: end; background: color-mix(in srgb, var(--w-acc) 12%, var(--w-panel)); border-color: color-mix(in srgb, var(--w-acc) 30%, var(--w-line)); border-radius: 12px 12px 4px 12px }
+.w-b .w-list { margin-top: 6px }
+.w-qr { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 8px }
+.w-qr.col { display: grid }
+.w-opt.lv { display: grid; gap: 1px }
+.w-opt.lv b { font-size: 12.5px } .w-opt.lv b em { font-style: normal; font-size: 10px; color: var(--w-acc) }
+.w-opt:disabled { opacity: .4; cursor: not-allowed }
+.w-sum { display: flex; flex-wrap: wrap; gap: 6px; position: sticky; top: 0; background: var(--w-bg); padding-bottom: 6px; z-index: 1 }
+.w-sum-c { font: inherit; font-size: 12px; border: 1px solid var(--w-line); background: var(--w-panel); color: var(--w-ink); border-radius: 99px; padding: 3px 10px; cursor: pointer; display: inline-flex; gap: 6px; align-items: baseline }
+.w-sum-c i { font-style: normal; color: var(--w-mut); font-size: 11px }
+.w-sum-c:disabled { cursor: default; color: var(--w-mut) }
+.w-sum-c.cur { border-color: var(--w-acc) }
+.w-sum-c.on:hover { border-color: var(--w-pri) }
+.w-cin { display: flex; gap: 6px; align-items: center; border: 1px solid var(--w-line); background: var(--w-panel); border-radius: 12px; padding: 8px }
+.w-cin input { flex: 1; min-width: 0; font: inherit; font-size: 13px; border: 0; background: none; color: var(--w-ink); padding: 4px 6px }
+.w-cin input:focus { outline: none }
+.w-cin:focus-within { outline: 2px solid var(--accent); outline-offset: 1px }
+.w-cin.first { display: grid }
+.w-cin.first textarea { border: 0; background: none; padding: 4px 6px }
+.w-cin.first textarea:focus { outline: none }
+.w-cin-row { display: flex; flex-wrap: wrap; gap: 6px; align-items: center }

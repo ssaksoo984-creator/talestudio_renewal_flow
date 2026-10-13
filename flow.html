@@ -67,7 +67,7 @@ h2 { font-size: 13px; text-transform: uppercase; letter-spacing: .06em; color: v
   <div class="top">
     <div>
       <h1>Tale Studio 리뉴얼 사용자 플로우</h1>
-      <p>Producer(아이디어) → Writer(산문) → Artist → Storyboard(가칭)까지. 노드를 누르면 오른쪽에 그 화면이 열려요. 목업은 실제로 동작해서, 입력하고 고른 값이 다음 화면까지 이어져요. <a href="index.html">프로토타입으로 ↗</a></p>
+      <p>Producer(아이디어) → Writer(산문) → Artist → Storyboard(가칭)까지. Producer·Writer는 1안(화면에서 고르기)과 2안(채팅으로 만들기)으로 비교해요. 노드를 누르면 오른쪽에 그 화면이 열려요. 목업은 실제로 동작해서, 입력하고 고른 값이 다음 화면까지 이어져요. <a href="index.html">프로토타입으로 ↗</a></p>
     </div>
     <span class="mono" style="font-size:12px;color:var(--mut)" id="updated"></span>
   </div>
@@ -75,7 +75,7 @@ h2 { font-size: 13px; text-transform: uppercase; letter-spacing: .06em; color: v
   <section aria-label="원칙"><div class="principles" id="principles"></div></section>
 
   <section class="plans" aria-label="Writer 1안 2안">
-    <div class="plans-h"><h2 style="margin:0">Writer 산문 작업공간 · 두 안 비교</h2><span class="seg-plan" id="planSeg"></span></div>
+    <div class="plans-h"><h2 style="margin:0">Producer · Writer 두 안 비교 <span style="text-transform:none;letter-spacing:0;font-weight:400">— Artist부터는 같아요</span></h2><span class="seg-plan" id="planSeg"></span></div>
     <div class="plans-b" id="plansBody"></div>
   </section>
 
@@ -185,7 +185,8 @@ h2 { font-size: 13px; text-transform: uppercase; letter-spacing: .06em; color: v
   function setPlan(p) {
     plan = p; try { localStorage.setItem('tale-plan', p); } catch (e) {}
     paintPlans(); P.setPlan(p);
-    V.setPlan(p).then(function () { if (!V.visible(cur)) select('W1', { scroll: true }); else V.mark(cur); });
+    var cn = byId[cur], to = !cn || !cn.plan || cn.plan === p ? cur : (F.twin[cur] || 'W1');
+    V.setPlan(p).then(function () { select(to, { scroll: true }); });
   }
   paintPlans(); V.setPlan(plan); P.setPlan(plan);
   $('planSeg').addEventListener('click', function (e) { var b = e.target.closest('[data-plan]'); if (b) setPlan(b.dataset.plan); });
@@ -193,7 +194,7 @@ h2 { font-size: 13px; text-transform: uppercase; letter-spacing: .06em; color: v
   P.mount($('screen'), { onNavigate: function (id) { if (byId[id]) select(id, { scroll: true, fromProto: true }); } });
   V.mount($('flow'), { onSelect: function (id) { select(id, { scroll: true }); } });
   $('zin').onclick = V.zoomIn; $('zout').onclick = V.zoomOut; $('zfit').onclick = V.fit;
-  $('protoReset').onclick = function () { P.reset(); P.show('E1'); select('E1', { scroll: true, fromProto: true }); };
+  $('protoReset').onclick = function () { var s0 = plan === 'B' ? 'EB1' : 'E1'; P.reset(); P.show(s0); select(s0, { scroll: true, fromProto: true }); };
 
   document.addEventListener('click', function (e) {
     var t = e.target;
@@ -211,7 +212,8 @@ h2 { font-size: 13px; text-transform: uppercase; letter-spacing: .06em; color: v
   };
 
   var start = location.hash.slice(1);
-  select(byId[start] ? start : 'E1');
+  if (byId[start] && !V.visible(start)) start = F.twin[start] || '';
+  select(byId[start] ? start : (plan === 'B' ? 'EB1' : 'E1'));
 })();
 </script>
 </body>

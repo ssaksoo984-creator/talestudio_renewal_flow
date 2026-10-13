@@ -32,7 +32,7 @@ body.docked .drawer { width: var(--dockw); box-shadow: none }
 <header class="pbar" id="pbar">
   <h1>Tale Studio 프로토타입</h1>
   <div class="here" aria-live="polite"><span class="id" id="hereId">E1</span><span class="lb" id="hereLabel"></span><span class="ty" id="hereType"></span></div>
-  <span class="seg-plan" id="planSeg" aria-label="Writer 안"></span>
+  <span class="seg-plan" id="planSeg" aria-label="Producer·Writer 안"></span>
   <div class="acts">
     <button class="btn" id="back" disabled>← 이전 화면</button>
     <button class="btn" id="toggleFlow" aria-expanded="false" aria-controls="drawer">플로우 보기</button>
@@ -111,8 +111,9 @@ body.docked .drawer { width: var(--dockw); box-shadow: none }
   function setPlan(p) {
     plan = p; try { localStorage.setItem('tale-plan', p); } catch (e) {}
     paintPlan(); P.setPlan(p);
-    V.setPlan(p).then(function () { if (!V.visible(cur)) update('W1'); else if (mounted) V.mark(cur, !$('drawer').hidden); });
-    if (!V.visible(cur)) update('W1');
+    var cn = byId[cur], to = !cn || !cn.plan || cn.plan === p ? cur : (F.twin[cur] || 'W1');
+    if (to !== cur) update(to);
+    V.setPlan(p).then(function () { if (mounted) V.mark(cur, !$('drawer').hidden); });
   }
   paintPlan(); V.setPlan(plan); P.setPlan(plan);
   $('planSeg').addEventListener('click', function (e) { var b = e.target.closest('[data-plan]'); if (b) setPlan(b.dataset.plan); barH(); });
@@ -121,13 +122,14 @@ body.docked .drawer { width: var(--dockw); box-shadow: none }
   $('toggleFlow').onclick = function () { openFlow($('drawer').hidden); };
   $('closeFlow').onclick = function () { openFlow(false); $('toggleFlow').focus(); };
   $('zin').onclick = V.zoomIn; $('zout').onclick = V.zoomOut; $('zfit').onclick = V.fit;
-  $('reset').onclick = function () { P.reset(); trail = []; cur = null; update('E1'); };
+  $('reset').onclick = function () { P.reset(); trail = []; cur = null; update(plan === 'B' ? 'EB1' : 'E1'); };
   $('back').onclick = function () { var p = trail.pop(); if (!p) return; cur = null; update(p); };
   $('nextList').addEventListener('click', function (e) { var b = e.target.closest('[data-node]'); if (b) update(b.dataset.node); });
   document.addEventListener('keydown', function (e) { if (e.key === 'Escape' && !$('drawer').hidden && !document.body.classList.contains('docked') && !document.querySelector('#screen .w-modal')) openFlow(false); });
 
   var start = location.hash.slice(1);
-  update(byId[start] ? start : 'E1');
+  if (byId[start] && !V.visible(start)) start = F.twin[start] || '';
+  update(byId[start] ? start : (plan === 'B' ? 'EB1' : 'E1'));
   // 넓은 화면에서는 플로우를 처음부터 옆에 붙여 보여준다
   var savedOpen = null; try { savedOpen = localStorage.getItem('tale-flow-open'); } catch (e) {}
   if (savedOpen === '1' || (savedOpen === null && wide.matches)) openFlow(true);

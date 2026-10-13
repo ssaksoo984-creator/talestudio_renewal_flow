@@ -100,7 +100,7 @@
       shots: [
         { sc: 1, len: 3, size: 3, ang: 0, move: 0, light: { pos: 0, temp: 3, bri: 50 }, dir: '', desc: '@민호가 자판기 버튼을 누른다', who: [0], ws: {}, lines: [], drawn: true },
         { sc: 1, len: 2, size: 0, ang: 0, move: 0, light: { pos: 0, temp: 3, bri: 50 }, dir: '레버를 당긴다', desc: '반환 레버를 당기는 @민호의 손', who: [0], ws: {}, lines: [], drawn: true },
-        { sc: 1, len: 2, size: 3, ang: 2, move: 3, light: { pos: 0, temp: 3, bri: 50 }, dir: '천천히 다가간다', desc: '@민호가 자판기를 툭 친다', who: [0], ws: {}, lines: [{ w: 0, t: '…또 안 나와?', lang: '한' }], drawn: true },
+        { sc: 1, len: 2, size: 3, ang: 2, move: 3, light: { pos: 0, temp: 3, bri: 50 }, dir: '천천히 다가간다', marks: [{ t: 'arrow', x1: 4, y1: 45, x2: 60, y2: 45, c: 'r' }], desc: '@민호가 자판기를 툭 친다', who: [0], ws: {}, lines: [{ w: 0, t: '…또 안 나와?', lang: '한' }], drawn: true },
         { sc: 2, len: 4, size: 6, ang: 1, move: 2, light: { pos: 0, temp: 3, bri: 50 }, dir: '아래로 틸트', desc: '캔이 우르르 쏟아진다', who: [0], ws: { 0: 1 }, lines: [], drawn: true },
         { sc: 2, len: 3, size: 11, ang: 0, move: 1, light: { pos: 0, temp: 3, bri: 50 }, dir: '', desc: '@팀장이 캔 하나를 집어 든다', who: [1, 0], ws: { 0: 1 }, lines: [{ w: 1, t: '고마워.', lang: '한' }], drawn: true },
         { sc: 2, len: 2, size: 1, ang: 0, move: 0, light: { pos: 0, temp: 3, bri: 50 }, dir: '', desc: '멍하니 선 @민호', who: [0], ws: { 0: 1 }, lines: [], drawn: true },
@@ -864,9 +864,49 @@
       '<div class="w-q"><div class="w-q-t">밝기 <small>' + l.bri + '</small></div><input type="range" min="0" max="100" step="5" value="' + l.bri + '" data-bind="' + path + '.bri" data-num="1" aria-label="밝기"></div></div></div>';
   }
   // 러프 한 장 (k: 0 시작, 1 연출). 다시 그릴 때마다 rv가 올라 그림이 달라 보인다.
+  // 러프 한 장 (k: 0 시작, 1 연출). 연출은 시작 그림 위에 그린 화살표 · 메모가 얹힌 그림이다.
   function frameImg(s, i, k, big) {
     var who = s.who.length && st.chars[s.who[0]] ? st.chars[s.who[0]].n : st.bgs[s.bg || 0].n;
-    return '<i class="w-frm' + (big ? ' big' : '') + '" style="background:' + styleBg(st.style) + ';filter:hue-rotate(' + ((i * 37 + k * 50 + (s.rv || 0) * 29) % 140) + 'deg)"><b>' + esc(big ? who : who.slice(0, 2)) + '</b><em>' + (k ? '연출' : '시작') + (big && s.rv ? ' · v' + (s.rv + 1) : '') + '</em></i>';
+    return '<i class="w-frm' + (big ? ' big' : '') + (k ? ' dir' : '') + '"><span class="w-frm-bg" style="background:' + styleBg(st.style) + ';filter:hue-rotate(' + ((i * 37 + (s.rv || 0) * 29) % 140) + 'deg)' + (k ? ' saturate(.75)' : '') + '"></span><b>' + esc(big ? who : who.slice(0, 2)) + '</b>' +
+      (k ? marksSvg(s.marks || [], false) : '') + '<em>' + (k ? '연출' : '시작') + (big && s.rv ? ' · v' + (s.rv + 1) : '') + '</em></i>';
+  }
+  // 그린 표시(화살표 · 메모). 좌표는 160 × 90 기준
+  var MCOL = { k: '#16181d', r: '#e5212d' };
+  function marksSvg(ms, live) {
+    return '<svg class="w-marks' + (live ? ' live' : '') + '" viewBox="0 0 160 90" preserveAspectRatio="none"' + (live ? ' data-draw="1"' : ' aria-hidden="true"') + '><defs>' + ['k', 'r'].map(function (c) { return '<marker id="ah' + c + (live ? 'L' : '') + '" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="5" markerHeight="5" orient="auto-start-reverse"><path d="M0 0L10 5L0 10z" fill="' + MCOL[c] + '"/></marker>'; }).join('') + '</defs>' +
+      ms.map(function (m, j) {
+        var del = live && st.drawTool === 'erase' ? ' data-mark="' + j + '" class="w-mk-del"' : '';
+        if (m.t === 'arrow') return '<g' + del + '><line x1="' + m.x1 + '" y1="' + m.y1 + '" x2="' + m.x2 + '" y2="' + m.y2 + '" stroke="' + MCOL[m.c] + '" stroke-width="1.6" stroke-linecap="round" marker-end="url(#ah' + m.c + (live ? 'L' : '') + ')"' + (isEdge(m.x1, m.y1) ? ' stroke-dasharray="4 2"' : '') + '/>' + (live ? '<line x1="' + m.x1 + '" y1="' + m.y1 + '" x2="' + m.x2 + '" y2="' + m.y2 + '" stroke="transparent" stroke-width="8"/>' : '') + '</g>';
+        return '<g' + del + '><rect x="' + (m.x - 1) + '" y="' + (m.y - 6) + '" width="' + (Math.min(60, m.text.length * 4.2) + 4) + '" height="8" rx="1.5" fill="#fff" fill-opacity=".85" stroke="' + MCOL[m.c] + '" stroke-width=".5"/><text x="' + (m.x + 1) + '" y="' + (m.y) + '" font-size="5" fill="' + MCOL[m.c] + '">' + (m.kind === 'cam' ? '🎥 ' : '') + esc(m.text.slice(0, 14)) + '</text></g>';
+      }).join('') + (live ? '<line class="w-mk-tmp" x1="0" y1="0" x2="0" y2="0" stroke="' + MCOL[st.drawColor || 'r'] + '" stroke-width="1.6" stroke-linecap="round" visibility="hidden"/>' : '') + '</svg>';
+  }
+  var isEdge = function (x, y) { return x < 14 || x > 146 || y < 10 || y > 80; };
+  // AI가 읽은 내용: 테두리에서 시작한 화살표는 카메라 무브, 안쪽은 사물 · 인물 움직임. 메모는 고른 종류대로.
+  function readMarks(ms) {
+    var out = [];
+    ms.forEach(function (m) {
+      if (m.t === 'arrow') {
+        var dx = m.x2 - m.x1, dy = m.y2 - m.y1, h = Math.abs(dx) >= Math.abs(dy), dir = h ? (dx > 0 ? '오른쪽으로' : '왼쪽으로') : (dy > 0 ? '아래로' : '위로');
+        // 대각선으로 가운데를 향하면 다가가기, 아니면 가로는 팬 · 세로는 틸트
+        var diag = Math.min(Math.abs(dx), Math.abs(dy)) > Math.max(Math.abs(dx), Math.abs(dy)) * 0.45, toC = diag && Math.hypot(80 - m.x2, 45 - m.y2) < Math.hypot(80 - m.x1, 45 - m.y1) - 15;
+        if (isEdge(m.x1, m.y1)) out.push({ cam: true, move: toC ? 3 : h ? 1 : 2, text: toC ? '카메라가 안쪽으로 다가가요 (달리 인)' : '카메라가 ' + dir + ' 움직여요 (' + (h ? '팬' : '틸트') + ')' });
+        else out.push({ cam: false, text: '화면 속 인물 · 사물이 ' + dir + ' 움직여요' });
+      } else out.push({ cam: m.kind === 'cam', text: (m.kind === 'cam' ? '카메라: ' : '액션: ') + m.text });
+    });
+    return out;
+  }
+  function syncMarks() {
+    var d = st.shotDraft; if (!d) return; var r = readMarks(d.marks || []);
+    var cam = r.filter(function (x) { return x.cam && x.move != null; })[0]; if (cam) d.move = cam.move;
+    if (!st.dirEdited) d.dir = r.map(function (x) { return x.text.replace(/^(카메라|액션): /, ''); }).join(', ');
+  }
+  function drawTools() {
+    var t = st.drawTool || 'arrow', c = st.drawColor || 'r', d = st.shotDraft;
+    return '<div class="w-drawbar" role="toolbar" aria-label="그리기 도구">' +
+      [['arrow', '↗ 화살표'], ['memo', '✎ 메모'], ['erase', '⌫ 지우개']].map(function (x) { return '<button class="w-btn sm' + (t === x[0] ? ' on' : '') + '" data-act="drawTool" data-arg="' + x[0] + '" aria-pressed="' + (t === x[0]) + '">' + x[1] + '</button>'; }).join('') +
+      '<span class="w-drawc">' + ['k', 'r'].map(function (x) { return '<button class="' + (c === x ? 'on' : '') + '" data-act="drawColor" data-arg="' + x + '" aria-label="' + (x === 'k' ? '검정' : '빨강') + '" style="background:' + MCOL[x] + '"></button>'; }).join('') + '</span><span class="w-tbar-sp"></span>' +
+      A('↶ 되돌리기', 'drawUndo', 'sm', (d.marks || []).length ? '' : ' disabled') + A('표시 모두 지우기', 'drawClear', 'sm w-link', (d.marks || []).length ? '' : ' disabled') + '</div>' +
+      (t === 'memo' ? '<div class="w-drawmemo"><span class="w-tabs">' + [['cam', '카메라 무브'], ['obj', '사물 · 인물 액션']].map(function (x) { return '<button class="' + ((st.memoKind || 'obj') === x[0] ? 'on' : '') + '" data-act="memoKind" data-arg="' + x[0] + '">' + x[1] + '</button>'; }).join('') + '</span><input class="w-in" data-bind="memoText" value="' + esc(st.memoText || '') + '" placeholder="메모를 적고 그림을 누르면 붙어요" aria-label="메모"></div>' : '');
   }
   function sbShot(s, i) {
     var badge = !s.drawn ? '<span class="w-tag-no">새로 추가 · 스케치 전</span>' : '';
@@ -971,22 +1011,24 @@
       '<div class="w-grid2"><div class="w-q"><div class="w-q-t">샷 타입 (카메라 초점)</div>' + dd('shotDraft.size', SHOT_TYPES, d.size, '샷 타입') + '</div><div class="w-q"><div class="w-q-t">카메라 앵글</div>' + dd('shotDraft.ang', ANGLES, d.ang, '카메라 앵글') + '</div></div>' +
       '<div class="w-q"><div class="w-q-t">조명</div>' + lightBox('shotDraft.light', d.light) + '</div>' +
       '<p class="w-note">적용하면 시작이 바뀌고, 연출도 이어서 다시 그려요.</p>' + agentHint;
-    return strip + '<div class="w-tabs w-dmode">' + [['opt', '옵션 + 텍스트'], ['draw', '그리기 + 텍스트']].map(function (m) { return '<button class="' + (st.dirMode === m[0] ? 'on' : '') + '" data-act="dirMode" data-arg="' + m[0] + '">' + m[1] + '</button>'; }).join('') + '</div>' +
-      (st.dirMode === 'draw' ? '<div class="w-drawpad"><span>시작 그림 위에 ↗ 화살표 · ✎ 메모를 그려요 (목업)</span><small>테두리에서 시작한 화살표는 카메라 무브, 안쪽은 사물 · 인물 움직임으로 읽어요. 글로 고치면 글이 우선이에요.</small></div>' :
-        '<div class="w-q"><div class="w-q-t">카메라 무브먼트</div>' + dd('shotDraft.move', MOVES, d.move, '카메라 무브먼트') + '</div>') +
-      '<div class="w-q"><div class="w-q-t">방향 · 사물 · 인물 액션 <small>안 써도 돼요</small></div><input class="w-in" data-bind="shotDraft.dir" value="' + esc(d.dir) + '" placeholder="예: 천천히 다가가며 캔이 굴러간다" aria-label="방향 · 액션"></div>' +
+    var rd = readMarks(d.marks || []);
+    return strip + '<p class="w-mut" style="margin:0;font-size:12px">왼쪽 시작 그림 위에 바로 그려요. 테두리에서 시작한 화살표는 카메라 무브, 안쪽은 사물 · 인물 움직임으로 읽어요.</p>' +
+      '<div class="w-q"><div class="w-q-t">AI가 읽은 내용</div>' + (rd.length ? '<ul class="w-read">' + rd.map(function (x) { return '<li><i>' + (x.cam ? '🎥' : '🏃') + '</i>' + esc(x.text) + '</li>'; }).join('') + '</ul>' : '<p class="w-mut" style="margin:0;font-size:12px">아직 그린 표시가 없어요. 그림에 그리거나 아래에 글로 적어 주세요.</p>') + '</div>' +
+      '<div class="w-q"><div class="w-q-t">카메라 무브먼트 <small>' + (rd.some(function (x) { return x.cam && x.move != null; }) ? '화살표에서 읽었어요 · 바꿔도 돼요' : '') + '</small></div>' + dd('shotDraft.move', MOVES, d.move, '카메라 무브먼트') + '</div>' +
+      '<div class="w-q"><div class="w-q-t">방향 · 사물 · 인물 액션 <small>' + (st.dirEdited ? '글로 고친 내용이 우선이에요' : '그린 표시대로 채워져요 · 고쳐도 돼요') + '</small></div><textarea class="w-ta sm" rows="2" data-bind="shotDraft.dir" placeholder="예: 천천히 다가가며 캔이 굴러간다" aria-label="방향 · 액션">' + esc(d.dir) + '</textarea></div>' +
       '<div class="w-q"><div class="w-q-t">길이</div>' + dd('shotDraft.lenI', lenItems(), d.lenI != null ? +d.lenI : d.len - 1, '길이') + '</div>' +
       '<p class="w-note">앵글은 시작에서 정해요. 적용하면 연출만 다시 그려요.</p>' + agentHint;
   }
   function S2() {
     if (!st.shotDraft) st.shotDraft = clone(st.shots[st.shotSel]);
     var tab = st.shotTab;
-    var x = st.shots[st.shotSel], f = st.sbFrame || 0;
+    var x = st.shots[st.shotSel], f = st.sbFrame || 0; if (!st.shotDraft.marks) st.shotDraft.marks = [];
     // 왼쪽: 지금 러프를 크게 (시작 / 연출). 고친 내용은 적용해서 다시 그린 뒤 확인 팝업에서 본다.
     var view = '<div class="w-adview"><div class="w-advh"><b>' + shotLabel(st.shotSel) + '</b><span class="w-mut">' + x.len + '초 · ' + SHOT_TYPES[x.size][0] + ' · ' + ANGLES[x.ang][0] + '</span><span class="w-tbar-sp"></span><span class="w-tabs">' +
-        ['시작', '연출'].map(function (n, k) { return '<button class="' + (f === k ? 'on' : '') + '" data-act="sbFrame" data-arg="' + k + '" aria-pressed="' + (f === k) + '">' + n + '</button>'; }).join('') + '</span></div>' +
-      '<div class="w-adv16 w-sbv">' + (x.drawn ? frameImg(x, st.shotSel, f, true) : '<span class="w-mut">스케치 전</span>') + '</div>' +
-      '<div class="w-sbthumbs">' + [0, 1].map(function (k) { return '<button class="' + (f === k ? 'on' : '') + '" data-act="sbFrame" data-arg="' + k + '" aria-label="' + (k ? '연출' : '시작') + ' 크게 보기">' + (x.drawn ? frameImg(x, st.shotSel, k) : '') + '</button>'; }).join('') + '</div>' +
+        (tab === 'dir' ? '<button class="on">시작 그림 위에 그리기</button>' : ['시작', '연출'].map(function (n, k) { return '<button class="' + (f === k ? 'on' : '') + '" data-act="sbFrame" data-arg="' + k + '" aria-pressed="' + (f === k) + '">' + n + '</button>'; }).join('')) + '</span></div>' +
+      (tab === 'dir' ? drawTools() + '<div class="w-adv16 w-sbv w-canvas tool-' + (st.drawTool || 'arrow') + '">' + frameImg(x, st.shotSel, 0, true) + marksSvg(st.shotDraft.marks || [], true) + '</div>'
+        : '<div class="w-adv16 w-sbv">' + (x.drawn ? frameImg(x, st.shotSel, f, true) : '<span class="w-mut">스케치 전</span>') + '</div>' +
+          '<div class="w-sbthumbs">' + [0, 1].map(function (k) { return '<button class="' + (f === k ? 'on' : '') + '" data-act="sbFrame" data-arg="' + k + '" aria-label="' + (k ? '연출' : '시작') + ' 크게 보기">' + (x.drawn ? frameImg(x, st.shotSel, k) : '') + '</button>'; }).join('') + '</div>') +
       '<p class="w-mut" style="margin:0;font-size:12px">' + atText(x.desc) + '</p></div>';
     return S1() + modal(shotLabel(st.shotSel) + ' 고치기', '<p class="w-mut">두 묶음으로 고쳐요 · 시작을 고치면 연출도 따라 바뀌고, 연출을 고치면 연출만 바뀌어요. 적용하면 다시 그린 그림을 먼저 보여 드려요.</p><div class="w-adet">' + view + '<div class="w-adr">' + shotEditor() + '</div></div>',
       A('취소', 'cancelShot') + A(tab === 'start' ? '시작 적용 · 연출도 다시' : '연출 적용 · 다시 그리기', 'applyShot', 'acc'), 'xxl');
@@ -1389,8 +1431,8 @@
     },
     shotDup: function (i) { var c = clone(st.shots[+i]); c.fresh = true; st.shots.splice(+i + 1, 0, c); st.sbMenu = -1; },
     shotDel: function (i) { var x = st.shots.splice(+i, 1)[0]; st.sbMenu = -1; st.lastDel = [+i, x]; say('Storyboard', 'Storyboard', '샷을 지웠어요. 지금 ' + total() + '초예요.'); },
-    editShot: function (i) { st.sbFrame = 0; st.shotSel = +i; st.shotDraft = clone(st.shots[+i]); st.shotTab = 'start'; st.sbMenu = -1; st.ddOpen = ''; return 'S2'; },
-    shotTab: function (t) { st.shotTab = t; },
+    editShot: function (i) { st.sbFrame = 0; st.dirEdited = false; st.drawTool = 'arrow'; st.shotSel = +i; st.shotDraft = clone(st.shots[+i]); st.shotTab = 'start'; st.sbMenu = -1; st.ddOpen = ''; return 'S2'; },
+    shotTab: function (t) { st.shotTab = t; st.ddOpen = ''; },
     dirMode: function (m) { st.dirMode = m; },
     shotWho: function (k) { k = +k; var d = st.shotDraft, j = d.who.indexOf(k); if (j >= 0) d.who.splice(j, 1); else d.who.push(k); },
     redraw: function (i) { var x = st.shots[+i]; st.busyNames = null; st.pending = function () { x.drawn = true; x.fresh = false; }; return 'S3'; },
@@ -1412,6 +1454,11 @@
     candUndo: function () { (st.cands || []).forEach(function (c) { st.shots[c.i] = c.prev; }); st.cands = null; st.shots.forEach(function (x) { x.chg = false; }); say('Storyboard', 'Storyboard', '되돌렸어요. 이전 그림 그대로예요.'); return 'S1'; },
     candEdit: function () { var c = st.cands[0], cur = st.shots[c.i]; st.shots[c.i] = c.prev; st.cands = null; st.shotSel = c.i; st.shotDraft = clone(cur); delete st.shotDraft.rv; st.shotDraft.rv = c.prev.rv || 0; st.ddOpen = ''; return 'S2'; },
     sbFrame: function (k) { st.sbFrame = +k; },
+    drawTool: function (t) { st.drawTool = t; },
+    drawColor: function (c) { st.drawColor = c; },
+    memoKind: function (k) { st.memoKind = k; },
+    drawUndo: function () { st.shotDraft.marks.pop(); syncMarks(); },
+    drawClear: function () { st.shotDraft.marks = []; syncMarks(); },
     // [＋ 샷]: 씬 머리에서 누르면 그 씬 끝, 위쪽에서 누르면 자리 없이 열고 왼쪽에서 고른다
     newShot: function (a) {
       var p = String(a || '').split(':'), n = +p[0] || 0;
@@ -1612,6 +1659,7 @@
       if (!p || t.tagName === 'BUTTON') return;
       setPath(st, p, t.tagName === 'SELECT' || t.type === 'range' ? +t.value : t.value);
       if (/\.prompt$/.test(p)) syncTraits();
+      if (p === 'shotDraft.dir') st.dirEdited = true;
       refresh();
     });
     el.addEventListener('change', function (e) {
@@ -1627,6 +1675,23 @@
         if (t.value === 'new') { st.stateFrom = cur; st.target = k; objs()[k].sTab = 0; st.vadd = true; st.vaName = ''; st.vaDesc = ''; st.dEdit = null; st.histOpen = false; go('S5'); }
         else st.shotDraft.ws[k] = +t.value;
       }
+    });
+    // 연출 그리기: 화살표는 끌어서, 메모는 눌러서, 지우개는 표시를 눌러서
+    var drag = null;
+    function svgPt(svg, e) { var r = svg.getBoundingClientRect(); return { x: Math.round((e.clientX - r.left) / r.width * 160), y: Math.round((e.clientY - r.top) / r.height * 90) }; }
+    el.addEventListener('pointerdown', function (e) {
+      var svg = e.target.closest && e.target.closest('svg[data-draw]'); if (!svg || !st.shotDraft) return;
+      e.preventDefault(); var pt = svgPt(svg, e), tool = st.drawTool || 'arrow', c = st.drawColor || 'r';
+      if (tool === 'erase') { var g = e.target.closest('[data-mark]'); if (g) { st.shotDraft.marks.splice(+g.getAttribute('data-mark'), 1); syncMarks(); paint(); } return; }
+      if (tool === 'memo') { var txt = (st.memoText || '').trim(); if (!txt) { var mi = root.querySelector('[data-bind="memoText"]'); if (mi) mi.focus(); return; } st.shotDraft.marks.push({ t: 'memo', x: pt.x, y: pt.y, text: txt, kind: st.memoKind || 'obj', c: c }); st.memoText = ''; syncMarks(); paint(); return; }
+      drag = { svg: svg, x1: pt.x, y1: pt.y, line: svg.querySelector('.w-mk-tmp') };
+      if (drag.line) { drag.line.setAttribute('x1', pt.x); drag.line.setAttribute('y1', pt.y); drag.line.setAttribute('x2', pt.x); drag.line.setAttribute('y2', pt.y); drag.line.setAttribute('visibility', 'visible'); }
+    });
+    el.addEventListener('pointermove', function (e) { if (!drag || !drag.line) return; var pt = svgPt(drag.svg, e); drag.line.setAttribute('x2', pt.x); drag.line.setAttribute('y2', pt.y); });
+    window.addEventListener('pointerup', function (e) {
+      if (!drag) return; var pt = svgPt(drag.svg, e), d0 = drag; drag = null;
+      if (Math.hypot(pt.x - d0.x1, pt.y - d0.y1) < 6) { if (d0.line) d0.line.setAttribute('visibility', 'hidden'); return; }
+      st.shotDraft.marks.push({ t: 'arrow', x1: d0.x1, y1: d0.y1, x2: pt.x, y2: pt.y, c: st.drawColor || 'r' }); syncMarks(); paint();
     });
     el.addEventListener('mouseup', function (e) {
       if (!e.target.closest || !e.target.closest('.w-tgprose') || e.target.closest('.w-tg')) return;

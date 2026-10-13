@@ -697,3 +697,22 @@ a.btn { text-decoration: none; display: inline-block }
 .w-cmp-f { display: grid; grid-template-columns: 1fr 1fr; gap: 6px }
 .w-cmp-ar { font-size: 20px; color: var(--w-mut) }
 @media (max-width: 760px) { .w-cmp-row { grid-template-columns: 1fr } .w-cmp-ar { transform: rotate(90deg); justify-self: center } }
+/* 연출: 시작 그림 위에 그리기 */
+.w-frm { overflow: hidden; isolation: isolate }
+.w-frm-bg { position: absolute; inset: 0; z-index: -1 }
+.w-frm b { position: relative }
+.w-marks { position: absolute; inset: 0; width: 100%; height: 100%; pointer-events: none }
+.w-marks.live { pointer-events: auto; touch-action: none; cursor: crosshair }
+.w-canvas.tool-memo .w-marks.live { cursor: text }
+.w-canvas.tool-erase .w-marks.live { cursor: not-allowed }
+.w-canvas.tool-erase .w-mk-del { cursor: pointer } .w-canvas.tool-erase .w-mk-del:hover { opacity: .45 }
+.w-canvas { position: relative }
+.w-drawbar { display: flex; align-items: center; gap: 6px; flex-wrap: wrap }
+.w-drawbar .w-btn.on { border-color: var(--w-pri); box-shadow: inset 0 0 0 1px var(--w-pri) }
+.w-drawc { display: inline-flex; gap: 4px; margin-left: 4px }
+.w-drawc button { width: 20px; height: 20px; border-radius: 50%; border: 2px solid var(--w-panel); box-shadow: 0 0 0 1px var(--w-line); cursor: pointer; padding: 0 }
+.w-drawc button.on { box-shadow: 0 0 0 2px var(--w-pri) }
+.w-drawmemo { display: flex; gap: 6px; align-items: center; flex-wrap: wrap } .w-drawmemo .w-in { flex: 1; min-width: 160px }
+.w-read { margin: 0; padding: 0; list-style: none; display: grid; gap: 4px; font-size: 12.5px }
+.w-read li { display: flex; gap: 6px; border: 1px solid var(--w-line); border-radius: 7px; padding: 5px 8px; background: var(--w-bg) } .w-read i { font-style: normal }
+.w-chips span { max-width: 100%; white-space: nowrap; overflow: hidden; text-overflow: ellipsis }

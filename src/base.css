@@ -374,3 +374,11 @@ a.btn { text-decoration: none; display: inline-block }
 .w-qr.sugg { margin: 0 }
 .w-cin.is-locked { opacity: .5 }
 .w-qr.sugg .w-tab { font-family: inherit; font-size: 12px; border-radius: 99px; padding: 3px 10px }
+
+/* ── 문단 고르기: 채팅 입력칸에 붙는 문단 칩 ── */
+.w-cin.pick { display: grid; gap: 6px; border-color: var(--w-acc) }
+.w-cin-chips { display: flex; flex-wrap: wrap; gap: 4px; align-items: center; font-size: 12px }
+.w-chip.pick { font: inherit; font-size: 11.5px; cursor: pointer; border-color: var(--w-acc); color: var(--w-acc); background: color-mix(in srgb, var(--w-acc) 10%, var(--w-panel)) }
+.w-cin.pick .w-cin-main input { flex: 1; min-width: 0; font: inherit; font-size: 13px; border: 0; background: none; color: var(--w-ink); padding: 4px 6px }
+.w-cin.pick .w-cin-main input:focus { outline: none }
+.w-chat .w-cin.pick { margin: 8px; border: 1px solid var(--w-acc); border-radius: 10px; padding: 6px }

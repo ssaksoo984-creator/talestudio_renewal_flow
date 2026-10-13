@@ -125,11 +125,19 @@
     var msgs = st.chat[on] || [];
     var chat = '<aside class="w-chat' + (o.chatLocked ? ' is-locked' : '') + '"><div class="w-chat-h">에이전트 채팅</div><div class="w-chat-b">' +
       msgs.map(function (m) { return '<div class="w-msg' + (m[0] === '나' ? ' me' : '') + '"><b>' + esc(m[0]) + '</b>' + esc(m[1]) + '</div>'; }).join('') + (o.card || '') +
-      '</div>' + (o.suggest ? '<div class="w-sugg">' + o.suggest.map(function (t) { return '<button class="w-tab" data-act="send" data-arg="' + esc(t) + '">' + esc(t) + '</button>'; }).join('') + '</div>' : '') + '<div class="w-chat-in">' + (o.chatLocked || o.noChat
+      '</div>' + (o.suggest ? '<div class="w-sugg">' + o.suggest.map(function (t) { return '<button class="w-tab" data-act="send" data-arg="' + esc(t) + '">' + esc(t) + '</button>'; }).join('') + '</div>' : '') + (o.pick ? chatInput(o) : '<div class="w-chat-in">' + (o.chatLocked || o.noChat
         ? '<span class="w-mut">' + (o.chatLocked ? '팝업을 닫으면 다시 쓸 수 있어요' : '여기서는 채팅으로 고칠 수 없어요') + '</span>'
         : '<input id="chat-in" data-bind="chatDraft" data-enter="send" value="' + esc(st.chatDraft) + '" placeholder="' + esc(o.ph || '말해주세요…') + '" aria-label="채팅 입력">' +
-          '<button class="w-btn pri" data-act="send" data-need="chatDraft">보내기</button>') + '</div></aside>';
+          '<button class="w-btn pri" data-act="send" data-need="chatDraft">보내기</button>') + '</div>') + '</aside>';
     return bar(on) + '<div class="w-studio"><main class="w-main">' + main + '</main>' + chat + '</div>';
+  }
+  function chatInput(o) {
+    if (o.pick) {
+      var chips = st.parts.length ? st.parts.map(function (i) { return '<button class="w-chip pick" data-act="togglePart" data-arg="' + i + '" aria-label="S' + (i + 1) + ' 빼기">S' + (i + 1) + ' ×</button>'; }).join('') : '<span class="w-mut">위 산문에서 문단을 누르세요</span>';
+      return '<div class="w-cin pick"><div class="w-cin-chips">' + chips + '</div><div class="w-cin-main"><input id="chat-in" data-bind="chatDraft" data-enter="sendPart" value="' + esc(st.chatDraft) + '" placeholder="어떻게 고칠까요? 예: 대사를 더 웃기게" aria-label="어떻게 고칠지">' +
+        '<button class="w-btn pri" data-act="sendPart"' + (st.parts.length ? '' : ' disabled') + '>보내기</button></div></div>';
+    }
+    return null;
   }
   function modal(title, body, acts, wide) {
     return '<div class="w-back"><div class="w-modal' + (wide ? ' wide' : '') + '" role="dialog" aria-modal="true" aria-label="' + esc(title) + '"><h4>' + esc(title) + '</h4>' + body + '<div class="w-acts">' + acts + '</div></div></div>';
@@ -396,15 +404,15 @@
     var msgs = (st.chat.Writer || []).slice(1).map(function (m) { return bubble(m[0] === '나' ? '' : m[0], esc(m[1]), m[0] === '나'); }).join('');
     var card = o.card ? o.card.replace('class="w-msg card"', 'class="w-b card"') : '';
     var locked = o.chatLocked;
-    var input = '<div class="w-cin' + (locked ? ' is-locked' : '') + '">' + (locked ? '<span class="w-mut">팝업을 닫으면 다시 쓸 수 있어요</span>'
+    var input = o.pick ? chatInput(o) : '<div class="w-cin' + (locked ? ' is-locked' : '') + '">' + (locked ? '<span class="w-mut">팝업을 닫으면 다시 쓸 수 있어요</span>'
       : '<input id="chat-in" data-bind="chatDraft" data-enter="send" value="' + esc(st.chatDraft) + '" placeholder="Writer에게 말해 주세요. 예: 다시 써줘 / 팀장을 더 얄밉게" aria-label="채팅 입력"><button class="w-btn pri" data-act="send" data-need="chatDraft">보내기</button>') + '</div>';
-    var sugg = !locked && !o.card && !ro ? '<div class="w-qr sugg">' + SUGGEST.map(function (t) { return '<button class="w-tab" data-act="send" data-arg="' + esc(t) + '">' + esc(t) + '</button>'; }).join('') + '</div>' : '';
+    var sugg = !locked && !o.card && !o.pick && !ro ? '<div class="w-qr sugg">' + SUGGEST.map(function (t) { return '<button class="w-tab" data-act="send" data-arg="' + esc(t) + '">' + esc(t) + '</button>'; }).join('') + '</div>' : '';
     return bar('Writer') + '<div class="w-chatstage">' + '<div class="w-thread">' + head + proseCard + msgs + card + '</div>' + sugg + input + '</div>';
   }
   function writer(o) {
     o = o || {};
     if (st.plan === 'B') return writerB(o);
-    return studio('Writer', proseMain(false, o.pick), { ph: st.plan === 'A' ? '예: 팀장을 더 얄밉게' : '예: 다시 써줘 / 팀장을 더 얄밉게', card: o.card, suggest: st.plan === 'B' && !o.card ? SUGGEST : null });
+    return studio('Writer', proseMain(false, o.pick), { pick: o.pick, ph: st.plan === 'A' ? '예: 팀장을 더 얄밉게' : '예: 다시 써줘 / 팀장을 더 얄밉게', card: o.card, suggest: st.plan === 'B' && !o.card ? SUGGEST : null });
   }
   function W1() { return writer(); }
   function W1r() { return st.plan === 'B' ? writerB() : studio('Writer', proseMain(true), { noChat: true }); }
@@ -418,9 +426,8 @@
   }
   function WC3() {
     var n = st.parts.length;
-    return writer({ pick: true, card: chatCard('어느 부분을 고칠까요?', '<p class="w-mut">산문에서 문단을 눌러 고르세요. ' + (n ? '<b>' + st.parts.map(function (i) { return 'S' + (i + 1); }).join(', ') + '</b> 골랐어요.' : '아직 고른 문단이 없어요.') + '</p>' +
-      '<input class="w-in" data-bind="partNote" value="' + esc(st.partNote) + '" placeholder="어떻게 바꿀까요? 예: 대사를 더 웃기게" aria-label="어떻게 바꿀지">' +
-      '<div class="w-card-acts">' + B('뒤로', 'WC1', 'sm') + A('이 부분만 다시 쓰기', 'rewritePart', 'acc sm', n ? '' : ' disabled') + '</div>') });
+    return writer({ pick: true, card: chatCard('어느 부분을 고칠까요?', '<p style="margin:0">' + (st.plan === 'B' ? '위' : '왼쪽') + ' 산문에서 문단을 누르면 아래 채팅창에 붙어요. 어떻게 고칠지 적어서 보내 주세요.' +
+      (n ? ' 지금 <b>' + st.parts.map(function (i) { return 'S' + (i + 1); }).join(', ') + '</b>을(를) 골랐어요.' : '') + '</p><div class="w-card-acts">' + A('그만두기', 'cancelPart', 'sm') + '</div>') });
   }
   function W2() { return W1() + busy(st.parts.length && st.partMode ? '고른 문단을 고치고 있어요' : '산문을 고치고 있어요', ['요청 읽기', '세 가지 안 쓰기']); }
   function variantsHtml() {
@@ -675,7 +682,12 @@
     confirmStart: function () {
       st.ratioLocked = true;
       if (preserve()) { st.proseLocked = true; return 'W1r'; }
-      st.pending = function () { if (st.idea.trim()) st.title = st.idea.trim().split(/[.,\n]/)[0].slice(0, 18) || st.title; };
+      st.pending = function () {
+        var t = st.idea.trim();
+        if (!t) return;
+        st.title = t.split(/[.,\n]/)[0].slice(0, 18) || st.title;
+        if (t !== initial().idea && !st.file) st.prose = [t.split('\n')[0].replace(/[.]?$/, '.'), '일이 점점 커지고, 주인공은 어떻게든 수습하려 애쓴다.', '마지막에 주인공은 작은 것 하나를 얻고, 처음과 조금 달라진 얼굴로 돌아선다.'];
+      };
       return 'E5';
     },
     send: function (arg) {
@@ -703,7 +715,14 @@
     rwPick: function (a) { var kv = a.split(':'); st.rw[kv[0]] = +kv[1]; },
     rwClose: function () { st.rw = null; },
     rwApply: function () { var d = st.rw; st.rw = null; st.runtime = d.runtime; st.mood = d.mood; st.seed = d.seed; return ACTS.rewrite(); },
-    togglePart: function (i) { i = +i; var k = st.parts.indexOf(i); if (k >= 0) st.parts.splice(k, 1); else st.parts.push(i); st.parts.sort(); },
+    togglePart: function (i) { i = +i; var k = st.parts.indexOf(i); if (k >= 0) st.parts.splice(k, 1); else st.parts.push(i); st.parts.sort(); st.focusChat = true; },
+    sendPart: function () {
+      if (!st.parts.length) return;
+      st.partNote = st.chatDraft.trim(); st.chatDraft = '';
+      say('Writer', '나', st.parts.map(function (i) { return 'S' + (i + 1); }).join(', ') + (st.partNote ? ' — ' + st.partNote : ' 다듬어 줘'));
+      return ACTS.rewritePart();
+    },
+    cancelPart: function () { st.parts = []; st.chatDraft = ''; return 'W1'; },
     rewritePart: function () {
       if (!st.parts.length) return;
       st.partMode = true;
@@ -825,6 +844,7 @@
     refresh();
     root.querySelectorAll('.w-chat-b').forEach(function (c) { c.scrollTop = c.scrollHeight; });
     if (focusId) { var el = root.querySelector('[data-bind="' + focusId + '"]:not(.w-opt)'); if (el && el.focus) el.focus(); }
+    if (st.focusChat) { st.focusChat = false; var fc = root.querySelector('#chat-in'); if (fc) { fc.focus({ preventScroll: true }); return; } }
     if (st.rw) { var po = root.querySelector('.w-rwp .w-opt.on'); if (po) { po.focus({ preventScroll: true }); return; } }
     var dlg = root.querySelector('.w-modal');
     if (dlg && !focusId) { var f = dlg.querySelector('input, textarea, .w-acts .w-btn:last-child'); if (f) f.focus({ preventScroll: true }); }

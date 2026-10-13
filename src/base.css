@@ -597,3 +597,51 @@ a.btn { text-decoration: none; display: inline-block }
 .w-drawpad small { color: var(--w-mut); font-size: 11px }
 .w-fr { grid-template-columns: repeat(3, minmax(0, 1fr)) }
 .w-fr i { min-width: 0; width: auto }
+.w-rail button.done.open::before { content: "" }
+.w-rtmini { font-size: 12px; color: var(--w-mut); font-variant-numeric: tabular-nums; margin-left: 8px }
+.w-rtmini b { color: var(--w-ink) }
+.w-fr { grid-template-columns: repeat(2, minmax(0, 1fr)) }
+.w-fr.drawn i { display: grid; place-items: center; color: #fff; text-shadow: 0 1px 3px rgb(0 0 0 / .5); font-size: 12px; border: 0 }
+.w-fr.drawn i em { color: #fff; opacity: .9 }
+/* 상세 팝업 (v18 상세 참고) */
+.w-modal.xxl { width: min(1080px, 100%); max-height: calc(100vh - 80px); overflow: auto }
+.w-adet { display: grid; grid-template-columns: minmax(0, 1.3fr) minmax(0, 1fr); gap: 22px; align-items: start }
+@media (max-width: 760px) { .w-adet { grid-template-columns: 1fr } .w-adview { position: static } }
+.w-adview { position: sticky; top: 0; display: flex; flex-direction: column; gap: 8px }
+.w-advh { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; font-size: 13.5px }
+.w-advh .w-histbtn { position: static }
+.w-adv16 { position: relative; aspect-ratio: 16 / 9; border-radius: 10px; overflow: hidden; border: 1px solid var(--w-line) }
+.w-adv16 .w-th.big { width: 100%; height: 100%; aspect-ratio: auto; border-radius: 0; font-size: 24px }
+.w-adv16 .w-histpop { top: 8px }
+.w-advf { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; min-height: 28px; font-size: 12px }
+.w-adr { display: flex; flex-direction: column; gap: 4px; min-width: 0 }
+.w-rglab { font-size: 12px; font-weight: 600; margin: 12px 0 4px } .w-rglab:first-child { margin-top: 0 }
+.w-rglab small { font-weight: 400; font-size: 11px }
+.w-dbox { border: 1px solid var(--w-line); border-radius: 10px; padding: 9px 11px; display: flex; flex-direction: column; gap: 5px; background: var(--w-bg) }
+.w-dbox.off { opacity: .55 } .w-dbox.var { margin-top: 6px; border-color: var(--w-acc); background: var(--w-panel) }
+.w-dk { display: flex; align-items: center; gap: 6px; font-family: var(--mono); font-size: 10px; letter-spacing: .04em; color: var(--w-mut) }
+.w-dlock { font-family: var(--font); font-size: 10px; border: 1px solid var(--w-line); border-radius: 4px; padding: 0 5px }
+.w-dv { font-size: 12.5px; line-height: 1.6 }
+.w-pen { min-width: 26px; padding: 2px 6px }
+.w-edrow { display: flex; align-items: center; gap: 6px; justify-content: flex-end; font-size: 11.5px } .w-edrow > span { margin-right: auto }
+.w-vtag { font-size: 9.5px; padding: 1px 6px; border-radius: 20px; border: 1px solid var(--w-acc); color: var(--w-acc) }
+.w-wst { font-size: 10.5px; border: 1px solid var(--w-line); border-radius: 5px; padding: 0 6px; color: var(--w-mut) }
+.w-wst.warn { border-color: var(--lock); color: var(--lock) }
+.w-vlist { display: flex; flex-direction: column; border: 1px solid var(--w-line); border-radius: 10px; overflow: hidden }
+.w-vrow { display: flex; align-items: center; gap: 10px; padding: 8px 10px; border-top: 1px solid var(--w-line) } .w-vrow:first-child { border-top: 0 }
+.w-vrow.on { background: var(--accent-soft) }
+.w-vrow .w-th { width: 44px; height: 44px; border-radius: 8px; flex: none }
+.w-vrm { flex: 1; min-width: 0 } .w-vrn { display: flex; gap: 6px; align-items: center; flex-wrap: wrap; font-size: 12.5px }
+.w-vrd { font-size: 11.5px; color: var(--w-mut); white-space: nowrap; overflow: hidden; text-overflow: ellipsis } .w-vrow.on .w-vrd { white-space: normal }
+.w-vra { display: flex; gap: 4px; flex: none } .w-vview { font-size: 11px; color: var(--w-acc) }
+.w-vaddf { border: 1px dashed var(--w-line); border-radius: 10px; padding: 10px 11px; display: flex; flex-direction: column; gap: 8px; margin-top: 6px }
+.w-refadd { width: 100%; margin-top: 6px; border-style: dashed !important; color: var(--accent) !important }
+.w-usechips { display: flex; flex-wrap: wrap; gap: 5px }
+.w-usecard { display: grid; grid-template-columns: 130px minmax(0, 1fr); gap: 11px; border-radius: 10px; padding: 9px; background: var(--w-bg); margin-top: 6px; font-size: 12px }
+.w-usecard .w-fr { grid-template-columns: 1fr }
+.w-afnote { margin-right: auto; font-size: 12px } .w-afnote b { color: var(--lock) }
+.w-wrnote { margin: 0 0 10px; font-size: 12px; border: 1px solid var(--w-line); border-radius: 8px; padding: 7px 10px; background: var(--w-bg) }
+.w-rgrefs { display: flex; flex-direction: column; gap: 6px }
+.w-rgref { display: flex; align-items: center; gap: 10px; border: 1px solid var(--w-line); background: var(--w-bg); border-radius: 9px; padding: 6px 10px; font-size: 12.5px; cursor: pointer }
+.w-rgref .w-th { width: 34px; height: 40px }
+.w-rgref em { display: block; font-style: normal; font-size: 11px; color: var(--w-mut) }

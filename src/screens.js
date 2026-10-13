@@ -493,8 +493,7 @@
   };
   function refStrip(key, refs) {
     return '<div class="w-refs">' + refs.map(function (r, k) { return '<span class="w-ref" title="' + esc(r) + '">' + esc(r.slice(0, 6)) + '<button class="w-x" data-act="delRef" data-arg="' + key + ':' + k + '" aria-label="레퍼런스 빼기">×</button></span>'; }).join('') +
-      '<label class="w-ref add" title="레퍼런스 이미지 올리기">＋<input type="file" accept="image/*" class="ref-in" data-ref="' + key + '" hidden></label>' +
-      A('예시 넣기', 'addRef', 'sm w-link', ' data-arg="' + key + '"') + '</div>';
+      '<label class="w-ref add" title="레퍼런스 이미지 올리기">＋<input type="file" accept="image/*" class="ref-in" data-ref="' + key + '" hidden></label></div>';
   }
   var refsOf = function (key) { return key === 'style' ? st.styleRefs : objs()[+key].refs; };
   function newVersion(style) {
@@ -561,7 +560,7 @@
       (unnamed ? '"지나가던 사람들"처럼 이름 없는 인물은 따로 뽑지 않았어요. 필요하면 산문에서 이름을 붙여 주세요.' : '') + '</div>' +
       (miss.length ? '<div class="w-err w-miss" role="alert">브레이크다운 오류: 산문에는 <b>' + esc(miss.join(', ')) + '</b>이(가) 나오는데 목록에 없어요.<div class="w-card-acts">' + A('다시 뽑기', 'rebreak', 'sm') + A('목록에 넣기 (산문에 있는 이름만)', 'addMissing', 'sm') + '</div></div>' : '') +
       filterBar() + rows('text') + '<p class="w-note">상태 추가(씬마다 다른 옷·나이)는 Storyboard 단계에서 할 수 있어요.</p>' +
-      '<div class="w-foot">' + B('빠진 인물·배경이 있어요', 'R1') + (miss.length ? '' : A('목업: 브레이크다운 오류 보기', 'fakeMiss', 'sm w-link')) + B('목록이 맞아요 · 그림 만들기 →', 'A2', 'pri', miss.length ? ' disabled title="빠진 이름을 먼저 정리해 주세요"' : '') + '</div>';
+      '<div class="w-foot">' + B('빠진 인물·배경이 있어요', 'R1') + B('목록이 맞아요 · 그림 만들기 →', 'A2', 'pri', miss.length ? ' disabled title="빠진 이름을 먼저 정리해 주세요"' : '') + '</div>';
     return studio('Artist', main, { noChat: true });
   }
   function A0() { return A1() + busy('인물·배경을 뽑고 있어요', ['산문 읽기', '인물 · 배경 찾기', '인물별 상태 세분화']); }
@@ -912,7 +911,6 @@
     },
     editMode: function (m) { st.editMode = m; },
     afilter: function (f) { st.afilter = f; },
-    fakeMiss: function () { var k = st.chars.map(function (c) { return c.n; }).indexOf('팀장'); if (k >= 0) { st.removed = st.chars.splice(k, 1)[0]; } },
     rebreak: function () { st.pending = function () { if (st.removed) { st.chars.push(st.removed); st.removed = null; } say('Artist', 'Artist', '다시 뽑았어요. 빠졌던 인물이 목록에 들어왔어요.'); }; return 'A0'; },
     addMissing: function () { missingNames().forEach(function (n) { var back = st.removed && st.removed.n === n ? st.removed : null; st.chars.push(back || { n: n, d: '산문에 나오는 인물. 설명은 다시 뽑거나 직접 적어 주세요.', states: ['기본'], tone: 0, note: '' }); }); st.removed = null; },
     addRef: function (key) { var r = refsOf(key); r.push((key === 'style' ? '그림체' : '참고') + '_' + (r.length + 1) + '.jpg'); },

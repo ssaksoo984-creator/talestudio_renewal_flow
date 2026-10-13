@@ -81,6 +81,7 @@ body.docked .drawer { width: var(--dockw); box-shadow: none }
     $('back').disabled = !trail.length;
     $('toIndex').href = 'flow.html#' + id;
     $('nodeInfo').innerHTML = (n.desc ? '<p>' + esc(n.desc) + '</p>' : '') +
+      (n.items ? '<ul>' + n.items.map(function (x) { return '<li>' + esc(x) + '</li>'; }).join('') + '</ul>' : '') +
       (n.lock ? '<p style="color:var(--lock)">🔒 여기서 잠겨요: ' + esc(n.lock) + '</p>' : '') +
       (n.open ? '<ul class="open">' + n.open.map(function (x) { return '<li>' + esc(x) + '</li>'; }).join('') + '</ul>' : '') +
       (n.fixes ? '<p style="color:var(--yes)">풀리는 오류 ' + n.fixes.map(function (k) { return '#' + k; }).join(' ') + '</p>' : '');

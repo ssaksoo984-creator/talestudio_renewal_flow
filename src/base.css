@@ -320,3 +320,22 @@ a.btn { text-decoration: none; display: inline-block }
 .w-opt em { display: block }
 .w-levels { grid-template-columns: repeat(3, minmax(0, 1fr)) }
 @media (max-width: 560px) { .w-levels { grid-template-columns: minmax(0, 1fr) } .w-lv { border-left: 0; border-top: 1px solid var(--w-line) } .w-lv:first-child { border-top: 0 } }
+
+/* ── Writer 1안: 산문 위 한 줄 도구 막대 ── */
+.w-tbar { display: flex; flex-wrap: wrap; gap: 6px; align-items: center; border-bottom: 1px solid var(--w-line); padding-bottom: 10px }
+.w-tbar-sp { flex: 1 }
+.w-popwrap { position: relative }
+.w-cchip { font: inherit; font-size: 12.5px; display: inline-flex; gap: 6px; align-items: baseline; border: 1px solid var(--w-line); background: var(--w-panel); color: var(--w-ink); border-radius: 99px; padding: 4px 10px; cursor: pointer }
+.w-cchip i { font-style: normal; font-size: 11px; color: var(--w-mut) }
+.w-cchip span { font-size: 10px; color: var(--w-mut) }
+.w-cchip em { font-style: normal; font-size: 10px; color: var(--w-acc); font-weight: 600 }
+.w-cchip.diff { border-color: var(--w-acc); background: color-mix(in srgb, var(--w-acc) 10%, var(--w-panel)) }
+.w-cchip.open, .w-cchip:hover { border-color: var(--w-pri) }
+.w-cchip:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px }
+.w-pop { position: absolute; z-index: 5; top: calc(100% + 4px); left: 0; min-width: 190px; max-height: 300px; overflow: auto; background: var(--w-panel); border: 1px solid var(--w-line); border-radius: 10px; box-shadow: 0 10px 30px rgb(0 0 0 / .18); padding: 4px; display: grid }
+.w-popo { font: inherit; font-size: 12.5px; text-align: left; border: 0; background: none; color: var(--w-ink); border-radius: 6px; padding: 6px 9px; cursor: pointer; display: grid; grid-template-columns: 1fr auto; gap: 0 8px }
+.w-popo small { grid-column: 1; font-size: 11px; color: var(--w-mut) }
+.w-popo em { grid-column: 2; grid-row: 1; font-style: normal; font-size: 10px; color: var(--w-mut) }
+.w-popo:hover, .w-popo:focus-visible { background: var(--w-bg); outline: none }
+.w-popo.on { background: color-mix(in srgb, var(--w-acc) 12%, var(--w-panel)); font-weight: 600 }
+.w-btn.glow { box-shadow: 0 0 0 3px color-mix(in srgb, var(--w-acc) 30%, transparent) }

@@ -53,38 +53,42 @@
       'classDef isnew stroke:' + css('--new') + ',stroke-dasharray:5 3,stroke-width:2px'
     ];
   }
-  // 단계마다 따로 그린다. 다른 단계로 가는 선은 "→ ID" 상자로 끝낸다
+  // 단계마다 따로 그린다. 다른 단계로 가는 선과, 같은 단계 안에서 앞 노드로 되돌아가는 선은
+  // 길게 돌아가는 대신 "→ ID" / "↩ ID" 작은 상자로 끝낸다. 그래야 선이 엉키지 않는다.
   function definition(stage) {
     var d = ['flowchart TB'], styles = [], k = 0;
     var mine = F.nodes.filter(function (n) { return n.stage === stage.id && inPlan(n.plan); });
-    var ids = {}; mine.forEach(function (n) { ids[n.id] = 1; d.push('  ' + shape(n)); });
+    var ids = {}, order = {}; mine.forEach(function (n, i) { ids[n.id] = 1; order[n.id] = i; d.push('  ' + shape(n)); });
     F.edges.forEach(function (e) {
       if (!ids[e[0]] || !inPlan(e[4]) || !byId[e[1]] || !inPlan(byId[e[1]].plan)) return;
-      var to = e[1];
-      if (!ids[to]) {
-        var t = byId[to];
+      var to = e[1], t = byId[to];
+      var cross = !ids[to], back = !cross && order[to] <= order[e[0]];
+      if (cross || back) {
         to = 'go__' + e[1] + '__' + k;
-        d.push('  ' + to + '(["' + (e[3] === 'back' ? '↩ ' : '→ ') + e[1] + ' ' + t.label.replace(/"/g, '#quot;') + (e[3] === 'back' ? '' : ' · ' + stageName[t.stage]) + '"])');
+        var ret = back || e[3] === 'back';
+        d.push('  ' + to + '(["' + (ret ? '↩ ' : '→ ') + e[1] + ' ' + t.label.replace(/"/g, '#quot;') + (cross && e[3] !== 'back' ? ' · ' + stageName[t.stage] : '') + '"])');
         d.push('class ' + to + ' ' + (e[3] === 'back' ? 'stubback' : 'stub'));
       }
       var arrow = e[3] === 'back' || e[3] === 'no' ? '-.->' : '-->';
       d.push(e[0] + ' ' + arrow + (e[2] ? '|"' + e[2] + '"|' : '') + ' ' + to);
-      if (e[3] === 'back') styles.push('linkStyle ' + k + ' stroke:' + css('--back') + ',stroke-width:2px');
-      if (e[3] === 'yes') styles.push('linkStyle ' + k + ' stroke:' + css('--yes') + ',stroke-width:1.6px');
+      if (e[3] === 'back') styles.push('linkStyle ' + k + ' interpolate ' + CURVE + ' stroke:' + css('--back') + ',stroke-width:2px');
+      if (e[3] === 'yes') styles.push('linkStyle ' + k + ' interpolate ' + CURVE + ' stroke:' + css('--yes') + ',stroke-width:1.6px');
       k++;
     });
+    if (k) styles.unshift('linkStyle default interpolate ' + CURVE);
     d = d.concat(classDefs());
     mine.forEach(function (n) { d.push('class ' + n.id + ' ' + n.type + (n.vs === 'new' ? ',isnew' : '')); });
     return d.concat(styles).join('\n');
   }
 
+  var CURVE = 'stepAfter'; // 직각으로 꺾이는 선
   var box = null, opts = {}, cur = null, zoom = 1, gen = 0, plan = 'A';
   function inPlan(p) { return !p || p === plan; }
   function render() {
     if (!box) return Promise.resolve();
     ensureGradient();
     if (!window.mermaid) { box.innerHTML = '<div class="loading">플로우 그리기 도구를 불러오지 못했어요. 네트워크를 확인하고 새로고침해 주세요.</div>'; return Promise.resolve(); }
-    mermaid.initialize({ startOnLoad: false, theme: 'base', securityLevel: 'strict', flowchart: { htmlLabels: true, curve: 'basis', nodeSpacing: 24, rankSpacing: 34, padding: 8 },
+    mermaid.initialize({ startOnLoad: false, theme: 'base', securityLevel: 'strict', flowchart: { htmlLabels: true, curve: CURVE, nodeSpacing: 26, rankSpacing: 36, padding: 8 },
       themeVariables: { fontFamily: css('--font'), fontSize: '13px', primaryColor: css('--surface'), primaryTextColor: css('--ink'), primaryBorderColor: css('--mut'), lineColor: css('--mut'), edgeLabelBackground: css('--surface'), titleColor: css('--ink') } });
     var g0 = ++gen;
     box.innerHTML = F.stages.map(function (s) {

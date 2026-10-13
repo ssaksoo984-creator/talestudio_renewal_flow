@@ -384,3 +384,39 @@ a.btn { text-decoration: none; display: inline-block }
 .w-chat .w-cin.pick { margin: 8px; border: 1px solid var(--w-acc); border-radius: 10px; padding: 6px }
 .w-qr.col .w-btn small { color: var(--w-mut); margin-left: 6px; font-size: 11px }
 .w-qr.col .w-btn { text-align: left }
+
+/* ── Artist: 목록형 · 버전 기록 ── */
+.w-rows { list-style: none; margin: 0; padding: 0; border: 1px solid var(--w-line); border-radius: 10px; background: var(--w-panel); overflow: hidden }
+.w-row { display: grid; grid-template-columns: auto minmax(0, 1fr) auto; gap: 12px; align-items: center; padding: 10px 12px; border-top: 1px solid var(--w-line) }
+.w-row:first-child { border-top: 0 }
+.w-row.is-new { box-shadow: inset 3px 0 0 var(--new) }
+.w-row-b { display: grid; gap: 3px; min-width: 0 }
+.w-row-b b small { font-weight: 400; color: var(--w-mut); font-size: 11px }
+.w-row-b p { margin: 0; font-size: 12px; color: var(--w-mut) }
+.w-row-st { display: flex; flex-wrap: wrap; gap: 4px }
+.w-row-st span { font-size: 11px; border: 1px solid var(--w-line); border-radius: 99px; padding: 0 7px; color: var(--w-ink) }
+.w-row-a { display: flex; gap: 4px }
+.w-rows:not(:has(.w-th)) .w-row { grid-template-columns: minmax(0, 1fr) auto }
+.w-th { width: 46px; height: 60px; border-radius: 6px; display: grid; place-items: center; color: #fff; font-size: 12px; font-weight: 600; text-shadow: 0 1px 3px rgb(0 0 0 / .45); position: relative; flex: none }
+.w-th.bg { width: 72px; height: 46px }
+.w-th i { position: absolute; right: 3px; bottom: 2px; font-style: normal; font-size: 9px; font-weight: 500; font-family: var(--mono) }
+.w-th.empty { background: repeating-linear-gradient(45deg, var(--w-line) 0 4px, transparent 4px 8px); color: var(--w-mut); text-shadow: none; font-size: 9.5px; font-weight: 400; text-align: center; border: 1px solid var(--w-line) }
+.w-stybar .w-tbar-sp { flex: 1 }
+.w-stybar .w-btn { margin-left: 0 }
+.w-sty small { font-size: 10px; color: var(--w-acc) }
+.w-vers { list-style: none; margin: 0; padding: 0; display: grid; gap: 8px; max-height: 420px; overflow: auto }
+.w-vers li { display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 6px 10px; align-items: center; border: 1px solid var(--w-line); border-radius: 9px; padding: 8px 10px }
+.w-vers li.on { border-color: var(--w-acc) }
+.w-vers-h { display: flex; gap: 8px; align-items: baseline; grid-column: 1 }
+.w-vers-h b { font-family: var(--mono) }
+.w-vers-h span { font-size: 12px; color: var(--w-mut) }
+.w-vers-h em { font-style: normal; font-size: 10.5px; color: var(--w-acc); font-weight: 600 }
+.w-vers-t { display: flex; gap: 4px; flex-wrap: wrap; grid-column: 1 }
+.w-vers .w-th { width: 30px; height: 40px; font-size: 9px }
+.w-vers .w-th.bg { width: 48px; height: 32px }
+.w-vers li > .w-btn { grid-column: 2; grid-row: 1 / span 2 }
+.w-ohist { list-style: none; margin: 0; padding: 0; display: flex; gap: 8px; flex-wrap: wrap }
+.w-ohist li { display: grid; gap: 3px; justify-items: center; font-size: 10.5px; color: var(--w-mut) }
+.w-ohist li.on span { color: var(--w-acc); font-weight: 600 }
+.w-ohist li.off .w-th { opacity: .4 }
+@media (max-width: 560px) { .w-row { grid-template-columns: auto minmax(0, 1fr) } .w-row-a { grid-column: 2 } }

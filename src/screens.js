@@ -84,7 +84,7 @@
       ],
       bgs: [{ n: '회사 복도 자판기 앞', d: '낮, 형광등, 리놀륨 바닥, 빨간 자판기 한 대.', tone: 0 }],
       newItems: [],
-      style: 1, styleLocked: false, generated: false,
+      style: 1, styleLocked: false, generated: false, versions: [], ver: 0, regenStyle: null,
       target: 0, toneDraft: 0, tweak: '',
       shots: [
         { sc: 1, len: 3, cam: 0, desc: '민호가 버튼을 누른다', who: [0], lines: [] },
@@ -160,7 +160,7 @@
       '<button class="w-btn ghost" data-act="skip">기다리지 않고 넘기기 →</button></div></div>';
   }
   var styleBg = function (i) { return 'linear-gradient(135deg,' + STYLES[i][1] + ')'; };
-  var target = function () { var n = st.chars.length; return st.target < n ? st.chars[st.target] : st.bgs[st.target - n]; };
+  var target = function () { return objs()[st.target] || objs()[0]; };
   var shotLabel = function (i) { var s = st.shots[i], k = 0; for (var j = 0; j <= i; j++) if (st.shots[j].sc === s.sc) k++; return 'S' + s.sc + '-' + k; };
   var total = function () { return st.shots.reduce(function (a, s) { return a + s.len; }, 0); };
   function say(stage, who, text) { st.chat[stage].push([who, text]); }
@@ -473,31 +473,51 @@
   }
 
   /* ── Artist ── */
-  function card(x, i, isBg, img) {
-    var idx = isBg ? st.chars.length + i : i;
-    var tone = TONES[x.tone];
-    var isNew = st.newItems.indexOf(x.n) >= 0;
-    var h = '<div class="w-card' + (isNew ? ' is-new' : '') + '">';
-    if (img) h += '<div class="w-img' + (isBg ? ' bg' : '') + (x.tone === 2 ? ' horror' : '') + '" style="background:' + (x.tone === 2 ? 'linear-gradient(135deg,#3a2b4a,#8a1f2e)' : styleBg(st.style)) + '">' + esc(x.n) + '</div>';
-    h += '<b>' + esc(x.n) + ' <small>' + (isBg ? '배경' : '인물') + (isNew ? ' · 새로' : '') + '</small></b>';
-    if (!img && st.descEdit === idx) h += '<textarea class="w-ta sm" rows="3" data-bind="' + (isBg ? 'bgs.' + i : 'chars.' + i) + '.d" aria-label="설명">' + esc(x.d) + '</textarea>';
-    else h += '<p>' + esc(x.d) + '</p>';
-    if (!isBg) h += '<ul class="w-states">' + x.states.map(function (s) { return '<li>' + esc(s) + '</li>'; }).join('') + '</ul>';
-    if (img && (x.tone || x.note)) h += '<p class="w-tone">톤 ' + esc(tone) + (x.note ? ' · ' + esc(x.note) : '') + '</p>';
-    h += '<div class="w-card-acts">';
-    if (img) h += A('톤: ' + esc(tone) + ' ▾', 'openTone', 'sm', ' data-arg="' + idx + '"') + A('AI로 고치기', 'openTone', 'sm', ' data-arg="' + idx + '"');
-    else h += (st.descEdit === idx ? A('완료', 'descDone', 'sm pri') : A('설명 고치기', 'descEdit', 'sm', ' data-arg="' + idx + '"')) + (isBg ? '' : '<button class="w-btn sm" disabled title="Storyboard에서 추가해요">상태 추가</button>');
-    return h + '</div></div>';
+  // 인물·배경을 한 목록으로 다룬다. 그림은 생성할 때마다 버전(v1, v2…)으로 남고, 객체마다도 기록이 쌓인다.
+  // 스타일은 작품에 하나라서: 전체 버전을 불러오면 스타일도 그 버전으로 바뀌고, 하나만 다시 만들기·불러오기는 지금 스타일 안에서만 된다.
+  function objs() {
+    var a = st.chars.concat(st.bgs);
+    a.forEach(function (o, i) { if (!o.hist) { o.hist = []; o.cur = -1; } o.isBg = i >= st.chars.length; });
+    return a;
   }
-  function cards(img) {
-    return '<div class="w-cards">' + st.chars.map(function (x, i) { return card(x, i, false, img); }).join('') + st.bgs.map(function (x, i) { return card(x, i, true, img); }).join('') + '</div>';
+  function newVersion(style) {
+    var n = st.versions.length + 1;
+    objs().forEach(function (o) { o.hist.push({ style: style, tone: o.tone || 0, note: '', v: n }); o.cur = o.hist.length - 1; });
+    st.versions.push({ n: n, style: style, snap: objs().map(function (o) { return o.cur; }) });
+    st.ver = st.versions.length - 1;
+  }
+  function thumb(o, h, big) {
+    if (!h) return '<span class="w-th empty' + (o.isBg ? ' bg' : '') + '">그림 없음</span>';
+    var bg = h.tone === 2 ? 'linear-gradient(135deg,#3a2b4a,#8a1f2e)' : styleBg(h.style);
+    return '<span class="w-th' + (o.isBg ? ' bg' : '') + (big ? ' big' : '') + '" style="background:' + bg + ';filter:hue-rotate(' + ((h.v * 23 + (h.r || 0) * 41) % 90) + 'deg)">' + esc(o.n.slice(0, 2)) + '<i>v' + h.v + (h.r ? '·' + h.r : '') + '</i></span>';
+  }
+  function row(o, i, mode) {
+    var h = o.cur >= 0 ? o.hist[o.cur] : null;
+    var isNew = st.newItems.indexOf(o.n) >= 0;
+    var desc = mode === 'text' && st.descEdit === i
+      ? '<textarea class="w-ta sm" rows="2" data-bind="' + (o.isBg ? 'bgs.' + (i - st.chars.length) : 'chars.' + i) + '.d" aria-label="설명">' + esc(o.d) + '</textarea>'
+      : '<p>' + esc(o.d) + '</p>';
+    var acts = mode === 'text'
+      ? (st.descEdit === i ? A('완료', 'descDone', 'sm pri') : A('설명 고치기', 'descEdit', 'sm', ' data-arg="' + i + '"'))
+      : A(h ? '다시 만들기' : '만들기', 'openTone', 'sm', ' data-arg="' + i + '"');
+    return '<li class="w-row' + (isNew ? ' is-new' : '') + '">' + (mode === 'img' ? thumb(o, h) : '') +
+      '<div class="w-row-b"><b>' + esc(o.n) + ' <small>' + (o.isBg ? '배경' : '인물') + (isNew ? ' · 새로' : '') + '</small></b>' + desc +
+      (o.isBg ? '' : '<div class="w-row-st">' + o.states.map(function (x) { return '<span>' + esc(x) + '</span>'; }).join('') + '</div>') +
+      (h && (h.tone || h.note) ? '<p class="w-tone">톤 ' + esc(TONES[h.tone]) + (h.note ? ' · ' + esc(h.note) : '') + '</p>' : '') + '</div>' +
+      '<div class="w-row-a">' + acts + '</div></li>';
+  }
+  function rows(mode) { return '<ul class="w-rows">' + objs().map(function (o, i) { return row(o, i, mode); }).join('') + '</ul>'; }
+  function styleRow(bind, cur) {
+    return '<div class="w-styles" role="radiogroup">' + STYLES.map(function (s, i) {
+      return '<button class="w-sty' + (i === cur ? ' on' : '') + '" role="radio" aria-checked="' + (i === cur) + '" data-bind="' + bind + '" data-val="' + i + '"><i style="background:' + styleBg(i) + '"></i>' + esc(s[0]) + (bind === 'regenStyle' && i === st.style ? '<small>지금</small>' : '') + '</button>';
+    }).join('') + '</div>';
   }
   function A1() {
     var unnamed = /사람들|누군가|행인/.test(st.prose.join(' '));
     var main = '<div class="w-title"><h3>Artist · 브레이크다운</h3><span class="w-mut">확정 산문에서 뽑은 인물 ' + st.chars.length + ' · 배경 ' + st.bgs.length + '</span></div>' +
       '<div class="w-diag"><b>AI 진단</b>' + (st.newItems.length ? '새로 들어온 것: ' + esc(st.newItems.join(', ')) + '. ' : '산문의 인물과 장소를 모두 찾았어요. ') +
       (unnamed ? '"지나가던 사람들"처럼 이름 없는 인물은 따로 뽑지 않았어요. 필요하면 산문에서 이름을 붙여 주세요.' : '') + '</div>' +
-      cards(false) + '<p class="w-note">상태 추가(씬마다 다른 옷·나이)는 Storyboard 단계에서 할 수 있어요.</p>' +
+      rows('text') + '<p class="w-note">상태 추가(씬마다 다른 옷·나이)는 Storyboard 단계에서 할 수 있어요.</p>' +
       '<div class="w-foot">' + B('빠진 인물·배경이 있어요', 'R1') + B('목록이 맞아요 · 스타일 고르기 →', 'A2', 'pri') + '</div>';
     return studio('Artist', main, { noChat: true });
   }
@@ -507,42 +527,60 @@
   }
   function R1() { return A1() + rollbackModal('Artist', [['잃는 것', '없음 (아직 그림이 없어요)'], ['다음', 'Writer 산문이 다시 열려요 → 고치고 다시 브레이크다운']], 'A1'); }
   function A2() {
-    var main = '<div class="w-title"><h3>Artist · 스타일</h3><span class="w-mut">이 작품의 스타일은 하나예요</span></div>' +
-      '<div class="w-styles" role="radiogroup">' + STYLES.map(function (s, i) {
-        return '<button class="w-sty' + (i === st.style ? ' on' : '') + '" role="radio" aria-checked="' + (i === st.style) + '" data-bind="style" data-val="' + i + '"><i style="background:' + styleBg(i) + '"></i>' + esc(s[0]) + '</button>';
-      }).join('') + '</div>' + cards(false) +
-      '<div class="w-foot"><span class="w-mut">인물 ' + st.chars.length + ' · 배경 ' + st.bgs.length + ' · 예상 크레딧 표시 자리</span>' + B(esc(STYLES[st.style][0]) + ' 스타일로 전체 생성', 'A3', 'acc') + '</div>';
+    var main = '<div class="w-title"><h3>Artist · 스타일</h3><span class="w-mut">이 작품의 스타일은 하나예요</span></div>' + styleRow('style', st.style) + rows('text') +
+      '<div class="w-foot"><span class="w-mut">인물 ' + st.chars.length + ' · 배경 ' + st.bgs.length + ' · 예상 크레딧 표시 자리</span>' + B(esc(STYLES[st.style][0]) + ' 스타일로 생성', 'A3', 'acc') + '</div>';
     return studio('Artist', main, { noChat: true });
   }
   function A3() {
     var n = st.chars.reduce(function (a, c) { return a + c.states.length; }, 0);
-    return A2() + modal(STYLES[st.style][0] + ' 스타일로 만들까요?', list([['만드는 것', '인물 시트 ' + st.chars.length + ' (상태 ' + n + ') · 배경 ' + st.bgs.length], ['🔒 스타일', esc(STYLES[st.style][0]) + '으로 잠겨요. 바꾸면 전체를 다시 만들어요'], ['예상 크레딧', '표시 자리']]),
+    return A2() + modal(STYLES[st.style][0] + ' 스타일로 만들까요?', list([['만드는 것', '인물 시트 ' + st.chars.length + ' (상태 ' + n + ') · 배경 ' + st.bgs.length], ['스타일', esc(STYLES[st.style][0]) + ' — 작품에 하나뿐인 값이에요'], ['예상 크레딧', '표시 자리']]),
       B('아니오', 'A2') + A('예, 만들기', 'generate', 'acc'));
   }
-  function A4() { return A2() + busy('그림을 만들고 있어요', st.chars.map(function (c) { return c.n + ' 시트'; }).concat(st.bgs.map(function (b) { return b.n; }))); }
+  function A4() { return (st.versions.length ? A5() : A2()) + busy('그림을 만들고 있어요', objs().map(function (o) { return o.n; })); }
   function A5() {
-    var main = '<div class="w-title"><h3>Artist</h3>' + B('다음: Storyboard로 →', 'A9', 'pri') + '</div>' +
-      '<div class="w-stybar"><i style="background:' + styleBg(st.style) + '"></i><b>' + esc(STYLES[st.style][0]) + '</b><span class="w-lock">🔒 스타일</span>' + B('스타일 바꾸기', 'A6', 'warn sm') + '</div>' +
-      cards(true) + '<div class="w-foot">' + B('＋ 인물·배경 추가', 'R2') + '</div>';
+    if (!st.versions.length) newVersion(st.style);
+    var v = st.versions[st.ver];
+    var main = '<div class="w-title"><h3>Artist</h3><span class="w-mut">인물 ' + st.chars.length + ' · 배경 ' + st.bgs.length + '</span></div>' +
+      '<div class="w-stybar"><i style="background:' + styleBg(st.style) + '"></i><b>' + esc(STYLES[st.style][0]) + '</b><span class="w-mut">작품 스타일 · v' + v.n + '</span>' +
+      '<span class="w-tbar-sp"></span>' + B('불러오기 · 기록 ' + st.versions.length, 'AV', 'sm', st.versions.length > 1 ? '' : ' disabled title="재생성하면 이전 버전이 여기 남아요"') + B('재생성하기', 'A6', 'sm') + '</div>' +
+      rows('img') +
+      '<div class="w-foot">' + B('＋ 인물·배경 추가', 'R2') + B('완료하기 →', 'A9', 'pri') + '</div>';
     return studio('Artist', main, { ph: '예: 민호 넥타이를 더 느슨하게' });
   }
   function A6() {
-    return A5() + modal('스타일을 바꾸면 전체를 다시 만들어요', list([['다시 만드는 것', '인물 시트 ' + st.chars.length + ' · 배경 ' + st.bgs.length], ['그대로인 것', '객체별 톤'], ['예상 크레딧', '표시 자리']]),
-      B('아니오', 'A5') + A('예, 스타일 다시 고르기', 'unlockStyle', 'warn'));
+    if (st.regenStyle == null) st.regenStyle = st.style;
+    return A5() + modal('어떤 스타일로 다시 만들까요?', '<p>같은 스타일로 다시 만들어도 되고, 다른 스타일을 골라도 돼요. 지금 버전(v' + st.versions[st.ver].n + ' · ' + esc(STYLES[st.style][0]) + ')은 기록에 남아서 언제든 불러올 수 있어요.</p>' +
+      styleRow('regenStyle', st.regenStyle) + list([['다시 만드는 것', '인물 ' + st.chars.length + ' · 배경 ' + st.bgs.length + ' 전체'], ['스타일', esc(STYLES[st.regenStyle][0]) + (st.regenStyle === st.style ? ' (그대로)' : ' — 작품 스타일이 이걸로 바뀌어요')], ['예상 크레딧', '표시 자리']]),
+      A('취소', 'regenCancel') + A('다시 만들기', 'regenAll', 'acc'), true);
+  }
+  function AV() {
+    var all = objs();
+    return A5() + modal('생성 기록', '<p>마음에 들었던 버전을 불러오세요. 스타일은 작품에 하나라서, 불러오면 스타일도 그 버전으로 바뀌어요.</p>' +
+      '<ul class="w-vers">' + st.versions.slice().reverse().map(function (v) {
+        var i = v.n - 1, on = i === st.ver;
+        return '<li class="' + (on ? 'on' : '') + '"><div class="w-vers-h"><b>v' + v.n + '</b><span>' + esc(STYLES[v.style][0]) + '</span>' + (on ? '<em>지금</em>' : '') + '</div>' +
+          '<div class="w-vers-t">' + all.map(function (o, k) { return thumb(o, o.hist[v.snap[k]]); }).join('') + '</div>' +
+          (on ? '' : A('불러오기', 'loadVer', 'sm', ' data-arg="' + i + '"')) + '</li>';
+      }).join('') + '</ul>', B('닫기', 'A5'), true);
   }
   function A7() {
-    var t = target();
-    return A5() + modal(t.n + '의 톤', '<p>이 객체에만 적용돼요. 스타일(' + esc(STYLES[st.style][0]) + ' 🔒)과 다른 객체는 그대로예요.</p>' +
-      opts('toneDraft', TONES, st.toneDraft) +
+    var o = target();
+    var hist = o.hist.map(function (h, k) {
+      var same = h.style === st.style, on = k === o.cur;
+      return '<li class="' + (on ? 'on' : '') + (same ? '' : ' off') + '">' + thumb(o, h) + '<span>' + (on ? '지금' : same ? '' : esc(STYLES[h.style][0]) + ' · 다른 스타일') + '</span>' +
+        (!on && same ? A('불러오기', 'objLoad', 'sm', ' data-arg="' + k + '"') : '') + '</li>';
+    }).join('');
+    return A5() + modal(o.n + ' 다시 만들기', '<p>스타일은 작품 스타일(' + esc(STYLES[st.style][0]) + ') 그대로예요. 이 ' + (o.isBg ? '배경' : '인물') + '만 다시 만들고 나머지는 그대로예요.</p>' +
+      '<div class="w-q"><div class="w-q-t">톤 <small>이 객체에만</small></div>' + opts('toneDraft', TONES, st.toneDraft) + '</div>' +
       '<div class="w-q"><div class="w-q-t">AI에게 고칠 점 <small>선택</small></div><input class="w-in" data-bind="tweak" value="' + esc(st.tweak) + '" placeholder="예: 넥타이를 더 느슨하게" aria-label="고칠 점"></div>' +
-      list([['다시 만드는 것', esc(t.n) + ' 1장'], ['예상 크레딧', '표시 자리']]),
-      B('취소', 'A5') + A(esc(t.n) + '만 다시 만들기', 'applyTone', 'acc'));
+      (o.hist.length ? '<div class="w-q"><div class="w-q-t">이 ' + (o.isBg ? '배경' : '인물') + '의 기록 <small>같은 스타일만 불러올 수 있어요</small></div><ul class="w-ohist">' + hist + '</ul></div>' : ''),
+      B('취소', 'A5') + A(esc(o.n) + '만 다시 만들기', 'applyTone', 'acc'), true);
   }
   function A8() { return A5() + busy(target().n + '을(를) 다시 만들고 있어요'); }
-  function R2() { return A5() + rollbackModal('Artist', [['그대로인 것', '바뀌지 않은 인물·배경 그림 (제안 · 개발 확인)'], ['다시 하는 것', '산문 확정 → 브레이크다운 → 새 객체 그림'], ['🔒 스타일', esc(STYLES[st.style][0]) + ' 유지']], 'A5'); }
+  function R2() { return A5() + rollbackModal('Artist', [['그대로인 것', '바뀌지 않은 인물·배경 그림 (제안 · 개발 확인)'], ['다시 하는 것', '산문 확정 → 브레이크다운 → 새 객체 그림'], ['스타일', esc(STYLES[st.style][0]) + ' 유지']], 'A5'); }
   function A9() {
-    return A5() + modal('Storyboard로 넘길까요?', list([['넘어가는 것', '확정 산문 · 인물 ' + st.chars.length + ' · 배경 ' + st.bgs.length + ' · 🔒 ' + esc(STYLES[st.style][0])], ['다음', 'AI가 씬·샷을 나누고 러프를 그려요'], ['나중에 인물·배경을 늘리려면', '산문으로 롤백해야 해요. 상태는 Storyboard에서 추가할 수 있어요']]),
-      B('아니오', 'A5') + A('예, 넘기기', 'toBoard', 'pri'));
+    return A5() + modal('완료하고 Storyboard로 넘길까요?', list([['넘어가는 것', '확정 산문 · 인물 ' + st.chars.length + ' · 배경 ' + st.bgs.length + ' · 스타일 ' + esc(STYLES[st.style][0]) + ' (v' + st.versions[st.ver].n + ')'], ['다음', 'AI가 씬·샷을 나누고 러프를 그려요'], ['나중에 인물·배경을 늘리려면', '산문으로 롤백해야 해요. 상태는 Storyboard에서 추가할 수 있어요']]),
+      B('아니오', 'A5') + A('예, 완료하기', 'toBoard', 'pri'));
   }
 
   /* ── Storyboard ── */
@@ -609,7 +647,7 @@
   }
 
   var SCREENS = { EB1: EB1, EBX: EBX, EB2: EB2, EB3: EB3, EB4: EB4, EB5: EB5, EB6: EB6, EB7: EB7, E1: E1, E1e: E1e, EF: EF, EFe: EFe, E2: E2, E2e: E2e, E3: E3, E4: E4, E5: E5, W1: W1, W1r: W1r, WC1: WC1, WC2: WC2, WC3: WC3, W2: W2, W4: W4, W5: W5, W6: W6, WP: WP, WN: WN, W3: W3,
-    A0: A0, A1: A1, R1: R1, A2: A2, A3: A3, A4: A4, A5: A5, A6: A6, A7: A7, A8: A8, R2: R2, A9: A9,
+    A0: A0, A1: A1, R1: R1, A2: A2, A3: A3, A4: A4, A5: A5, A6: A6, A7: A7, A8: A8, R2: R2, A9: A9, AV: AV,
     S0: S0, S1: S1, S2: S2, S3: S3, S4: S4, R3: R3, S5: S5, S6: S6, S7: S7, D1: D1 };
   // 갈림 노드는 그 갈림을 묻는 화면으로
   var DECISION_SCREEN = { E1n: function () { return entryId(); }, EFq: 'EF', E2q: function () { return isB() ? 'EB3' : 'E3'; }, E5q: function () { return isB() ? 'EB7' : 'E4'; }, W1q: 'W1', WPq: 'WP', A1q: 'A1', A5q: 'A5', S1q: 'S1', S4q: 'S4' };
@@ -714,7 +752,7 @@
         st.pending = function () { makeVariants(t); say('Writer', 'Writer', '요청대로 세 가지 안을 썼어요. 하나를 골라 주세요.'); };
         return 'W2';
       }
-      if (on === 'Artist') { st.target = 0; var x = target(); st.pending = function () { x.note = t; say('Artist', 'Artist', x.n + '을(를) 다시 만들었어요.'); }; return 'A8'; }
+      if (on === 'Artist') { st.target = 0; st.toneDraft = 0; st.tweak = t; return ACTS.applyTone(); }
       st.pending = function () { st.shots.forEach(function (s) { s.redrawn = true; }); say('Storyboard', 'Storyboard', '요청을 반영해 샷을 다시 그렸어요.'); };
       return 'S3';
     },
@@ -759,10 +797,23 @@
     rollback: function (from) { st.proseLocked = false; st.back = from; st.ratioLocked = true; return 'W1'; },
     descEdit: function (i) { st.descEdit = +i; },
     descDone: function () { st.descEdit = -1; },
-    generate: function () { st.styleLocked = true; st.pending = function () { st.generated = true; st.newItems = []; say('Artist', 'Artist', STYLES[st.style][0] + '으로 그림을 만들었어요. 특정 객체만 톤을 바꾸려면 카드의 톤을 눌러 주세요.'); }; return 'A4'; },
-    unlockStyle: function () { st.styleLocked = false; st.generated = false; return 'A2'; },
-    openTone: function (i) { st.target = +i; var t = target(); st.toneDraft = t.tone; st.tweak = t.note || ''; return 'A7'; },
-    applyTone: function () { var t = target(), tone = st.toneDraft, tw = st.tweak; st.pending = function () { t.tone = tone; t.note = tw; say('Artist', 'Artist', t.n + '을(를) ' + TONES[tone] + ' 톤으로 다시 만들었어요.'); }; return 'A8'; },
+    generate: function () { st.styleLocked = true; st.pending = function () { newVersion(st.style); st.generated = true; st.newItems = []; say('Artist', 'Artist', STYLES[st.style][0] + '으로 v' + st.versions.length + '을 만들었어요. 마음에 들면 [완료하기], 아니면 [재생성하기]나 하나씩 [다시 만들기]를 눌러 주세요.'); }; return 'A4'; },
+    regenCancel: function () { st.regenStyle = null; return 'A5'; },
+    regenAll: function () { var sty = st.regenStyle == null ? st.style : st.regenStyle; st.regenStyle = null; st.pending = function () { st.style = sty; newVersion(sty); say('Artist', 'Artist', STYLES[sty][0] + '으로 v' + st.versions.length + '을 만들었어요. 이전 버전은 [불러오기]에 있어요.'); }; return 'A4'; },
+    loadVer: function (i) { var v = st.versions[+i]; st.style = v.style; objs().forEach(function (o, k) { if (v.snap[k] != null) o.cur = v.snap[k]; }); st.ver = +i; say('Artist', 'Artist', 'v' + v.n + '(' + STYLES[v.style][0] + ')을 불러왔어요. 작품 스타일도 ' + STYLES[v.style][0] + '으로 바뀌었어요.'); return 'A5'; },
+    objLoad: function (k) { var o = target(); if (o.hist[+k].style !== st.style) return; o.cur = +k; st.versions[st.ver].snap[st.target] = o.cur; say('Artist', 'Artist', o.n + '의 이전 그림을 불러왔어요.'); return 'A5'; },
+    openTone: function (i) { st.target = +i; var t = target(), h = t.hist[t.cur]; st.toneDraft = h ? h.tone : 0; st.tweak = ''; return 'A7'; },
+    applyTone: function () {
+      var t = target(), ti = st.target, tone = st.toneDraft, tw = st.tweak.trim();
+      st.pending = function () {
+        var v = st.versions[st.ver] ? st.versions[st.ver].n : 1;
+        var r = t.hist.filter(function (h) { return h.v === v; }).length;
+        t.hist.push({ style: st.style, tone: tone, note: tw, v: v, r: r }); t.cur = t.hist.length - 1;
+        if (st.versions[st.ver]) st.versions[st.ver].snap[ti] = t.cur;
+        say('Artist', 'Artist', t.n + '을(를) 다시 만들었어요' + (tone ? ' (' + TONES[tone] + ' 톤)' : '') + '. 이전 그림은 다시 만들기 창의 기록에 있어요.');
+      };
+      return 'A8';
+    },
     toBoard: function () { st.pending = function () { st.shots.forEach(function (s) { s.redrawn = false; s.fresh = false; }); say('Storyboard', 'Storyboard', '씬 ' + st.prose.length + '개를 샷 ' + st.shots.length + '개로 나눴어요. 지금 약 ' + total() + '초예요.'); }; return 'S0'; },
     editShot: function (i) { st.shotSel = +i; st.shotDraft = clone(st.shots[+i]); return 'S2'; },
     redraw: function (i) { var s = st.shots[+i]; st.pending = function () { s.redrawn = true; }; return 'S3'; },

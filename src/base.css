@@ -481,3 +481,27 @@ a.btn { text-decoration: none; display: inline-block }
 .w-target { margin: 4px 0 0; font-size: 12px; background: var(--w-bg); border: 1px dashed var(--w-line); border-radius: 7px; padding: 6px 9px }
 .w-target i { font-style: normal; color: var(--w-mut); font-size: 11px; margin-right: 6px }
 .w-tag-no { font-size: 10.5px; border: 1px solid var(--w-line); border-radius: 99px; padding: 0 6px; color: var(--w-mut); white-space: nowrap }
+
+/* 인물·장소 표시 (브레이크다운 전) */
+.w-wt-main { display: grid; gap: 12px; align-content: start }
+.w-wt { display: grid; grid-template-columns: minmax(0, 1fr) 260px; gap: 14px; align-items: start }
+@media (max-width: 760px) { .w-wt { grid-template-columns: 1fr } }
+.w-wt-p { position: relative; display: grid; gap: 6px }
+.w-tgprose p { line-height: 2.05 }
+.w-tg { font: inherit; font-size: inherit; color: var(--w-ink); border-radius: 4px; padding: 0 3px; margin: 0 1px; cursor: pointer; border: 1px solid transparent; line-height: 1.5 }
+.w-tg.char { background: color-mix(in srgb, var(--accent) 14%, transparent); border-color: color-mix(in srgb, var(--accent) 40%, transparent) }
+.w-tg.place { background: color-mix(in srgb, var(--new) 14%, transparent); border-color: color-mix(in srgb, var(--new) 40%, transparent) }
+.w-tg.sug { background: transparent; border: 1.5px dashed var(--w-warn); color: var(--w-warn) }
+.w-tg.sel { box-shadow: 0 0 0 2px var(--w-pri) }
+.w-tg:focus-visible { outline: 2px solid var(--accent); outline-offset: 1px }
+.w-note .w-tg { cursor: default; font-size: 11px }
+.w-sugbox { position: sticky; top: 0; z-index: 2; border: 1px solid var(--w-warn); background: var(--w-panel); border-radius: 8px; padding: 10px 12px; display: grid; gap: 8px; font-size: 12.5px; box-shadow: 0 6px 18px rgb(0 0 0 / .12) }
+.w-wt-l { border: 1px solid var(--w-line); background: var(--w-panel); border-radius: 8px; padding: 10px 12px; display: grid; gap: 8px }
+.w-ents { list-style: none; margin: 0; padding: 0; display: grid; gap: 4px }
+.w-ents li { display: grid; grid-template-columns: 1fr auto; align-items: center; gap: 2px 6px; padding: 5px 6px; border-radius: 6px; font-size: 12.5px }
+.w-ents li.on { background: var(--accent-soft) }
+.w-ents label { display: flex; align-items: center; gap: 6px; cursor: pointer; min-width: 0 }
+.w-ents label small { color: var(--w-mut); font-size: 11px }
+.w-ents .w-tg { cursor: inherit }
+.w-ents li > :last-child { grid-column: 2; grid-row: 1 }
+.w-alias { grid-column: 1 / -1; grid-row: 2; padding-left: 22px; color: var(--w-mut); font-size: 11px }

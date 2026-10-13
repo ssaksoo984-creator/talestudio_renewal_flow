@@ -519,13 +519,14 @@
         '<p class="w-note"><span class="w-tg char">인물</span> <span class="w-tg place">장소</span> AI가 뽑은 것만 표시돼 있어요 · 표시된 말을 누르면 수정할 수 있어요</p>' + pickBar + '</div>' +
       '<aside class="w-wt-l"><div class="w-q-t">뽑은 목록 <small>' + st.ents.length + '개</small></div>' + listH + '</aside></div>' +
       '<p class="w-note">산문에 없는 인물·배경이 필요하면 산문을 다시 써야 해요.</p>';
-    return A1() + modal('산문 재점검', body,
+    return listScreen() + modal('산문 재점검', body,
       A('취소', 'recheckCancel') + A('산문 다시 쓰기', 'recheckRewrite') + A('목록에 반영', 'extract', 'pri', st.editEnt >= 0 ? ' disabled title="수정 중인 이름을 먼저 확인해 주세요"' : ''), 'xl');
   }
   // 이미 있는 이름으로 고쳤을 때: 합칠지 한 번 묻는다
   function WTm() {
     var e = st.ents[st.editEnt], t = st.ents[st.mergeInto];
     return WT() + modal(e.name + ' → ' + t.name + ', 하나로 합칠까요?', '<p>' + esc(t.name) + '은(는) 이미 목록에 있어요. 합치면 한 ' + entKind(t) + '이 되고, 산문의 "' + esc(e.aliases.join('", "')) + '"은(는) ' + esc(t.name) + '의 다른 이름(또는)으로 남아요.</p>' +
+      (drawn() ? '<p class="w-note">' + esc(e.name) + '의 그림은 ' + esc(t.name) + '의 기록으로 옮겨져요. 같은 스타일이라 기록 아이콘에서 불러올 수 있어요.</p>' : '') +
       '<p class="w-note">오타라면 산문 표기도 ' + esc(t.name) + '(으)로 맞출지 개발 확인이 필요해요.</p>',
       A('취소', 'mergeCancel') + A('합치기', 'mergeDo', 'acc'));
   }
@@ -589,7 +590,7 @@
     var n = { all: st.chars.length + st.bgs.length, char: st.chars.length, bg: st.bgs.length };
     return '<div class="w-fbar"><span class="w-tabs">' + [['all', '모두'], ['char', '인물'], ['bg', '배경']].map(function (f) {
       return '<button class="' + (st.afilter === f[0] ? 'on' : '') + '" data-act="afilter" data-arg="' + f[0] + '" aria-pressed="' + (st.afilter === f[0]) + '">' + f[1] + ' ' + n[f[0]] + '</button>';
-    }).join('') + '</span><span class="w-mut w-fbar-note">목록은 산문에서 나와요. 새 인물·배경은 산문에 넣어야 생겨요 ' + B('산문으로 →', st.versions.length ? 'R2' : 'A1c', 'w-link') + '</span></div>';
+    }).join('') + '</span></div>';
   }
   function imgCards() {
     return '<div class="w-acards">' + objs().map(function (o, i) {
@@ -600,7 +601,7 @@
         (o.isBg ? '' : '<div class="w-row-st">' + o.states.map(function (x) { return '<span>' + esc(x) + '</span>'; }).join('') + '</div>') +
         (h && h.traits && h.traits.length ? '<p class="w-tone">' + esc(h.traits.join(' · ')) + '</p>' : '') +
         (o.refs.length ? '<p class="w-mut" style="margin:0;font-size:11px">레퍼런스 ' + o.refs.length + '장</p>' : '') +
-        A('열기 · 고치기', 'openTone', 'sm', ' data-arg="' + i + '"') + '</div></div>';
+        (h ? A('열기 · 고치기', 'openTone', 'sm', ' data-arg="' + i + '"') : A('같은 스타일로 만들기', 'openTone', 'pri sm', ' data-arg="' + i + '"')) + '</div></div>';
     }).join('') + '</div>';
   }
   function rows(mode) { return '<ul class="w-rows">' + objs().map(function (o, i) { return showObj(o) ? row(o, i, mode) : ''; }).join('') + '</ul>'; }
@@ -618,9 +619,14 @@
       '<div class="w-foot">' + B('인물·배경이 빠졌거나 겹쳤어요', 'A1c') + B('목록이 맞아요 · 그림 만들기 →', 'A2', 'pri') + '</div>';
     return studio('Artist', main, { noChat: true });
   }
+  // 그림을 만든 뒤에도 같은 질문을 한다. 재점검은 스타일·그림을 그대로 두고 목록만 고친다.
+  var drawn = function () { return st.versions.length > 0; };
+  var listScreen = function () { return drawn() ? A5() : A1(); };
   function A1c() {
-    return A1() + modal('산문을 다시 쓸래요? 재점검할까요?', '<p class="w-mut">목록이 산문과 달라 보이면 먼저 골라 주세요.</p>' + list([['산문 재점검', '산문에 이미 나오는데 목록에 없거나, 한 사람이 둘로 나뉘었을 때. 산문은 잠긴 채로 말마다 표시만 고쳐요'], ['산문 다시 쓰기', '산문에 없는 인물·배경을 넣을 때. 산문이 다시 열려요 (아직 그림이 없어 잃는 건 없어요)']]),
-      B('취소', 'A1') + B('산문 다시 쓰기', 'R1') + A('산문 재점검', 'recheck', 'pri'));
+    return listScreen() + modal('산문을 다시 쓸래요? 재점검할까요?', '<p class="w-mut">목록이 산문과 달라 보이면 먼저 골라 주세요.</p>' + list(drawn()
+      ? [['산문 재점검', '산문에 이미 나오는 말이면 이걸로 충분해요. 스타일과 지금 그림은 그대로예요. 새로 넣은 인물·배경만 그림이 비어 있어서 같은 스타일로 만들고, 합친 쪽 그림은 남는 쪽 기록으로 옮겨요'], ['산문 다시 쓰기', '산문에 없는 인물·배경을 넣을 때. 산문이 다시 열려요 (스타일 유지 · 바뀌지 않은 그림 유지는 개발 확인)']]
+      : [['산문 재점검', '산문에 이미 나오는데 목록에 없거나, 한 사람이 둘로 나뉘었을 때. 산문은 잠긴 채로 말마다 표시만 고쳐요'], ['산문 다시 쓰기', '산문에 없는 인물·배경을 넣을 때. 산문이 다시 열려요 (아직 그림이 없어 잃는 건 없어요)']]),
+      B('취소', drawn() ? 'A5' : 'A1') + B('산문 다시 쓰기', drawn() ? 'R2' : 'R1') + A('산문 재점검', 'recheck', 'pri'));
   }
   function A0() { return A1() + busy('인물·배경을 뽑고 있어요', ['산문 읽기', '인물 · 배경 찾기', '인물별 상태 세분화']); }
   function rollbackModal(from, lose, no) {
@@ -643,7 +649,7 @@
       '<div class="w-stybar"><i style="background:' + styleBg(st.style) + '"></i><b>' + esc(STYLES[st.style][0]) + '</b><span class="w-mut">작품 스타일 · v' + v.n + '</span>' +
       '<span class="w-tbar-sp"></span>' + B('불러오기 · 기록 ' + st.versions.length, 'AV', 'sm', st.versions.length > 1 ? '' : ' disabled title="재생성하면 이전 버전이 여기 남아요"') + B('재생성하기', 'A6', 'sm') + '</div>' +
       filterBar() + imgCards() +
-      '<div class="w-foot"><span></span>' + B('완료하기 →', 'A9', 'pri') + '</div>';
+      '<div class="w-foot">' + B('인물·배경이 빠졌거나 겹쳤어요', 'A1c') + B('완료하기 →', 'A9', 'pri', objs().some(function (x) { return x.cur < 0; }) ? ' disabled title="그림 없는 인물·배경을 먼저 만들어 주세요"' : '') + '</div>';
     return studio('Artist', main, { card: o.card, ph: o.ph || '예: 민호 바꿔줘' });
   }
   // 에이전트에게 "민호 바꿔줘": 어떻게 바꿀지 세 갈래로 묻는다
@@ -696,7 +702,7 @@
     // 기록: 그림 옆 시계 아이콘을 누르면 열린다. 같은 스타일 그림만 불러올 수 있다.
     var hist = o.hist.map(function (x, k) {
       var same = x.style === st.style, on = k === o.cur;
-      return '<li class="' + (on ? 'on' : '') + (same ? '' : ' off') + '">' + thumb(o, x) + '<span>' + (on ? '지금' : same ? (x.state ? esc(x.state) : '') : esc(STYLES[x.style][0]) + ' · 다른 스타일') + '</span>' +
+      return '<li class="' + (on ? 'on' : '') + (same ? '' : ' off') + '">' + thumb(o, x) + '<span>' + (on ? '지금' : same ? (x.from ? esc(x.from) + '에서 옴' : x.state ? esc(x.state) : '') : esc(STYLES[x.style][0]) + ' · 다른 스타일') + '</span>' +
         (on ? '' : same ? A('불러오기', 'objLoad', 'sm', ' data-arg="' + k + '"') : A('불러오기', 'objLoad', 'sm', ' disabled title="다른 스타일이라 불러올 수 없어요"')) + '</li>';
     }).reverse().join('');
     var histBtn = '<button class="w-histbtn' + (st.histOpen ? ' on' : '') + '" data-act="histToggle" aria-expanded="' + !!st.histOpen + '" aria-label="기록 · 이전 그림 불러오기" title="기록 · 이전 그림 불러오기"' + (o.hist.length > 1 ? '' : ' disabled') + '>' +
@@ -719,14 +725,13 @@
     var modeBox = '<div class="w-q"><div class="w-q-t">어떻게 바꿀까요?</div><div class="w-modes" role="radiogroup">' +
       '<button class="w-mode' + (mode === 'edit' ? ' on' : '') + '" role="radio" aria-checked="' + (mode === 'edit') + '" data-act="editMode" data-arg="edit"' + (h ? '' : ' disabled') + '><b>조금 고치기</b><small>지금 그림 위에서 고쳐요 · 얼굴·체형은 그대로</small></button>' +
       '<button class="w-mode' + (mode === 'new' ? ' on' : '') + '" role="radio" aria-checked="' + (mode === 'new') + '" data-act="editMode" data-arg="new"><b>새로 만들기</b><small>같은 스타일로 생김새부터 새로</small></button></div>' +
-      '<p class="w-target"><i>바꾸는 대상</i><b>' + esc(o.n) + ' · ' + esc(stateName) + '</b> — 지금 그림을 바꿔요(이전 그림은 기록에 남아요). <span class="w-tag-no">새 상태 추가 아님</span>' + (o.isBg ? '' : ' 상태를 더하려면 위의 [＋ 상태]를 누르세요.') + '</p></div>';
-    if (adding) modeBox = '<div class="w-q"><div class="w-q-t">새 상태 이름</div><input class="w-in" data-bind="stateDraft" value="' + esc(st.stateDraft || '') + '" placeholder="예: 비에 젖은 셔츠 · 10년 뒤" aria-label="새 상태 이름"></div>' +
-      '<p class="w-target"><i>바꾸는 대상</i><b>' + esc(o.n) + ' · 새 상태</b> — 지금 그림은 그대로 두고 상태를 하나 더해요. <span class="w-tag-new">새 상태 추가</span> 어느 상태에서 시작하든 같아요.</p>';
+      '</div>';
+    if (adding) modeBox = '<div class="w-q"><div class="w-q-t">새 상태 이름</div><input class="w-in" data-bind="stateDraft" value="' + esc(st.stateDraft || '') + '" placeholder="예: 비에 젖은 셔츠 · 10년 뒤" aria-label="새 상태 이름"></div>';
     var body = head +
       '<div class="w-dt-img">' + thumb(o, h, true) + (o.isBg ? '' : '<span class="w-dt-cap">' + esc(adding ? '새 상태' : stateName) + ' · 턴어라운드 시트</span>') + histBtn + histPop + '</div>' +
       modeBox +
-      '<div class="w-q"><div class="w-q-t">' + (mode === 'edit' ? '무엇을 고칠까요' : '외형 프롬프트') + ' <small>' + (mode === 'edit' ? '예: 넥타이를 풀어 줘 · 아래 칩은 @로 들어가요' : '아래 칩을 누르면 @엉뚱한 처럼 들어가요 · 지우면 칩도 꺼져요') + '</small></div><textarea class="w-ta sm" rows="2" data-bind="' + path + '.prompt" aria-label="외형 프롬프트">' + esc(o.prompt) + '</textarea></div>' +
-      '<div class="w-q"><div class="w-q-t">' + (o.isBg ? '공간의 성격' : '캐릭터성') + ' <small>누르면 프롬프트에 @로 들어가요 · 다시 누르거나 프롬프트에서 지우면 빠져요</small></div>' + traits + '</div>' +
+      '<div class="w-q"><div class="w-q-t">' + (mode === 'edit' ? '무엇을 고칠까요' : '외형 프롬프트') + ' <small>' + (mode === 'edit' ? '예: 넥타이를 풀어 줘' : '캐릭터성 추천은 @엉뚱한 처럼 들어가요 · 지우면 칩도 꺼져요') + '</small></div><textarea class="w-ta sm" rows="2" data-bind="' + path + '.prompt" aria-label="외형 프롬프트">' + esc(o.prompt) + '</textarea></div>' +
+      '<div class="w-q w-fold"><button class="w-fold-h" data-act="traitsFold" aria-expanded="' + !!st.traitsOpen + '">' + (st.traitsOpen ? '▾' : '▸') + ' ' + (o.isBg ? '공간의 성격' : '캐릭터성') + ' 추천 <small>' + (o.traits.length ? '고른 것 ' + o.traits.length + ' · ' : '') + '누르면 프롬프트에 @로 들어가요</small></button>' + (st.traitsOpen ? traits : '') + '</div>' +
       '<div class="w-q"><div class="w-q-t">레퍼런스 <small>이 ' + (o.isBg ? '배경' : '인물') + '만 참고해요</small></div>' + refStrip(String(i), o.refs) + '</div>' +
       '<div class="w-q"><div class="w-q-t">이미지 생성 도구</div><select data-bind="' + path + '.model" aria-label="이미지 생성 도구">' + MODELS.map(function (m, k) { return '<option value="' + k + '"' + (k == o.model ? ' selected' : '') + '>' + esc(m) + '</option>'; }).join('') + '</select></div>' +
       '<p class="w-note">스타일은 작품 스타일(' + esc(STYLES[st.style][0]) + ') 그대로예요. 이 ' + (o.isBg ? '배경' : '인물') + '만 바뀌어요.</p>';
@@ -960,17 +965,28 @@
     breakdown: function () { st.back = ''; st.proseLocked = true; st.ents = null; return 'A0'; },
     // 재점검 팝업 열기 · 닫기: 닫으면 고친 표시를 되돌린다
     recheck: function () { if (!st.ents) initEnts(); st.entsBak = JSON.parse(JSON.stringify(st.ents)); st.pick = null; st.adding = false; st.editEnt = -1; return 'WT'; },
-    recheckCancel: function () { if (st.entsBak) st.ents = st.entsBak; st.entsBak = null; st.pick = null; st.editEnt = -1; return 'A1'; },
-    recheckRewrite: function () { ACTS.recheckCancel(); return 'R1'; },
+    recheckCancel: function () { if (st.entsBak) st.ents = st.entsBak; st.entsBak = null; st.pick = null; st.editEnt = -1; return drawn() ? 'A5' : 'A1'; },
+    recheckRewrite: function () { ACTS.recheckCancel(); return drawn() ? 'R2' : 'R1'; },
     // 표시한 대로 목록을 다시 채운다: 이미 있던 것은 설명·그림을 그대로 두고, 산문은 바꾸지 않는다
     extract: function () {
       var oldC = st.chars, oldB = st.bgs, before = oldC.concat(oldB).map(function (o) { return o.n; });
-      function keep(list, e, d) { var o = list.filter(function (x) { return x.n === e.name; })[0]; if (o) { o.aliases = e.aliases; return o; } return { n: e.name, d: d, states: ['처음 모습'], tone: 0, note: '', aliases: e.aliases }; }
+      // 그림이 있으면 버전마다 가리키던 그림을 객체에 붙여 두었다가, 목록이 바뀐 뒤 다시 맞춘다
+      oldC.concat(oldB).forEach(function (o, k) { o._sn = st.versions.map(function (v) { return v.snap[k]; }); });
+      function keep(list, e, d) {
+        var same = list.filter(function (x) { return e.aliases.indexOf(x.n) >= 0 || x.n === e.name; });
+        var o = same.filter(function (x) { return x.n === e.name; })[0] || same[0];
+        if (!o) return { n: e.name, d: d, states: ['처음 모습'], tone: 0, note: '', aliases: e.aliases };
+        // 합쳐진 쪽(틴장)의 그림은 남는 쪽(팀장) 기록 끝에 붙는다
+        same.forEach(function (x) { if (x !== o && x.hist) x.hist.forEach(function (h) { o.hist.push(Object.assign({}, h, { from: x.n })); }); });
+        o.n = e.name; o.aliases = e.aliases; return o;
+      }
       st.chars = st.ents.filter(function (e) { return e.type === 'char'; }).map(function (e) { return keep(oldC, e, '산문에서 표시한 인물. 설명은 AI가 산문을 읽고 채워요.'); });
       st.bgs = st.ents.filter(function (e) { return e.type === 'place'; }).map(function (e) { return keep(oldB, e, '산문에서 표시한 장소.'); });
       st.newItems = st.ents.map(function (e) { return e.name; }).filter(function (n) { return before.indexOf(n) < 0; });
+      var all = objs(); st.versions.forEach(function (v, vi) { v.snap = all.map(function (o) { return o._sn ? o._sn[vi] : null; }); });
+      all.forEach(function (o) { delete o._sn; });
       st.pick = null; st.editEnt = -1; st.entsBak = null;
-      return 'A1';
+      return drawn() ? 'A5' : 'A1';
     },
     pickClear: function () { st.pick = null; st.adding = false; },
     addStart: function () { if (st.pick) st.adding = true; },
@@ -1017,6 +1033,7 @@
       else { o.traits.push(t); o.prompt = (o.prompt.trim() ? o.prompt.trim() + ' ' : '') + '@' + t; }
     },
     histToggle: function () { st.histOpen = !st.histOpen; },
+    traitsFold: function () { st.traitsOpen = !st.traitsOpen; },
     editMode: function (m) { st.editMode = m; },
     afilter: function (f) { st.afilter = f; },
     addRef: function (key) { var r = refsOf(key); r.push((key === 'style' ? '그림체' : '참고') + '_' + (r.length + 1) + '.jpg'); },

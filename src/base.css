@@ -526,3 +526,6 @@ a.btn { text-decoration: none; display: inline-block }
 .w-histbtn:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px }
 .w-histpop { position: absolute; top: 44px; right: 8px; z-index: 3; width: min(360px, calc(100% - 16px)); background: var(--w-panel); border: 1px solid var(--w-line); border-radius: 10px; padding: 10px; display: grid; gap: 8px; box-shadow: 0 10px 30px rgb(0 0 0 / .2) }
 .w-tag-new { font-size: 10.5px; border: 1px solid var(--new); border-radius: 99px; padding: 0 6px; color: var(--new); white-space: nowrap }
+.w-fold-h { all: unset; cursor: pointer; font-size: 12.5px; font-weight: 600; color: var(--w-ink); display: flex; gap: 6px; align-items: baseline }
+.w-fold-h small { font-weight: 400; color: var(--w-mut); font-size: 11px }
+.w-fold-h:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; border-radius: 4px }

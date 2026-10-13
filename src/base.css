@@ -1,0 +1,214 @@
+/* 공용: 색 토큰 · 플로우차트 · 와이어프레임. index.html과 proto.html이 함께 쓴다 */
+/* 레이아웃: 위 원칙 띠 → 왼쪽 플로우차트 / 오른쪽 노드 설명 + 화면 목업. 좁으면 위아래로 쌓는다 */
+:root {
+  --bg: #f3f5f8; --surface: #ffffff; --ink: #18202b; --mut: #5c6878; --line: #d6dce4;
+  --accent: #2f5bd3; --accent-soft: #e4ebfb;
+  --hl: #e5212d; --hl2: #ff8a4c; --yes: #1f8a5b; --no: #6b7684; --back: #c4462b; --lock: #a86a00; --ai: #6b4fc8; --new: #0f7c8a;
+  --w-bg: #fbfbfc; --w-panel: #ffffff; --w-line: #dfe3e8; --w-ink: #1d232c; --w-mut: #707a87; --w-acc: #6b4fc8; --w-pri: #18202b; --w-pri-ink: #ffffff; --w-warn: #c4462b;
+  --font: "IBM Plex Sans KR", "Apple SD Gothic Neo", "Malgun Gothic", system-ui, sans-serif;
+  --mono: "IBM Plex Mono", ui-monospace, SFMono-Regular, Menlo, monospace;
+}
+@media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) {
+  --bg: #11151b; --surface: #181e26; --ink: #e6eaf0; --mut: #97a2b1; --line: #2b3440;
+  --accent: #7d9cf2; --accent-soft: #1f2a44;
+  --hl: #ff4d57; --hl2: #ffa06b; --yes: #4cc28d; --no: #8e99a8; --back: #f08066; --lock: #e3a93a; --ai: #a993f0; --new: #4fc0cd;
+  --w-bg: #151a21; --w-panel: #1b222b; --w-line: #2e3743; --w-ink: #e3e7ed; --w-mut: #8f9aa8; --w-acc: #a993f0; --w-pri: #e6eaf0; --w-pri-ink: #11151b; --w-warn: #f08066;
+  color-scheme: dark } }
+:root[data-theme="dark"] {
+  --bg: #11151b; --surface: #181e26; --ink: #e6eaf0; --mut: #97a2b1; --line: #2b3440;
+  --accent: #7d9cf2; --accent-soft: #1f2a44;
+  --hl: #ff4d57; --hl2: #ffa06b; --yes: #4cc28d; --no: #8e99a8; --back: #f08066; --lock: #e3a93a; --ai: #a993f0; --new: #4fc0cd;
+  --w-bg: #151a21; --w-panel: #1b222b; --w-line: #2e3743; --w-ink: #e3e7ed; --w-mut: #8f9aa8; --w-acc: #a993f0; --w-pri: #e6eaf0; --w-pri-ink: #11151b; --w-warn: #f08066;
+  color-scheme: dark }
+
+* { box-sizing: border-box }
+body { background: var(--bg); color: var(--ink); font: 14px/1.55 var(--font); margin: 0 }
+
+.mono { font-family: var(--mono) }
+
+.legend { display: flex; flex-wrap: wrap; gap: 6px 14px; font-size: 12px; color: var(--mut); align-items: center }
+.legend i { display: inline-block; width: 14px; height: 10px; vertical-align: -1px; margin-right: 5px; border: 1.5px solid var(--mut); border-radius: 2px }
+.legend .lg-dec { transform: rotate(45deg) scale(.8); border-radius: 1px }
+.legend .lg-ai { border-color: var(--ai); background: color-mix(in srgb, var(--ai) 18%, transparent) }
+.legend .lg-modal { border-style: double; border-width: 3px }
+.legend .lg-back { border: 0; border-top: 2px dashed var(--back); height: 0; width: 22px }
+.legend .lg-new { border-color: var(--new); border-style: dashed }
+
+.flow-box { overflow: auto; max-height: calc(100vh - 120px); padding: 12px }
+@media (max-width: 1100px) { .flow-box { max-height: 70vh } }
+.flow-box svg { max-width: none !important; height: auto }
+.stage { padding: 6px 0 14px; border-bottom: 1px solid var(--line) }
+.stage:last-child { border-bottom: 0 }
+.stage h3 { margin: 0 0 6px; font-size: 14px; position: sticky; left: 0 }
+.stage h3 small { font-weight: 400; color: var(--mut); font-size: 12px; margin-left: 4px }
+.stage .tbd { font-size: 11px; font-weight: 500; color: var(--lock); border: 1px dashed var(--lock); border-radius: 99px; padding: 0 7px }
+.stage-svg { display: flex; justify-content: center; min-width: max-content }
+.flow-box .node { cursor: pointer }
+.flow-box .node.is-sel rect, .flow-box .node.is-sel polygon, .flow-box .node.is-sel path { stroke: url(#hl-red) !important; stroke-width: 4px !important; stroke-dasharray: none !important }
+.flow-box .node.is-sel { filter: drop-shadow(0 0 6px color-mix(in srgb, var(--hl) 70%, transparent)); animation: hlpulse 1.6s ease-in-out infinite }
+@keyframes hlpulse { 50% { filter: drop-shadow(0 0 12px color-mix(in srgb, var(--hl) 90%, transparent)) } }
+@media (prefers-reduced-motion: reduce) { .flow-box .node.is-sel { animation: none } }
+.flow-box .node:focus-visible { outline: none }
+.flow-box .node:focus-visible rect, .flow-box .node:focus-visible polygon { stroke: var(--accent) !important; stroke-width: 3px !important }
+.zoom { display: flex; gap: 4px }
+.btn { font: inherit; font-size: 12.5px; border: 1px solid var(--line); background: var(--surface); color: var(--ink); border-radius: 6px; padding: 4px 10px; cursor: pointer }
+.btn:hover { border-color: var(--accent) }
+.btn:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px }
+.loading { color: var(--mut); padding: 24px }
+
+.device { overflow: auto; border-top: 1px solid var(--line); background: var(--bg) }
+.screen { position: relative; min-width: 0; min-height: 640px; background: var(--w-bg); color: var(--w-ink); font-size: 13px }
+
+/* ── 와이어프레임 ── */
+.w-bar { display: flex; align-items: center; gap: 14px; padding: 8px 14px; border-bottom: 1px solid var(--w-line); background: var(--w-panel) }
+.w-logo { font-size: 13px }
+.w-rail { display: flex; gap: 4px; flex: 1 }
+.w-rail span { white-space: nowrap; font-size: 12px; padding: 2px 9px; border-radius: 99px; color: var(--w-mut) }
+.w-rail .on { background: var(--w-pri); color: var(--w-pri-ink) }
+.w-rail .done { color: var(--w-ink) }
+.w-rail .done::before { content: "🔒 "; font-size: 10px }
+.w-meta { display: flex; gap: 8px; font-size: 12px; color: var(--w-mut) }
+.w-lock { color: var(--lock); font-weight: 500 }
+.w-studio { display: grid; grid-template-columns: minmax(0, 1fr) 230px; min-height: 480px }
+.w-main { padding: 16px 18px; display: grid; gap: 12px; align-content: start; min-width: 0 }
+.w-chat { border-left: 1px solid var(--w-line); background: var(--w-panel); display: grid; grid-template-rows: auto 1fr auto }
+.w-chat.is-locked { opacity: .45 }
+.w-chat-h { font-size: 12px; font-weight: 600; padding: 10px 12px; border-bottom: 1px solid var(--w-line) }
+.w-chat-b { padding: 10px 12px; display: grid; gap: 8px; align-content: start }
+.w-msg { font-size: 12.5px; background: var(--w-bg); border: 1px solid var(--w-line); border-radius: 8px; padding: 7px 9px }
+.w-msg b { display: block; font-size: 11px; color: var(--w-acc) }
+.w-chat-in { display: flex; gap: 6px; align-items: center; padding: 8px; border-top: 1px solid var(--w-line); font-size: 12px; color: var(--w-mut) }
+.w-chat-in span { flex: 1 }
+.w-entry { max-width: 620px; margin: 0 auto; padding: 28px 20px; display: grid; gap: 14px }
+.w-entry h3, .w-title h3 { margin: 0; font-size: 18px }
+.w-title { display: flex; justify-content: space-between; align-items: center; gap: 10px; flex-wrap: wrap }
+.w-ta { border: 1px solid var(--w-line); background: var(--w-panel); border-radius: 8px; padding: 12px; min-height: 76px }
+.w-ta.sm { min-height: 0; padding: 8px 10px }
+.w-file { display: flex; justify-content: space-between; align-items: center; gap: 10px; border: 1px dashed var(--w-line); border-radius: 8px; padding: 10px 12px }
+.w-q { display: grid; gap: 6px }
+.w-q-t { font-weight: 600; font-size: 13px }
+.w-q-t small { font-weight: 400; color: var(--w-mut); margin-left: 6px }
+.w-opts { display: flex; flex-wrap: wrap; gap: 6px }
+.w-opt { font: inherit; font-size: 12.5px; text-align: left; border: 1px solid var(--w-line); background: var(--w-panel); color: var(--w-ink); border-radius: 7px; padding: 6px 10px; cursor: pointer; display: grid }
+.w-opt small { color: var(--w-mut); font-size: 11px }
+.w-opt em { font-style: normal; font-size: 10px; color: var(--w-acc); font-weight: 600 }
+.w-opt.on { border-color: var(--w-pri); box-shadow: inset 0 0 0 1px var(--w-pri) }
+.w-foot { display: flex; justify-content: space-between; align-items: center; gap: 10px; flex-wrap: wrap }
+.w-mut { color: var(--w-mut); font-size: 12px }
+.w-note { color: var(--w-mut); font-size: 12px; margin: 0 }
+.w-btn { font: inherit; font-size: 12.5px; border: 1px solid var(--w-line); background: var(--w-panel); color: var(--w-ink); border-radius: 7px; padding: 6px 12px; cursor: pointer; white-space: nowrap }
+.w-btn.sm { font-size: 11.5px; padding: 3px 8px }
+.w-btn.pri { background: var(--w-pri); color: var(--w-pri-ink); border-color: var(--w-pri) }
+.w-btn.acc { background: var(--w-acc); color: #fff; border-color: var(--w-acc) }
+.w-btn.warn { color: var(--w-warn); border-color: var(--w-warn) }
+.w-btn.ghost { border-style: dashed; color: var(--w-mut) }
+.w-btn:disabled { opacity: .4; cursor: not-allowed }
+.w-btn:focus-visible, .w-opt:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px }
+.w-link { font: inherit; font-size: 12px; background: none; border: 0; color: var(--w-acc); text-decoration: underline; cursor: pointer; padding: 0; justify-self: start }
+.w-chip { font-size: 12px; background: var(--w-bg); border: 1px solid var(--w-line); border-radius: 99px; padding: 2px 9px }
+.w-banner, .w-diag { border: 1px solid var(--w-line); background: var(--w-panel); border-radius: 8px; padding: 9px 12px; font-size: 12.5px }
+.w-diag b { color: var(--w-acc); margin-right: 6px }
+.w-prose-tools { display: flex; gap: 6px; flex-wrap: wrap }
+.w-prose, .w-editor { border: 1px solid var(--w-line); background: var(--w-panel); border-radius: 8px; padding: 12px 14px; display: grid; gap: 8px; line-height: 1.7 }
+.w-prose p, .w-editor p { margin: 0 }
+.w-prose span, .w-editor span { font-family: var(--mono); font-size: 11px; color: var(--w-mut); margin-right: 8px }
+.w-editor { outline: none; border-color: var(--w-acc) }
+.w-back { position: absolute; inset: 0; background: color-mix(in srgb, var(--w-ink) 35%, transparent); display: grid; place-items: center; padding: 16px; z-index: 2 }
+.w-modal { background: var(--w-panel); border: 1px solid var(--w-line); border-radius: 12px; padding: 18px; width: min(420px, 100%); display: grid; gap: 12px; box-shadow: 0 12px 40px rgb(0 0 0 / .25) }
+.w-modal.wide { width: min(560px, 100%) }
+.w-modal h4 { margin: 0; font-size: 15px }
+.w-modal p { margin: 0 }
+.w-acts { display: flex; justify-content: flex-end; gap: 8px; flex-wrap: wrap }
+.w-list { margin: 0; display: grid; gap: 0; border: 1px solid var(--w-line); border-radius: 8px; overflow: hidden }
+.w-list div { display: grid; grid-template-columns: 9.5em 1fr; gap: 10px; padding: 7px 10px; border-top: 1px solid var(--w-line); font-size: 12.5px }
+.w-list div:first-child { border-top: 0 }
+.w-list dt { color: var(--w-mut) } .w-list dd { margin: 0 }
+.w-read { display: flex; flex-wrap: wrap; gap: 8px; align-items: center }
+.w-proto-tabs { display: flex; flex-wrap: wrap; gap: 4px; align-items: center; font-size: 11px; color: var(--w-mut); border-top: 1px dashed var(--w-line); padding-top: 8px }
+.w-tab { font: inherit; font-family: var(--mono); font-size: 11px; border: 1px solid var(--w-line); background: none; color: var(--w-mut); border-radius: 5px; padding: 1px 6px; cursor: pointer }
+.w-tab.on { color: var(--w-ink); border-color: var(--w-ink) }
+.w-variants { display: grid; gap: 6px }
+.w-var { font: inherit; font-size: 12.5px; text-align: left; border: 1px solid var(--w-line); background: var(--w-bg); color: var(--w-ink); border-radius: 8px; padding: 8px 10px; cursor: pointer }
+.w-var b { margin-right: 8px } .w-var.on { border-color: var(--w-pri) }
+.w-busy { position: absolute; inset: 0; z-index: 3; background: color-mix(in srgb, var(--w-bg) 78%, transparent); backdrop-filter: blur(2px); display: grid; place-items: center; padding: 16px; cursor: progress }
+.w-busy-card { background: var(--w-panel); border: 1px solid var(--w-line); border-radius: 14px; padding: 24px 26px; display: grid; gap: 10px; justify-items: center; text-align: center; width: min(400px, 100%); cursor: default }
+.w-busy-card h4 { margin: 0; font-size: 16px }
+.w-busy-card p { margin: 0; color: var(--w-mut); font-size: 12.5px }
+.w-spin { width: 38px; height: 38px; border-radius: 50%; border: 4px solid var(--w-line); border-top-color: var(--w-acc); animation: spin 1s linear infinite }
+@keyframes spin { to { transform: rotate(1turn) } }
+@media (prefers-reduced-motion: reduce) { .w-spin { animation: none; border-top-color: var(--w-acc) } }
+.w-steps { margin: 0; padding: 0; list-style: none; display: grid; gap: 3px; font-size: 12px; color: var(--w-mut); justify-self: stretch; text-align: left }
+.w-steps li::before { content: "○ "; } .w-steps .done::before { content: "● "; color: var(--yes) } .w-steps .cur { color: var(--w-ink); font-weight: 600 } .w-steps .cur::before { content: "◐ "; color: var(--w-acc) }
+.w-cards { display: grid; grid-template-columns: repeat(auto-fill, minmax(170px, 1fr)); gap: 10px }
+.w-card { border: 1px solid var(--w-line); background: var(--w-panel); border-radius: 9px; padding: 10px; display: grid; gap: 6px; align-content: start; min-width: 0 }
+.w-card b small { font-weight: 400; color: var(--w-mut); font-size: 11px }
+.w-card p { margin: 0; font-size: 12px; color: var(--w-mut) }
+.w-states { margin: 0; padding-left: 16px; font-size: 11.5px }
+.w-card-acts { display: flex; gap: 4px; flex-wrap: wrap }
+.w-img { aspect-ratio: 9 / 12; max-width: 100%; border-radius: 6px; background: linear-gradient(135deg, #ffb4a2, #8aa6ff); display: grid; place-items: center; color: #fff; font-weight: 600; text-shadow: 0 1px 3px rgb(0 0 0 / .4) }
+.w-img.bg { aspect-ratio: 16 / 10; background: linear-gradient(135deg, #b8d4ff, #ffd2b3) }
+.w-img.horror { background: linear-gradient(135deg, #3a2b4a, #8a1f2e) }
+.w-styles { display: grid; grid-template-columns: repeat(6, minmax(0, 1fr)); gap: 6px }
+.w-sty { font: inherit; font-size: 12px; border: 1px solid var(--w-line); background: var(--w-panel); color: var(--w-ink); border-radius: 8px; padding: 6px; display: grid; gap: 4px; cursor: pointer }
+.w-sty i { display: block; height: 34px; border-radius: 5px }
+.w-sty.on { border-color: var(--w-pri); box-shadow: inset 0 0 0 1px var(--w-pri) }
+.w-stybar { display: flex; gap: 10px; align-items: center; border: 1px solid var(--w-line); background: var(--w-panel); border-radius: 8px; padding: 7px 10px }
+.w-stybar i { width: 26px; height: 18px; border-radius: 4px }
+.w-stybar .w-btn { margin-left: auto }
+.w-tools { display: flex; gap: 8px; align-items: center; flex-wrap: wrap }
+.w-rt { border: 1px solid var(--w-line); background: var(--w-panel); border-radius: 8px; padding: 9px 12px; display: grid; gap: 5px }
+.w-rt-h { display: flex; gap: 8px; align-items: baseline; font-size: 12px }
+.w-rt-h b { font-size: 18px; font-variant-numeric: tabular-nums }
+.w-rt-bar { height: 6px; border-radius: 99px; background: var(--w-line); overflow: hidden }
+.w-rt-bar i { display: block; height: 100%; background: var(--lock) }
+.w-tbd { font-size: 11px; font-weight: 500; color: var(--lock); border: 1px dashed var(--lock); border-radius: 99px; padding: 0 7px; vertical-align: 3px }
+.w-shots { display: grid; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: 8px }
+.w-shot { border: 1px solid var(--w-line); background: var(--w-panel); border-radius: 8px; padding: 7px; display: grid; gap: 4px }
+.w-shot small { color: var(--w-mut); font-size: 11px }
+.w-fr { display: grid; grid-template-columns: repeat(3, 1fr); gap: 3px }
+.w-fr i { aspect-ratio: 9 / 16; border-radius: 3px; background: repeating-linear-gradient(45deg, var(--w-line) 0 4px, transparent 4px 8px); border: 1px solid var(--w-line) }
+.w-shot-c { display: flex; justify-content: space-between; font-size: 12px; font-variant-numeric: tabular-nums }
+.w-line { display: flex; gap: 8px; align-items: center; border: 1px solid var(--w-line); border-radius: 7px; padding: 6px 8px }
+.w-line span { flex: 1 }
+
+.lower { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 16px }
+.box { background: var(--surface); border: 1px solid var(--line); border-radius: 10px; padding: 14px 16px; min-width: 0 }
+.box ul { margin: 0; padding-left: 18px; display: grid; gap: 6px }
+.box a, .linkbtn { color: var(--accent); background: none; border: 0; font: inherit; padding: 0; cursor: pointer; text-decoration: underline; text-underline-offset: 2px }
+.export { display: flex; gap: 8px; flex-wrap: wrap; align-items: center; margin-top: 10px }
+.export textarea { width: 100%; min-height: 90px; font: 12px var(--mono); background: var(--bg); color: var(--ink); border: 1px solid var(--line); border-radius: 6px; padding: 8px }
+
+/* ── 동작하는 목업용 ── */
+.w-in, .w-chat-in input, .w-main select, .w-modal select { font: inherit; font-size: 12.5px; border: 1px solid var(--w-line); background: var(--w-panel); color: var(--w-ink); border-radius: 7px; padding: 6px 9px; min-width: 0 }
+.w-in { width: 100% }
+.w-chat-in input { flex: 1 }
+.w-in:focus, .w-ta:focus, .w-chat-in input:focus, select:focus { outline: 2px solid var(--accent); outline-offset: 1px }
+textarea.w-ta { width: 100%; font: inherit; color: var(--w-ink); resize: vertical; line-height: 1.6 }
+.w-x { font: inherit; border: 0; background: none; color: var(--w-mut); cursor: pointer; padding: 0 2px; margin-left: 4px; font-size: 14px; line-height: 1 }
+.w-x:hover { color: var(--w-warn) }
+.w-samples { display: flex; flex-wrap: wrap; gap: 4px; align-items: center }
+.w-samples .w-mut { margin-right: 4px; font-size: 11px }
+.w-btn.w-link { border: 0; background: none; color: var(--w-acc); text-decoration: underline; padding: 0; justify-self: start }
+.w-opt.sm { padding: 2px 8px; font-size: 11.5px }
+.w-msg.me { background: color-mix(in srgb, var(--w-acc) 10%, var(--w-panel)); border-color: color-mix(in srgb, var(--w-acc) 30%, var(--w-line)) }
+.w-msg.me b { color: var(--w-mut) }
+.w-chat-b { max-height: 420px; overflow: auto }
+.w-banner.warn { border-color: var(--back); color: var(--w-ink) }
+.w-prog { width: 100%; height: 6px; background: var(--w-line); border-radius: 99px; overflow: hidden }
+.w-prog i { display: block; height: 100%; background: var(--w-acc); transition: width .5s }
+.w-tone { color: var(--w-acc) !important; font-size: 11.5px !important }
+.w-dl { color: var(--w-ink) !important }
+.w-card.is-new, .w-shot.is-new { border-color: var(--new); box-shadow: inset 0 0 0 1px var(--new) }
+.w-fr.drawn i { background: linear-gradient(160deg, color-mix(in srgb, var(--w-acc) 25%, var(--w-panel)), var(--w-panel)) }
+.w-rt.over .w-rt-bar i { background: var(--back) }
+.w-warn-t { color: var(--back); font-size: 12px; font-weight: 600 }
+.w-line { flex-wrap: wrap }
+.w-line .w-in { flex: 1; width: auto }
+@media (max-width: 760px) {
+  .w-studio { grid-template-columns: minmax(0, 1fr) }
+  .w-chat { border-left: 0; border-top: 1px solid var(--w-line) }
+  .w-styles { grid-template-columns: repeat(3, minmax(0, 1fr)) }
+  .w-bar { flex-wrap: wrap }
+  .w-rail { order: 3; flex-basis: 100%; overflow-x: auto }
+}
+a.btn { text-decoration: none; display: inline-block }

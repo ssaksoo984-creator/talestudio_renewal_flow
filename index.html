@@ -1,74 +1,25 @@
 <title>Tale Studio 리뉴얼 플로우</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans+KR:wght@400;500;600;700&display=swap">
+<link rel="stylesheet" href="src/base.css">
 <style>
-/* 레이아웃: 위 원칙 띠 → 왼쪽 플로우차트 / 오른쪽 노드 설명 + 화면 목업. 좁으면 위아래로 쌓는다 */
-:root {
-  --bg: #f3f5f8; --surface: #ffffff; --ink: #18202b; --mut: #5c6878; --line: #d6dce4;
-  --accent: #2f5bd3; --accent-soft: #e4ebfb;
-  --yes: #1f8a5b; --no: #6b7684; --back: #c4462b; --lock: #a86a00; --ai: #6b4fc8; --new: #0f7c8a;
-  --w-bg: #fbfbfc; --w-panel: #ffffff; --w-line: #dfe3e8; --w-ink: #1d232c; --w-mut: #707a87; --w-acc: #6b4fc8; --w-pri: #18202b; --w-pri-ink: #ffffff; --w-warn: #c4462b;
-  --font: "IBM Plex Sans KR", "Apple SD Gothic Neo", "Malgun Gothic", system-ui, sans-serif;
-  --mono: "IBM Plex Mono", ui-monospace, SFMono-Regular, Menlo, monospace;
-}
-@media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) {
-  --bg: #11151b; --surface: #181e26; --ink: #e6eaf0; --mut: #97a2b1; --line: #2b3440;
-  --accent: #7d9cf2; --accent-soft: #1f2a44;
-  --yes: #4cc28d; --no: #8e99a8; --back: #f08066; --lock: #e3a93a; --ai: #a993f0; --new: #4fc0cd;
-  --w-bg: #151a21; --w-panel: #1b222b; --w-line: #2e3743; --w-ink: #e3e7ed; --w-mut: #8f9aa8; --w-acc: #a993f0; --w-pri: #e6eaf0; --w-pri-ink: #11151b; --w-warn: #f08066;
-  color-scheme: dark } }
-:root[data-theme="dark"] {
-  --bg: #11151b; --surface: #181e26; --ink: #e6eaf0; --mut: #97a2b1; --line: #2b3440;
-  --accent: #7d9cf2; --accent-soft: #1f2a44;
-  --yes: #4cc28d; --no: #8e99a8; --back: #f08066; --lock: #e3a93a; --ai: #a993f0; --new: #4fc0cd;
-  --w-bg: #151a21; --w-panel: #1b222b; --w-line: #2e3743; --w-ink: #e3e7ed; --w-mut: #8f9aa8; --w-acc: #a993f0; --w-pri: #e6eaf0; --w-pri-ink: #11151b; --w-warn: #f08066;
-  color-scheme: dark }
-
-* { box-sizing: border-box }
-body { background: var(--bg); color: var(--ink); font: 14px/1.55 var(--font); margin: 0 }
 .wrap { padding: 20px 20px 48px; max-width: 1680px; margin: 0 auto; display: grid; gap: 18px }
 h1 { font-size: 22px; margin: 0; letter-spacing: -.01em; text-wrap: balance }
 h2 { font-size: 13px; text-transform: uppercase; letter-spacing: .06em; color: var(--mut); margin: 0 0 10px; font-weight: 600 }
 .top { display: flex; flex-wrap: wrap; gap: 8px 16px; align-items: baseline; justify-content: space-between }
 .top p { margin: 4px 0 0; color: var(--mut); max-width: 70ch }
-.mono { font-family: var(--mono) }
 
 .principles { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 10px }
 .pr { background: var(--surface); border: 1px solid var(--line); border-radius: 8px; padding: 10px 12px; min-width: 0 }
 .pr b { display: block; font-size: 13px }
 .pr span { color: var(--mut); font-size: 12.5px }
 
-.legend { display: flex; flex-wrap: wrap; gap: 6px 14px; font-size: 12px; color: var(--mut); align-items: center }
-.legend i { display: inline-block; width: 14px; height: 10px; vertical-align: -1px; margin-right: 5px; border: 1.5px solid var(--mut); border-radius: 2px }
-.legend .lg-dec { transform: rotate(45deg) scale(.8); border-radius: 1px }
-.legend .lg-ai { border-color: var(--ai); background: color-mix(in srgb, var(--ai) 18%, transparent) }
-.legend .lg-modal { border-style: double; border-width: 3px }
-.legend .lg-back { border: 0; border-top: 2px dashed var(--back); height: 0; width: 22px }
-.legend .lg-new { border-color: var(--new); border-style: dashed }
 
 .split { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1.15fr); gap: 16px; align-items: start }
 @media (max-width: 1100px) { .split { grid-template-columns: minmax(0, 1fr) } }
 .pane { background: var(--surface); border: 1px solid var(--line); border-radius: 10px; min-width: 0 }
 .pane-h { display: flex; gap: 8px; align-items: center; justify-content: space-between; padding: 10px 14px; border-bottom: 1px solid var(--line); flex-wrap: wrap }
 .pane-h b { font-size: 13px }
-.flow-box { overflow: auto; max-height: calc(100vh - 120px); padding: 12px }
-@media (max-width: 1100px) { .flow-box { max-height: 70vh } }
-.flow-box svg { max-width: none !important; height: auto }
-.stage { padding: 6px 0 14px; border-bottom: 1px solid var(--line) }
-.stage:last-child { border-bottom: 0 }
-.stage h3 { margin: 0 0 6px; font-size: 14px; position: sticky; left: 0 }
-.stage h3 small { font-weight: 400; color: var(--mut); font-size: 12px; margin-left: 4px }
-.stage .tbd { font-size: 11px; font-weight: 500; color: var(--lock); border: 1px dashed var(--lock); border-radius: 99px; padding: 0 7px }
-.stage-svg { display: flex; justify-content: center; min-width: max-content }
-.flow-box .node { cursor: pointer }
-.flow-box .node.is-sel rect, .flow-box .node.is-sel polygon, .flow-box .node.is-sel path { stroke: var(--accent) !important; stroke-width: 3px !important }
-.flow-box .node:focus-visible { outline: none }
-.flow-box .node:focus-visible rect, .flow-box .node:focus-visible polygon { stroke: var(--accent) !important; stroke-width: 3px !important }
-.zoom { display: flex; gap: 4px }
-.btn { font: inherit; font-size: 12.5px; border: 1px solid var(--line); background: var(--surface); color: var(--ink); border-radius: 6px; padding: 4px 10px; cursor: pointer }
-.btn:hover { border-color: var(--accent) }
-.btn:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px }
-.loading { color: var(--mut); padding: 24px }
 
 .side { display: grid; gap: 16px; position: sticky; top: env(safe-area-inset-top, 0px) }
 @media (max-width: 1100px) { .side { position: static } }
@@ -96,134 +47,13 @@ h2 { font-size: 13px; text-transform: uppercase; letter-spacing: .06em; color: v
 .review .seg button[aria-pressed="true"] { background: var(--accent-soft); border-color: var(--accent) }
 .review textarea { width: 100%; min-height: 54px; font: inherit; font-size: 13px; border: 1px solid var(--line); border-radius: 6px; background: var(--bg); color: var(--ink); padding: 6px 8px; resize: vertical }
 
-.device { overflow: auto; border-top: 1px solid var(--line); background: var(--bg) }
-.screen { position: relative; min-width: 720px; min-height: 640px; background: var(--w-bg); color: var(--w-ink); font-size: 13px }
-
-/* ── 와이어프레임 ── */
-.w-bar { display: flex; align-items: center; gap: 14px; padding: 8px 14px; border-bottom: 1px solid var(--w-line); background: var(--w-panel) }
-.w-logo { font-size: 13px }
-.w-rail { display: flex; gap: 4px; flex: 1 }
-.w-rail span { font-size: 12px; padding: 2px 9px; border-radius: 99px; color: var(--w-mut) }
-.w-rail .on { background: var(--w-pri); color: var(--w-pri-ink) }
-.w-rail .done { color: var(--w-ink) }
-.w-rail .done::before { content: "🔒 "; font-size: 10px }
-.w-meta { display: flex; gap: 8px; font-size: 12px; color: var(--w-mut) }
-.w-lock { color: var(--lock); font-weight: 500 }
-.w-studio { display: grid; grid-template-columns: minmax(0, 1fr) 230px; min-height: 480px }
-.w-main { padding: 16px 18px; display: grid; gap: 12px; align-content: start; min-width: 0 }
-.w-chat { border-left: 1px solid var(--w-line); background: var(--w-panel); display: grid; grid-template-rows: auto 1fr auto }
-.w-chat.is-locked { opacity: .45 }
-.w-chat-h { font-size: 12px; font-weight: 600; padding: 10px 12px; border-bottom: 1px solid var(--w-line) }
-.w-chat-b { padding: 10px 12px; display: grid; gap: 8px; align-content: start }
-.w-msg { font-size: 12.5px; background: var(--w-bg); border: 1px solid var(--w-line); border-radius: 8px; padding: 7px 9px }
-.w-msg b { display: block; font-size: 11px; color: var(--w-acc) }
-.w-chat-in { display: flex; gap: 6px; align-items: center; padding: 8px; border-top: 1px solid var(--w-line); font-size: 12px; color: var(--w-mut) }
-.w-chat-in span { flex: 1 }
-.w-entry { max-width: 620px; margin: 0 auto; padding: 28px 20px; display: grid; gap: 14px }
-.w-entry h3, .w-title h3 { margin: 0; font-size: 18px }
-.w-title { display: flex; justify-content: space-between; align-items: center; gap: 10px; flex-wrap: wrap }
-.w-ta { border: 1px solid var(--w-line); background: var(--w-panel); border-radius: 8px; padding: 12px; min-height: 76px }
-.w-ta.sm { min-height: 0; padding: 8px 10px }
-.w-file { display: flex; justify-content: space-between; align-items: center; gap: 10px; border: 1px dashed var(--w-line); border-radius: 8px; padding: 10px 12px }
-.w-q { display: grid; gap: 6px }
-.w-q-t { font-weight: 600; font-size: 13px }
-.w-q-t small { font-weight: 400; color: var(--w-mut); margin-left: 6px }
-.w-opts { display: flex; flex-wrap: wrap; gap: 6px }
-.w-opt { font: inherit; font-size: 12.5px; text-align: left; border: 1px solid var(--w-line); background: var(--w-panel); color: var(--w-ink); border-radius: 7px; padding: 6px 10px; cursor: pointer; display: grid }
-.w-opt small { color: var(--w-mut); font-size: 11px }
-.w-opt em { font-style: normal; font-size: 10px; color: var(--w-acc); font-weight: 600 }
-.w-opt.on { border-color: var(--w-pri); box-shadow: inset 0 0 0 1px var(--w-pri) }
-.w-foot { display: flex; justify-content: space-between; align-items: center; gap: 10px; flex-wrap: wrap }
-.w-mut { color: var(--w-mut); font-size: 12px }
-.w-note { color: var(--w-mut); font-size: 12px; margin: 0 }
-.w-btn { font: inherit; font-size: 12.5px; border: 1px solid var(--w-line); background: var(--w-panel); color: var(--w-ink); border-radius: 7px; padding: 6px 12px; cursor: pointer; white-space: nowrap }
-.w-btn.sm { font-size: 11.5px; padding: 3px 8px }
-.w-btn.pri { background: var(--w-pri); color: var(--w-pri-ink); border-color: var(--w-pri) }
-.w-btn.acc { background: var(--w-acc); color: #fff; border-color: var(--w-acc) }
-.w-btn.warn { color: var(--w-warn); border-color: var(--w-warn) }
-.w-btn.ghost { border-style: dashed; color: var(--w-mut) }
-.w-btn:disabled { opacity: .4; cursor: not-allowed }
-.w-btn:focus-visible, .w-opt:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px }
-.w-link { font: inherit; font-size: 12px; background: none; border: 0; color: var(--w-acc); text-decoration: underline; cursor: pointer; padding: 0; justify-self: start }
-.w-chip { font-size: 12px; background: var(--w-bg); border: 1px solid var(--w-line); border-radius: 99px; padding: 2px 9px }
-.w-banner, .w-diag { border: 1px solid var(--w-line); background: var(--w-panel); border-radius: 8px; padding: 9px 12px; font-size: 12.5px }
-.w-diag b { color: var(--w-acc); margin-right: 6px }
-.w-prose-tools { display: flex; gap: 6px; flex-wrap: wrap }
-.w-prose, .w-editor { border: 1px solid var(--w-line); background: var(--w-panel); border-radius: 8px; padding: 12px 14px; display: grid; gap: 8px; line-height: 1.7 }
-.w-prose p, .w-editor p { margin: 0 }
-.w-prose span, .w-editor span { font-family: var(--mono); font-size: 11px; color: var(--w-mut); margin-right: 8px }
-.w-editor { outline: none; border-color: var(--w-acc) }
-.w-back { position: absolute; inset: 0; background: color-mix(in srgb, var(--w-ink) 35%, transparent); display: grid; place-items: center; padding: 16px; z-index: 2 }
-.w-modal { background: var(--w-panel); border: 1px solid var(--w-line); border-radius: 12px; padding: 18px; width: min(420px, 100%); display: grid; gap: 12px; box-shadow: 0 12px 40px rgb(0 0 0 / .25) }
-.w-modal.wide { width: min(560px, 100%) }
-.w-modal h4 { margin: 0; font-size: 15px }
-.w-modal p { margin: 0 }
-.w-acts { display: flex; justify-content: flex-end; gap: 8px; flex-wrap: wrap }
-.w-list { margin: 0; display: grid; gap: 0; border: 1px solid var(--w-line); border-radius: 8px; overflow: hidden }
-.w-list div { display: grid; grid-template-columns: 9.5em 1fr; gap: 10px; padding: 7px 10px; border-top: 1px solid var(--w-line); font-size: 12.5px }
-.w-list div:first-child { border-top: 0 }
-.w-list dt { color: var(--w-mut) } .w-list dd { margin: 0 }
-.w-read { display: flex; flex-wrap: wrap; gap: 8px; align-items: center }
-.w-proto-tabs { display: flex; flex-wrap: wrap; gap: 4px; align-items: center; font-size: 11px; color: var(--w-mut); border-top: 1px dashed var(--w-line); padding-top: 8px }
-.w-tab { font: inherit; font-family: var(--mono); font-size: 11px; border: 1px solid var(--w-line); background: none; color: var(--w-mut); border-radius: 5px; padding: 1px 6px; cursor: pointer }
-.w-tab.on { color: var(--w-ink); border-color: var(--w-ink) }
-.w-variants { display: grid; gap: 6px }
-.w-var { font: inherit; font-size: 12.5px; text-align: left; border: 1px solid var(--w-line); background: var(--w-bg); color: var(--w-ink); border-radius: 8px; padding: 8px 10px; cursor: pointer }
-.w-var b { margin-right: 8px } .w-var.on { border-color: var(--w-pri) }
-.w-busy { position: absolute; inset: 0; z-index: 3; background: color-mix(in srgb, var(--w-bg) 78%, transparent); backdrop-filter: blur(2px); display: grid; place-items: center; padding: 16px; cursor: progress }
-.w-busy-card { background: var(--w-panel); border: 1px solid var(--w-line); border-radius: 14px; padding: 24px 26px; display: grid; gap: 10px; justify-items: center; text-align: center; width: min(400px, 100%); cursor: default }
-.w-busy-card h4 { margin: 0; font-size: 16px }
-.w-busy-card p { margin: 0; color: var(--w-mut); font-size: 12.5px }
-.w-spin { width: 38px; height: 38px; border-radius: 50%; border: 4px solid var(--w-line); border-top-color: var(--w-acc); animation: spin 1s linear infinite }
-@keyframes spin { to { transform: rotate(1turn) } }
-@media (prefers-reduced-motion: reduce) { .w-spin { animation: none; border-top-color: var(--w-acc) } }
-.w-steps { margin: 0; padding: 0; list-style: none; display: grid; gap: 3px; font-size: 12px; color: var(--w-mut); justify-self: stretch; text-align: left }
-.w-steps li::before { content: "○ "; } .w-steps .done::before { content: "● "; color: var(--yes) } .w-steps .cur { color: var(--w-ink); font-weight: 600 } .w-steps .cur::before { content: "◐ "; color: var(--w-acc) }
-.w-cards { display: grid; grid-template-columns: repeat(auto-fill, minmax(170px, 1fr)); gap: 10px }
-.w-card { border: 1px solid var(--w-line); background: var(--w-panel); border-radius: 9px; padding: 10px; display: grid; gap: 6px; align-content: start; min-width: 0 }
-.w-card b small { font-weight: 400; color: var(--w-mut); font-size: 11px }
-.w-card p { margin: 0; font-size: 12px; color: var(--w-mut) }
-.w-states { margin: 0; padding-left: 16px; font-size: 11.5px }
-.w-card-acts { display: flex; gap: 4px; flex-wrap: wrap }
-.w-img { aspect-ratio: 9 / 12; max-width: 100%; border-radius: 6px; background: linear-gradient(135deg, #ffb4a2, #8aa6ff); display: grid; place-items: center; color: #fff; font-weight: 600; text-shadow: 0 1px 3px rgb(0 0 0 / .4) }
-.w-img.bg { aspect-ratio: 16 / 10; background: linear-gradient(135deg, #b8d4ff, #ffd2b3) }
-.w-img.horror { background: linear-gradient(135deg, #3a2b4a, #8a1f2e) }
-.w-styles { display: grid; grid-template-columns: repeat(6, minmax(0, 1fr)); gap: 6px }
-.w-sty { font: inherit; font-size: 12px; border: 1px solid var(--w-line); background: var(--w-panel); color: var(--w-ink); border-radius: 8px; padding: 6px; display: grid; gap: 4px; cursor: pointer }
-.w-sty i { display: block; height: 34px; border-radius: 5px }
-.w-sty.on { border-color: var(--w-pri); box-shadow: inset 0 0 0 1px var(--w-pri) }
-.w-stybar { display: flex; gap: 10px; align-items: center; border: 1px solid var(--w-line); background: var(--w-panel); border-radius: 8px; padding: 7px 10px }
-.w-stybar i { width: 26px; height: 18px; border-radius: 4px }
-.w-stybar .w-btn { margin-left: auto }
-.w-tools { display: flex; gap: 8px; align-items: center; flex-wrap: wrap }
-.w-rt { border: 1px solid var(--w-line); background: var(--w-panel); border-radius: 8px; padding: 9px 12px; display: grid; gap: 5px }
-.w-rt-h { display: flex; gap: 8px; align-items: baseline; font-size: 12px }
-.w-rt-h b { font-size: 18px; font-variant-numeric: tabular-nums }
-.w-rt-bar { height: 6px; border-radius: 99px; background: var(--w-line); overflow: hidden }
-.w-rt-bar i { display: block; height: 100%; background: var(--lock) }
-.w-tbd { font-size: 11px; font-weight: 500; color: var(--lock); border: 1px dashed var(--lock); border-radius: 99px; padding: 0 7px; vertical-align: 3px }
-.w-shots { display: grid; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: 8px }
-.w-shot { border: 1px solid var(--w-line); background: var(--w-panel); border-radius: 8px; padding: 7px; display: grid; gap: 4px }
-.w-shot small { color: var(--w-mut); font-size: 11px }
-.w-fr { display: grid; grid-template-columns: repeat(3, 1fr); gap: 3px }
-.w-fr i { aspect-ratio: 9 / 16; border-radius: 3px; background: repeating-linear-gradient(45deg, var(--w-line) 0 4px, transparent 4px 8px); border: 1px solid var(--w-line) }
-.w-shot-c { display: flex; justify-content: space-between; font-size: 12px; font-variant-numeric: tabular-nums }
-.w-line { display: flex; gap: 8px; align-items: center; border: 1px solid var(--w-line); border-radius: 7px; padding: 6px 8px }
-.w-line span { flex: 1 }
-
-.lower { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 16px }
-.box { background: var(--surface); border: 1px solid var(--line); border-radius: 10px; padding: 14px 16px; min-width: 0 }
-.box ul { margin: 0; padding-left: 18px; display: grid; gap: 6px }
-.box a, .linkbtn { color: var(--accent); background: none; border: 0; font: inherit; padding: 0; cursor: pointer; text-decoration: underline; text-underline-offset: 2px }
-.export { display: flex; gap: 8px; flex-wrap: wrap; align-items: center; margin-top: 10px }
-.export textarea { width: 100%; min-height: 90px; font: 12px var(--mono); background: var(--bg); color: var(--ink); border: 1px solid var(--line); border-radius: 6px; padding: 8px }
 </style>
 
 <div class="wrap">
   <div class="top">
     <div>
       <h1>Tale Studio 리뉴얼 사용자 플로우</h1>
-      <p>진입 → Producer(산문) → Artist → Storyboard(가칭)까지. 노드를 누르면 오른쪽에 그 화면이 열리고, 화면 안 버튼을 누르면 플로우를 따라 이동해요.</p>
+      <p>진입 → Producer(산문) → Artist → Storyboard(가칭)까지. 노드를 누르면 오른쪽에 그 화면이 열려요. 목업은 실제로 동작해서, 입력하고 고른 값이 다음 화면까지 이어져요. <a href="proto.html">목업만 크게 보기 ↗</a></p>
     </div>
     <span class="mono" style="font-size:12px;color:var(--mut)" id="updated"></span>
   </div>
@@ -243,7 +73,7 @@ h2 { font-size: 13px; text-transform: uppercase; letter-spacing: .06em; color: v
     <div class="side">
       <section class="pane" aria-label="노드 설명"><div class="info" id="info"></div></section>
       <section class="pane" aria-label="화면 목업">
-        <div class="pane-h"><b>화면 목업 <span class="mono" id="scrId" style="color:var(--mut);font-weight:400"></span></b><span style="font-size:12px;color:var(--mut)">와이어프레임 · 시각 디자인 전</span></div>
+        <div class="pane-h"><b>화면 목업 <span class="mono" id="scrId" style="color:var(--mut);font-weight:400"></span></b><span class="zoom"><button class="btn" id="protoReset">처음부터</button><a class="btn" id="protoOpen" href="proto.html">목업 따로 보기 ↗</a></span></div>
         <div class="device"><div class="screen" id="screen"></div></div>
       </section>
     </div>
@@ -261,14 +91,13 @@ h2 { font-size: 13px; text-transform: uppercase; letter-spacing: .06em; color: v
 
 <script src="https://cdn.jsdelivr.net/npm/mermaid@11.4.1/dist/mermaid.min.js"></script>
 <script src="src/flow.js"></script>
+<script src="src/flowview.js"></script>
 <script src="src/screens.js"></script>
 <script>
 (function () {
-  var F = window.FLOW, S = window.SCREENS;
-  var byId = {}; F.nodes.forEach(function (n) { byId[n.id] = n; });
-  var stageName = {}; F.stages.forEach(function (s) { stageName[s.id] = s.name; });
+  var F = window.FLOW, V = window.FlowView, P = window.PROTO;
+  var byId = V.byId, stageName = V.stageName, esc = V.esc;
   var $ = function (id) { return document.getElementById(id); };
-  var esc = function (s) { return String(s).replace(/[&<>"]/g, function (c) { return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]; }); };
   var store = {
     get: function () { try { return JSON.parse(localStorage.getItem('tale-flow-review') || '{}'); } catch (e) { return {}; } },
     set: function (v) { try { localStorage.setItem('tale-flow-review', JSON.stringify(v)); } catch (e) {} },
@@ -282,115 +111,21 @@ h2 { font-size: 13px; text-transform: uppercase; letter-spacing: .06em; color: v
   var rm = []; F.nodes.forEach(function (n) { (n.removed || []).forEach(function (r) { rm.push('<li>' + esc(r) + ' <button class="linkbtn" data-node="' + n.id + '">' + n.id + '</button></li>'); }); });
   $('removed').innerHTML = rm.join('');
 
-  /* ── Mermaid 정의 만들기 ── */
-  function css(v) { return getComputedStyle(document.documentElement).getPropertyValue(v).trim(); }
-  function lbl(n) {
-    var t = n.label + (n.lock ? '<br/>🔒 ' + n.lock : '');
-    if (n.type === 'ai') t = '⏳ ' + t;
-    return '"' + n.id + ' · ' + t.replace(/"/g, '#quot;') + '"';
-  }
-  function shape(n) {
-    var L = lbl(n);
-    switch (n.type) {
-      case 'decision': return n.id + '{' + L + '}';
-      case 'ai': return n.id + '{{' + L + '}}';
-      case 'modal': return n.id + '[[' + L + ']]';
-      case 'ext': return n.id + '[/' + L + '/]';
-      default: return n.id + '[' + L + ']';
-    }
-  }
-  function classDefs() {
-    var ink = css('--ink'), surf = css('--surface');
-    return [
-      'classDef screen fill:' + surf + ',stroke:' + css('--mut') + ',color:' + ink,
-      'classDef modal fill:' + surf + ',stroke:' + css('--mut') + ',color:' + ink,
-      'classDef decision fill:' + css('--accent-soft') + ',stroke:' + css('--accent') + ',color:' + ink,
-      'classDef ai fill:' + surf + ',stroke:' + css('--ai') + ',stroke-width:2px,color:' + css('--ai'),
-      'classDef ext fill:' + css('--bg') + ',stroke:' + css('--line') + ',color:' + css('--mut'),
-      'classDef stub fill:' + css('--bg') + ',stroke:' + css('--line') + ',color:' + css('--mut') + ',stroke-dasharray:2 2',
-      'classDef stubback fill:' + css('--bg') + ',stroke:' + css('--back') + ',color:' + css('--back') + ',stroke-dasharray:2 2',
-      'classDef isnew stroke:' + css('--new') + ',stroke-dasharray:5 3,stroke-width:2px'
-    ];
-  }
-  /* 단계마다 따로 그린다. 다른 단계로 가는 선은 "→ ID" 표시 상자로 끝낸다 */
-  function definition(stage) {
-    var d = ['flowchart TB'], styles = [], k = 0;
-    var mine = F.nodes.filter(function (n) { return n.stage === stage.id; });
-    var ids = {}; mine.forEach(function (n) { ids[n.id] = 1; d.push('  ' + shape(n)); });
-    F.edges.forEach(function (e) {
-      if (!ids[e[0]]) return;
-      var to = e[1];
-      if (!ids[to]) {
-        var t = byId[to];
-        to = 'go__' + e[1] + '__' + k;
-        d.push('  ' + to + '(["' + (e[3] === 'back' ? '↩ ' : '→ ') + e[1] + ' ' + t.label.replace(/"/g, '#quot;') + (e[3] === 'back' ? '' : ' · ' + stageName[t.stage]) + '"])');
-        d.push('class ' + to + ' ' + (e[3] === 'back' ? 'stubback' : 'stub'));
-      }
-      var arrow = e[3] === 'back' || e[3] === 'no' ? '-.->' : '-->';
-      d.push(e[0] + ' ' + arrow + (e[2] ? '|"' + e[2] + '"|' : '') + ' ' + to);
-      if (e[3] === 'back') styles.push('linkStyle ' + k + ' stroke:' + css('--back') + ',stroke-width:2px');
-      if (e[3] === 'yes') styles.push('linkStyle ' + k + ' stroke:' + css('--yes') + ',stroke-width:1.6px');
-      k++;
-    });
-    d = d.concat(classDefs());
-    mine.forEach(function (n) { d.push('class ' + n.id + ' ' + n.type + (n.vs === 'new' ? ',isnew' : '')); });
-    return d.concat(styles).join('\n');
-  }
-
-  var zoom = 1, rendered = 0;
-  function render() {
-    var box = $('flow');
-    if (!window.mermaid) { box.innerHTML = '<div class="loading">플로우 그리기 도구를 불러오지 못했어요. 네트워크를 확인하고 새로고침해 주세요.</div>'; return; }
-    mermaid.initialize({ startOnLoad: false, theme: 'base', securityLevel: 'strict', flowchart: { htmlLabels: true, curve: 'basis', nodeSpacing: 24, rankSpacing: 34, padding: 8 },
-      themeVariables: { fontFamily: css('--font'), fontSize: '13px', primaryColor: css('--surface'), primaryTextColor: css('--ink'), primaryBorderColor: css('--mut'), lineColor: css('--mut'), edgeLabelBackground: css('--surface'), titleColor: css('--ink') } });
-    rendered++;
-    box.innerHTML = F.stages.map(function (s) {
-      return '<section class="stage" id="st-' + s.id + '"><h3>' + esc(s.name) + (s.tbd ? ' <span class="tbd">이름 미정</span>' : '') + ' <small>' + esc(s.sub) + '</small></h3><div class="stage-svg"></div></section>';
-    }).join('');
-    var r0 = rendered;
-    F.stages.reduce(function (p, s) {
-      return p.then(function () {
-        if (r0 !== rendered) return;
-        return mermaid.render('fs' + r0 + s.id, definition(s)).then(function (r) {
-          var host = box.querySelector('#st-' + s.id + ' .stage-svg');
-          host.innerHTML = r.svg;
-          var svg = host.querySelector('svg');
-          svg.dataset.w = svg.viewBox.baseVal.width;
-          host.querySelectorAll('g.node').forEach(function (g) {
-            var m = g.id.match(/flowchart-(.+)-\d+$/); if (!m) return;
-            var id = m[1].indexOf('go__') === 0 ? m[1].split('__')[1] : m[1];
-            if (!byId[id]) return;
-            g.dataset.node = id; if (id !== m[1]) g.dataset.stub = '1';
-            g.setAttribute('tabindex', '0'); g.setAttribute('role', 'button'); g.setAttribute('aria-label', id + ' ' + byId[id].label);
-          });
-        });
-      });
-    }, Promise.resolve()).then(function () { applyZoom(); mark(); })
-      .catch(function (err) { box.insertAdjacentHTML('afterbegin', '<div class="loading">플로우를 그리지 못했어요: ' + esc(err.message || err) + '</div>'); });
-  }
-  function applyZoom() {
-    $('flow').querySelectorAll('.stage-svg svg').forEach(function (svg) { svg.style.width = (svg.dataset.w * zoom) + 'px'; });
-  }
-  $('zin').onclick = function () { zoom = Math.min(2, zoom + .15); applyZoom(); };
-  $('zout').onclick = function () { zoom = Math.max(.4, zoom - .15); applyZoom(); };
-  $('zfit').onclick = function () { var w = 0; $('flow').querySelectorAll('.stage-svg svg').forEach(function (s) { w = Math.max(w, +s.dataset.w); }); if (!w) return; zoom = ($('flow').clientWidth - 32) / w; applyZoom(); };
-  function mark() {
-    $('flow').querySelectorAll('g.node').forEach(function (g) { g.classList.toggle('is-sel', g.dataset.node === cur && !g.dataset.stub); });
-  }
-
-  /* ── 노드 고르기 ── */
   var VS = { keep: '지금과 같음', change: '바뀜', 'new': '새로' };
   var TYPE = { screen: '화면', modal: '팝업 · 확인창', decision: '갈림', ai: 'AI 작업 중 · 전체 잠금', ext: '범위 밖' };
   var REV = [['ok', '확정'], ['fix', '수정 필요'], ['ask', '질문']];
-  function select(id, scroll) {
-    var alias = (window.SCREEN_ALIAS || {})[id];
-    var nodeId = alias || id;
-    var n = byId[nodeId]; if (!n) return;
-    cur = nodeId; mark();
-    var scr = S[id] ? id : (n.screen && S[n.screen] ? n.screen : null);
-    $('screen').innerHTML = scr ? S[scr]() : '<div class="w-entry"><p class="w-mut">이 노드는 화면이 없어요.</p></div>';
-    $('scrId').textContent = scr || '';
-    var out = F.edges.filter(function (e) { return e[0] === nodeId; });
+
+  // 노드 고르기: 설명을 바꾸고, 목업을 그 화면으로 옮기고, 플로우에 빨간 표시
+  function select(id, opt) {
+    opt = opt || {};
+    var n = byId[id]; if (!n) return;
+    cur = id;
+    V.mark(id, opt.scroll);
+    if (!opt.fromProto && P.current() !== id) P.show(id);
+    var scr = P.screenFor(id);
+    $('scrId').textContent = scr ? scr + (scr !== id ? ' (' + id + ' 갈림)' : '') : '';
+    $('protoOpen').href = 'proto.html#' + id;
+    var out = F.edges.filter(function (e) { return e[0] === id; });
     var h = '<div class="info-h"><span class="mono tag">' + n.id + '</span><h3>' + esc(n.label) + '</h3>' +
       '<span class="tag' + (n.type === 'ai' ? ' t-ai' : '') + '">' + TYPE[n.type] + '</span>' +
       (n.vs ? '<span class="tag t-' + n.vs + '">' + VS[n.vs] + '</span>' : '') +
@@ -404,22 +139,15 @@ h2 { font-size: 13px; text-transform: uppercase; letter-spacing: .06em; color: v
     if (out.length) h += '<div class="sub">여기서 갈 수 있는 곳</div><div class="next">' + out.map(function (e) {
       return '<button class="btn k-' + (e[3] || 'go') + '" data-node="' + e[1] + '">' + (e[2] ? esc(e[2]) + ' → ' : '→ ') + '<span class="mono">' + e[1] + '</span> ' + esc(byId[e[1]].label) + '</button>';
     }).join('') + '</div>';
-    var r = review[nodeId] || {};
+    var r = review[id] || {};
     h += '<div class="review"><label>검토</label><span class="seg">' + REV.map(function (x) { return '<button class="btn" data-rev="' + x[0] + '" aria-pressed="' + (r.s === x[0]) + '">' + x[1] + '</button>'; }).join('') + '</span>' +
-      '<textarea id="memo-' + nodeId + '" placeholder="이 노드에 대한 메모" aria-label="메모">' + esc(r.m || '') + '</textarea></div>';
+      '<textarea id="memo-' + id + '" placeholder="이 노드에 대한 메모" aria-label="메모">' + esc(r.m || '') + '</textarea></div>';
     $('info').innerHTML = h;
-    if (scroll) {
-      var g = $('flow').querySelector('g.node[data-node="' + nodeId + '"]:not([data-stub])');
-      if (g && g.scrollIntoView) g.scrollIntoView({ block: 'nearest', inline: 'nearest', behavior: 'smooth' });
-    }
     if (history.replaceState) history.replaceState(null, '', '#' + id);
   }
-  function saveReview(id, patch) {
-    review[id] = Object.assign({}, review[id] || {}, patch);
-    store.set(review); exportText();
-  }
+  function saveReview(id, patch) { review[id] = Object.assign({}, review[id] || {}, patch); store.set(review); exportText(); }
   function exportText() {
-    var lines = Object.keys(review).filter(function (k) { return review[k].s || review[k].m; }).map(function (k) {
+    var lines = Object.keys(review).filter(function (k) { return byId[k] && (review[k].s || review[k].m); }).map(function (k) {
       var r = review[k], lab = { ok: '확정', fix: '수정 필요', ask: '질문' }[r.s] || '-';
       return k + ' ' + byId[k].label + ' | ' + lab + (r.m ? ' | ' + r.m.replace(/\n/g, ' ') : '');
     });
@@ -427,18 +155,17 @@ h2 { font-size: 13px; text-transform: uppercase; letter-spacing: .06em; color: v
   }
   exportText();
 
+  P.mount($('screen'), { onNavigate: function (id) { if (byId[id]) select(id, { scroll: true, fromProto: true }); } });
+  V.mount($('flow'), { onSelect: function (id) { select(id, { scroll: true }); } });
+  $('zin').onclick = V.zoomIn; $('zout').onclick = V.zoomOut; $('zfit').onclick = V.fit;
+  $('protoReset').onclick = function () { P.reset(); P.show('E1'); select('E1', { scroll: true, fromProto: true }); };
+
   document.addEventListener('click', function (e) {
     var t = e.target;
-    var g = t.closest('g.node[data-node]'); if (g) { select(g.dataset.node); return; }
-    var nb = t.closest('[data-node]'); if (nb && !nb.closest('svg')) { select(nb.dataset.node, true); return; }
-    var go = t.closest('#screen [data-go]'); if (go && !go.disabled && go.dataset.go) { select(go.dataset.go, true); return; }
-    var pick = t.closest('#screen [data-pick]'); if (pick) { [].forEach.call(pick.parentNode.children, function (o) { o.classList.toggle('on', o === pick); }); return; }
-    var kd = t.closest('#screen [data-kind]'); if (kd) { window.setKind(kd.dataset.kind); select('E3'); return; }
-    if (t.closest('#screen [data-cycle]')) { window.cycleKind(); select('E3'); return; }
-    var rv = t.closest('[data-rev]'); if (rv && cur) { var on = rv.getAttribute('aria-pressed') !== 'true'; saveReview(cur, { s: on ? rv.dataset.rev : '' }); select(cur); return; }
-  });
-  document.addEventListener('keydown', function (e) {
-    if ((e.key === 'Enter' || e.key === ' ') && e.target.matches && e.target.matches('g.node[data-node]')) { e.preventDefault(); select(e.target.dataset.node); }
+    var nb = t.closest('[data-node]');
+    if (nb && !nb.closest('svg') && !nb.closest('#screen')) { select(nb.dataset.node, { scroll: true }); return; }
+    var rv = t.closest('[data-rev]');
+    if (rv && cur) { var on = rv.getAttribute('aria-pressed') !== 'true'; saveReview(cur, { s: on ? rv.dataset.rev : '' }); select(cur, { fromProto: true }); }
   });
   document.addEventListener('input', function (e) { if (e.target.id && e.target.id.indexOf('memo-') === 0) saveReview(e.target.id.slice(5), { m: e.target.value }); });
   $('copy').onclick = function () {
@@ -448,11 +175,7 @@ h2 { font-size: 13px; text-transform: uppercase; letter-spacing: .06em; color: v
     else ta.select();
   };
 
-  render();
-  var mq = window.matchMedia('(prefers-color-scheme: dark)');
-  if (mq.addEventListener) mq.addEventListener('change', render);
-  new MutationObserver(render).observe(document.documentElement, { attributes: true, attributeFilter: ['data-theme'] });
   var start = location.hash.slice(1);
-  select(byId[start] || S[start] ? start : 'E1');
+  select(byId[start] ? start : 'E1');
 })();
 </script>

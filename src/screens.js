@@ -163,7 +163,7 @@
   var entryBase = function () { return isB() ? EB1() : E1(); };
   function counter() { return '<span class="w-count" data-count aria-live="polite"></span>'; }
   function lenErrHtml() {
-    return st.lenErr && !st.file && ideaLen() < MIN_LEN ? '<p class="w-err" data-lenerr role="alert">조금 더 적어 주세요. ' + MIN_LEN + '자 이상이면 AI가 이야기를 잡을 수 있어요. (지금 ' + ideaLen() + '자)</p>' : '';
+    return st.lenErr && !st.file && ideaLen() < MIN_LEN ? '<p class="w-err" data-lenerr role="alert">조금 더 적어 주세요. ' + MIN_LEN + '자 이상이면 AI가 이야기를 잡을 수 있어요. (지금 <b data-lennow>' + ideaLen() + '</b>자)</p>' : '';
   }
   function fileRow() {
     return '<div class="w-file">' + (st.file ? '<span class="w-chip">📎 ' + esc(st.file.name) + '<button class="w-x" data-act="clearFile" aria-label="파일 빼기">×</button></span>'
@@ -296,17 +296,17 @@
   function chatStage(curKey) {
     var order = bOrder().concat(['confirm']);
     var h = bubble('Producer', '무엇을 만들까요? 자료가 있으면 올리거나 직접 적어 주세요. 아이디어가 아직 없으면 제가 여러 가지 예시를 들려드릴게요.' +
-      (curKey ? '' : '<div class="w-qr">' + B('📎 자료 올리기', 'EF', 'sm') + A('✎ 직접 적을게요', 'focusIdea', 'sm') + B('💡 예시 들려줘', 'EBX', 'sm' + (st.showEx ? ' on' : '')) + '</div>'));
+      (curKey || st.showEx ? '' : '<div class="w-qr">' + B('💡 예시 보여줘', 'EBX') + '</div>'));
     if (!curKey) {
       if (st.showEx) {
         var ex = EXAMPLES.slice(st.exPage * 3, st.exPage * 3 + 3);
         if (!ex.length) { st.exPage = 0; ex = EXAMPLES.slice(0, 3); }
-        h += bubble('', '예시 들려줘', true) + bubble('Producer', '이런 건 어때요? 마음에 드는 걸 누르면 입력칸에 넣어 드려요. 고쳐서 보내도 돼요.' +
+        h += bubble('', '예시 보여줘', true) + bubble('Producer', '이런 건 어때요? 마음에 드는 걸 누르면 입력칸에 넣어 드려요. 고쳐서 보내도 돼요.' +
           '<div class="w-ex">' + ex.map(function (x) { var i = EXAMPLES.indexOf(x);
             return '<button class="w-ex-c" data-act="example" data-arg="' + i + '"><b>' + esc(x[0]) + '</b><span>' + esc(x[1]) + '</span></button>';
           }).join('') + '</div><div class="w-qr">' + A('다른 예시', 'moreEx', 'sm') + '</div>');
       }
-      if (st.lenErr && !st.file && ideaLen() < MIN_LEN) h += bubble('Producer', '<span class="w-err-t">조금 더 적어 주세요. ' + MIN_LEN + '자 이상이면 이야기를 잡을 수 있어요. (지금 ' + ideaLen() + '자)</span> 아래 "누구 이야기 · 어디서 · 무슨 일이"를 눌러 채워 봐도 좋아요.');
+      if (st.lenErr && !st.file && ideaLen() < MIN_LEN) h += '<div data-lenerr>' + bubble('Producer', '<span class="w-err-t">조금 더 적어 주세요. ' + MIN_LEN + '자 이상이면 이야기를 잡을 수 있어요. (지금 <b data-lennow>' + ideaLen() + '</b>자)</span> 누가, 어디서, 무슨 일이, 어떻게 끝나는지 한두 줄이면 돼요.') + '</div>';
     } else {
       h += bubble('', esc(st.idea) + (st.file ? '<br><span class="w-chip">📎 ' + esc(st.file.name) + '</span>' : ''), true);
       var pre = BQ.filter(function (k) { return st.bPre[k] && order.indexOf(k) >= 0; });
@@ -324,10 +324,11 @@
     }).join('') + '</div>';
     var input = curKey
       ? '<div class="w-cin"><input id="chat-in" data-bind="chatDraft" data-enter="bSend" value="' + esc(st.chatDraft) + '" placeholder="골라도 되고, 말로 해도 돼요. 예: 1분짜리로" aria-label="채팅 입력"><button class="w-btn pri" data-act="bSend" data-need="chatDraft">보내기</button></div>'
-      : '<div class="w-cin first"><div class="w-guides">' + GUIDES.map(function (g, i) { return '<button class="w-tab" data-act="guide" data-arg="' + i + '">＋ ' + esc(g.replace(': ', '')) + '</button>'; }).join('') + counter() + '</div>' +
-        '<textarea class="w-ta sm" id="idea" data-bind="idea" rows="3" aria-label="아이디어" placeholder="예: 회사 자판기가 고장 나는 1분짜리 코미디">' + esc(st.idea) + '</textarea>' +
-        '<div class="w-cin-row">' + (st.file ? '<span class="w-chip">📎 ' + esc(st.file.name) + '<button class="w-x" data-act="clearFile" aria-label="파일 빼기">×</button></span>' : '') +
-        B('파일 첨부', 'EF', 'sm') + '<span style="flex:1"></span>' + A('보내기', 'bStart', 'pri') + '</div></div>';
+      : '<div class="w-cin first">' +
+        '<div class="w-cin-main"><textarea id="idea" data-bind="idea" data-enter="bStart" rows="2" aria-label="아이디어" placeholder="누가, 어디서, 무슨 일이, 어떻게 끝나는지 적어 주세요">' + esc(st.idea) + '</textarea>' + A('보내기', 'bStart', 'pri') + '</div>' +
+        '<div class="w-cin-row">' + (st.file ? '<span class="w-chip">📎 ' + esc(st.file.name) + '<button class="w-x" data-act="clearFile" aria-label="파일 빼기">×</button></span>'
+          : B('📎', 'EF', 'w-icon', ' aria-label="파일 첨부" title="파일 첨부"') + '<span class="w-mut">파일이 있으면 올려 주세요</span>') +
+        '<span style="flex:1"></span>' + counter() + '</div></div>';
     return bar('Producer') + '<div class="w-chatstage">' + (curKey ? sum : '') + '<div class="w-thread">' + h + '</div>' + input + '</div>';
   }
   function EB1() { st.showEx = false; return chatStage(null); }
@@ -738,6 +739,7 @@
     skip: function () { return finishBusy(true); },
     reset: function () { var p = st.plan; st = initial(); st.plan = p; return p === 'B' ? 'EB1' : 'E1'; },
     bStart: function () {
+      if (!st.file && /예시/.test(st.idea) && ideaLen() < MIN_LEN + 10) { st.idea = ''; st.lenErr = false; return 'EBX'; }
       if (!st.file && ideaLen() < MIN_LEN) { st.lenErr = true; return 'E1e'; }
       st.lenErr = false; st.bAns = {}; st.bPre = {}; st.bHint = ''; st.bSent = true;
       st.pending = function () {
@@ -810,6 +812,7 @@
       el.textContent = n + '자' + (st.file ? '' : ' · 최소 ' + MIN_LEN + '자');
       el.classList.toggle('short', !st.file && n < MIN_LEN);
     });
+    root.querySelectorAll('[data-lennow]').forEach(function (el) { el.textContent = n; });
     if (n >= MIN_LEN) root.querySelectorAll('[data-lenerr]').forEach(function (el) { el.hidden = true; });
     root.querySelectorAll('.w-lv').forEach(function (b) { b.disabled = !levelOk(+b.getAttribute('data-val')); });
     root.querySelectorAll('[data-need]').forEach(function (b) {
@@ -879,7 +882,7 @@
     });
     el.addEventListener('keydown', function (e) {
       var t = e.target;
-      if (e.key === 'Enter' && !e.isComposing && t.getAttribute && t.getAttribute('data-enter')) { e.preventDefault(); run(t.getAttribute('data-enter')); }
+      if (e.key === 'Enter' && !e.isComposing && !(e.shiftKey && t.tagName === 'TEXTAREA') && t.getAttribute && t.getAttribute('data-enter')) { e.preventDefault(); run(t.getAttribute('data-enter')); }
       if (e.key === 'Escape' && st.rw) { st.rw = null; paint(); var ob = root.querySelector('[data-act="rwOpen"]'); if (ob) ob.focus(); return; }
       if (e.key === 'Escape') { var c = root.querySelector('.w-acts .w-btn'); if (c) c.click(); }
     });

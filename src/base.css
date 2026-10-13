@@ -348,3 +348,14 @@ a.btn { text-decoration: none; display: inline-block }
 .w-rwp .w-opt { padding: 4px 9px; font-size: 12px }
 .w-rwp .w-opt em { font-style: normal; font-size: 9.5px; color: var(--w-mut); font-weight: 400 }
 .w-qr .w-btn.on { border-color: var(--w-acc); color: var(--w-acc) }
+
+/* ── 2안 첫 입력칸: 채팅방처럼 작게, 아래에 붙여 ── */
+.w-chatstage .w-cin.first { position: sticky; bottom: 0; display: grid; gap: 6px; padding: 8px 10px; box-shadow: 0 -8px 16px var(--w-bg) }
+.w-cin-main { display: flex; gap: 8px; align-items: flex-end }
+.w-cin-main textarea { flex: 1; min-width: 0; font: inherit; font-size: 13.5px; line-height: 1.5; border: 0; background: none; color: var(--w-ink); padding: 6px 4px; resize: none; max-height: 7.5em }
+.w-cin-main textarea:focus { outline: none }
+.w-cin.first .w-cin-row { border-top: 1px solid var(--w-line); padding-top: 6px; font-size: 12px }
+.w-btn.w-icon { padding: 2px 8px; font-size: 13px; line-height: 1.4 }
+.w-chatstage { display: flex; flex-direction: column }
+.w-chatstage .w-thread { flex: 1 }
+.w-chatstage { min-height: max(520px, calc(100vh - 175px)) }

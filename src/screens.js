@@ -454,6 +454,19 @@
         A('＋ 씬 추가', 'addScene', 'sm'),
         B('취소', 'W1') + A('저장', 'saveDirect', 'pri'), true);
   }
+  // 고친 걸 적용하면 다음 단계(브레이크다운)를 먼저 제안한다. 싫다면 무엇을 더 할지 고르고, 다시 적용하면 또 제안한다.
+  function WP() {
+    return writer({ card: chatCard('적용했어요. 다음 단계로 넘어갈까요?', '<p style="margin:0">넘어가면 산문이 잠기고, Artist가 산문에서 인물·배경을 뽑아요.</p>' +
+      '<div class="w-card-acts">' + A('좋아요, 브레이크다운', 'breakdown', 'pri sm') + B('아니요, 더 고칠래요', 'WN', 'sm') + '</div>') });
+  }
+  function WN() {
+    return writer({ card: chatCard('무엇을 더 해 볼까요?', '<div class="w-qr col">' +
+      B('✦ 다시 써 달라고 하기 <small>전부 또는 일부분</small>', 'WC1', 'sm') +
+      (st.plan === 'A' ? A('러닝타임 · 장르 바꿔서 다시 쓰기', 'rwOpenGo', 'sm') : B('러닝타임 · 장르 바꿔서 다시 쓰기', 'WC2', 'sm')) +
+      A('✎ 직접 고치기', 'openDirect', 'sm') +
+      A('채팅으로 말할게요', 'chatFree', 'sm') + '</div><p class="w-note">고친 걸 적용하면 다시 물어볼게요. 언제든 [브레이크다운하기]로 넘어갈 수도 있어요.</p>') });
+  }
+  function W3() { if (!st.rw) st.rw = { runtime: st.runtime, mood: st.mood, seed: st.seed }; return W1(); }
   function W6() {
     return W1() + modal('산문을 확정하고 브레이크다운할까요?', list([['🔒 산문', '확정하면 잠겨요'], ['다음', 'AI가 인물·배경을 글로 뽑아요'], ['나중에 인물·배경을 늘리려면', '여기 산문으로 돌아와야 해요']]),
       B('아니오', st.proseLocked ? 'W1r' : 'W1') + A('예, 브레이크다운', 'breakdown', 'pri'));
@@ -595,11 +608,11 @@
       '<p class="w-note">함께 확인: Director가 Artist 인물 시트를 참조하는지 (오류 13), 러프 마네킹이 인물로 이어지지 않는지 (오류 12).</p>' + A('처음부터 다시', 'reset') + '</div>';
   }
 
-  var SCREENS = { EB1: EB1, EBX: EBX, EB2: EB2, EB3: EB3, EB4: EB4, EB5: EB5, EB6: EB6, EB7: EB7, E1: E1, E1e: E1e, EF: EF, EFe: EFe, E2: E2, E2e: E2e, E3: E3, E4: E4, E5: E5, W1: W1, W1r: W1r, WC1: WC1, WC2: WC2, WC3: WC3, W2: W2, W4: W4, W5: W5, W6: W6,
+  var SCREENS = { EB1: EB1, EBX: EBX, EB2: EB2, EB3: EB3, EB4: EB4, EB5: EB5, EB6: EB6, EB7: EB7, E1: E1, E1e: E1e, EF: EF, EFe: EFe, E2: E2, E2e: E2e, E3: E3, E4: E4, E5: E5, W1: W1, W1r: W1r, WC1: WC1, WC2: WC2, WC3: WC3, W2: W2, W4: W4, W5: W5, W6: W6, WP: WP, WN: WN, W3: W3,
     A0: A0, A1: A1, R1: R1, A2: A2, A3: A3, A4: A4, A5: A5, A6: A6, A7: A7, A8: A8, R2: R2, A9: A9,
     S0: S0, S1: S1, S2: S2, S3: S3, S4: S4, R3: R3, S5: S5, S6: S6, S7: S7, D1: D1 };
   // 갈림 노드는 그 갈림을 묻는 화면으로
-  var DECISION_SCREEN = { E1n: function () { return entryId(); }, EFq: 'EF', E2q: function () { return isB() ? 'EB3' : 'E3'; }, E5q: function () { return isB() ? 'EB7' : 'E4'; }, W1q: 'W1', W3: 'W1', A1q: 'A1', A5q: 'A5', S1q: 'S1', S4q: 'S4' };
+  var DECISION_SCREEN = { E1n: function () { return entryId(); }, EFq: 'EF', E2q: function () { return isB() ? 'EB3' : 'E3'; }, E5q: function () { return isB() ? 'EB7' : 'E4'; }, W1q: 'W1', WPq: 'WP', A1q: 'A1', A5q: 'A5', S1q: 'S1', S4q: 'S4' };
   // AI 작업이 끝나면 가는 곳
   var BUSY_NEXT = {
     E2: function () { if (st.file && st.file.noText) return 'E2e'; if (isB()) return st.file ? 'EB2' : nextQ(); return 'E3'; },
@@ -734,12 +747,14 @@
       var v = st.variants[st.vpick]; if (!v) return 'W1';
       st.prose = v.prose.slice(); st.variants = []; st.parts = []; st.partNote = ''; st.partMode = false;
       say('Writer', 'Writer', '안 ' + (st.vpick + 1) + '을(를) 적용했어요.');
-      return 'W1';
+      return 'WP';
     },
     dropVariant: function () { st.variants = []; st.partMode = false; say('Writer', 'Writer', '수정안을 버리고 원래 산문을 유지해요.'); return 'W1'; },
     openDirect: function () { st.draft = st.prose.slice(); st.titleDraft = st.title; return 'W5'; },
     addScene: function () { st.draft.push(''); },
-    saveDirect: function () { st.prose = st.draft.filter(function (p) { return p.trim(); }); if (st.titleDraft && st.titleDraft.trim()) st.title = st.titleDraft.trim(); say('Writer', 'Writer', '직접 고친 산문을 저장했어요.'); return 'W1'; },
+    saveDirect: function () { st.prose = st.draft.filter(function (p) { return p.trim(); }); if (st.titleDraft && st.titleDraft.trim()) st.title = st.titleDraft.trim(); say('Writer', 'Writer', '직접 고친 산문을 저장했어요.'); return 'WP'; },
+    rwOpenGo: function () { st.rw = { runtime: st.runtime, mood: st.mood, seed: st.seed }; return 'W3'; },
+    chatFree: function () { st.focusChat = true; return 'W1'; },
     breakdown: function () { st.proseLocked = true; st.back = ''; st.pending = detectNew; return 'A0'; },
     rollback: function (from) { st.proseLocked = false; st.back = from; st.ratioLocked = true; return 'W1'; },
     descEdit: function (i) { st.descEdit = +i; },

@@ -382,3 +382,5 @@ a.btn { text-decoration: none; display: inline-block }
 .w-cin.pick .w-cin-main input { flex: 1; min-width: 0; font: inherit; font-size: 13px; border: 0; background: none; color: var(--w-ink); padding: 4px 6px }
 .w-cin.pick .w-cin-main input:focus { outline: none }
 .w-chat .w-cin.pick { margin: 8px; border: 1px solid var(--w-acc); border-radius: 10px; padding: 6px }
+.w-qr.col .w-btn small { color: var(--w-mut); margin-left: 6px; font-size: 11px }
+.w-qr.col .w-btn { text-align: left }

@@ -645,3 +645,37 @@ a.btn { text-decoration: none; display: inline-block }
 .w-rgref { display: flex; align-items: center; gap: 10px; border: 1px solid var(--w-line); background: var(--w-bg); border-radius: 9px; padding: 6px 10px; font-size: 12.5px; cursor: pointer }
 .w-rgref .w-th { width: 34px; height: 40px }
 .w-rgref em { display: block; font-style: normal; font-size: 11px; color: var(--w-mut) }
+/* 샷: 카드 전체가 버튼 · 드롭다운(코드 + 설명) · 조명 미리보기 · 샷 추가 두 칸 */
+.w-shot[role="button"] { cursor: pointer }
+.w-shot[role="button"]:hover { border-color: var(--accent) }
+.w-shot[role="button"]:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px }
+.w-sw { display: inline-block; width: 10px; height: 10px; border-radius: 50%; border: 1px solid rgb(0 0 0 / .25); vertical-align: -1px; margin-right: 4px }
+.w-dl-ic { padding: 4px 8px; display: inline-flex; align-items: center }
+.w-dd { position: relative }
+.w-dd-b { width: 100%; display: flex; align-items: center; gap: 6px; font: inherit; font-size: 13px; text-align: left; border: 1px solid var(--w-line); background: var(--w-panel); color: var(--w-ink); border-radius: 8px; padding: 7px 10px; cursor: pointer }
+.w-dd.open .w-dd-b { border-color: var(--w-pri); box-shadow: 0 0 0 1px var(--w-pri) }
+.w-dd-l { position: absolute; z-index: 5; top: calc(100% + 4px); left: 0; min-width: 100%; width: max-content; max-width: min(460px, 80vw); max-height: 300px; overflow: auto; background: var(--w-panel); border: 1px solid var(--w-line); border-radius: 10px; padding: 6px; box-shadow: 0 12px 30px rgb(0 0 0 / .25); display: grid }
+.w-dd-l button { all: unset; box-sizing: border-box; display: flex; align-items: baseline; gap: 8px; padding: 7px 10px; border-radius: 6px; cursor: pointer; font-size: 13px }
+.w-dd-l button:hover, .w-dd-l button:focus-visible { background: var(--w-bg) }
+.w-dd-l button b { min-width: 52px } .w-dd-l button small { color: var(--w-mut); font-size: 12px } .w-dd-l button em { margin-left: auto; font-style: normal; padding-left: 12px }
+.w-dd-d { display: block; color: var(--w-mut); font-size: 11.5px; margin-top: 3px }
+.w-grid2 { display: grid; grid-template-columns: 1fr 1fr; gap: 12px }
+.w-light { display: grid; grid-template-columns: 110px minmax(0, 1fr); gap: 12px; align-items: start; border: 1px solid var(--w-line); border-radius: 10px; padding: 10px }
+.w-light-pv { display: grid; gap: 4px; justify-items: center; font-size: 11px; color: var(--w-mut); text-align: center }
+.w-lp { width: 100px; height: 100px; border-radius: 10px; display: block }
+.w-light-f { display: grid; gap: 8px }
+.w-light input[type="range"] { width: 100%; accent-color: var(--w-pri) }
+.w-tempbar { display: grid; grid-template-columns: repeat(6, 1fr); gap: 2px; margin-top: 5px }
+.w-tempbar i { height: 8px; border-radius: 3px; border: 1px solid rgb(0 0 0 / .12) } .w-tempbar i.on { outline: 2px solid var(--w-pri); outline-offset: 1px }
+.w-addshot { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 0; border-top: 1px solid var(--w-line); margin: 0 -18px }
+@media (max-width: 760px) { .w-addshot { grid-template-columns: 1fr } .w-grid2 { grid-template-columns: 1fr } }
+.w-apos { padding: 12px 18px; border-right: 1px solid var(--w-line); max-height: 62vh; overflow: auto; display: grid; gap: 2px; align-content: start }
+.w-acont { padding: 12px 18px; display: grid; gap: 10px; align-content: start; max-height: 62vh; overflow: auto }
+.w-apos-sc { display: flex; gap: 8px; font-size: 13px; margin-top: 8px; min-width: 0 } .w-apos-sc span, .w-apos-sh span { color: var(--w-mut); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; min-width: 0 }
+.w-apos-sh { display: flex; gap: 8px; font-size: 12.5px; padding: 4px 0 4px 14px; min-width: 0 } .w-apos-sh b { font-weight: 500; white-space: nowrap }
+.w-slot { all: unset; box-sizing: border-box; margin-left: 14px; padding: 2px 10px; font-size: 11px; color: transparent; border: 1px dashed transparent; border-radius: 8px; cursor: pointer; text-align: center; min-height: 10px }
+.w-slot:hover, .w-slot:focus-visible { color: var(--w-mut); border-color: var(--w-line) }
+.w-slot.on { color: var(--yes); border-color: var(--yes); padding: 10px; background: color-mix(in srgb, var(--yes) 8%, transparent) }
+.w-box { border: 1px solid var(--w-line); border-radius: 10px; padding: 10px 12px; display: grid; gap: 10px }
+.w-box .w-rglab { margin: 0 }
+.w-agent-hint { margin: 0; font-size: 12px; color: var(--w-acc) }

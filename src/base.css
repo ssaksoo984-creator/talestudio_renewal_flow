@@ -359,3 +359,18 @@ a.btn { text-decoration: none; display: inline-block }
 .w-chatstage { display: flex; flex-direction: column }
 .w-chatstage .w-thread { flex: 1 }
 .w-chatstage { min-height: max(520px, calc(100vh - 175px)) }
+
+/* ── 2안 Writer: 채팅방 안의 산문 카드 ── */
+.w-sys { justify-self: center; font-size: 11.5px; color: var(--w-mut); border: 1px dashed var(--w-line); border-radius: 99px; padding: 3px 12px; text-align: center }
+.w-b.doc, .w-b.card { max-width: 100%; justify-self: stretch }
+.w-b.card { border-color: var(--w-acc) }
+.w-b.card > b { color: var(--w-acc) }
+.w-card-t { font-weight: 600 }
+.w-doc { margin-top: 8px; border: 1px solid var(--w-line); background: var(--w-bg); border-radius: 10px; padding: 12px 14px; display: grid; gap: 8px; line-height: 1.7 }
+.w-doc h4 { margin: 0; font-size: 14px }
+.w-doc p { margin: 0 }
+.w-doc p > span, .w-doc .w-para span { font-family: var(--mono); font-size: 11px; color: var(--w-mut); margin-right: 8px }
+.w-doc.picking { border-color: var(--w-acc) }
+.w-qr.sugg { margin: 0 }
+.w-cin.is-locked { opacity: .5 }
+.w-qr.sugg .w-tab { font-family: inherit; font-size: 12px; border-radius: 99px; padding: 3px 10px }

@@ -289,7 +289,7 @@
     if (key === 'ratio') return bubble('Producer', '화면 비율을 골라 주세요. <b class="w-lock">🔒 고르면 끝까지 바꿀 수 없어요.</b>' + qr('ratio', RATIOS, -1, 1));
     if (key === 'confirm') {
       return bubble('Producer', '이렇게 시작할게요.' + list([['장르·분위기', esc(ansText('mood'))], ['길이', esc(ansText('runtime'))], ['바꿈 정도', esc(ansText('level')) + ' — ' + esc(LV()[st.level].s)], ['🔒 화면 비율', esc(st.ratio) + ' · 끝까지 바꿀 수 없어요'], ['자료', st.file ? esc(st.file.name) : '아이디어 글만']]) +
-        '<div class="w-qr">' + A('시작', 'confirmStart', 'pri sm') + '</div><p class="w-note">고치고 싶으면 위쪽 항목을 누르거나 "길이는 1분으로"처럼 말해 주세요.</p>');
+        '<div class="w-qr">' + A('✎ Writer에게 써 달라고 하기', 'confirmStart', 'pri') + '</div><p class="w-note">🔒 누르면 화면 비율이 잠겨요. 고치고 싶으면 위쪽 항목을 누르거나 "길이는 1분으로"처럼 말해 주세요.</p>');
     }
     return '';
   }
@@ -385,12 +385,29 @@
       '<article class="w-prose' + (pick ? ' picking' : '') + '">' + proseHtml(pick) + '</article>';
   }
   var SUGGEST = ['다시 써줘', '더 짧게', '팀장을 더 얄밉게'];
+  // 2안 Writer: Producer와 같은 채팅방. 산문은 채팅 안의 카드로 오고, 고치기 버튼은 카드에 붙는다.
+  function writerB(o) {
+    o = o || {};
+    var ro = st.proseLocked && !o.pick;
+    var head = '<div class="w-sys">Producer와 정한 것 · ' + esc(RUNTIMES[st.runtime][0]) + ' · ' + esc(MOODS[st.mood]) + ' · ' + esc(LV()[st.level].n) + ' · 🔒 ' + esc(st.ratio) + '</div>';
+    var proseCard = '<div class="w-b doc"><b>Writer</b><div>' + (ro ? '대본을 그대로 옮겼어요. 확인하고 브레이크다운해 주세요.' : '산문을 썼어요. 마음에 안 들면 "다시 써줘"라고 하거나 고치고 싶은 걸 말해 주세요.') +
+      '<article class="w-doc' + (o.pick ? ' picking' : '') + '"><h4>' + esc(st.title) + '</h4>' + (o.pick ? '<p class="w-note pick">고칠 문단을 눌러 고르세요.</p>' : '') + proseHtml(o.pick) + '</article>' +
+      '<div class="w-qr">' + (ro ? '' : B('✦ 다시 써줘', 'WC1') + A('✎ 직접 고치기', 'openDirect')) + B('브레이크다운하기 →', 'W6', 'pri') + '</div></div></div>';
+    var msgs = (st.chat.Writer || []).slice(1).map(function (m) { return bubble(m[0] === '나' ? '' : m[0], esc(m[1]), m[0] === '나'); }).join('');
+    var card = o.card ? o.card.replace('class="w-msg card"', 'class="w-b card"') : '';
+    var locked = o.chatLocked;
+    var input = '<div class="w-cin' + (locked ? ' is-locked' : '') + '">' + (locked ? '<span class="w-mut">팝업을 닫으면 다시 쓸 수 있어요</span>'
+      : '<input id="chat-in" data-bind="chatDraft" data-enter="send" value="' + esc(st.chatDraft) + '" placeholder="Writer에게 말해 주세요. 예: 다시 써줘 / 팀장을 더 얄밉게" aria-label="채팅 입력"><button class="w-btn pri" data-act="send" data-need="chatDraft">보내기</button>') + '</div>';
+    var sugg = !locked && !o.card && !ro ? '<div class="w-qr sugg">' + SUGGEST.map(function (t) { return '<button class="w-tab" data-act="send" data-arg="' + esc(t) + '">' + esc(t) + '</button>'; }).join('') + '</div>' : '';
+    return bar('Writer') + '<div class="w-chatstage">' + '<div class="w-thread">' + head + proseCard + msgs + card + '</div>' + sugg + input + '</div>';
+  }
   function writer(o) {
     o = o || {};
+    if (st.plan === 'B') return writerB(o);
     return studio('Writer', proseMain(false, o.pick), { ph: st.plan === 'A' ? '예: 팀장을 더 얄밉게' : '예: 다시 써줘 / 팀장을 더 얄밉게', card: o.card, suggest: st.plan === 'B' && !o.card ? SUGGEST : null });
   }
   function W1() { return writer(); }
-  function W1r() { return studio('Writer', proseMain(true), { noChat: true }); }
+  function W1r() { return st.plan === 'B' ? writerB() : studio('Writer', proseMain(true), { noChat: true }); }
   function chatCard(title, body) { return '<div class="w-msg card"><b>Writer</b><div class="w-card-t">' + esc(title) + '</div>' + body + '</div>'; }
   function WC1() {
     return writer({ card: chatCard('뭐가 마음에 안 드세요?', '<div class="w-card-acts">' + B('전부 다시', 'WC2', 'pri sm') + B('일부분만', 'WC3', 'sm') + '</div>') });
@@ -406,8 +423,15 @@
       '<div class="w-card-acts">' + B('뒤로', 'WC1', 'sm') + A('이 부분만 다시 쓰기', 'rewritePart', 'acc sm', n ? '' : ' disabled') + '</div>') });
   }
   function W2() { return W1() + busy(st.parts.length && st.partMode ? '고른 문단을 고치고 있어요' : '산문을 고치고 있어요', ['요청 읽기', '세 가지 안 쓰기']); }
+  function variantsHtml() {
+    return '<div class="w-variants" role="radiogroup">' + st.variants.map(function (v, i) {
+      return '<button class="w-var' + (i === st.vpick ? ' on' : '') + '" role="radio" aria-checked="' + (i === st.vpick) + '" data-bind="vpick" data-val="' + i + '"><b>안 ' + (i + 1) + '</b>' +
+        v.changed.map(function (k) { return '<span class="w-var-p"><i>S' + (k + 1) + '</i>' + esc(v.prose[k]) + '</span>'; }).join('') + '</button>';
+    }).join('') + '</div>';
+  }
   function W4() {
     if (!st.variants.length) makeVariants('');
+    if (st.plan === 'B') return writerB({ card: chatCard('세 가지 안이에요. 하나를 골라 주세요.', '<p class="w-mut">' + esc(st.vnote) + '</p>' + variantsHtml() + '<div class="w-card-acts">' + A('버리기', 'dropVariant', 'sm') + A('이 안 적용', 'applyVariant', 'pri sm') + '</div>') });
     return W1() + modal('세 가지 안', '<p class="w-mut">' + esc(st.vnote) + '</p>' +
       '<div class="w-variants" role="radiogroup">' + st.variants.map(function (v, i) {
         return '<button class="w-var' + (i === st.vpick ? ' on' : '') + '" role="radio" aria-checked="' + (i === st.vpick) + '" data-bind="vpick" data-val="' + i + '"><b>안 ' + (i + 1) + '</b>' +
@@ -416,7 +440,7 @@
       A('버리기', 'dropVariant') + A('이 안 적용', 'applyVariant', 'pri'), true);
   }
   function W5() {
-    return studio('Writer', proseMain(false), { chatLocked: true }) +
+    return (st.plan === 'B' ? writerB({ chatLocked: true }) : studio('Writer', proseMain(false), { chatLocked: true })) +
       modal('직접 작성', '<p class="w-mut">팝업이 열려 있는 동안 에이전트 채팅은 잠겨요.</p>' +
         '<div class="w-q"><div class="w-q-t">제목</div><input class="w-in" data-bind="titleDraft" value="' + esc(st.titleDraft || st.title) + '" aria-label="제목"></div>' +
         st.draft.map(function (p, i) { return '<div class="w-q"><div class="w-q-t">S' + (i + 1) + '</div><textarea class="w-ta sm" rows="3" data-bind="draft.' + i + '" aria-label="씬 ' + (i + 1) + '">' + esc(p) + '</textarea></div>'; }).join('') +

@@ -11,7 +11,6 @@
   var RATIOS = [['16:9', '가로'], ['9:16', '세로 · 숏폼'], ['1:1', '정방형'], ['2.39:1', '시네마']];
   var RUNTIMES = [['15초 이하', '숏폼', 15], ['15~60초', '광고·티저', 60], ['1~5분', 'MV·웹드라마', 300], ['5~20분', '단편', 1200]];
   var MOODS = ['코미디', '드라마', '로맨스', '스릴러', '호러'];
-  var AMOUNTS = ['조금만 다듬기', '표현을 새로', '아이디어부터 다시'];
   var TONES = ['작품 기본', '코미디', '호러', '로맨스', '따뜻하게'];
   var CAMS = ['와이드 · 고정', '미디엄 · 고정', '클로즈업', '와이드 · 틸트 다운', '미디엄 · 팬'];
   var STYLES = [['실사', '#5b6470,#22262c'], ['애니메이션', '#ffb4a2,#8aa6ff'], ['웹툰', '#fff3c4,#ffd0e0'], ['3D', '#9be1d4,#5f7fd9'], ['수채화', '#d9ecf5,#f4d9c6'], ['견본 이미지', '#c9c2b8,#8f8a83']];
@@ -36,7 +35,7 @@
         '회사 복도, 오후 세 시. 민호가 자판기 버튼을 누르지만 아무것도 나오지 않는다. 동전 반환 레버를 당겨 봐도 조용하다. 민호는 자판기를 툭 친다.',
         '자판기가 덜컹거리더니 캔이 우르르 쏟아진다. 지나가던 팀장이 하나를 집어 들고 "고마워" 하고 간다. 바닥에 굴러다니는 캔 사이에서 민호는 멍하니 서 있다.',
       ],
-      draft: [], runtime: 0, mood: 0, amount: 0, request: '', variants: [], vpick: 0,
+      plan: 'A', draft: [], runtime: 0, mood: 0, seed: 0, request: '', variants: [], vpick: 0, vnote: '', parts: [], partNote: '', partMode: false,
       proseLocked: false, back: '', descEdit: -1,
       chars: [
         { n: '민호', d: '20대 후반 직장인. 흰 셔츠, 느슨한 넥타이, 피곤한 눈.', states: ['기본: 흰 셔츠', '파생: 셔츠에 콜라 얼룩 (S2)'], tone: 0, note: '' },
@@ -59,7 +58,7 @@
       stateAdd: { who: 0, text: '10년 뒤, 머리가 희끗한 민호' },
       chatDraft: '',
       chat: {
-        Producer: [['Producer', '씬 두 개로 산문을 썼어요. 길이나 분위기를 바꾸고 싶으면 "AI 다시 쓰기"에서 골라 주세요.']],
+        Writer: [['Writer', '씬 두 개로 산문을 썼어요. 마음에 안 들면 "다시 써줘"라고 하거나 조건을 바꿔 다시 쓰게 해 주세요.']],
         Artist: [['Artist', '인물 2명, 배경 1곳이에요. 민호는 S2에서 얼룩진 셔츠 상태가 하나 더 있어요.']],
         Storyboard: [['Storyboard', '씬 2개를 샷 6개로 나눴어요.']],
       },
@@ -69,7 +68,7 @@
   var st = initial();
 
   /* ── 부품 ── */
-  var STAGES = ['Producer', 'Artist', 'Storyboard', 'Director', 'Editor'];
+  var STAGES = ['Producer', 'Writer', 'Artist', 'Storyboard', 'Director', 'Editor'];
   function rail(on) {
     var i = STAGES.indexOf(on);
     return '<nav class="w-rail" aria-label="단계">' + STAGES.map(function (s, k) {
@@ -84,8 +83,8 @@
     o = o || {};
     var msgs = st.chat[on] || [];
     var chat = '<aside class="w-chat' + (o.chatLocked ? ' is-locked' : '') + '"><div class="w-chat-h">에이전트 채팅</div><div class="w-chat-b">' +
-      msgs.map(function (m) { return '<div class="w-msg' + (m[0] === '나' ? ' me' : '') + '"><b>' + esc(m[0]) + '</b>' + esc(m[1]) + '</div>'; }).join('') +
-      '</div><div class="w-chat-in">' + (o.chatLocked || o.noChat
+      msgs.map(function (m) { return '<div class="w-msg' + (m[0] === '나' ? ' me' : '') + '"><b>' + esc(m[0]) + '</b>' + esc(m[1]) + '</div>'; }).join('') + (o.card || '') +
+      '</div>' + (o.suggest ? '<div class="w-sugg">' + o.suggest.map(function (t) { return '<button class="w-tab" data-act="send" data-arg="' + esc(t) + '">' + esc(t) + '</button>'; }).join('') + '</div>' : '') + '<div class="w-chat-in">' + (o.chatLocked || o.noChat
         ? '<span class="w-mut">' + (o.chatLocked ? '팝업을 닫으면 다시 쓸 수 있어요' : '여기서는 채팅으로 고칠 수 없어요') + '</span>'
         : '<input id="chat-in" data-bind="chatDraft" data-enter="send" value="' + esc(st.chatDraft) + '" placeholder="' + esc(o.ph || '말해주세요…') + '" aria-label="채팅 입력">' +
           '<button class="w-btn pri" data-act="send" data-need="chatDraft">보내기</button>') + '</div></aside>';
@@ -121,7 +120,7 @@
   function E1() {
     var f = st.file;
     var can = st.idea.trim() || f;
-    return bar('') + '<div class="w-entry"><h3>무엇을 만들어 볼까요?</h3>' +
+    return bar('Producer') + '<div class="w-entry"><h3>무엇을 만들어 볼까요?</h3>' +
       '<textarea class="w-ta" id="idea" data-bind="idea" aria-label="아이디어" placeholder="아이디어를 적거나 파일을 올려 주세요">' + esc(st.idea) + '</textarea>' +
       '<div class="w-file">' + (f ? '<span class="w-chip">📎 ' + esc(f.name) + '<button class="w-x" data-act="clearFile" aria-label="파일 빼기">×</button></span>'
         : '<span class="w-mut">대본 · 기획 메모 · 캐릭터 시트 · 웹툰 · 사진</span>') +
@@ -150,47 +149,76 @@
     return E1() + modal('이대로 시작할까요?', list([['🔒 화면 비율', esc(st.ratio) + ' · 시작하면 끝까지 바꿀 수 없어요'], ['채팅 언어', '한국어 (사이트 언어)'], ['자료', src]]),
       B('아니오, 고칠래요', 'E1') + A('예, 시작', 'confirmStart', 'pri'));
   }
-  function E5() { return P1() + busy('산문 초안을 쓰고 있어요', ['자료 정리', '이야기 뼈대', '씬 스토리 쓰기']); }
+  function E5() { return W1() + busy('산문 초안을 쓰고 있어요', ['자료 정리', '이야기 뼈대', '씬 스토리 쓰기']); }
 
-  /* ── Producer ── */
-  function proseHtml() { return st.prose.map(function (p, i) { return '<p><span>S' + (i + 1) + '</span>' + esc(p) + '</p>'; }).join(''); }
-  function proseMain(ro) {
-    return '<div class="w-title"><h3>' + esc(st.title) + '</h3>' + B('브레이크다운하기 →', 'P6', 'pri') + '</div>' +
+  /* ── Writer (산문 작업공간) — 1안: 조건 패널 + 채팅 / 2안: 채팅 중심 ── */
+  var SEEDS = [['그대로', '지금 아이디어 소재 유지'], ['새롭게', '소재부터 새로']];
+  function condFields() {
+    return '<div class="w-q"><div class="w-q-t">러닝타임</div>' + opts('runtime', RUNTIMES, st.runtime) + '</div>' +
+      '<div class="w-q"><div class="w-q-t">글의 장르·분위기</div>' + opts('mood', MOODS, st.mood) + '</div>' +
+      '<div class="w-q"><div class="w-q-t">아이디어 소재</div>' + opts('seed', SEEDS, st.seed) + '</div>';
+  }
+  function proseHtml(pick) {
+    return st.prose.map(function (p, i) {
+      var on = st.parts.indexOf(i) >= 0;
+      return pick ? '<p class="w-para' + (on ? ' sel' : '') + '"><button data-act="togglePart" data-arg="' + i + '" aria-pressed="' + on + '"><span>S' + (i + 1) + '</span>' + esc(p) + '</button></p>'
+        : '<p><span>S' + (i + 1) + '</span>' + esc(p) + '</p>';
+    }).join('');
+  }
+  function proseMain(ro, pick) {
+    var A_ = st.plan === 'A';
+    return '<div class="w-title"><h3>' + esc(st.title) + '</h3>' + B('브레이크다운하기 →', 'W6', 'pri') + '</div>' +
       (st.back ? '<div class="w-banner warn">' + esc(st.back) + '에서 돌아왔어요. 새 인물·배경을 산문에 넣고 다시 브레이크다운해 주세요. <span class="w-mut">(목업: "경비원", "옥상" 같은 말을 넣어 보세요)</span></div>' : '') +
       (ro ? '<div class="w-banner">대본을 그대로 쓰는 프로젝트예요. 산문을 고칠 수 없고, 확인한 뒤 브레이크다운만 할 수 있어요.</div>' : '') +
-      '<div class="w-prose-tools">' + B('✦ AI 다시 쓰기', 'P3', 'acc', ro ? ' disabled' : '') + A('직접 작성', 'openDirect', '', ro ? ' disabled' : '') +
+      (A_ && !ro ? '<section class="w-panel" aria-label="다시 쓰기 조건"><div class="w-panel-h"><b>다시 쓰기 조건</b><span class="w-mut">바꾸고 [AI 다시 쓰기]를 누르면 산문 전체를 다시 써요</span></div>' + condFields() +
+        '<div class="w-foot"><span class="w-mut">채팅에서 바꾼 조건도 여기에 반영돼요.</span>' + A('✦ AI 다시 쓰기', 'rewrite', 'acc') + '</div></section>' : '') +
+      '<div class="w-prose-tools">' + (A_ ? '' : B('✦ AI 다시 쓰기', 'WC1', 'acc', ro ? ' disabled' : '')) + A('직접 작성', 'openDirect', '', ro ? ' disabled' : '') +
       '<span class="w-mut">' + esc(RUNTIMES[st.runtime][0]) + ' · ' + esc(MOODS[st.mood]) + ' 기준으로 쓴 산문</span></div>' +
-      '<article class="w-prose">' + proseHtml() + '</article>';
+      (pick ? '<p class="w-note pick">고칠 문단을 눌러 고르세요. 고른 문단만 다시 써요.</p>' : '') +
+      '<article class="w-prose' + (pick ? ' picking' : '') + '">' + proseHtml(pick) + '</article>';
   }
-  function P1() { return studio('Producer', proseMain(false), { ph: '예: 팀장을 더 얄밉게' }); }
-  function P1r() { return studio('Producer', proseMain(true), { noChat: true }); }
-  function P3() {
-    return P1() + modal('AI 다시 쓰기', '<p class="w-mut">이 값들은 산문을 쓰는 재료예요. 산문을 확정하면 여기서 끝나요.</p>' +
-      '<div class="w-q"><div class="w-q-t">러닝타임</div>' + opts('runtime', RUNTIMES, st.runtime) + '</div>' +
-      '<div class="w-q"><div class="w-q-t">글의 분위기 <small>이전 이름: 장르·톤</small></div>' + opts('mood', MOODS, st.mood) + '</div>' +
-      '<div class="w-q"><div class="w-q-t">얼마나 바꿀까요?</div>' + opts('amount', AMOUNTS, st.amount) + '</div>',
-      B('취소', 'P1') + A('다시 쓰기', 'rewrite', 'acc'), true);
+  var SUGGEST = ['다시 써줘', '더 짧게', '팀장을 더 얄밉게'];
+  function writer(o) {
+    o = o || {};
+    return studio('Writer', proseMain(false, o.pick), { ph: st.plan === 'A' ? '예: 팀장을 더 얄밉게' : '예: 다시 써줘 / 팀장을 더 얄밉게', card: o.card, suggest: st.plan === 'B' && !o.card ? SUGGEST : null });
   }
-  function P2() { return P1() + busy('산문을 고치고 있어요', ['요청 읽기', '세 가지 안 쓰기']); }
-  function P4() {
+  function W1() { return writer(); }
+  function W1r() { return studio('Writer', proseMain(true), { noChat: true }); }
+  function chatCard(title, body) { return '<div class="w-msg card"><b>Writer</b><div class="w-card-t">' + esc(title) + '</div>' + body + '</div>'; }
+  function WC1() {
+    return writer({ card: chatCard('뭐가 마음에 안 드세요?', '<div class="w-card-acts">' + B('전부 다시', 'WC2', 'pri sm') + B('일부분만', 'WC3', 'sm') + '</div>') });
+  }
+  function WC2() {
+    return writer({ card: chatCard('전부 다시 쓸게요. 조건을 골라 주세요.', condFields() + (st.plan === 'A' ? '<p class="w-note">고른 값은 조건 패널에도 반영돼요.</p>' : '') +
+      '<div class="w-card-acts">' + B('뒤로', 'WC1', 'sm') + A('다시 쓰기', 'rewrite', 'acc sm') + '</div>') });
+  }
+  function WC3() {
+    var n = st.parts.length;
+    return writer({ pick: true, card: chatCard('어느 부분을 고칠까요?', '<p class="w-mut">산문에서 문단을 눌러 고르세요. ' + (n ? '<b>' + st.parts.map(function (i) { return 'S' + (i + 1); }).join(', ') + '</b> 골랐어요.' : '아직 고른 문단이 없어요.') + '</p>' +
+      '<input class="w-in" data-bind="partNote" value="' + esc(st.partNote) + '" placeholder="어떻게 바꿀까요? 예: 대사를 더 웃기게" aria-label="어떻게 바꿀지">' +
+      '<div class="w-card-acts">' + B('뒤로', 'WC1', 'sm') + A('이 부분만 다시 쓰기', 'rewritePart', 'acc sm', n ? '' : ' disabled') + '</div>') });
+  }
+  function W2() { return W1() + busy(st.parts.length && st.partMode ? '고른 문단을 고치고 있어요' : '산문을 고치고 있어요', ['요청 읽기', '세 가지 안 쓰기']); }
+  function W4() {
     if (!st.variants.length) makeVariants('');
-    return P1() + modal('세 가지 안', '<p class="w-mut">' + esc(st.request ? '요청: ' + st.request : RUNTIMES[st.runtime][0] + ' · ' + MOODS[st.mood] + ' · ' + AMOUNTS[st.amount]) + '</p>' +
+    return W1() + modal('세 가지 안', '<p class="w-mut">' + esc(st.vnote) + '</p>' +
       '<div class="w-variants" role="radiogroup">' + st.variants.map(function (v, i) {
-        return '<button class="w-var' + (i === st.vpick ? ' on' : '') + '" role="radio" aria-checked="' + (i === st.vpick) + '" data-bind="vpick" data-val="' + i + '"><b>안 ' + (i + 1) + '</b>' + esc(v[0]) + '</button>';
+        return '<button class="w-var' + (i === st.vpick ? ' on' : '') + '" role="radio" aria-checked="' + (i === st.vpick) + '" data-bind="vpick" data-val="' + i + '"><b>안 ' + (i + 1) + '</b>' +
+          v.changed.map(function (k) { return '<span class="w-var-p"><i>S' + (k + 1) + '</i>' + esc(v.prose[k]) + '</span>'; }).join('') + '</button>';
       }).join('') + '</div>',
       A('버리기', 'dropVariant') + A('이 안 적용', 'applyVariant', 'pri'), true);
   }
-  function P5() {
-    return studio('Producer', proseMain(false), { chatLocked: true }) +
+  function W5() {
+    return studio('Writer', proseMain(false), { chatLocked: true }) +
       modal('직접 작성', '<p class="w-mut">팝업이 열려 있는 동안 에이전트 채팅은 잠겨요.</p>' +
         '<div class="w-q"><div class="w-q-t">제목</div><input class="w-in" data-bind="titleDraft" value="' + esc(st.titleDraft || st.title) + '" aria-label="제목"></div>' +
         st.draft.map(function (p, i) { return '<div class="w-q"><div class="w-q-t">S' + (i + 1) + '</div><textarea class="w-ta sm" rows="3" data-bind="draft.' + i + '" aria-label="씬 ' + (i + 1) + '">' + esc(p) + '</textarea></div>'; }).join('') +
         A('＋ 씬 추가', 'addScene', 'sm'),
-        B('취소', 'P1') + A('저장', 'saveDirect', 'pri'), true);
+        B('취소', 'W1') + A('저장', 'saveDirect', 'pri'), true);
   }
-  function P6() {
-    return P1() + modal('산문을 확정하고 브레이크다운할까요?', list([['🔒 산문', '확정하면 잠겨요'], ['다음', 'AI가 인물·배경을 글로 뽑아요'], ['나중에 인물·배경을 늘리려면', '여기 산문으로 돌아와야 해요']]),
-      B('아니오', st.proseLocked ? 'P1r' : 'P1') + A('예, 브레이크다운', 'breakdown', 'pri'));
+  function W6() {
+    return W1() + modal('산문을 확정하고 브레이크다운할까요?', list([['🔒 산문', '확정하면 잠겨요'], ['다음', 'AI가 인물·배경을 글로 뽑아요'], ['나중에 인물·배경을 늘리려면', '여기 산문으로 돌아와야 해요']]),
+      B('아니오', st.proseLocked ? 'W1r' : 'W1') + A('예, 브레이크다운', 'breakdown', 'pri'));
   }
 
   /* ── Artist ── */
@@ -226,7 +254,7 @@
   function rollbackModal(from, lose, no) {
     return modal('산문으로 돌아갈까요?', '<p>인물·배경은 산문에서 나와요. 산문에 넣어야 목록에 생겨요.</p>' + list(lose), B('아니오', no) + A('예, 산문으로', 'rollback', 'warn', ' data-arg="' + from + '"'));
   }
-  function R1() { return A1() + rollbackModal('Artist', [['잃는 것', '없음 (아직 그림이 없어요)'], ['다음', 'Producer 산문이 다시 열려요 → 고치고 다시 브레이크다운']], 'A1'); }
+  function R1() { return A1() + rollbackModal('Artist', [['잃는 것', '없음 (아직 그림이 없어요)'], ['다음', 'Writer 산문이 다시 열려요 → 고치고 다시 브레이크다운']], 'A1'); }
   function A2() {
     var main = '<div class="w-title"><h3>Artist · 스타일</h3><span class="w-mut">이 작품의 스타일은 하나예요</span></div>' +
       '<div class="w-styles" role="radiogroup">' + STYLES.map(function (s, i) {
@@ -329,30 +357,56 @@
       '<p class="w-note">함께 확인: Director가 Artist 인물 시트를 참조하는지 (오류 13), 러프 마네킹이 인물로 이어지지 않는지 (오류 12).</p>' + A('처음부터 다시', 'reset') + '</div>';
   }
 
-  var SCREENS = { E1: E1, E1m: E1m, E2: E2, E3: E3, E4: E4, E5: E5, P1: P1, P1r: P1r, P2: P2, P3: P3, P4: P4, P5: P5, P6: P6,
+  var SCREENS = { E1: E1, E1m: E1m, E2: E2, E3: E3, E4: E4, E5: E5, W1: W1, W1r: W1r, WC1: WC1, WC2: WC2, WC3: WC3, W2: W2, W4: W4, W5: W5, W6: W6,
     A0: A0, A1: A1, R1: R1, A2: A2, A3: A3, A4: A4, A5: A5, A6: A6, A7: A7, A8: A8, R2: R2, A9: A9,
     S0: S0, S1: S1, S2: S2, S3: S3, S4: S4, R3: R3, S5: S5, S6: S6, S7: S7, D1: D1 };
   // 갈림 노드는 그 갈림을 묻는 화면으로
-  var DECISION_SCREEN = { E1q: 'E1', E1mq: 'E1m', E2q: 'E3', E5q: 'E4', P1q: 'P1', A1q: 'A1', A5q: 'A5', S1q: 'S1', S4q: 'S4' };
+  var DECISION_SCREEN = { E1q: 'E1', E1mq: 'E1m', E2q: 'E3', E5q: 'E4', W1q: 'W1', W3: 'W1', A1q: 'A1', A5q: 'A5', S1q: 'S1', S4q: 'S4' };
   // AI 작업이 끝나면 가는 곳
   var BUSY_NEXT = {
     E2: function () { return !st.file || !KINDS[st.kind].o.length ? 'E4' : 'E3'; },
-    E5: 'P1', P2: 'P4', A0: 'A1', A4: 'A5', A8: 'A5', S0: 'S1', S3: 'S1', S6: 'S1',
+    E5: 'W1', W2: 'W4', A0: 'A1', A4: 'A5', A8: 'A5', S0: 'S1', S3: 'S1', S6: 'S1',
   };
   var preserve = function () { return st.file && KINDS[st.kind].keep.indexOf(st.level) >= 0; };
 
   /* ── 동작 ── */
-  function makeVariants(req) {
-    var rt = RUNTIMES[st.runtime][0], md = MOODS[st.mood];
-    var base = req ? '"' + req + '" 반영: ' : rt + ' · ' + md + ' · ' + AMOUNTS[st.amount] + ': ';
-    var M = {
-      '코미디': ['민호가 자판기를 발로 차자 캔이 쏟아지고, 팀장이 "고마워" 하고 하나를 가져간다.', '민호가 마지막 동전을 넣는다. 캔은 안 나오고, 팀장이 오자 우르르 쏟아진다.', '자판기가 민호만 무시한다. 팀장 앞에서는 캔을 선물하듯 내민다.'],
-      '드라마': ['야근 중인 민호. 자판기마저 응답이 없다. 팀장이 말없이 캔 하나를 건넨다.', '민호의 마지막 동전. 자판기는 멈추고, 복도엔 형광등 소리만 남는다.', '쏟아진 캔을 줍는 민호와 팀장. 처음으로 둘이 웃는다.'],
-      '로맨스': ['자판기 앞에서 마주친 민호와 신입. 쏟아진 캔을 같이 줍는다.', '민호가 누른 버튼에서 두 개가 나온다. 하나를 옆 사람에게 건넨다.', '고장 난 자판기 앞, 같은 음료를 고른 두 사람.'],
-      '스릴러': ['복도 불이 깜박인다. 자판기에서 캔 대신 낯선 열쇠가 떨어진다.', '민호가 자판기를 치자 안쪽에서 누군가 두드린다.', '캔이 쏟아지는 순간 CCTV가 꺼진다.'],
-      '호러': ['밤 열한 시. 자판기 불빛만 켜진 복도에서 캔이 저절로 굴러온다.', '민호가 버튼을 누르자 자판기 유리에 다른 얼굴이 비친다.', '쏟아진 캔이 모두 같은 날짜로 찍혀 있다. 오늘 밤.'],
-    }[md];
-    st.variants = M.map(function (t) { return [base + t, t]; });
+  // 목업용 수정안. 전체: 러닝타임에 맞춰 문단 수가 바뀐다. 일부분: 고른 문단만 바뀐다.
+  var KEEP_SEED = {
+    '코미디': ['민호가 자판기를 발로 차자 캔이 쏟아지고, 팀장이 "고마워" 하고 하나를 가져간다.', '민호가 마지막 동전을 넣는다. 캔은 안 나오고, 팀장이 오자 우르르 쏟아진다.', '자판기가 민호만 무시한다. 팀장 앞에서는 캔을 선물하듯 내민다.'],
+    '드라마': ['야근 중인 민호. 자판기마저 응답이 없다. 팀장이 말없이 캔 하나를 건넨다.', '민호의 마지막 동전. 자판기는 멈추고, 복도엔 형광등 소리만 남는다.', '쏟아진 캔을 줍는 민호와 팀장. 처음으로 둘이 웃는다.'],
+    '로맨스': ['자판기 앞에서 마주친 민호와 신입. 쏟아진 캔을 같이 줍는다.', '민호가 누른 버튼에서 두 개가 나온다. 하나를 옆 사람에게 건넨다.', '고장 난 자판기 앞, 같은 음료를 고른 두 사람.'],
+    '스릴러': ['복도 불이 깜박인다. 자판기에서 캔 대신 낯선 열쇠가 떨어진다.', '민호가 자판기를 치자 안쪽에서 누군가 두드린다.', '캔이 쏟아지는 순간 CCTV가 꺼진다.'],
+    '호러': ['밤 열한 시. 자판기 불빛만 켜진 복도에서 캔이 저절로 굴러온다.', '민호가 버튼을 누르자 자판기 유리에 다른 얼굴이 비친다.', '쏟아진 캔이 모두 같은 날짜로 찍혀 있다. 오늘 밤.'],
+  };
+  var NEW_SEED = {
+    '코미디': ['회사 엘리베이터가 민호만 태우지 않는다. 문이 닫힐 때마다 팀장이 손을 흔든다.', '사내 복권에 민호 혼자 당첨된다. 상품은 자판기 평생 이용권.', '민호의 화분이 말을 하기 시작한다. 잔소리만 한다.'],
+    '드라마': ['퇴사 날, 민호는 처음 입사한 날의 사원증을 서랍에서 찾는다.', '민호와 팀장이 정전된 엘리베이터에 갇힌다.', '아버지가 일하던 공장 자리에 민호의 회사가 들어서 있다.'],
+    '로맨스': ['매일 같은 시간, 옥상에서 마주치는 두 사람.', '잘못 온 택배 상자 속에 편지가 들어 있다.', '복사기 앞에서 매번 종이가 걸리는 사람.'],
+    '스릴러': ['민호의 메일함에 내일 날짜로 보낸 메일이 와 있다.', '퇴근 후 사무실 불이 하나씩 다시 켜진다.', '회의실 화이트보드에 민호만 읽을 수 있는 글씨가 남아 있다.'],
+    '호러': ['13층 버튼이 생긴다. 아무도 누르지 않았는데.', '민호의 책상 위 사진 속 사람이 한 명 늘어 있다.', '야근하는 민호의 모니터에 회사 CCTV 화면이 뜬다. 민호 뒤에 누가 서 있다.'],
+  };
+  var CONT = ['일이 점점 커지고, 민호는 수습하려 애쓴다.', '예상하지 못한 사람이 끼어들며 판이 뒤집힌다.', '마지막에 민호는 작은 것 하나를 얻는다.', '다음 날, 같은 자리에서 비슷한 일이 다시 시작된다.'];
+  var PART_WAYS = ['더 짧고 빠르게', '대사를 살려서', '분위기를 바꿔서'];
+  function makeVariants(req, parts) {
+    var md = MOODS[st.mood];
+    if (parts && parts.length) {
+      st.vnote = '고른 문단: ' + parts.map(function (i) { return 'S' + (i + 1); }).join(', ') + (req ? ' · 요청: ' + req : '') + ' · 나머지 문단은 그대로';
+      st.variants = PART_WAYS.map(function (w, k) {
+        var pr = st.prose.slice();
+        parts.forEach(function (i) { pr[i] = '[' + w + '] ' + (req ? req + ' — ' : '') + st.prose[i]; });
+        return { prose: pr, changed: parts.slice() };
+      });
+    } else if (req) {
+      st.vnote = '요청: ' + req;
+      st.variants = KEEP_SEED[md].map(function (t) { var pr = st.prose.slice(); pr[0] = t; return { prose: pr, changed: [0] }; });
+    } else {
+      var n = [2, 3, 4, 5][st.runtime];
+      st.vnote = RUNTIMES[st.runtime][0] + ' · ' + md + ' · 소재 ' + SEEDS[st.seed][0] + ' · 씬 ' + n + '개';
+      st.variants = (st.seed ? NEW_SEED : KEEP_SEED)[md].map(function (t) {
+        var pr = [t].concat(CONT.slice(0, n - 1));
+        return { prose: pr, changed: pr.map(function (_, i) { return i; }) };
+      });
+    }
     st.vpick = 0;
   }
   function detectNew() {
@@ -371,33 +425,51 @@
     cycleKind: function () { var ks = Object.keys(KINDS).filter(function (k) { return KINDS[k].o.length; }); st.kind = ks[(ks.indexOf(st.kind) + 1) % ks.length]; st.level = 0; },
     confirmStart: function () {
       st.ratioLocked = true;
-      if (preserve()) { st.proseLocked = true; return 'P1r'; }
+      if (preserve()) { st.proseLocked = true; return 'W1r'; }
       st.pending = function () { if (st.idea.trim()) st.title = st.idea.trim().split(/[.\n]/)[0].slice(0, 18) || st.title; };
       return 'E5';
     },
-    send: function () {
-      var t = st.chatDraft.trim(); if (!t) return;
+    send: function (arg) {
+      var t = (arg || st.chatDraft).trim(); if (!t) return;
       st.chatDraft = '';
-      var on = cur.charAt(0) === 'P' ? 'Producer' : cur.charAt(0) === 'A' ? 'Artist' : 'Storyboard';
+      var on = cur.charAt(0) === 'W' ? 'Writer' : cur.charAt(0) === 'A' ? 'Artist' : 'Storyboard';
       say(on, '나', t);
-      if (on === 'Producer') { st.request = t; st.pending = function () { makeVariants(t); say('Producer', 'Producer', '요청대로 세 가지 안을 썼어요. 하나를 골라 주세요.'); }; return 'P2'; }
+      if (on === 'Writer') {
+        if (/다시\s*(써|쓰)/.test(t)) return 'WC1';
+        st.request = t; st.partMode = false;
+        st.pending = function () { makeVariants(t); say('Writer', 'Writer', '요청대로 세 가지 안을 썼어요. 하나를 골라 주세요.'); };
+        return 'W2';
+      }
       if (on === 'Artist') { st.target = 0; var x = target(); st.pending = function () { x.note = t; say('Artist', 'Artist', x.n + '을(를) 다시 만들었어요.'); }; return 'A8'; }
       st.pending = function () { st.shots.forEach(function (s) { s.redrawn = true; }); say('Storyboard', 'Storyboard', '요청을 반영해 샷을 다시 그렸어요.'); };
       return 'S3';
     },
-    rewrite: function () { st.request = ''; st.pending = function () { makeVariants(''); say('Producer', 'Producer', RUNTIMES[st.runtime][0] + ' · ' + MOODS[st.mood] + '으로 세 가지 안을 썼어요.'); }; return 'P2'; },
-    applyVariant: function () {
-      var v = st.variants[st.vpick]; if (!v) return 'P1';
-      st.prose[0] = v[1]; st.variants = [];
-      say('Producer', 'Producer', '안 ' + (st.vpick + 1) + '을(를) 적용했어요.');
-      return 'P1';
+    rewrite: function () {
+      st.request = ''; st.partMode = false;
+      var from = cur === 'WC2' ? '채팅 카드' : '조건 패널';
+      st.pending = function () { makeVariants(''); say('Writer', 'Writer', RUNTIMES[st.runtime][0] + ' · ' + MOODS[st.mood] + ' · 소재 ' + SEEDS[st.seed][0] + '으로 세 가지 안을 썼어요.' + (st.plan === 'A' && from === '채팅 카드' ? ' 조건 패널에도 반영했어요.' : '')); };
+      return 'W2';
     },
-    dropVariant: function () { st.variants = []; say('Producer', 'Producer', '수정안을 버리고 원래 산문을 유지해요.'); return 'P1'; },
-    openDirect: function () { st.draft = st.prose.slice(); st.titleDraft = st.title; return 'P5'; },
+    togglePart: function (i) { i = +i; var k = st.parts.indexOf(i); if (k >= 0) st.parts.splice(k, 1); else st.parts.push(i); st.parts.sort(); },
+    rewritePart: function () {
+      if (!st.parts.length) return;
+      st.partMode = true;
+      var note = st.partNote.trim();
+      st.pending = function () { makeVariants(note, st.parts.slice()); say('Writer', 'Writer', st.parts.map(function (i) { return 'S' + (i + 1); }).join(', ') + '만 고친 세 가지 안이에요. 나머지는 그대로예요.'); };
+      return 'W2';
+    },
+    applyVariant: function () {
+      var v = st.variants[st.vpick]; if (!v) return 'W1';
+      st.prose = v.prose.slice(); st.variants = []; st.parts = []; st.partNote = ''; st.partMode = false;
+      say('Writer', 'Writer', '안 ' + (st.vpick + 1) + '을(를) 적용했어요.');
+      return 'W1';
+    },
+    dropVariant: function () { st.variants = []; st.partMode = false; say('Writer', 'Writer', '수정안을 버리고 원래 산문을 유지해요.'); return 'W1'; },
+    openDirect: function () { st.draft = st.prose.slice(); st.titleDraft = st.title; return 'W5'; },
     addScene: function () { st.draft.push(''); },
-    saveDirect: function () { st.prose = st.draft.filter(function (p) { return p.trim(); }); if (st.titleDraft && st.titleDraft.trim()) st.title = st.titleDraft.trim(); say('Producer', 'Producer', '직접 고친 산문을 저장했어요.'); return 'P1'; },
+    saveDirect: function () { st.prose = st.draft.filter(function (p) { return p.trim(); }); if (st.titleDraft && st.titleDraft.trim()) st.title = st.titleDraft.trim(); say('Writer', 'Writer', '직접 고친 산문을 저장했어요.'); return 'W1'; },
     breakdown: function () { st.proseLocked = true; st.back = ''; st.pending = detectNew; return 'A0'; },
-    rollback: function (from) { st.proseLocked = false; st.back = from; st.ratioLocked = true; return 'P1'; },
+    rollback: function (from) { st.proseLocked = false; st.back = from; st.ratioLocked = true; return 'W1'; },
     descEdit: function (i) { st.descEdit = +i; },
     descDone: function () { st.descEdit = -1; },
     generate: function () { st.styleLocked = true; st.pending = function () { st.generated = true; st.newItems = []; say('Artist', 'Artist', STYLES[st.style][0] + '으로 그림을 만들었어요. 특정 객체만 톤을 바꾸려면 카드의 톤을 눌러 주세요.'); }; return 'A4'; },
@@ -436,7 +508,7 @@
       return 'S6';
     },
     skip: function () { return finishBusy(true); },
-    reset: function () { st = initial(); return 'E1'; },
+    reset: function () { var p = st.plan; st = initial(); st.plan = p; return 'E1'; },
   };
 
   /* ── 엔진 ── */
@@ -456,6 +528,7 @@
     var focusId = document.activeElement && root.contains(document.activeElement) ? document.activeElement.getAttribute('data-bind') : null;
     root.innerHTML = sid ? SCREENS[sid]() : '<div class="w-entry"><p class="w-mut">이 노드는 화면이 없어요.</p></div>';
     refresh();
+    root.querySelectorAll('.w-chat-b').forEach(function (c) { c.scrollTop = c.scrollHeight; });
     if (focusId) { var el = root.querySelector('[data-bind="' + focusId + '"]:not(.w-opt)'); if (el && el.focus) el.focus(); }
     var dlg = root.querySelector('.w-modal');
     if (dlg && !focusId) { var f = dlg.querySelector('input, textarea, .w-acts .w-btn:last-child'); if (f) f.focus({ preventScroll: true }); }
@@ -486,7 +559,7 @@
   function show(id) {
     clearInterval(timer); timer = null;
     cur = id;
-    if (id === 'P1' && st.proseLocked) st.proseLocked = false;
+    if (id === 'W1' && st.proseLocked) st.proseLocked = false;
     paint();
     if (BUSY_NEXT[id]) startBusy();
   }
@@ -537,7 +610,8 @@
     mount: mount, show: show,
     has: function (id) { return !!screenFor(id); },
     screenFor: screenFor,
-    reset: function () { st = initial(); show(cur); },
+    reset: function () { var p = st.plan; st = initial(); st.plan = p; show(cur); },
+    setPlan: function (p) { st.plan = p; if (cur) show(cur); },
     current: function () { return cur; },
   };
 })();

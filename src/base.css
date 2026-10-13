@@ -212,3 +212,29 @@ textarea.w-ta { width: 100%; font: inherit; color: var(--w-ink); resize: vertica
   .w-rail { order: 3; flex-basis: 100%; overflow-x: auto }
 }
 a.btn { text-decoration: none; display: inline-block }
+
+/* ── Writer 1안/2안 ── */
+.w-studio { grid-template-columns: minmax(0, 1fr) 280px }
+.w-panel { border: 1px solid var(--w-line); background: var(--w-panel); border-radius: 10px; padding: 12px 14px; display: grid; gap: 10px }
+.w-panel-h { display: flex; gap: 8px; align-items: baseline; flex-wrap: wrap }
+.w-panel-h b { font-size: 13px }
+.w-msg.card { border-color: var(--w-acc); display: grid; gap: 8px }
+.w-card-t { font-weight: 600; font-size: 13px }
+.w-msg.card .w-q-t { font-size: 12px }
+.w-msg.card .w-opt { padding: 4px 8px; font-size: 11.5px }
+.w-sugg { display: flex; flex-wrap: wrap; gap: 4px; padding: 6px 8px 0; border-top: 1px solid var(--w-line) }
+.w-sugg .w-tab { font-family: inherit; font-size: 11.5px; padding: 2px 8px; border-radius: 99px }
+.w-prose.picking { border-color: var(--w-acc) }
+.w-para button { font: inherit; text-align: left; width: 100%; background: none; border: 1px dashed transparent; border-radius: 6px; padding: 4px 6px; color: var(--w-ink); cursor: pointer; line-height: 1.7 }
+.w-para button:hover { border-color: var(--w-line) }
+.w-para.sel button { border: 1px solid var(--w-acc); background: color-mix(in srgb, var(--w-acc) 10%, transparent) }
+.w-note.pick { color: var(--w-acc) }
+.w-var-p { display: block; margin-top: 4px; font-size: 12px }
+.w-var-p i { font-style: normal; font-family: var(--mono); font-size: 10.5px; color: var(--w-mut); margin-right: 6px }
+.seg-plan { display: inline-flex; border: 1px solid var(--line); border-radius: 8px; overflow: hidden }
+.seg-plan button { font: inherit; font-size: 12.5px; border: 0; background: var(--surface); color: var(--mut); padding: 5px 12px; cursor: pointer }
+.seg-plan button + button { border-left: 1px solid var(--line) }
+.seg-plan button[aria-pressed="true"] { background: var(--ink); color: var(--surface) }
+.seg-plan button:focus-visible { outline: 2px solid var(--accent); outline-offset: -2px }
+.w-chat, .w-chat > * { min-width: 0 }
+.w-chat-in input { width: 0; flex: 1 1 auto }

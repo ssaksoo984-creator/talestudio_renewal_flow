@@ -1,6 +1,7 @@
 /* 플로우차트 그리기 — index.html과 proto.html이 함께 쓴다.
  * FlowView.mount(box, { onSelect(id) }) → 단계마다 Mermaid로 그린다.
- * FlowView.mark(id) → 그 노드를 빨간 그라데이션 실선으로 표시. */
+ * FlowView.mark(id) → 그 노드를 빨간 그라데이션 실선으로 표시.
+ * FlowView.setPlan('A'|'B') → 그 안의 노드·엣지만 그린다. */
 (function () {
   var F = window.FLOW;
   var byId = {}; F.nodes.forEach(function (n) { byId[n.id] = n; });
@@ -52,10 +53,10 @@
   // 단계마다 따로 그린다. 다른 단계로 가는 선은 "→ ID" 상자로 끝낸다
   function definition(stage) {
     var d = ['flowchart TB'], styles = [], k = 0;
-    var mine = F.nodes.filter(function (n) { return n.stage === stage.id; });
+    var mine = F.nodes.filter(function (n) { return n.stage === stage.id && inPlan(n.plan); });
     var ids = {}; mine.forEach(function (n) { ids[n.id] = 1; d.push('  ' + shape(n)); });
     F.edges.forEach(function (e) {
-      if (!ids[e[0]]) return;
+      if (!ids[e[0]] || !inPlan(e[4]) || !byId[e[1]] || !inPlan(byId[e[1]].plan)) return;
       var to = e[1];
       if (!ids[to]) {
         var t = byId[to];
@@ -74,7 +75,8 @@
     return d.concat(styles).join('\n');
   }
 
-  var box = null, opts = {}, cur = null, zoom = 1, gen = 0;
+  var box = null, opts = {}, cur = null, zoom = 1, gen = 0, plan = 'A';
+  function inPlan(p) { return !p || p === plan; }
   function render() {
     if (!box) return Promise.resolve();
     ensureGradient();
@@ -152,6 +154,10 @@
       return render();
     },
     mark: mark,
+    setPlan: function (p) { if (p === plan) return Promise.resolve(); plan = p; return render(); },
+    plan: function () { return plan; },
+    visible: function (id) { var n = byId[id]; return !!n && inPlan(n.plan); },
+    setZoom: function (z) { zoom = z; applyZoom(); },
     zoomIn: function () { zoom = Math.min(2, zoom + .15); applyZoom(); },
     zoomOut: function () { zoom = Math.max(.35, zoom - .15); applyZoom(); },
     fit: fit,

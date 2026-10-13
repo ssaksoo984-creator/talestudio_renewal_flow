@@ -38,6 +38,7 @@ img { max-width: 100% }
 <header class="pbar" id="pbar">
   <h1>Tale Studio 목업</h1>
   <div class="here" aria-live="polite"><span class="id" id="hereId">E1</span><span class="lb" id="hereLabel"></span><span class="ty" id="hereType"></span></div>
+  <span class="seg-plan" id="planSeg" aria-label="Writer 안"></span>
   <div class="acts">
     <button class="btn" id="back" disabled>← 이전 화면</button>
     <button class="btn" id="toggleFlow" aria-expanded="false" aria-controls="drawer">플로우 보기</button>
@@ -93,12 +94,26 @@ img { max-width: 100% }
     if (!open) return;
     if (!mounted) {
       mounted = true;
-      V.mount($('flow'), { onSelect: function (id) { update(id); } }).then(function () { V.mark(cur, true); });
+      V.mount($('flow'), { onSelect: function (id) { update(id); } }).then(function () { V.setZoom(.8); V.mark(cur, true); });
     } else V.mark(cur, true);
   }
 
   function barH() { document.documentElement.style.setProperty('--barh', $('pbar').getBoundingClientRect().bottom + 'px'); }
   barH(); window.addEventListener('resize', barH);
+  var plan = 'A';
+  try { plan = localStorage.getItem('tale-plan') === 'B' ? 'B' : 'A'; } catch (e) {}
+  function paintPlan() {
+    $('planSeg').innerHTML = F.plans.map(function (x) { return '<button data-plan="' + x.id + '" aria-pressed="' + (x.id === plan) + '" title="' + esc(x.text) + '">' + esc(x.name) + '</button>'; }).join('');
+  }
+  function setPlan(p) {
+    plan = p; try { localStorage.setItem('tale-plan', p); } catch (e) {}
+    paintPlan(); P.setPlan(p);
+    V.setPlan(p).then(function () { if (!V.visible(cur)) update('W1'); else if (mounted) V.mark(cur, !$('drawer').hidden); });
+    if (!V.visible(cur)) update('W1');
+  }
+  paintPlan(); V.setPlan(plan); P.setPlan(plan);
+  $('planSeg').addEventListener('click', function (e) { var b = e.target.closest('[data-plan]'); if (b) setPlan(b.dataset.plan); barH(); });
+
   P.mount($('screen'), { onNavigate: function (id) { update(id, true); } });
   $('toggleFlow').onclick = function () { openFlow($('drawer').hidden); };
   $('closeFlow').onclick = function () { openFlow(false); $('toggleFlow').focus(); };

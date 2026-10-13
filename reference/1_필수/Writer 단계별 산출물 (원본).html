@@ -1,0 +1,647 @@
+<!doctype html><html><head><meta charset=utf8><meta name=viewport content="width=device-width,initial-scale=1,viewport-fit=cover"><style>:root{color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}html{scroll-padding-top:env(safe-area-inset-top,0px)}body{margin:0;padding:0;font:14px -apple-system,BlinkMacSystemFont,sans-serif;background:#faf9f5;color:#141413}img{max-width:100%}[hidden]:not([hidden=until-found i]){display:none!important}</style></head><body>
+<title>Writer 단계별 산출물</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&family=Noto+Sans+KR:wght@400;500;700;800&display=swap">
+<style>
+/* 레이아웃: 네이비 머리 → 묶음 바로가기(고정) → 가로 단계 트랙(누르는 곳) → 바로 아래 상세 판.
+   팔레트는 참고 파일(Tale Studio 제작 파이프라인 지도)을 그대로 따른다. 한 가지 밝은 테마로 고정. */
+:root{
+  color-scheme: light;
+  --ink:#172839; --muted:#617286; --line:#dce5ec; --paper:#f3f6f8; --white:#ffffff; --navy:#0f2032;
+  --teal:#19a5a0; --teal-ink:#0c7984; --teal-btn:#117f83; --violet:#8c68d6; --blue:#4888d9;
+  --amber:#df9c2f; --rose:#d96982; --green:#2eaa84; --slate:#617286;
+  --grid:#edf3f7; --board:#fafcfd; --arrow:#9bafbb; --focus:#2c9cce; --soft:#f3f7f9; --soft-line:#dce7ed;
+  --shadow:0 14px 34px rgba(20,42,62,.08);
+  --font:"Inter","Pretendard","Noto Sans KR",system-ui,-apple-system,"Segoe UI",sans-serif;
+  --mono:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;
+}
+*{box-sizing:border-box}
+html{scroll-behavior:smooth}
+@media (prefers-reduced-motion:reduce){html{scroll-behavior:auto}*{transition:none!important}}
+body{margin:0;background:var(--paper);color:var(--ink);font-family:var(--font);font-size:15px;line-height:1.6;-webkit-font-smoothing:antialiased}
+button{font:inherit;cursor:pointer}
+button:focus-visible,a:focus-visible{outline:3px solid var(--focus);outline-offset:3px}
+.wrap{width:min(1440px,calc(100% - 52px));margin-inline:auto}
+h1,h2,h3{text-wrap:balance}
+
+/* 머리 */
+.hero{background:radial-gradient(circle at 85% 18%,rgba(41,181,175,.23),transparent 26%),radial-gradient(circle at 12% 90%,rgba(142,104,214,.18),transparent 28%),var(--navy);color:#f8fbfc;padding-block:42px 28px;overflow:hidden}
+.hero-top{display:flex;justify-content:space-between;gap:30px;align-items:flex-start}
+.eyebrow{font-size:12px;text-transform:uppercase;letter-spacing:.16em;color:#7ddbd2;font-weight:800}
+.hero h1{font-size:clamp(30px,4vw,50px);line-height:1.12;margin:12px 0;letter-spacing:-.04em}
+.hero p{color:#c8d5df;line-height:1.7;max-width:720px;margin:0;font-size:16px}
+.snapshot{border:1px solid #3d5364;background:#1d3244;border-radius:14px;padding:14px 18px;min-width:240px;font-size:12.5px;line-height:1.75;color:#c7d8e1;flex:none}
+.snapshot strong{color:#ffffff;display:block;font-size:13px}
+.hero-stats{display:flex;gap:12px;flex-wrap:wrap;margin-top:28px}
+.stat{border:1px solid #3b5265;background:#1a3144;border-radius:14px;padding:12px 18px;min-width:150px}
+.stat b{display:block;font-size:25px;color:#ffffff;line-height:1.15}
+.stat span{color:#b7ccd9;font-size:12.5px}
+
+/* 묶음 바로가기 */
+.topnav{position:sticky;top:env(safe-area-inset-top,0px);z-index:30;background:rgba(244,247,249,.96);backdrop-filter:blur(12px);border-bottom:1px solid var(--line)}
+.navrow{display:flex;gap:2px;overflow-x:auto;scrollbar-width:thin}
+.navrow button{display:flex;align-items:center;gap:8px;padding:14px 16px;white-space:nowrap;border:0;border-bottom:3px solid transparent;background:transparent;color:#4f6272;font-size:13px;font-weight:800}
+.navrow button:hover,.navrow button.active{color:var(--teal-ink);border-color:#21a8a2;background:#e8f4f3}
+.navrow .ndot{width:9px;height:9px;border-radius:99px;background:var(--c);flex:none}
+.navrow .ndot.dashed{background:transparent;border:1.5px dashed var(--c)}
+.navrow small{font-weight:700;color:#8296a5;font-size:11.5px}
+
+main{padding-bottom:80px}
+.version-bar{display:flex;justify-content:space-between;align-items:center;gap:14px;padding-top:14px;font-size:12px;color:#657b89;flex-wrap:wrap}
+.version-bar b{color:#2c4558}
+.section{padding-top:34px;scroll-margin-top:56px}
+.section-head{display:flex;justify-content:space-between;align-items:end;gap:20px;margin-bottom:16px;flex-wrap:wrap}
+.section-kicker{font-size:11px;font-weight:800;color:#078c8b;letter-spacing:.12em;text-transform:uppercase}
+.section-head h2{font-size:clamp(24px,2.4vw,32px);letter-spacing:-.035em;margin:4px 0 0}
+.section-head p{color:var(--muted);margin:8px 0 0;font-size:14px;line-height:1.6}
+.section-action{display:flex;gap:8px}
+.ghost-btn,.solid-btn{border-radius:9px;padding:9px 14px;font-weight:700;font-size:13px}
+.ghost-btn{background:#ffffff;border:1px solid var(--line);color:#31495e}
+.ghost-btn:hover:not(:disabled){border-color:#77bdbc;background:#f5fcfc}
+.solid-btn{background:var(--teal-btn);border:1px solid var(--teal-btn);color:#ffffff}
+.solid-btn:hover:not(:disabled){background:#0c666b}
+.ghost-btn:disabled,.solid-btn:disabled{opacity:.4;cursor:default}
+
+/* 범례 */
+.legend{display:flex;gap:16px;flex-wrap:wrap;color:#5f7484;font-size:12.5px;margin-bottom:12px}
+.legend span{display:flex;align-items:center;gap:7px}
+.legend i{width:22px;height:0;border-top:4px solid var(--c);border-radius:2px}
+.legend i.dashed{border-top:2px dashed var(--c)}
+
+/* 트랙 */
+.diagram-shell{position:relative;background:#ffffff;border:1px solid var(--line);border-radius:16px;box-shadow:var(--shadow);overflow:hidden}
+.diagram-shell::before,.diagram-shell::after{content:'';position:absolute;top:0;bottom:0;width:44px;pointer-events:none;opacity:0;transition:opacity .2s;z-index:3}
+.diagram-shell::before{left:0;background:linear-gradient(90deg,var(--board),rgba(250,252,253,0))}
+.diagram-shell::after{right:0;background:linear-gradient(270deg,var(--board),rgba(250,252,253,0))}
+.diagram-shell.more-left::before,.diagram-shell.more-right::after{opacity:1}
+.diagram-scroll{overflow-x:auto;background-image:linear-gradient(var(--grid) 1px,transparent 1px),linear-gradient(90deg,var(--grid) 1px,transparent 1px);background-size:28px 28px;background-color:var(--board);scrollbar-width:thin}
+.track{display:flex;align-items:flex-start;width:max-content;padding:22px 26px 28px}
+.group{--ph-ink:color-mix(in srgb,var(--ph) 68%,#10202f);display:grid;gap:10px;flex:none;align-content:start}
+.g-label{display:flex;align-items:baseline;gap:8px;font-size:12.5px;font-weight:800;color:var(--ph-ink);padding-bottom:6px;border-bottom:2px solid var(--ph);white-space:nowrap}
+.g-range{font-family:var(--mono);font-size:11.5px;letter-spacing:.06em}
+.g-label small{font-weight:700;color:#7b8e9c;font-size:11.5px}
+.g-row{display:flex;align-items:stretch}
+.arr{width:24px;flex:none;display:grid;place-items:center;color:var(--arrow);font-weight:700;font-size:17px}
+.link-arr{width:36px;flex:none;display:grid;place-items:center;height:24px;margin-top:82px;color:var(--arrow);font-weight:700;font-size:20px}
+
+.tile{--ph-ink:color-mix(in srgb,var(--ph) 68%,#10202f);width:150px;min-height:112px;flex:none;display:flex;flex-direction:column;align-items:flex-start;gap:5px;text-align:left;background:#ffffff;border:1px solid var(--line);border-top:4px solid var(--ph);border-radius:12px;padding:11px 12px 12px;color:var(--ink);box-shadow:0 4px 12px rgba(20,42,62,.05);transition:transform .16s,box-shadow .16s,border-color .16s}
+.tile:hover{transform:translateY(-3px);box-shadow:0 12px 26px rgba(20,42,62,.12)}
+.tile[aria-selected="true"]{border-color:var(--teal);border-top-color:var(--ph);box-shadow:0 0 0 3px rgba(25,165,160,.3),0 14px 30px rgba(20,42,62,.14);transform:translateY(-3px)}
+.t-num{display:flex;align-items:center;gap:6px;font-family:var(--mono);font-size:12px;font-weight:800;letter-spacing:.1em;color:var(--ph-ink)}
+.t-name{font-size:15px;font-weight:800;line-height:1.3;letter-spacing:-.02em}
+.t-name small{display:block;font-size:11.5px;font-weight:700;color:#7b8e9c;letter-spacing:0}
+.t-gist{font-size:12px;color:var(--muted);line-height:1.45}
+.t-badge{margin-top:auto;font-size:10.5px;font-weight:800;color:#94671d;background:#fff7e9;border:1px solid #f0dec0;border-radius:99px;padding:2px 8px}
+.tile.wide{width:100%;min-height:84px}
+.group.shot{width:498px}
+.tile.gate{width:136px;background:#f8fbfc;border:1.5px dashed #9bb3c2;border-top:1.5px dashed #9bb3c2}
+.tile.gate[aria-selected="true"]{border-color:var(--teal);border-style:dashed}
+.tile.bookend{background:#f8fbfc}
+.pause{display:inline-flex;gap:2px}
+.pause::before,.pause::after{content:'';width:3px;height:10px;border-radius:1px;background:var(--ph-ink)}
+
+/* 상세 */
+.detail{--ph-ink:color-mix(in srgb,var(--ph) 68%,#10202f);margin-top:18px;display:grid;gap:16px;scroll-margin-top:60px}
+.detail-head{background:#ffffff;border:1px solid var(--line);border-top:5px solid var(--ph);border-radius:16px;padding:22px 26px;display:flex;justify-content:space-between;gap:20px;align-items:flex-start;box-shadow:var(--shadow)}
+.dh-main{min-width:0}
+.mini-label{font-size:12px;font-weight:900;color:var(--ph-ink);letter-spacing:.1em}
+.detail-head h2{display:flex;flex-wrap:wrap;align-items:baseline;gap:6px 10px;font-size:clamp(23px,2.4vw,30px);margin:4px 0 8px;letter-spacing:-.03em;line-height:1.25}
+.h-sub{font-size:16px;font-weight:700;color:#7b8e9c;letter-spacing:0}
+.code-chip{font-family:var(--mono);font-size:12px;font-weight:700;color:#496071;background:var(--soft);border:1px solid var(--soft-line);border-radius:6px;padding:2px 8px;letter-spacing:0}
+.badge{font-size:12px;font-weight:800;color:#94671d;background:#fff7e9;border:1px solid #f0dec0;border-radius:99px;padding:2px 9px;letter-spacing:0}
+.does{margin:0;color:#3d5265;font-size:16px;line-height:1.75;max-width:72ch}
+.detail-nav{display:flex;gap:8px;flex:none}
+
+.detail-grid{display:grid;grid-template-columns:minmax(0,1.55fr) minmax(0,1fr);gap:16px;align-items:start}
+.side{display:grid;gap:12px;min-width:0}
+.card{background:#ffffff;border:1px solid var(--line);border-radius:16px;box-shadow:var(--shadow);overflow:hidden;min-width:0}
+.card-head{padding:15px 20px 13px;border-bottom:1px solid #e9eef2;background:linear-gradient(100deg,color-mix(in srgb,var(--ph) 11%,white),#ffffff 72%)}
+.quad{font-size:10.5px;font-weight:900;color:var(--ph-ink);letter-spacing:.15em;text-transform:uppercase}
+.card-head h3{font-size:17px;margin:3px 0 0;letter-spacing:-.02em}
+.item-list{list-style:none;margin:0;padding:6px 8px 10px;display:grid}
+.item-list li{display:grid;grid-template-columns:22px minmax(0,1fr);gap:2px 10px;padding:11px 12px;border-radius:10px}
+.item-list li + li{border-top:1px solid #eef2f5}
+.item-list .ix{grid-row:span 2;font-family:var(--mono);font-size:11.5px;font-weight:800;color:var(--ph-ink);padding-top:3px}
+.item-list b{font-size:15.5px;font-weight:700;letter-spacing:-.01em}
+.item-list span{font-size:14px;color:var(--muted);line-height:1.6}
+.io{padding:14px 18px;display:grid;gap:9px}
+.io + .io{border-top:1px solid #edf1f3}
+.io-label{font-size:12px;font-weight:800;color:#496071}
+.io-note{margin:0;font-size:13.5px;color:var(--muted)}
+.chips{display:flex;flex-wrap:wrap;gap:6px}
+.chip{display:inline-flex;align-items:center;gap:7px;border:1px solid var(--soft-line);background:var(--soft);color:#2f475a;border-radius:99px;padding:5px 11px;font-size:13px;font-weight:700}
+button.chip:hover{border-color:#77bdbc;background:#f5fcfc}
+.chip .cdot{width:8px;height:8px;border-radius:99px;background:var(--c);flex:none}
+.chip.static{cursor:default;color:#5b7080}
+.callout{display:grid;gap:4px;background:#e7f2f4;border:1px solid #c8e4e5;border-radius:12px;padding:13px 16px;color:#345967;font-size:14px;line-height:1.6}
+.callout b{color:#0d6570;font-size:12.5px;letter-spacing:.02em}
+.callout ul{margin:0;padding-left:18px}
+.callout.warning{background:#fff7e9;border-color:#f0dec0;color:#6e5a38}
+.callout.warning b{color:#94671d}
+.callout.plain{background:#ffffff;border-color:var(--line);color:#4a6072}
+.callout.plain b{color:#2c4558}
+
+.foot{margin-top:34px;color:#6c8090;font-size:12.5px;display:grid;gap:4px;line-height:1.6}
+.foot p{margin:0}
+
+@media (max-width:900px){
+  .hero-top{flex-direction:column}
+  .detail-grid{grid-template-columns:1fr}
+}
+@media (max-width:700px){
+  .detail-head{flex-direction:column}
+  .detail-nav{width:100%}
+  .detail-nav button{flex:1}
+}
+@media (max-width:480px){
+  .wrap{width:calc(100% - 32px)}
+  .hero{padding-block:32px 22px}
+  .snapshot{min-width:0;width:100%}
+  .stat{min-width:0;flex:1 1 40%}
+  .detail-head{padding:18px}
+  .track{padding:18px 16px 22px}
+}
+</style>
+
+<header class="hero">
+  <div class="wrap hero-top">
+    <div>
+      <div class="eyebrow">Writer pipeline atlas</div>
+      <h1>Writer 단계별 산출물</h1>
+      <p>Producer에서 넘어온 이야기가 샷 표가 되기까지 15단계를 거칩니다. 아래 트랙에서 단계를 누르면 그 단계가 무엇을 만드는지 바로 아래에 열립니다.</p>
+    </div>
+    <div class="snapshot"><strong>기준</strong>Writer 코드 · 2026.10.08<br>기본 Writer 엔진 기준<br>대본 보존 모드 차이 함께 표시</div>
+  </div>
+  <div class="wrap hero-stats">
+    <div class="stat"><b>15</b><span>단계</span></div>
+    <div class="stat"><b>5</b><span>묶음</span></div>
+    <div class="stat"><b>1</b><span>사람이 확정하는 지점</span></div>
+    <div class="stat"><b>2</b><span>동시에 도는 갈래</span></div>
+  </div>
+</header>
+
+<nav class="topnav" aria-label="묶음 바로가기">
+  <div class="wrap navrow" id="phaseNav"></div>
+</nav>
+
+<main class="wrap">
+  <div class="version-bar">
+    <b>Writer · 코드 기준 2026.10.08</b>
+    <span>타일을 누르거나, 타일을 고른 뒤 ← → 키로 옮겨 보세요.</span>
+  </div>
+
+  <section class="section" id="flow" aria-labelledby="flow-h">
+    <div class="section-head">
+      <div>
+        <div class="section-kicker">흐름</div>
+        <h2 id="flow-h">단계를 눌러 보세요</h2>
+        <p>왼쪽에서 오른쪽으로 진행합니다. 옆으로 밀거나 오른쪽 버튼으로 넘겨 보세요.</p>
+      </div>
+      <div class="section-action">
+        <button type="button" class="ghost-btn" id="scrollPrev" aria-label="트랙을 왼쪽으로">←</button>
+        <button type="button" class="ghost-btn" id="scrollNext" aria-label="트랙을 오른쪽으로">→</button>
+      </div>
+    </div>
+
+    <div class="legend" id="legend"></div>
+
+    <div class="diagram-shell" id="shell">
+      <div class="diagram-scroll" id="trackScroll">
+        <div class="track" id="track" role="tablist" aria-label="Writer 단계"></div>
+      </div>
+    </div>
+
+    <section class="detail" id="detail" role="tabpanel" aria-label="고른 단계의 상세"></section>
+  </section>
+
+  <footer class="foot">
+    <p>기본 Writer 엔진 기준입니다. 관리자용 V2 엔진은 흐름이 달라 이 지도에 없습니다.</p>
+    <p>단계 옆의 작은 영문 표기(s1, v0 등)는 개발자용 흐름도에서 같은 단계를 찾을 때 쓰는 이름입니다.</p>
+  </footer>
+</main>
+
+<script>
+(function () {
+  // 묶음: 트랙 색과 바로가기의 단위. 바깥(Producer·하류)은 참고 파일의 단계 색을 쓴다.
+  var PH = {
+    'in':  { label: 'Producer에서 받는 것', track: '받는 것', nav: '받는 것', range: '바깥', color: '#8c68d6' },
+    story: { label: '이야기 짜기', nav: '이야기 짜기', range: '01~04', color: '#4888d9' },
+    gate:  { label: '사람이 확정', nav: '확정', range: '멈춤', color: '#617286', dashed: true },
+    look:  { label: '보이는 모습 정하기', nav: '보이는 모습', range: '05~07', color: '#df9c2f' },
+    scene: { label: '씬 촬영 설계', nav: '씬 촬영 설계', range: '08~10', color: '#19a5a0' },
+    shot:  { label: '샷 완성', nav: '샷 완성', range: '11~14', color: '#d96982', hint: '위 그림 갈래 · 아래 대사 갈래, 동시에' },
+    save:  { label: '저장', nav: '저장', range: '15', color: '#2eaa84' },
+    out:   { label: 'Writer 다음', nav: '다음', range: '바깥', color: '#617286' }
+  };
+  var PH_ORDER = ['in', 'story', 'gate', 'look', 'scene', 'shot', 'save', 'out'];
+
+  // 단계 내용: 코드(steps.ts 등) 기준. items = [이름, 풀이].
+  var N = {
+    'in': { phase: 'in', num: '바깥', name: 'Producer에서 받는 것', gist: 'Writer가 받는 재료',
+      does: 'Writer가 만들지 않고, Producer에서 확정돼 넘어오는 재료입니다. Writer는 이 재료로 01부터 시작합니다.',
+      itemsQuad: '재료', itemsTitle: '넘어오는 것',
+      items: [
+        ['장르·톤·목표 감정', ''],
+        ['화면비·러닝타임·깊이(D1~D7)', '러닝타임과 깊이가 씬 수와 샷 수의 규모를 정합니다.'],
+        ['인물 목록', '이름·역할·외형입니다.'],
+        ['배경 목록', '장소 이름과 설명입니다.'],
+        ['그림체 견본', '골랐을 때만 넘어옵니다. 있으면 05에서 매체와 화풍을 견본에 맞춥니다.'],
+        ['이야기 원문 또는 대본', '대본을 넣고 보존 모드를 켜면 씬과 대사를 대본 그대로 씁니다.']
+      ],
+      useLabel: '이 재료를 쓰는 단계', usedBy: ['s01', 's02', 's03', 's05', 's07', 's08', 's09', 's14'] },
+
+    s01: { phase: 'story', num: '01', code: 's0.5', name: '드라마투르기', gist: '필요한 장소 후보를 끌어냄',
+      does: '이야기가 굴러가려면 어떤 장소들이 필요한지 이야기 안에서 끌어냅니다. 이야기 자체는 고치지 않고 옆에 재료로 둡니다.',
+      items: [
+        ['무대(장소) 후보 목록', '이야기의 핵심 장치가 돌아가는 데 꼭 필요한 장소들입니다. 새로 지어내지 않고 이야기에서 끌어냅니다.'],
+        ['극적 진단', '이야기의 극적 구조를 살핀 메모입니다. 02에서 막을 세울 때 참고합니다.']
+      ],
+      notes: ['후보 가운데 씬이 실제로 쓴 장소만 배경 목록에 들어갑니다. 쓰이지 않은 후보에는 그림 비용이 들지 않습니다.'],
+      receives: ['in'], usedBy: ['s02', 's03'] },
+
+    s02: { phase: 'story', num: '02', code: 's1', name: '서사 구조', gist: '막과 전환점을 세움',
+      does: '이야기의 뼈대를 막 단위로 세웁니다.',
+      items: [
+        ['구조 유형', '3막, 기승전결처럼 이야기를 어떤 틀로 나눌지 정합니다.'],
+        ['막 구성', '막마다 하는 일과, 전체에서 차지하는 비중입니다.'],
+        ['시점', '1인칭, 3인칭처럼 누구의 눈으로 이야기하는지 정합니다.'],
+        ['주제', ''],
+        ['중심 극적 질문', '이야기가 끝까지 붙잡고 가는 질문입니다.'],
+        ['전환점 위치', '이야기가 크게 꺾이는 지점이 전체의 어디쯤인지 정합니다.']
+      ],
+      receives: ['in', 's01'], usedBy: ['s03', 's04', 's06'] },
+
+    s03: { phase: 'story', num: '03', code: 's3', name: '씬 목록', gist: '씬마다 무슨 일이 일어나는지',
+      does: '이야기를 씬으로 나누고, 씬마다 무슨 일이 일어나는지 적습니다.',
+      items: [
+        ['씬별 목적', '이 씬이 이야기에서 맡은 일입니다.'],
+        ['장소·시간대·날씨', ''],
+        ['감정 흐름', '씬 안에서 감정이 어떻게 움직이는지 적습니다.'],
+        ['예상 길이', '초 단위입니다.'],
+        ['행동 비트', '씬 안의 행동을 순서대로 나눈 것입니다. 09에서 샷을 나누는 원재료가 됩니다.'],
+        ['핵심 대사', ''],
+        ['정보 차이', '누가 무엇을 알고, 누가 모르는지 적습니다.']
+      ],
+      notes: ['이야기에 새로 필요한 인물·장소는 기존 목록 뒤에 덧붙입니다. 원래 목록은 바꾸지 않습니다.'],
+      script: '씬 순서·장소·시간·인물·비트·대사는 대본 그대로 쓰고, 대본에 없는 칸(목적·감정·정보 차이·요약)만 채웁니다.',
+      receives: ['in', 's01', 's02'], usedBy: ['s04', 'gate', 's07', 's08', 's09', 's10', 's11', 's12', 's14'] },
+
+    s04: { phase: 'story', num: '04', code: 'c1', name: '이야기 점검', gist: '인과와 차별점 점검', badge: '기본 건너뜀',
+      does: '인과가 무너진 곳과, 처음 의도한 차별점이 사라진 곳을 찾아 보고합니다. 흔한 장르 관습은 감점하지 않습니다.',
+      items: [
+        ['점검 보고서', '인과가 끊긴 곳, 차별점이 사라진 곳, 중심 질문이 살아 있는지를 적습니다.']
+      ],
+      warn: '지금은 기본으로 실행되지 않고, 빈 보고서로 다음으로 넘어갑니다.',
+      receives: ['s02', 's03'], usedBy: [], usedByNote: '뒤 단계가 이 보고서를 읽지는 않습니다.' },
+
+    gate: { phase: 'gate', num: '멈춤', name: '씬 스토리 확정', gist: 'Producer 화면에서 사람이 확인',
+      does: '01~04가 끝나면 Writer가 멈추고 기다립니다. Producer 화면에서 사람이 씬 스토리를 확인하고 확정하면 05부터 이어서 진행됩니다.',
+      itemsQuad: '할 일', itemsTitle: '여기서 할 수 있는 일',
+      items: [
+        ['직접 고치기', '씬 스토리를 손으로 고쳐 저장합니다.'],
+        ['AI 수정안 받기', '고칠 점을 말하면 수정안이 나옵니다. 적용하거나 버릴 수 있습니다.'],
+        ['다시 쓰기', '고치는 정도를 고르면 세 가지 안이 나오고, 하나를 골라 적용합니다. 적용 전으로 되돌릴 수 있습니다.'],
+        ['확정', '확정하면 05부터 15까지 이어서 자동으로 진행됩니다.']
+      ],
+      notes: ['확정 전에는 05 이후 단계가 시작되지 않습니다.'],
+      script: '대본을 보존하는 프로젝트는 씬을 고칠 수 없고, 확정만 할 수 있습니다.',
+      recLabel: '확인하는 것', receives: ['s03', 's04'], useLabel: '확정 후 이어지는 단계', usedBy: ['s05'] },
+
+    s05: { phase: 'look', num: '05', code: 'v0', name: '비주얼 아이덴티티', gist: '작품 전체 그림 스타일',
+      does: '작품 전체에 고정될 그림 스타일을 한 번 정합니다. 뒤의 모든 시각 단계가 이 값을 그대로 물려받습니다.',
+      items: [
+        ['기술 사양', '매체, 화면비, 해상도, 초당 프레임, 그리는 방식입니다.'],
+        ['화풍', ''],
+        ['형태와 선의 느낌', ''],
+        ['인체 비례', ''],
+        ['질감', '']
+      ],
+      notes: ['화면비는 Producer에서 정한 값을 그대로 씁니다.', '그림체 견본을 골랐으면 매체와 화풍은 견본을 따릅니다.'],
+      receives: ['in'], usedBy: ['s06', 's07', 's08', 's11', 's13'] },
+
+    s06: { phase: 'look', num: '06', code: 'v1', name: '막별 비주얼 아크', gist: '막마다 색·빛·에너지 변화',
+      does: '막이 바뀔 때 화면이 어떻게 변하는지 정합니다. 전체 스타일은 그대로 두고 색·빛·에너지만 막마다 움직입니다.',
+      items: [
+        ['막별 색 변화', ''],
+        ['막별 조명 분위기', ''],
+        ['막별 에너지', ''],
+        ['막별 시각 메모', ''],
+        ['전체 변화 의도', '처음부터 끝까지 화면이 어디로 가는지 한 문장으로 적습니다.']
+      ],
+      receives: ['s02', 's05'], usedBy: ['s07', 's08'] },
+
+    s07: { phase: 'look', num: '07', code: 'v2', name: '인물·배경 디자인', gist: '인물 의상과 장소 생김새',
+      does: '인물이 어떻게 생기고 무엇을 입는지, 장소가 어떻게 보이는지 정합니다.',
+      items: [
+        ['인물별 외형·의상', ''],
+        ['작품 색 팔레트', '작품 전체에 쓸 색과, 절대 쓰지 않을 색입니다.'],
+        ['색의 의미', '색마다 무엇을 뜻하는지 적습니다.'],
+        ['장소별 디자인', '장소마다 빛, 스타일, 소품입니다.'],
+        ['특수효과 방향', '']
+      ],
+      after: ['작품 스타일과 팔레트가 디자인 기준값으로 저장됩니다.', '인물·배경·씬 목록이 프로젝트에 기록됩니다.', 'Artist의 인물 시트·배경 그림 생성이 자동으로 시작됩니다.'],
+      receives: ['in', 's03', 's05', 's06'], usedBy: ['s08', 's09', 's10', 's11', 's12', 's13', ['out', 'Artist 인물 시트·배경 그림']] },
+
+    s08: { phase: 'scene', num: '08', code: 'v3', name: '씬 촬영계획', gist: '씬을 어떻게 찍을지',
+      does: '씬마다 이 장면을 어떻게 찍을지 큰 방침을 정합니다. 뒤의 샷 단계는 이 방침 안에서만 움직입니다.',
+      items: [
+        ['목표 샷 수', ''],
+        ['평균 샷 길이·컷 템포', '화면이 촘촘한 그림체일수록 샷을 길게 잡습니다.'],
+        ['렌즈·카메라 장비', ''],
+        ['카메라 에너지', ''],
+        ['조명 변화', '씬 처음부터 끝까지 빛의 색온도가 어떻게 바뀌는지 정합니다.'],
+        ['강조 색', ''],
+        ['180° 축', '대화 씬에서 카메라가 넘지 않는 선입니다.'],
+        ['주 시점 인물', ''],
+        ['찍는 방식(커버리지)', '어떤 각도들로 장면을 덮을지 정합니다.']
+      ],
+      notes: ['씬마다 행동 수를 세어 권장 샷 수도 함께 계산합니다. 한 샷에 안 담기는 씬은 미리 표시해 둡니다.', '규칙에 어긋난 계획은 한 번 고쳐서 다시 만듭니다.'],
+      receives: ['in', 's03', 's05', 's06', 's07'], usedBy: ['s09', 's10', 's11', 's12'] },
+
+    s09: { phase: 'scene', num: '09', code: 'decoupage', name: '샷 나누기', sub: '데쿠파주', gist: '행동 비트를 샷으로 분해',
+      does: '감독처럼 씬의 행동 비트를 샷으로 나눕니다. 샷 개수는 시간 계산이 아니라 연출 판단으로 정해집니다.',
+      items: [
+        ['씬별 샷 목록', '비트 하나를 샷 하나로 옮기거나, 없던 샷을 더하거나, 여러 비트를 합치거나, 한 비트를 쪼갭니다.'],
+        ['샷 크기', '와이드에서 클로즈업까지입니다.'],
+        ['샷 길이', ''],
+        ['리듬 역할과 극적 목적', ''],
+        ['카메라 의도와 움직일 이유', '']
+      ],
+      notes: ['카메라는 강조·감정·드러내기·에너지·시점 가운데 이유가 있을 때만 움직이고, 이유가 없으면 고정합니다.'],
+      receives: ['in', 's03', 's07', 's08'], usedBy: ['s10', 's11', 's12', 's14'] },
+
+    s10: { phase: 'scene', num: '10', code: 'stage', name: '씬 무대', gist: '인물이 설 자리 배치도',
+      does: '씬마다 위에서 내려다본 배치도를 세웁니다. 이 배치도로 샷의 화면 안 위치를 계산해서, 인물이 컷마다 좌우로 뒤집히지 않게 합니다.',
+      items: [
+        ['지형·소품 위치', ''],
+        ['비트별 인물 위치·방향·자세', ''],
+        ['180° 축과 카메라가 머무는 쪽', '']
+      ],
+      receives: ['s03', 's07', 's08', 's09'], usedBy: ['s11'] },
+
+    s11: { phase: 'shot', num: '11', code: 'v4', name: '샷 설계', gist: '샷마다 화면과 움직임 스펙',
+      does: '샷 하나하나에 세부 스펙을 붙입니다. 의도, 멈춘 화면, 움직임의 세 덩어리로 나뉩니다.',
+      items: [
+        ['의도', '왜 이 샷인지, 길이를 이렇게 잡은 까닭, 관객이 볼 곳입니다.'],
+        ['멈춘 화면', '렌즈·앵글·심도·프레이밍·조명·인물 배치·소품·색·질감, 그리고 첫 프레임 문장입니다.'],
+        ['움직임', '카메라 움직임·인물 동작·시선·환경 변화·전환, 그리고 영상 문장입니다.'],
+        ['인물 상태 장부', '자세나 위치가 바뀌는 순간을 어느 샷이 보여주는지 적습니다.']
+      ],
+      notes: ['첫 프레임 문장과 영상 문장이 그대로 그림·영상 생성에 쓰입니다.', '화면 안 위치는 10의 배치도에서 계산합니다.'],
+      receives: ['s03', 's05', 's07', 's08', 's09', 's10'], usedBy: ['s12'] },
+
+    s12: { phase: 'shot', num: '12', code: 'c2', name: '샷 검수', gist: '문제를 고르고 샷을 쪼갬',
+      does: '샷 전체를 한 번에 읽고 문제를 고릅니다. 한 샷에 다 안 담기는 장면은 둘 이상으로 쪼갭니다.',
+      items: [
+        ['쪼갠 샷', ''],
+        ['그림 제약', '화면에서 고칠 수 있는 문제를 해당 샷에 붙인 문장입니다. 러프·실사 그림을 만들 때 실립니다.'],
+        ['검수 보고서', '치명적인 문제가 하나라도 있으면 불합격으로 표시합니다.'],
+        ['최종 샷 번호', '']
+      ],
+      receives: ['s03', 's07', 's08', 's09', 's11'], usedBy: ['s13', 's15'] },
+
+    s13: { phase: 'shot', num: '13', code: 'v5', name: '생성용 문장 정리', gist: '그림·영상 생성 재료 묶음',
+      does: '샷마다 그림·영상 생성에 넣을 재료를 한 묶음으로 정리합니다. 문장이 이미 있으면 그대로 옮기고, 비어 있을 때만 새로 씁니다.',
+      items: [
+        ['이미지 문장', ''],
+        ['영상 문장', ''],
+        ['화면비·해상도·초당 프레임', ''],
+        ['참조할 인물·배경', '']
+      ],
+      notes: ['이 묶음은 Writer 결과 내보내기에 실립니다. Director는 15에서 저장한 샷 표의 문장을 읽습니다.'],
+      receives: ['s05', 's07', 's12'], usedBy: [['', 'Writer 결과 내보내기']] },
+
+    s14: { phase: 'shot', num: '14', code: 'dialogue', name: '대사', gist: '말투를 정하고 샷별 대사를 씁니다 · 11~13과 동시에',
+      does: '인물별 말투를 먼저 정하고, 씬 순서대로 샷마다 대사를 씁니다. 앞 씬에서 확정된 사실과 관계를 기억하며 이어 씁니다.',
+      items: [
+        ['인물별 말투', '인물마다 어투를 먼저 정해 대사가 흔들리지 않게 합니다.'],
+        ['샷별 대사', '']
+      ],
+      notes: ['말 없는 순간을 남기고, 정보는 정해진 순서대로만 드러내고, 명대사를 억지로 만들지 않습니다.', '한 씬의 대사 작성이 실패해도 그 씬만 대사 없이 넘어가고, 나머지는 계속됩니다.'],
+      script: '새로 쓰지 않고 대본의 대사를 그대로 샷에 싣습니다.',
+      receives: ['in', 's03', 's09'], usedBy: ['s15'] },
+
+    s15: { phase: 'save', num: '15', code: 'persist', name: '샷 저장', gist: '샷 표로 기록',
+      does: '그림 갈래와 대사 갈래의 결과를 합쳐, 샷 표에 샷 하나당 한 줄씩 기록합니다.',
+      items: [
+        ['생성 문장', '첫 프레임 문장과 영상 문장입니다.'],
+        ['멈춘 화면·움직임 스펙', ''],
+        ['그림 제약', ''],
+        ['길이', ''],
+        ['대사 줄', '']
+      ],
+      notes: ['사람이 직접 고친 칸은 덮어쓰지 않습니다.'],
+      receives: ['s12', 's14'], usedBy: [['out', '러프 스토리보드'], ['out', 'Director 실사'], ['out', 'Editor 편집']] },
+
+    out: { phase: 'out', num: '바깥', name: 'Writer 다음', gist: '샷 표를 읽어 그림·영상으로',
+      does: '샷 표가 저장되면 다른 화면들이 이 내용을 읽어 그림과 영상을 만듭니다.',
+      itemsQuad: '하류', itemsTitle: '그다음 만들어지는 것',
+      items: [
+        ['러프 스토리보드', '샷마다 시작·연출·끝 세 장입니다. Writer 화면이 열려 있을 때 그립니다.'],
+        ['인물 시트·배경 그림 (Artist)', '07이 끝나면 자동으로 시작됩니다.'],
+        ['실사 스틸·영상 (Director)', '러프 스토리보드, 인물 시트, 배경 그림을 참조해 만듭니다.'],
+        ['편집 (Editor)', '만든 영상을 샷 순서대로 이어 붙이고, Writer 대사로 자막 초안을 채웁니다.']
+      ],
+      recLabel: '읽는 것', receives: ['s07', 's15'], usedBy: [] }
+  };
+
+  var ORDER = ['in', 's01', 's02', 's03', 's04', 'gate', 's05', 's06', 's07', 's08', 's09', 's10', 's11', 's12', 's13', 's14', 's15', 'out'];
+  var LAYOUT = [
+    { phase: 'in', rows: [['in']] },
+    { phase: 'story', rows: [['s01', 's02', 's03', 's04']] },
+    { phase: 'gate', rows: [['gate']] },
+    { phase: 'look', rows: [['s05', 's06', 's07']] },
+    { phase: 'scene', rows: [['s08', 's09', 's10']] },
+    { phase: 'shot', rows: [['s11', 's12', 's13'], ['s14']], wideRow: 1 },
+    { phase: 'save', rows: [['s15']] },
+    { phase: 'out', rows: [['out']] }
+  ];
+
+  var $ = function (id) { return document.getElementById(id); };
+  var track = $('track'), scroller = $('trackScroll'), shell = $('shell'), detail = $('detail'), nav = $('phaseNav');
+  var reduced = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  var current = null;
+
+  function isStage(n) { return /^\d/.test(n.num); }
+  function refLabel(id) {
+    var n = N[id];
+    if (isStage(n)) return n.num + ' ' + n.name;
+    return n.name;
+  }
+
+  // 트랙
+  var ARR = '<span class="arr" aria-hidden="true">→</span>';
+  function tile(id, wide) {
+    var n = N[id], p = PH[n.phase];
+    var cls = 'tile' + (n.phase === 'gate' ? ' gate' : '') + (n.phase === 'in' || n.phase === 'out' ? ' bookend' : '') + (wide ? ' wide' : '');
+    return '<button type="button" class="' + cls + '" role="tab" id="t-' + id + '" data-id="' + id + '" aria-selected="false" aria-controls="detail" tabindex="-1" style="--ph:' + p.color + '">' +
+      '<span class="t-num">' + (n.phase === 'gate' ? '<span class="pause" aria-hidden="true"></span>' : '') + n.num + '</span>' +
+      '<span class="t-name">' + n.name + (n.sub ? '<small>' + n.sub + '</small>' : '') + '</span>' +
+      '<span class="t-gist">' + n.gist + '</span>' +
+      (n.badge ? '<span class="t-badge">' + n.badge + '</span>' : '') +
+      '</button>';
+  }
+  function group(g) {
+    var p = PH[g.phase];
+    var head = '<div class="g-label"><span class="g-range">' + p.range + '</span>' + (p.track || p.label) + (p.hint ? '<small>' + p.hint + '</small>' : '') + '</div>';
+    var rows = g.rows.map(function (r, i) {
+      var wide = g.wideRow === i;
+      return '<div class="g-row">' + r.map(function (id) { return tile(id, wide); }).join(ARR) + '</div>';
+    }).join('');
+    return '<div class="group' + (g.phase === 'shot' ? ' shot' : '') + '" style="--ph:' + p.color + '">' + head + rows + '</div>';
+  }
+  track.innerHTML = LAYOUT.map(group).join('<span class="link-arr" aria-hidden="true">→</span>');
+
+  // 범례
+  $('legend').innerHTML = PH_ORDER.filter(function (k) { return k !== 'in' && k !== 'out'; }).map(function (k) {
+    var p = PH[k];
+    return '<span><i class="' + (p.dashed ? 'dashed' : '') + '" style="--c:' + p.color + '"></i>' + p.label + '</span>';
+  }).join('') + '<span><i style="--c:#c9d5de"></i>바깥: Producer · 하류</span>';
+
+  // 묶음 바로가기
+  nav.innerHTML = PH_ORDER.map(function (k) {
+    var p = PH[k];
+    return '<button type="button" data-phase="' + k + '" style="--c:' + p.color + '"><span class="ndot' + (p.dashed ? ' dashed' : '') + '"></span>' + p.nav +
+      (/^\d/.test(p.range) ? ' <small>' + p.range + '</small>' : '') + '</button>';
+  }).join('');
+
+  // 상세
+  function chip(ref) {
+    var id, label;
+    if (Array.isArray(ref)) { id = ref[0]; label = ref[1]; } else { id = ref; }
+    if (!id) return '<span class="chip static">' + label + '</span>';
+    var n = N[id];
+    return '<button type="button" class="chip" data-go="' + id + '" style="--c:' + PH[n.phase].color + '"><span class="cdot"></span>' + (label || refLabel(id)) + '</button>';
+  }
+  function miniLabel(n) {
+    var p = PH[n.phase];
+    return (isStage(n) ? n.num : p.range) + ' · ' + p.label;
+  }
+  function renderDetail(id) {
+    var n = N[id], p = PH[n.phase];
+    var i = ORDER.indexOf(id), prev = ORDER[i - 1], next = ORDER[i + 1];
+    detail.style.setProperty('--ph', p.color);
+
+    var head = '<div class="detail-head"><div class="dh-main">' +
+      '<div class="mini-label">' + miniLabel(n) + '</div>' +
+      '<h2>' + n.name + (n.sub ? '<span class="h-sub">' + n.sub + '</span>' : '') +
+        (n.code ? '<span class="code-chip">' + n.code + '</span>' : '') +
+        (n.badge ? '<span class="badge">' + n.badge + '</span>' : '') + '</h2>' +
+      '<p class="does">' + n.does + '</p></div>' +
+      '<div class="detail-nav">' +
+        '<button type="button" class="ghost-btn" data-go="' + (prev || '') + '"' + (prev ? '' : ' disabled') + '>← 이전</button>' +
+        '<button type="button" class="solid-btn" data-go="' + (next || '') + '"' + (next ? '' : ' disabled') + '>다음 →</button>' +
+      '</div></div>';
+
+    var made = '<article class="card"><div class="card-head"><div class="quad">' + (n.itemsQuad || '산출물') + '</div><h3>' + (n.itemsTitle || '만들어지는 것') + '</h3></div>' +
+      '<ul class="item-list">' + n.items.map(function (it, k) {
+        return '<li><span class="ix">' + String(k + 1).padStart(2, '0') + '</span><b>' + it[0] + '</b>' + (it[1] ? '<span>' + it[1] + '</span>' : '') + '</li>';
+      }).join('') + '</ul></article>';
+
+    var io = '';
+    if (n.receives && n.receives.length) {
+      io += '<div class="io"><span class="io-label">' + (n.recLabel || '받는 것') + '</span><div class="chips">' + n.receives.map(chip).join('') + '</div></div>';
+    }
+    if ((n.usedBy && n.usedBy.length) || n.usedByNote) {
+      io += '<div class="io"><span class="io-label">' + (n.useLabel || '이 결과를 쓰는 곳') + '</span>' +
+        (n.usedBy && n.usedBy.length ? '<div class="chips">' + n.usedBy.map(chip).join('') + '</div>' : '') +
+        (n.usedByNote ? '<p class="io-note">' + n.usedByNote + '</p>' : '') + '</div>';
+    }
+    var flow = io ? '<article class="card"><div class="card-head"><div class="quad">흐름</div><h3>흐름 속 위치</h3></div>' + io + '</article>' : '';
+
+    var side = flow;
+    if (n.warn) side += '<div class="callout warning"><b>기본값</b><span>' + n.warn + '</span></div>';
+    if (n.after) side += '<div class="callout"><b>이 단계가 끝나면 바로</b><ul>' + n.after.map(function (a) { return '<li>' + a + '</li>'; }).join('') + '</ul></div>';
+    if (n.script) side += '<div class="callout"><b>대본 보존 모드</b><span>' + n.script + '</span></div>';
+    if (n.notes && n.notes.length) side += '<div class="callout plain"><b>알아둘 점</b><ul>' + n.notes.map(function (t) { return '<li>' + t + '</li>'; }).join('') + '</ul></div>';
+
+    detail.setAttribute('aria-labelledby', 't-' + id);
+    detail.innerHTML = head + '<div class="detail-grid">' + made + '<div class="side">' + side + '</div></div>';
+  }
+
+  // 트랙 가로 스크롤만 옮긴다 (페이지 세로 위치는 건드리지 않음)
+  function centerTile(id) {
+    var t = $('t-' + id); if (!t) return;
+    var sr = scroller.getBoundingClientRect(), tr = t.getBoundingClientRect();
+    var left = scroller.scrollLeft + (tr.left - sr.left) - (sr.width - tr.width) / 2;
+    scroller.scrollTo({ left: Math.max(0, left), behavior: reduced ? 'auto' : 'smooth' });
+  }
+  function select(id, opts) {
+    opts = opts || {};
+    if (!N[id]) return;
+    current = id;
+    track.querySelectorAll('.tile').forEach(function (t) {
+      var on = t.dataset.id === id;
+      t.setAttribute('aria-selected', on ? 'true' : 'false');
+      t.tabIndex = on ? 0 : -1;
+    });
+    renderDetail(id);
+    centerTile(id);
+    var ph = N[id].phase;
+    nav.querySelectorAll('button').forEach(function (b) {
+      var on = b.dataset.phase === ph;
+      b.classList.toggle('active', on);
+      if (on && b.scrollIntoView) {
+        var nr = nav.getBoundingClientRect(), br = b.getBoundingClientRect();
+        if (br.left < nr.left || br.right > nr.right) nav.scrollTo({ left: nav.scrollLeft + (br.left - nr.left) - 20, behavior: reduced ? 'auto' : 'smooth' });
+      }
+    });
+    if (opts.focusTile) { var t = $('t-' + id); if (t) t.focus({ preventScroll: true }); }
+    if (opts.showDetail) {
+      var r = detail.getBoundingClientRect();
+      if (r.top < 60 || r.top > window.innerHeight - 120) detail.scrollIntoView({ block: 'start', behavior: reduced ? 'auto' : 'smooth' });
+    }
+  }
+
+  track.addEventListener('click', function (e) {
+    var t = e.target.closest('.tile'); if (t) select(t.dataset.id);
+  });
+  track.addEventListener('keydown', function (e) {
+    var t = e.target.closest('.tile'); if (!t) return;
+    var i = ORDER.indexOf(t.dataset.id), to = null;
+    if (e.key === 'ArrowRight' || e.key === 'ArrowDown') to = ORDER[Math.min(ORDER.length - 1, i + 1)];
+    else if (e.key === 'ArrowLeft' || e.key === 'ArrowUp') to = ORDER[Math.max(0, i - 1)];
+    else if (e.key === 'Home') to = ORDER[0];
+    else if (e.key === 'End') to = ORDER[ORDER.length - 1];
+    if (to) { e.preventDefault(); select(to, { focusTile: true }); }
+  });
+  detail.addEventListener('click', function (e) {
+    var b = e.target.closest('[data-go]'); if (!b || b.disabled || !b.dataset.go) return;
+    var fromNav = b.closest('.detail-nav');
+    select(b.dataset.go, { showDetail: !fromNav });
+    if (fromNav) {
+      var keep = detail.querySelector(b.classList.contains('solid-btn') ? '.detail-nav .solid-btn' : '.detail-nav .ghost-btn');
+      if (keep && !keep.disabled) keep.focus({ preventScroll: true });
+    }
+  });
+  nav.addEventListener('click', function (e) {
+    var b = e.target.closest('button[data-phase]'); if (!b) return;
+    var first = ORDER.filter(function (id) { return N[id].phase === b.dataset.phase; })[0];
+    if (!first) return;
+    select(first);
+    var fr = $('flow').getBoundingClientRect();
+    if (fr.top < 0 || fr.top > window.innerHeight * 0.5) $('flow').scrollIntoView({ block: 'start', behavior: reduced ? 'auto' : 'smooth' });
+  });
+
+  // 가장자리 흐림 + 넘기기 버튼
+  function edges() {
+    var max = scroller.scrollWidth - scroller.clientWidth;
+    shell.classList.toggle('more-left', scroller.scrollLeft > 4);
+    shell.classList.toggle('more-right', scroller.scrollLeft < max - 4);
+    $('scrollPrev').disabled = scroller.scrollLeft <= 4;
+    $('scrollNext').disabled = scroller.scrollLeft >= max - 4;
+  }
+  scroller.addEventListener('scroll', edges, { passive: true });
+  window.addEventListener('resize', edges);
+  $('scrollPrev').addEventListener('click', function () { scroller.scrollBy({ left: -scroller.clientWidth * 0.75, behavior: reduced ? 'auto' : 'smooth' }); });
+  $('scrollNext').addEventListener('click', function () { scroller.scrollBy({ left: scroller.clientWidth * 0.75, behavior: reduced ? 'auto' : 'smooth' }); });
+
+  // 시작: 링크 끝의 #s03 같은 표시가 있으면 그 단계, 없으면 01
+  var hash = (location.hash || '').replace('#', '');
+  select(N[hash] ? hash : 's01');
+  edges();
+})();
+</script>
+
+</body></html>

@@ -1,0 +1,155 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<title>Tale Studio 결함 증거 — 이미지 첨부판</title>
+<style>
+  :root{
+    --bg:#0b0b0d; --panel:#151519; --panel2:#1c1c22; --line:#2a2a32;
+    --text:#e9e9ee; --muted:#9a9aa5; --accent:#ff5c5c; --accent2:#5c9dff;
+    --ok:#5cd68a; --warn:#ffb84d;
+  }
+  *{box-sizing:border-box;}
+  body{
+    background:var(--bg); color:var(--text); margin:0; padding:0;
+    font-family:-apple-system,BlinkMacSystemFont,"Apple SD Gothic Neo","Malgun Gothic",sans-serif;
+    line-height:1.6;
+  }
+  .wrap{max-width:920px;margin:0 auto;padding:40px 20px 100px;}
+  h1{font-size:26px;margin:0 0 6px;}
+  .sub{color:var(--muted);font-size:14px;margin-bottom:36px;}
+  h2{font-size:19px;margin:56px 0 6px;padding-top:20px;border-top:1px solid var(--line);}
+  h2 .tag{font-size:11px;font-weight:600;color:var(--accent);border:1px solid var(--accent);border-radius:999px;padding:2px 10px;margin-right:8px;vertical-align:2px;}
+  .lede{color:var(--muted);font-size:14.5px;margin-bottom:20px;}
+  .card{background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:22px;margin-bottom:18px;}
+  .compare{display:flex;gap:14px;flex-wrap:wrap;margin:16px 0;}
+  .shot{flex:1 1 260px;min-width:220px;background:var(--panel2);border-radius:10px;overflow:hidden;border:1px solid var(--line);}
+  .shot img{display:block;width:100%;height:auto;background:#000;}
+  .shot .cap{padding:10px 12px;font-size:12.5px;color:var(--muted);}
+  .shot .cap b{color:var(--text);}
+  .badge{display:inline-block;font-size:11px;font-weight:700;letter-spacing:.02em;padding:3px 9px;border-radius:6px;margin-bottom:8px;}
+  .badge.bad{background:rgba(255,92,92,.15);color:var(--accent);}
+  .badge.name{background:rgba(92,157,255,.15);color:var(--accent2);}
+  .finding{font-size:14.5px;margin-top:14px;}
+  .finding b{color:var(--warn);}
+  .kv{display:grid;grid-template-columns:120px 1fr;gap:6px 14px;font-size:13px;margin:14px 0;background:#000;border-radius:8px;padding:14px;border:1px solid var(--line);}
+  .kv div:nth-child(odd){color:var(--muted);}
+  code{background:#000;border:1px solid var(--line);border-radius:5px;padding:1px 6px;font-size:12.5px;color:#ffd479;}
+  ul{padding-left:20px;font-size:14.5px;}
+  li{margin-bottom:6px;}
+  .note{font-size:12.5px;color:var(--muted);border-left:3px solid var(--line);padding:8px 14px;margin-top:14px;background:#000;border-radius:0 8px 8px 0;}
+  table{width:100%;border-collapse:collapse;font-size:13.5px;margin:16px 0;}
+  th,td{border:1px solid var(--line);padding:9px 10px;text-align:left;vertical-align:top;}
+  th{background:var(--panel2);color:var(--muted);font-weight:600;}
+  .toc{background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:18px 22px;margin-bottom:8px;}
+  .toc a{color:var(--accent2);text-decoration:none;font-size:14px;}
+  .toc li{margin-bottom:8px;}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <h1>🐸 Tale Studio 결함 증거 모음</h1>
+  <div class="sub">
+    "만수의 아침" 8샷 프로젝트를 실제로 끝까지 돌리며 캡처한 화면입니다.
+    이미지가 있는 항목만 이 문서에 담았고, 나머지(버튼 숨김·토스트 에러 등 순수 UI 버그)는
+    앞서 드린 텍스트 리포트에 정리돼 있습니다.
+  </div>
+  <div class="note" style="border-left-color:var(--warn);">
+    ⚠️ 이 파일은 이미지를 <b>같은 폴더에 있는 5개의 파일</b>로 불러옵니다(외부 링크 아님).
+    함께 받은 <code>shot7_real_mannequin.webp</code> · <code>char_paribee_sheet.png</code> ·
+    <code>shot3_real_fly.webp</code> · <code>shot1_rough_previz.webp</code> · <code>shot1_real_photo.webp</code>
+    5개 파일을 이 html과 <b>정확히 같은 폴더</b>에 넣고 열어주세요.
+  </div>
+
+  <div class="toc">
+    <b style="font-size:13px;color:var(--muted);">바로가기</b>
+    <ul style="margin:10px 0 0;">
+      <li><a href="#bug1">① 만수 대신 나무 마네킹이 나온 샷 (제일 심각)</a></li>
+      <li><a href="#bug2">② 캐릭터 시트 = 벌, 실제 컷 = 파리 (서로 다른 생물)</a></li>
+      <li><a href="#bug3">③ 이름은 4개, 실체는 하나 (러프/Previz/rough/storyboard)</a></li>
+    </ul>
+  </div>
+
+  <h2 id="bug1"><span class="tag">치명</span>대사·인물이 통째로 다른 존재로 바뀜</h2>
+  <div class="lede">
+    Scene 1 · Shot 7 — 원본 대본: <i>"만수가 연잎에 축 늘어져 하늘을 바라본다. 완전히 패배한 얼굴."</i>
+  </div>
+  <div class="card">
+    <span class="badge bad">Real(실사) 렌더 결과</span>
+    <div class="compare">
+      <div class="shot">
+        <img src="shot7_real_mannequin.webp" alt="만수 대신 나무 마네킹이 연잎에 누워있는 실사 렌더">
+        <div class="cap">Director → The Set → <b>Real</b> 탭에서 확인한 실제 화면 그대로</div>
+      </div>
+    </div>
+    <div class="finding">
+      개구리 <b>만수가 관절 인형(artist's mannequin)</b>으로 바뀌어 있습니다.
+      원인은 러프 스토리보드 단계 — Writer가 그린 연필 스케치에서부터 이미 만수를 목각 인형처럼 그렸고,
+      Director의 실사화(Real) 단계가 그 스케치를 "충실하게" 사진처럼 구현한 것입니다.
+      즉 <b>실사화 엔진의 오류가 아니라, 앞 단계 스케치 오류를 그대로 승계</b>하는 구조적 문제입니다.
+    </div>
+    <div class="note">재현: Director → 스토리보드 뷰 → Scene 1 · Shot 7 카드 더블클릭 → "연출 화살표 편집" 모달에서도 동일한 마네킹이 시작/중간/끝 3프레임 전부에 나타남 → Real 탭 최종 렌더에도 동일하게 반영됨.</div>
+  </div>
+
+  <h2 id="bug2"><span class="tag">일관성</span>캐릭터 시트와 실제 컷이 다른 생물</h2>
+  <div class="lede">
+    "파리" 캐릭터로 등록했는데, Artist가 만든 캐릭터 시트는 <b>꿀벌</b>이고 실제 촬영 컷은 <b>파리</b>입니다.
+  </div>
+  <div class="card">
+    <span class="badge name">등장인물 시트 — 이름: "파리"</span>
+    <div class="compare">
+      <div class="shot">
+        <img src="char_paribee_sheet.png" alt="파리 캐릭터 시트인데 실제로는 벌 캐릭터 턴어라운드">
+        <div class="cap">The Visual Studio → 등장인물 → <b>"파리"</b> 카드의 전체 캐릭터 시트<br>(초상/표정 4종/턴어라운드 4방향/포즈 2종/디테일까지 완비 — 완성도는 높음)</div>
+      </div>
+      <div class="shot">
+        <img src="shot3_real_fly.webp" alt="Scene 1 Shot 3 실사 렌더 - 실제로는 사실적인 파리로 나옴">
+        <div class="cap">같은 프로젝트, Scene 1 · Shot 3 <b>실사 렌더</b><br>"갈대 끝에 앉은 통통한 파리" — 여기선 정말 파리로 나옴</div>
+      </div>
+    </div>
+    <div class="finding">
+      캐릭터 시트(참조 이미지)와 실제 샷 생성 결과가 <b>서로를 참조하지 않는다</b>는 뜻입니다.
+      Director의 실사화 단계는 캐스팅 시트가 아니라 장면 텍스트만 보고 매번 새로 상상해서 그리는 것으로 보입니다.
+      우연히 Shot 3은 "파리"라는 단어 덕에 그럴듯하게 나왔지만, 시트를 기준으로 한 <b>일관된 캐릭터 유지가 전혀 보장되지 않습니다.</b>
+      같은 문제가 "나비" 캐릭터(시트도 벌/나비 혼종 디자인)에서도 동일하게 관찰됩니다.
+    </div>
+  </div>
+
+  <h2 id="bug3"><span class="tag">명명 혼란</span>같은 그림, 이름이 4개</h2>
+  <div class="lede">
+    Writer가 만든 "러프 스토리보드"와 Director의 "Previz"는 사실 같은 그림입니다. 여기에 실제 파일명까지 더하면 이름이 4개가 됩니다.
+  </div>
+  <div class="card">
+    <span class="badge name">Scene 1 · Shot 1 — 같은 샷, 두 가지 처리 단계</span>
+    <div class="compare">
+      <div class="shot">
+        <img src="shot1_rough_previz.webp" alt="연필 스케치 러프 스토리보드, 파일명은 rough">
+        <div class="cap">화면 라벨: <b>"Previz"</b><br>실제 파일명: <code>..._rough_start_thumb.webp</code><br>Writer 화면에서 부르던 이름: <b>"러프 스토리보드"</b></div>
+      </div>
+      <div class="shot">
+        <img src="shot1_real_photo.webp" alt="실사 렌더 사진, 파일명은 storyboard">
+        <div class="cap">화면 라벨: <b>"Real"</b><br>실제 파일명: <code>..._storyboard_start_thumb.webp</code><br>채팅 로그 표현: <b>"촬영용 이미지"</b> / API 명칭: <code>storyboard_real_grid</code></div>
+      </div>
+    </div>
+    <div class="kv">
+      <div>연필 스케치</div><div>러프 스토리보드(Writer) = Previz(Director 토글) = 파일명 <code>rough</code></div>
+      <div>실사 사진</div><div>Real(Director 토글) = 파일명 <code>storyboard</code> = 채팅에서는 "촬영용 이미지" = API는 <code>storyboard_real_grid</code></div>
+    </div>
+    <div class="finding">
+      가장 헷갈리는 지점은 <b>"storyboard"라는 단어가 스케치가 아니라 사진 쪽 파일명에 붙어 있다</b>는 것입니다.
+      영상 제작 상식과 정반대입니다. 사용자는 Writer 화면에서 "러프 스토리보드"를 배우고,
+      Director에 오면 똑같은 그림이 "Previz"로 재명명되고, 실사 버튼을 누르면 진행 표시줄엔 "촬영용 이미지"라고 뜨는
+      3중 명명을 순서대로 겪게 됩니다.
+    </div>
+  </div>
+
+  <div class="note" style="margin-top:40px;">
+    이 3건은 스크린샷/원본 렌더 이미지로 직접 확인 가능한 것만 추렸습니다.
+    버튼 비활성화·토스트 원문 노출·채팅 확답 미반영 같은 나머지 항목은 이미지로 남기기 어려운(호버 상태·순간적 토스트) UI 버그라
+    이전에 드린 텍스트 리포트의 "분류 1~8"을 참고해 주세요.
+  </div>
+
+</div>
+</body>
+</html>

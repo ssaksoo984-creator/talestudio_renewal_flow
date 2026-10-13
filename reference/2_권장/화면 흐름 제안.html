@@ -1,0 +1,552 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>시작부터 Writer까지 화면 흐름</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;700;800&family=JetBrains+Mono:wght@500;700&display=swap">
+<style>
+:root{
+  --paper:#f2f4f6; --card:#ffffff; --ink:#18232e; --muted:#5f6f7c; --line:#dde3e8; --soft:#eef2f5;
+  --violet:#8c68d6; --violet-ink:#6a49b8; --violet-soft:#f1ecfb; --teal:#13958f; --teal-soft:#e5f5f3; --amber:#b9781a; --amber-soft:#fff6e6; --rose:#c4566f; --rose-soft:#fdecee; --blue:#3f7fd0;
+  --m-bg:#0b0b0c; --m-panel:#121214; --m-card:#17171a; --m-line:#2a2a2f; --m-ink:#f2f2f4; --m-mut:#8c8c96; --m-dim:#5d5d66; --m-acc:#9b7ae6; --m-acc-soft:#2a2340; --m-warn:#e2a33d;
+  --font:"Noto Sans KR","Pretendard",system-ui,-apple-system,"Segoe UI",sans-serif;
+  --mono:"JetBrains Mono",ui-monospace,Menlo,monospace;
+}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--paper:#0f1215;--card:#171b20;--ink:#e8edf1;--muted:#9aa8b3;--line:#2b333b;--soft:#1e252c;--violet-soft:#241d36;--amber-soft:#2c2416;--teal-soft:#14302d;--rose-soft:#3a1d24;--violet-ink:#b9a0f0}}
+:root[data-theme="dark"]{--paper:#0f1215;--card:#171b20;--ink:#e8edf1;--muted:#9aa8b3;--line:#2b333b;--soft:#1e252c;--violet-soft:#241d36;--amber-soft:#2c2416;--teal-soft:#14302d;--rose-soft:#3a1d24;--violet-ink:#b9a0f0}
+*{box-sizing:border-box}
+body{margin:0;background:var(--paper);color:var(--ink);font-family:var(--font);font-size:15px;line-height:1.65;-webkit-font-smoothing:antialiased}
+button{font:inherit;cursor:pointer;color:inherit}
+button:focus-visible{outline:3px solid #2c9cce;outline-offset:2px}
+.wrap{width:min(1320px,calc(100% - 32px));margin-inline:auto}
+h1,h2,h3{text-wrap:balance;letter-spacing:-.025em}
+header.top{padding:40px 0 8px}
+.kick{font-size:12px;font-weight:800;letter-spacing:.14em;color:var(--violet-ink);text-transform:uppercase}
+header.top h1{font-size:clamp(28px,3.6vw,42px);margin:8px 0 10px;line-height:1.15}
+header.top p{margin:0;color:var(--muted);max-width:78ch}
+.rules{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:12px;margin-top:22px}
+.rule{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:14px 16px}
+.rule b{display:block;font-size:15px;margin-bottom:4px}
+.rule span{font-size:13.5px;color:var(--muted)}
+.rule i{font-style:normal;font-family:var(--mono);font-size:11px;color:var(--violet-ink);font-weight:700}
+.sec{padding:34px 0 0}
+.sec h2{font-size:clamp(21px,2.2vw,26px);margin:0 0 4px}
+.sec>p{color:var(--muted);margin:0 0 14px;max-width:82ch}
+
+/* 값이 닿는 범위 */
+.scope{background:var(--card);border:1px solid var(--line);border-radius:14px;overflow-x:auto}
+.scope-grid{display:grid;grid-template-columns:170px repeat(6,minmax(118px,1fr));min-width:900px}
+.scope-grid>div{padding:10px 12px;border-bottom:1px solid var(--line);font-size:13px}
+.sh{font-size:11.5px!important;font-weight:800;color:var(--muted);background:var(--soft)}
+.sh small{display:block;font-weight:600;font-size:10.5px;color:var(--muted);opacity:.8}
+.sl{font-weight:800}
+.sl small{display:block;font-weight:500;color:var(--muted);font-size:11.5px}
+.lane{position:relative;grid-column:2 / -1;display:grid;grid-template-columns:repeat(6,1fr);align-items:center;padding:10px 0!important}
+.bar{height:28px;border-radius:8px;display:flex;align-items:center;gap:6px;padding:0 10px;font-size:12px;font-weight:700;color:#fff;margin:0 6px;white-space:nowrap;overflow:hidden}
+.bar.v{background:var(--violet)}.bar.t{background:var(--teal)}.bar.a{background:var(--amber)}.bar.b{background:var(--blue)}
+.bar.ghost{background:transparent;border:1.5px dashed var(--line);color:var(--muted);font-weight:600}
+.lock{display:inline-grid;place-items:center;width:18px;height:18px;border-radius:5px;background:rgba(255,255,255,.25);font-size:11px}
+.cut{font-size:11px;color:var(--muted);font-weight:700;padding-left:8px;white-space:nowrap}
+.scope-note{padding:10px 14px;font-size:12.5px;color:var(--muted);margin:0}
+
+/* 흐름 */
+.steps{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:12px}
+.steps button{border:1px solid var(--line);background:var(--card);border-radius:99px;padding:6px 13px;font-size:13px;font-weight:700;color:var(--muted)}
+.steps button[aria-pressed="true"]{background:var(--violet);border-color:var(--violet);color:#fff}
+.steps button.new{border-style:dashed}
+.steps button small{font-weight:800;font-size:10px;color:var(--amber);margin-left:4px}
+.steps button[aria-pressed="true"] small{color:#ffe2a8}
+.layout{display:grid;grid-template-columns:minmax(0,1fr) 330px;gap:18px;align-items:start}
+@media (max-width:1050px){.layout{grid-template-columns:1fr}}
+.notes{display:grid;gap:12px;position:sticky;top:12px}
+.note{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:14px 16px}
+.note h3{margin:0 0 6px;font-size:14px}
+.note p{margin:0;font-size:13.5px;color:var(--muted)}
+.note ul{margin:0;padding-left:18px;font-size:13.5px;color:var(--muted)}
+.note li+li{margin-top:4px}
+.note.dev{background:var(--amber-soft);border-color:color-mix(in srgb,var(--amber) 30%,var(--line))}
+.note.dev h3{color:var(--amber)}
+.note.flow h3{color:var(--violet-ink)}
+.legend-diff{font-size:12px;color:var(--muted);margin:8px 0 0;display:flex;align-items:center;gap:8px}
+.legend-diff i{width:22px;height:12px;border:2px dashed var(--m-warn);border-radius:4px;display:inline-block}
+
+/* ── 목업 ── */
+.device{position:relative;background:var(--m-bg);border-radius:16px;border:1px solid #000;box-shadow:0 18px 40px rgba(10,20,30,.22);overflow:hidden;color:var(--m-ink);font-size:13px}
+.d-bar{display:flex;align-items:center;gap:10px;padding:10px 14px;border-bottom:1px solid var(--m-line);font-weight:800;font-size:13px}
+.d-bar .crumbs{display:flex;gap:8px;align-items:center;margin-left:auto;color:var(--m-dim);font-weight:600;font-size:11.5px;flex-wrap:wrap}
+.d-bar .crumbs b{color:var(--m-ink)}
+.wiz{max-width:640px;margin:0 auto;padding:30px 22px 28px;min-height:540px}
+.wiz h4{font-size:21px;margin:0 0 4px;letter-spacing:-.02em}
+.wiz .sub{color:var(--m-mut);margin:0 0 18px;font-size:12.5px}
+.q{border:1px solid var(--m-line);background:var(--m-panel);border-radius:12px;padding:12px 14px;margin-bottom:10px}
+.q-t{display:flex;justify-content:space-between;gap:10px;font-weight:700;font-size:13.5px;margin-bottom:9px;align-items:center}
+.q-t small{font-weight:500;color:var(--m-dim);font-size:11.5px}
+.lockb{font-size:10.5px;font-weight:800;color:#f3c77a;border:1px solid #5a4520;background:#2a2112;border-radius:99px;padding:1px 8px;white-space:nowrap}
+.pass{font-size:10.5px;font-weight:800;color:#b9a3f2;border:1px solid #3c3160;background:#1d1830;border-radius:99px;padding:1px 8px;white-space:nowrap}
+.opts{display:flex;flex-wrap:wrap;gap:6px}
+.opt{border:1px solid var(--m-line);background:var(--m-card);border-radius:9px;padding:6px 11px;font-size:12.5px;color:var(--m-ink);display:inline-flex;flex-direction:column;align-items:flex-start;line-height:1.3}
+.opt small{color:var(--m-dim);font-size:10.5px}
+.opt.on{border-color:var(--m-acc);background:var(--m-acc-soft)}
+.opt .rec{font-size:9.5px;color:var(--m-acc);font-weight:800}
+.ratio{display:inline-block;border:1.5px solid currentColor;border-radius:2px;margin-bottom:3px;opacity:.75}
+.ta{border:1px solid var(--m-line);background:var(--m-panel);border-radius:12px;padding:12px 14px;min-height:78px;color:var(--m-ink);font-size:13px;margin-bottom:8px}
+.up{display:flex;justify-content:space-between;align-items:center;border:1px dashed var(--m-line);border-radius:12px;padding:10px 14px;color:var(--m-mut);font-size:12px;margin-bottom:14px}
+.btn{border:1px solid var(--m-line);background:var(--m-card);border-radius:8px;padding:6px 11px;font-size:12px;font-weight:700;color:var(--m-ink)}
+.btn.pri{background:#f2f2f4;color:#111;border-color:#f2f2f4}
+.btn.acc{background:var(--m-acc);border-color:var(--m-acc);color:#fff}
+.btn.warn{background:#3a2a10;border-color:#6a4b1a;color:#f3c77a}
+.btn[disabled]{opacity:.4;cursor:not-allowed}
+.wiz-foot{display:flex;justify-content:space-between;align-items:center;margin-top:16px}
+.ghost{background:transparent;border:0;color:var(--m-mut);font-size:12.5px}
+.hint{font-size:11.5px;color:var(--m-mut);border-left:2px solid var(--m-acc);padding:4px 10px;margin:10px 0 0;background:#141320}
+.rec-banner{display:flex;gap:8px;align-items:center;font-size:11.5px;color:#cdbdf5;background:var(--m-acc-soft);border:1px solid #3c3160;border-radius:9px;padding:7px 10px;margin-bottom:10px}
+
+.studio{display:grid;grid-template-columns:58px minmax(0,1fr) 250px;min-height:580px}
+@media (max-width:760px){.studio{grid-template-columns:1fr}.rail,.chat{display:none}}
+.rail{border-right:1px solid var(--m-line);display:flex;flex-direction:column;align-items:center;gap:14px;padding-top:14px;color:var(--m-dim);font-size:9.5px}
+.rail span{display:grid;place-items:center;gap:2px;text-align:center}
+.rail span.on{color:var(--m-ink)}
+.rail i{width:20px;height:20px;border-radius:6px;background:#222226;display:block}
+.rail span.on i{background:var(--m-acc)}
+.rail span.lk i{background:#2a2112;outline:1px solid #5a4520}
+.rail span.moved{outline:2px dashed var(--m-warn);outline-offset:3px;border-radius:6px}
+.main{padding:16px 18px 20px;min-width:0}
+.title-row{display:flex;justify-content:space-between;align-items:center;gap:10px;margin-bottom:4px}
+.title-row h5{margin:0;font-size:17px}
+.meta{color:var(--m-dim);font-size:11.5px;margin-bottom:14px;display:flex;gap:8px;flex-wrap:wrap;align-items:center}
+.sect{margin-bottom:14px}
+.sect-h{display:flex;align-items:center;gap:8px;font-weight:800;font-size:13px;margin-bottom:7px;flex-wrap:wrap}
+.sect-h small{color:var(--m-dim);font-weight:600}
+.sect-h .right{margin-left:auto;display:flex;gap:6px;align-items:center}
+.pill{display:inline-flex;align-items:center;gap:6px;border:1px solid var(--m-line);background:var(--m-card);border-radius:99px;padding:4px 10px 4px 4px;font-size:12px;margin:0 5px 5px 0}
+.pill i{width:20px;height:20px;border-radius:99px;background:#26262b;display:grid;place-items:center;font-style:normal;font-size:10px}
+.prose{border:1px solid var(--m-line);background:var(--m-panel);border-radius:12px;overflow:hidden}
+.prose-h{display:flex;flex-wrap:wrap;gap:6px 10px;align-items:center;padding:10px 12px;border-bottom:1px solid var(--m-line)}
+.rt{font-family:var(--mono);font-size:11.5px;color:#cdbdf5;background:var(--m-acc-soft);border-radius:6px;padding:2px 7px}
+.tagc{font-size:11.5px;color:var(--m-mut);border:1px solid var(--m-line);border-radius:6px;padding:2px 7px;background:var(--m-card)}
+.tools{margin-left:auto;display:flex;gap:6px}
+.prose-b{padding:12px 14px;display:grid;gap:8px;font-size:12.5px;line-height:1.75;color:#d6d6dc}
+.prose-b p{margin:0;display:grid;grid-template-columns:26px 1fr;gap:6px}
+.prose-b p span:first-child{font-family:var(--mono);font-size:10.5px;color:var(--m-dim);padding-top:3px}
+.chat{border-left:1px solid var(--m-line);background:var(--m-panel);display:flex;flex-direction:column}
+.chat-h{padding:12px 14px;border-bottom:1px solid var(--m-line);font-weight:800;font-size:12.5px}
+.chat-h small{display:block;font-weight:500;color:var(--m-dim);font-size:10.5px}
+.chat-b{flex:1;padding:12px;display:flex;flex-direction:column;gap:10px;justify-content:flex-end}
+.msg{background:var(--m-card);border:1px solid var(--m-line);border-radius:10px;padding:9px 10px;font-size:12px;color:#d6d6dc;line-height:1.6}
+.msg b{color:var(--m-acc);font-size:11px;display:block}
+.msg.me{background:#2a2a30;align-self:flex-end;max-width:85%}
+.card-q{border:1px solid #3c3160;background:#16131f;border-radius:10px;padding:10px;display:grid;gap:7px}
+.card-q .qt{font-size:12px;font-weight:700}
+.card-q .row{display:grid;gap:4px}
+.card-q .row>small{color:var(--m-dim);font-size:10.5px}
+.card-q .opts .opt{padding:4px 8px;font-size:11.5px}
+.chat-in{margin:10px;border:1px solid var(--m-line);border-radius:10px;padding:9px 10px;color:var(--m-dim);font-size:11.5px}
+.diff{outline:2px dashed var(--m-warn);outline-offset:3px;border-radius:8px}
+
+/* 인물·배경·스타일 */
+.subtabs{display:flex;gap:4px;border-bottom:1px solid var(--m-line);margin:2px 0 14px}
+.subtabs span{padding:7px 10px;font-size:12px;font-weight:700;color:var(--m-dim);border-bottom:2px solid transparent}
+.subtabs span.on{color:var(--m-ink);border-color:var(--m-acc)}
+.assets{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:10px}
+.asset{border:1px solid var(--m-line);background:var(--m-card);border-radius:12px;overflow:hidden;position:relative}
+.asset .ph{aspect-ratio:16/10;display:grid;place-items:center;font-weight:800;font-size:22px;color:rgba(255,255,255,.85)}
+.asset .ph.empty{background:repeating-linear-gradient(45deg,#16161a 0 8px,#1b1b20 8px 16px);color:var(--m-dim);font-size:11.5px;font-weight:600}
+.asset .ph.s1{background:radial-gradient(circle at 50% 38%,#9aa0a8 0 16%,transparent 17%),radial-gradient(ellipse at 50% 92%,#7d838c 0 34%,transparent 35%),linear-gradient(160deg,#454b54,#1c1f24)}
+.asset .ph.s1.bg{background:linear-gradient(180deg,#5a6069 0 45%,#30353c 45% 100%),#2a2e34}
+.asset .ph.s2{background:radial-gradient(circle at 50% 38%,#ffd8c2 0 16%,transparent 17%),radial-gradient(ellipse at 50% 92%,#6f8cff 0 34%,transparent 35%),linear-gradient(160deg,#ffb4a2,#8aa6ff)}
+.asset .ph.s2.bg{background:linear-gradient(180deg,#9ec5ff 0 45%,#ffc98f 45% 100%)}
+.asset .ph.busy{background:linear-gradient(90deg,#1b1b20,#26262c,#1b1b20);background-size:200% 100%;animation:sh 1.4s linear infinite;color:var(--m-mut);font-size:11.5px;font-weight:600}
+@keyframes sh{to{background-position:-200% 0}}
+@media (prefers-reduced-motion:reduce){.asset .ph.busy{animation:none}}
+.asset .cap{padding:8px 10px;display:grid;gap:2px}
+.asset .cap b{font-size:12.5px}
+.asset .cap small{color:var(--m-dim);font-size:10.5px;line-height:1.4}
+.asset .vtag{position:absolute;top:7px;left:7px;font-size:10px;font-weight:800;border-radius:6px;padding:1px 6px;background:rgba(0,0,0,.55);color:#fff}
+.asset .vtag.old{background:#3a2a10;color:#f3c77a;border:1px solid #6a4b1a}
+.asset .chk{position:absolute;top:7px;right:7px;width:18px;height:18px;border-radius:5px;border:1.5px solid #fff;background:rgba(0,0,0,.35);display:grid;place-items:center;font-size:11px}
+.asset .chk.on{background:var(--m-acc);border-color:var(--m-acc)}
+.asset.add{display:grid;place-items:center;min-height:150px;border-style:dashed;color:var(--m-mut);font-size:12px}
+.styles{display:grid;grid-template-columns:repeat(auto-fill,minmax(92px,1fr));gap:8px}
+.sty{border:1px solid var(--m-line);background:var(--m-card);border-radius:10px;overflow:hidden;text-align:left;padding:0}
+.sty .sw{height:46px}
+.sty span{display:block;padding:6px 8px;font-size:11.5px;font-weight:700}
+.sty span small{display:block;font-weight:500;color:var(--m-dim);font-size:10px}
+.sty.on{border-color:var(--m-acc);box-shadow:0 0 0 2px var(--m-acc-soft)}
+.stybar{display:flex;align-items:center;gap:8px;flex-wrap:wrap;border:1px solid var(--m-line);background:var(--m-panel);border-radius:10px;padding:8px 10px;margin-bottom:12px;font-size:12px}
+.stybar .sw{width:28px;height:18px;border-radius:4px}
+.stybar .ver{font-family:var(--mono);font-size:11px;color:#cdbdf5;background:var(--m-acc-soft);border-radius:5px;padding:1px 6px}
+.stybar .right{margin-left:auto;display:flex;gap:6px}
+.est{font-size:11.5px;color:var(--m-mut)}
+.foot-bar{display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap;margin-top:12px;border-top:1px solid var(--m-line);padding-top:12px}
+
+/* 모달 */
+.modal-back{position:absolute;inset:0;background:rgba(0,0,0,.62);display:grid;place-items:center;z-index:5;padding:16px}
+.modal{width:min(460px,100%);background:#151518;border:1px solid var(--m-line);border-radius:14px;padding:18px;display:grid;gap:12px;box-shadow:0 20px 50px rgba(0,0,0,.5)}
+.modal h6{margin:0;font-size:16px}
+.modal p{margin:0;color:var(--m-mut);font-size:12.5px;line-height:1.65}
+.modal .list{display:grid;gap:6px;border:1px solid var(--m-line);border-radius:10px;padding:10px 12px;background:var(--m-panel)}
+.modal .list div{display:flex;justify-content:space-between;gap:10px;font-size:12px}
+.modal .list div span:first-child{color:var(--m-mut)}
+.modal .acts{display:flex;justify-content:flex-end;gap:6px;flex-wrap:wrap}
+.vers{display:flex;gap:6px;flex-wrap:wrap}
+.vers span{font-size:11.5px;border:1px solid var(--m-line);border-radius:8px;padding:4px 8px;background:var(--m-card)}
+.vers span.cur{border-color:var(--m-acc);color:#cdbdf5}
+
+/* Director */
+.board{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:10px}
+.frame{border:1px solid var(--m-line);border-radius:10px;overflow:hidden;background:var(--m-card)}
+.frame .ph{aspect-ratio:9/16;max-height:170px;width:100%;display:grid;place-items:center;font-size:11px;color:var(--m-dim)}
+.frame .cap{padding:6px 8px;font-size:11px;color:var(--m-mut)}
+.banner{display:flex;gap:10px;align-items:center;border:1px solid #5a4520;background:#221a0d;color:#f3c77a;border-radius:10px;padding:9px 12px;font-size:12px;margin-bottom:12px;flex-wrap:wrap}
+.banner.ok{border-color:#3c3160;background:#16131f;color:#cdbdf5}
+.banner .right{margin-left:auto;display:flex;gap:6px}
+
+/* 표 */
+.tbl-wrap{background:var(--card);border:1px solid var(--line);border-radius:14px;overflow-x:auto}
+table{border-collapse:collapse;width:100%;min-width:820px;font-size:13.5px}
+th,td{padding:10px 14px;text-align:left;border-bottom:1px solid var(--line);vertical-align:top}
+thead th{font-size:12px;color:var(--muted);font-weight:800;background:var(--soft)}
+td b{font-weight:800}
+.st{display:inline-block;font-size:11px;font-weight:800;border-radius:99px;padding:1px 8px;white-space:nowrap}
+.st.mv{background:var(--violet-soft);color:var(--violet-ink)}
+.st.rm{background:var(--rose-soft);color:var(--rose)}
+.st.kp{background:var(--teal-soft);color:var(--teal)}
+.st.nw{background:var(--amber-soft);color:var(--amber)}
+.st.lk{background:var(--amber-soft);color:var(--amber)}
+.mini{display:grid;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));gap:14px}
+.decide{display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:12px}
+.decide .note b{display:block;margin-bottom:4px}
+.foot{padding:30px 0 50px;color:var(--muted);font-size:12.5px}
+
+.writer-run{display:flex;align-items:center;gap:8px;flex-wrap:wrap;border:1px solid #2b3c55;background:#121a26;color:#9fc0ea;border-radius:10px;padding:8px 12px;font-size:12px;margin-bottom:12px}
+.writer-run b{color:#cfe1fa}
+.writer-run .right{margin-left:auto}
+.spin{width:12px;height:12px;border-radius:50%;border:2px solid #4888d9;border-top-color:transparent;animation:rot 1s linear infinite;flex:none}
+@keyframes rot{to{transform:rotate(360deg)}}
+@media (prefers-reduced-motion:reduce){.spin{animation:none}}
+.rail span{position:relative}
+.rail span.run i{background:#1f3350;outline:1px dashed #4888d9}
+.rundot{position:absolute;top:-2px;right:6px;width:7px;height:7px;border-radius:50%;background:#4888d9}
+.gchip{display:inline-flex;align-items:center;gap:4px;font-size:10.5px;border:1px solid var(--m-line);border-radius:99px;padding:2px 8px;color:var(--m-mut);background:var(--m-panel);margin-top:6px;width:max-content}
+.gchip.set{color:#f3c77a;border-color:#5a4520;background:#2a2112}
+.asset .ph.horror{filter:hue-rotate(160deg) saturate(.6) brightness(.7)}
+.lockbox{border:1px solid #5a4520;background:#1d170d;border-radius:12px;padding:10px 12px 2px;margin-bottom:10px}
+.prosebox{border:1px solid #3c3160;background:#16131f;border-radius:12px;padding:10px 12px 2px}
+.lockbox h6,.prosebox h6{margin:0 0 8px;font-size:12px;font-weight:800}
+.lockbox h6{color:#f3c77a}
+.prosebox h6{color:#cdbdf5}
+.rtbig{display:flex;align-items:baseline;gap:10px;flex-wrap:wrap;border:1px solid var(--m-line);background:var(--m-panel);border-radius:12px;padding:10px 14px;margin-bottom:12px}
+.rtbig b{font-family:var(--mono);font-size:22px;color:#cdbdf5}
+.rtbig small{color:var(--m-dim);font-size:11.5px;flex-basis:100%}
+.shotgrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:10px}
+.shot{border:1px solid var(--m-line);border-radius:10px;overflow:hidden;background:var(--m-card);padding:0;text-align:left;color:var(--m-ink)}
+.shot .fr{display:grid;grid-template-columns:repeat(3,1fr);gap:2px;background:#0f0f12}
+.shot .fr i{display:block;aspect-ratio:9/16;max-height:72px;background:repeating-linear-gradient(45deg,#1b1b20 0 6px,#222228 6px 12px)}
+.shot .cap{padding:6px 8px;font-size:11px;color:var(--m-mut);display:flex;justify-content:space-between;gap:6px}
+.optpanel{border:1px solid var(--m-line);background:var(--m-panel);border-radius:12px;padding:10px 12px;margin-bottom:12px;display:grid;gap:8px}
+.dl{display:flex;gap:10px;align-items:center;flex-wrap:wrap}
+.modal .list div{align-items:center}
+</style>
+</head>
+<body>
+<header class="top wrap">
+  <div class="kick">Tale Studio · 화면 흐름 제안 · 기초 세팅 B안 + 파이프라인 A안</div>
+  <h1>시작부터 Writer까지 화면 흐름</h1>
+  <p>기초 세팅에서 잠글 값과 산문용 값을 나누고, Producer는 산문만 다룹니다. 산문을 확정하면 Artist 화면이 먼저 열려 스타일을 정하고 인물·배경 그림을 만들고, 그동안 Writer는 뒤에서 씬·샷을 나눕니다.</p>
+  <div class="rules">
+    <div class="rule"><i>원칙 1</i><b>잠글 값과 산문용 값을 나눈다</b><span>작업 언어·화면 비율은 기초 세팅에서 잠그고, 장르·톤·길이·AI 개입 정도는 산문에만 쓰고 산문 확정에서 끊어요.</span></div>
+    <div class="rule"><i>원칙 2</i><b>Artist가 먼저, Writer는 뒤에서</b><span>산문을 넘기면 Artist 화면이 먼저 열려요. 스타일은 Artist에서 정하면 잠기고, 장르·톤은 인물·배경·씬마다 따로 줄 수 있어요.</span></div>
+    <div class="rule"><i>원칙 3</i><b>Writer는 보여주고 고르게</b><span>총 러닝타임은 고치는 칸이 아니라 "이 정도 나와요"로 보여줘요. 대사 언어는 옵션에서 바꾸고, 대사마다 따로 바꿔 섞을 수 있어요.</span></div>
+  </div>
+</header>
+
+<main class="wrap">
+
+  <section class="sec" aria-labelledby="scope-h">
+    <h2 id="scope-h">값이 어디까지 닿는가</h2>
+    <p>막대가 끝나는 곳에서 그 값의 영향이 끝납니다. 뒤 단계는 받은 값을 자기 것으로 쓰고, 앞 단계로 거슬러 올라가 맞추지 않습니다.</p>
+    <div class="scope"><div class="scope-grid">
+      <div class="sh">값</div>
+      <div class="sh">기초 세팅</div>
+      <div class="sh">Producer 산문</div>
+      <div class="sh">산문 확정<small>넘기기 · Producer 잠금</small></div>
+      <div class="sh">Artist<small>먼저 열림</small></div>
+      <div class="sh">Writer<small>뒤에서 씬·샷</small></div>
+      <div class="sh">Director</div>
+
+      <div class="sl">작업 언어</div>
+      <div class="lane"><div class="bar a" style="grid-column:1 / 7"><span class="lock">🔒</span>기초 세팅에서 잠금 · 끝까지 같음</div></div>
+      <div class="sl">화면 비율</div>
+      <div class="lane"><div class="bar a" style="grid-column:1 / 7"><span class="lock">🔒</span>기초 세팅에서 잠금 · 끝까지 같음</div></div>
+      <div class="sl">장르·톤 <small>산문용</small></div>
+      <div class="lane"><div class="bar v" style="grid-column:1 / 3">추천 → 다시 쓰기 조건</div><div class="cut" style="grid-column:3 / 7">✂ 산문 확정에서 끊김 · Artist의 장르·톤과 따로</div></div>
+      <div class="sl">길이 <small>산문용</small></div>
+      <div class="lane"><div class="bar v" style="grid-column:1 / 3">범위 → 다시 쓰기 조건</div><div class="cut" style="grid-column:3 / 7">✂ 산문 확정에서 끊김</div></div>
+      <div class="sl">AI 개입 정도 <small>산문용</small></div>
+      <div class="lane"><div class="bar v" style="grid-column:1 / 3">자료와 함께 → 다시 쓰기 "얼마나"</div><div class="cut" style="grid-column:3 / 7">✂ 산문 확정에서 끊김</div></div>
+      <div class="sl">스타일</div>
+      <div class="lane"><div class="bar b" style="grid-column:4 / 5"><span class="lock">🔒</span>Artist에서 정하고 잠금</div><div class="bar b" style="grid-column:5 / 7;opacity:.75">바꾸면 리셋 (Artist부터 다시)</div></div>
+      <div class="sl">장르·톤 <small>객체마다</small></div>
+      <div class="lane"><div class="bar t" style="grid-column:4 / 5">인물·배경마다</div><div class="bar ghost" style="grid-column:6 / 7">씬마다? (확인 필요)</div></div>
+      <div class="sl">총 러닝타임</div>
+      <div class="lane"><div class="bar t" style="grid-column:5 / 6">샷 길이 합 · 보여주기만</div></div>
+      <div class="sl">대사 언어</div>
+      <div class="lane"><div class="bar t" style="grid-column:5 / 6">옵션 · 대사마다 한/영</div></div>
+    </div>
+    <p class="scope-note">장르·톤은 부모·자식으로 물려받지 않고, 인물·배경·씬 이미지 하나하나에 따로 적용됩니다(예: 스타일은 애니인데 이 인물만 호러).</p>
+    </div>
+  </section>
+
+  <section class="sec" aria-labelledby="flow-h">
+    <h2 id="flow-h">화면 흐름</h2>
+    <p>단계를 누르거나 화면 안 버튼을 눌러 넘겨 보세요. 점선 테두리는 지금 제품과 달라지는 곳입니다.</p>
+    <div class="steps" id="steps"></div>
+    <div class="layout">
+      <div><div class="device" id="device"></div><p class="legend-diff"><i></i>지금 제품과 달라지는 곳</p></div>
+      <aside class="notes" id="notes" aria-live="polite"></aside>
+    </div>
+  </section>
+
+  <section class="sec" aria-labelledby="where-h">
+    <h2 id="where-h">기능이 가는 곳</h2>
+    <p>지금 제품과 비교해 어디로 옮기고, 무엇을 잠그고, 무엇을 빼는지 정리했습니다.</p>
+    <div class="tbl-wrap"><table>
+      <thead><tr><th style="width:170px">기능</th><th style="width:90px">처리</th><th>어디서, 어떻게</th></tr></thead>
+      <tbody>
+        <tr><td><b>작업 언어</b><br><small>지금 이름: 채팅 언어</small></td><td><span class="st lk">잠금</span></td><td>기초 세팅의 "잠기는 값"에서 확인하고 잠가요. 기본값은 사이트 언어예요.</td></tr>
+        <tr><td><b>화면 비율</b></td><td><span class="st lk">잠금</span></td><td>기초 세팅의 "잠기는 값"에서 확인하고 잠가요.</td></tr>
+        <tr><td><b>장르·톤 (산문용)</b></td><td><span class="st mv">바뀜</span></td><td>기초 세팅의 "산문 조건"에서 추천받고, Producer에서는 다시 쓰기 조건으로만 바꿔요. 산문 확정에서 끊겨요.</td></tr>
+        <tr><td><b>길이 (산문용)</b></td><td><span class="st mv">바뀜</span></td><td>기초 세팅의 "산문 조건"에서 범위로 고르고, 다시 쓰기로만 바꿔요. 산문 확정에서 끊겨요.</td></tr>
+        <tr><td><b>AI 개입 정도</b></td><td><span class="st nw">새로</span></td><td>자료를 넣을 때 고르고, 다시 쓰기의 "얼마나"와 같은 말을 써요. 지금의 "쓰임새(대본 그대로 · 다듬어서 · 아이디어)"를 넓힌 거예요.</td></tr>
+        <tr><td><b>인물·배경 목록</b></td><td><span class="st mv">이동</span></td><td>Producer의 Casting · Background를 빼고, Artist가 확정 산문에서 뽑아요.</td></tr>
+        <tr><td><b>스타일</b></td><td><span class="st mv">이동 · 잠금</span></td><td>Producer에서 빼고 Artist에서 정해요. 정하면 잠기고, Artist에서든 Director에서든 바꾸면 리셋돼서 그림을 다시 만들어요.</td></tr>
+        <tr><td><b>장르·톤 (객체마다)</b></td><td><span class="st nw">새로</span></td><td>Artist에서 인물·배경 카드마다 줄 수 있어요. 그 객체만 다시 만들어요.</td></tr>
+        <tr><td><b>총 러닝타임</b></td><td><span class="st mv">바뀜</span></td><td>Writer 씬·샷 화면 위쪽에 샷 길이의 합으로 보여줘요. 고치는 칸이 아니라 "이 정도 나와요" 안내예요.</td></tr>
+        <tr><td><b>대사 언어</b></td><td><span class="st mv">이동</span></td><td>Producer에서 빼고 Writer 옵션에서 바꿔요. 대사마다 따로 바꿔서 한국어·영어를 섞을 수 있어요.</td></tr>
+        <tr><td><b>"무엇을 만들고 싶으세요"</b></td><td><span class="st rm">삭제</span></td><td>추천이 채워진 기초 세팅으로 바뀌어요.</td></tr>
+        <tr><td><b>제목 아래 설정 칩</b></td><td><span class="st rm">삭제</span></td><td>산문 머리에 예상 시간과 장르만 보여줘요.</td></tr>
+      </tbody>
+    </table></div>
+  </section>
+
+  <section class="sec" aria-labelledby="dec-h">
+    <h2 id="dec-h">남은 결정과 개발 확인</h2>
+    <div class="decide">
+      <div class="note"><b>Director에서 장르·톤</b><p>씬·샷 이미지마다 장르·톤을 Director에서도 줄 수 있게 할지, Artist에서만 줄지 정해야 해요. 범위표에는 "확인 필요"로 남겨 뒀어요.</p></div>
+      <div class="note dev"><h3>개발 확인 1 · 순서</h3><p>지금은 Writer 06·07(그림 쪽)이 01~03(이야기 쪽) 결과를 받아 써요. Artist를 먼저 띄우고 Writer를 뒤에서 돌리려면, 인물·배경 디자인이 확정 산문만으로 돌 수 있어야 해요.</p></div>
+      <div class="note dev"><h3>개발 확인 2 · 스타일과 장르·톤</h3><p>스타일을 잠그고 바꿀 때 리셋하는 방식, 그리고 장르·톤을 이미지 객체마다 저장해 그 객체만 다시 만들 수 있는지요.</p></div>
+      <div class="note dev"><h3>개발 확인 3 · 러닝타임과 대사</h3><p>넘기기 때 러닝타임 일치 검사를 빼도 되는지, 총 러닝타임을 샷 길이 합으로 보여줄 수 있는지, 대사 언어를 대사마다 저장할 수 있는지요.</p></div>
+    </div>
+  </section>
+
+  <p class="foot">기준: Tale Studio 실제 화면(새 프로젝트, Producer Meeting Room, 다시 쓰기 카드) 2026-10-12 확인 · Producer · Writer 단계별 산출물(제안 A안). 목업은 흐름 확인용이며 시각 디자인은 정리 전입니다. 크레딧과 시간 숫자는 예시입니다.</p>
+</main>
+<script>
+(function () {
+  var $ = function (s, r) { return (r || document).querySelector(s); };
+  var $$ = function (s, r) { return [].slice.call((r || document).querySelectorAll(s)); };
+  function opts(list, onIdx, recIdx) {
+    return '<div class="opts">' + list.map(function (o, i) {
+      var t = Array.isArray(o) ? o : [o, ''];
+      return '<button class="opt' + (i === onIdx ? ' on' : '') + '" data-pick>' + (i === recIdx ? '<span class="rec">추천</span>' : '') + t[0] + (t[1] ? '<small>' + t[1] + '</small>' : '') + '</button>';
+    }).join('') + '</div>';
+  }
+  var R = function (w, h) { return '<span class="ratio" style="width:' + w + 'px;height:' + h + 'px"></span>'; };
+  var LEN = [['15초 이하', '숏폼'], ['15~60초', '광고·티저'], ['1~5분', '뮤직비디오·웹드라마'], ['5~20분', '단편 영화']];
+  var GEN = ['코미디', '드라마', '로맨스', '스릴러', '호러', 'SF·판타지', '아직 몰라요'];
+  var RAT = [[R(22, 12) + '16:9', '가로'], [R(10, 18) + '9:16', '세로'], [R(14, 14) + '1:1', '정방형'], [R(26, 11) + '2.39:1', '시네마']];
+  var LEVEL = [['최대한 그대로', '대본을 거의 안 바꿔요'], ['조금만 다듬기', '빈칸만 채우고 표현 정리'], ['아이디어부터 키우기', '설정과 사건을 더해 새로 써요']];
+  var STY = [
+    ['실사', '시네마틱', 'linear-gradient(135deg,#59606a,#1c1f24)'],
+    ['애니메이션', '셀 셰이딩', 'linear-gradient(135deg,#ffb4a2,#8aa6ff)'],
+    ['웹툰', '선 + 플랫 컬러', 'linear-gradient(135deg,#fff3c4,#ffd0e0)'],
+    ['3D', '부드러운 렌더', 'linear-gradient(135deg,#9be1d4,#5f7fd9)'],
+    ['수채화', '번짐 · 종이 질감', 'linear-gradient(135deg,#d9ecf5,#f4d9c6)'],
+    ['직접 올리기', '견본 이미지', 'repeating-linear-gradient(45deg,#1b1b20 0 6px,#25252b 6px 12px)']
+  ];
+  function bar(c) { return '<div class="d-bar">Tale Studio<span class="crumbs">' + (c || '') + '</span></div>'; }
+  var CR = ['1 자료 · 아이디어', '2 기초 세팅', 'Producer'];
+  function crumb(cur) { return CR.map(function (c, i) { return i === cur ? '<b>' + c + '</b>' : c; }).join(' — '); }
+  function wiz(cur, title, sub, body, next, back) {
+    return bar(crumb(cur)) + '<div class="wiz"><h4>' + title + '</h4><p class="sub">' + sub + '</p>' + body +
+      '<div class="wiz-foot">' + (back ? '<button class="ghost" data-go="' + back + '">이전</button>' : '<button class="ghost">취소</button>') +
+      '<button class="btn pri" data-go="' + next[0] + '">' + next[1] + '</button></div></div>';
+  }
+  var RAIL = ['Producer', 'Artist', 'Writer', 'Director', 'Editor'];
+  function studio(o) {
+    var rail = RAIL.map(function (n) {
+      var cls = (n === (o.on || 'Producer') ? 'on' : '') + ((o.locked || []).indexOf(n) >= 0 ? ' lk' : '') + (o.run === n ? ' run' : '') + (o.moved === n ? ' moved' : '');
+      return '<span class="' + cls + '"><i></i>' + n + ((o.locked || []).indexOf(n) >= 0 ? ' 🔒' : '') + (o.run === n ? '<em class="rundot" title="진행 중"></em>' : '') + '</span>';
+    }).join('');
+    return bar(o.crumbs || o.on || 'Producer') + '<div class="studio"><div class="rail">' + rail + '</div><div class="main">' + o.main + '</div>' +
+      '<div class="chat"><div class="chat-h">에이전트 채팅<small>모든 단계가 이어지는 하나의 대화</small></div><div class="chat-b">' + (o.chat || '') + '</div><div class="chat-in">말해주세요…</div></div></div>' + (o.modal || '');
+  }
+  function modal(title, body, acts) { return '<div class="modal-back"><div class="modal diff" role="dialog" aria-label="' + title + '"><h6>' + title + '</h6>' + body + '<div class="acts">' + acts + '</div></div></div>'; }
+  function list(rows) { return '<div class="list">' + rows.map(function (r) { return '<div><span>' + r[0] + '</span><b>' + r[1] + '</b></div>'; }).join('') + '</div>'; }
+  function writerRun(txt) { return '<div class="writer-run diff"><span class="spin" aria-hidden="true"></span><span><b>Writer</b> ' + txt + '</span><span class="right"><button class="btn" data-go="W1">Writer 보기</button></span></div>'; }
+
+  // ① 자료
+  function S1() {
+    return wiz(0, '가진 자료나 아이디어를 넣어주세요', '둘 중 하나만 있어도 괜찮아요.',
+      '<div class="ta">자판기에서 캔이 우르르 쏟아지는 코미디</div>' +
+      '<div class="up"><span>스토리 · 대본 · 기획 메모 · 인물 · 배경 이미지</span><button class="btn">파일 올리기</button></div>' +
+      '<div class="q diff"><div class="q-t">AI가 얼마나 손댈까요?<small>산문용 · 지금의 "쓰임새"를 넓힘</small></div>' + opts(LEVEL, 2, 2) +
+      '<p class="hint">입력이 한 줄이라 "아이디어부터 키우기"를 추천해요. 대본을 올리면 "최대한 그대로"를 추천해요.</p></div>', ['S2', '다음']);
+  }
+  // ② 기초 세팅: 잠기는 값 / 산문 조건
+  function S2() {
+    var q = function (t, body) { return '<div class="q"><div class="q-t">' + t + '</div>' + body + '</div>'; };
+    var body = '<div class="rec-banner">✦ 아이디어를 보고 미리 골라 뒀어요. 맞으면 그대로 넘어가세요.</div>' +
+      '<div class="lockbox diff"><h6>🔒 잠기는 값 · 시작하면 바꿀 수 없어요</h6>' +
+        q('어떤 언어로 작업할까요?', opts([['한국어', ''], ['English', '']], 0)) +
+        q('화면 비율', opts(RAT, 1, 1)) + '</div>' +
+      '<div class="prosebox diff"><h6>✎ 산문 조건 · 산문에만 영향을 주고 Producer에서 다시 쓰기로 바꿔요</h6>' +
+        q('길이는 어느 정도 예상하세요?', opts(LEN, 0, 0)) +
+        q('어떤 장르·톤을 원하세요?', opts(GEN, 0, 0)) + '</div>';
+    return wiz(1, '이렇게 시작해 볼까요?', '"무엇을 만들고 싶으세요" 대신, 아이디어를 읽고 채운 값을 확인해요.', body, ['S3', 'Producer로 시작하기'], 'S1');
+  }
+  // ③ Producer 산문
+  function S3() {
+    var main = '<div class="title-row"><h5>자판기의 반란</h5><button class="btn pri" data-go="S4">산문 확정 · 넘기기 →</button></div>' +
+      '<div class="meta">🔒 한국어 · 9:16 <span style="opacity:.7">기초 세팅에서 잠김</span></div>' +
+      '<div class="sect"><div class="sect-h">씬 스토리 <small>산문 · 인물·배경과 스타일은 Artist에서 정해요</small></div><div class="prose"><div class="prose-h diff"><span class="rt">예상 약 12초</span><span class="tagc">코미디</span><span class="tagc">씬 2</span>' +
+      '<span class="tools"><button class="btn">복사</button><button class="btn">직접 고치기</button><button class="btn acc">✦ 다시 쓰기</button></span></div>' +
+      '<div class="prose-b"><p><span>S1</span><span>복도 자판기. 민호가 버튼을 누르지만 아무것도 나오지 않는다. 자판기를 툭 친다.</span></p><p><span>S2</span><span>캔이 우르르 쏟아진다. 지나가던 팀장이 하나 집어 들고 "고마워". 민호는 멍하니 서 있다.</span></p></div></div></div>';
+    var card = '<div class="card-q diff"><div class="qt">씬 스토리를 얼마나 바꿀까요?</div>' +
+      '<div class="row"><small>얼마나 (AI 개입 정도)</small>' + opts(['조금만 다듬기', '표현을 새로', '아이디어부터 다시'], 0) + '</div>' +
+      '<div class="row"><small>길이</small>' + opts(['더 짧게', '지금대로 (약 12초)', '더 길게'], 1) + '</div>' +
+      '<div class="row"><small>장르·톤</small>' + opts(['코미디 더 진하게', '호러스럽게', '따뜻하게', '직접 입력…'], -1) + '</div>' +
+      '<button class="btn acc">세 가지 안 만들기</button></div>';
+    return studio({ main: main, chat: '<div class="msg"><b>Producer</b>15초 이하 코미디로 씬 2개를 썼어요. 길이·장르·톤은 다시 쓰기 조건으로 바꿔 주세요.</div>' + card });
+  }
+  // ④ 산문 확정 · 넘기기
+  function S4() {
+    var m = modal('산문을 확정하고 넘길까요?',
+      '<p>넘기면 Producer는 잠겨요. 산문 조건(장르·톤, 길이, AI 개입 정도)은 여기서 끝나고, 뒤 단계는 확정된 산문만 받아요.</p>' +
+      list([['넘어가는 것', '확정 산문 · 🔒 한국어 · 9:16'], ['여기서 끝나는 것', '장르·톤 · 길이 · AI 개입 정도'], ['다음 화면', 'Artist가 먼저 열려요'], ['뒤에서', 'Writer가 씬·샷을 나눠요']]),
+      '<button class="btn" data-go="S3">취소</button><button class="btn pri" data-go="A1">확정하고 넘기기</button>');
+    return S3() + m;
+  }
+  // Artist 공통
+  var CARDS = [['민호', '주인공 · 20대 직장인, 흰 셔츠', false, '민'], ['팀장', '조연 · 40대, 넥타이', false, '팀'], ['회사 복도 자판기 앞', '배경 · 낮, 형광등', true, '']];
+  function assets(state, genreMap) {
+    genreMap = genreMap || {};
+    return '<div class="assets">' + CARDS.map(function (c, i) {
+      var ph = state === 'pick' ? 'ph empty' : state === 'busy' ? 'ph busy' : 'ph s1' + (c[2] ? ' bg' : '');
+      if (state !== 'pick' && state !== 'busy' && genreMap[i] === '호러') ph = 'ph s1 horror' + (c[2] ? ' bg' : '');
+      var label = state === 'pick' ? '아직 없음' : state === 'busy' ? '만드는 중…' : c[3];
+      var tag = state === 'done' || state === 'genre' ? '<span class="vtag">실사 🔒</span>' : '';
+      var g = genreMap[i];
+      var gchip = state === 'done' || state === 'genre' ? '<button class="gchip' + (g ? ' set' : '') + '" data-go="A3">장르·톤: ' + (g || '작품 기본') + ' ▾</button>' : '';
+      return '<div class="asset"><div class="' + ph + '">' + label + '</div>' + tag + '<div class="cap"><b>' + c[0] + '</b><small>' + c[1] + '</small>' + gchip + '</div></div>';
+    }).join('') + '<div class="asset add">＋ 인물·배경 추가</div></div>';
+  }
+  function A1() {
+    var main = '<div class="title-row"><h5>Artist · 보이는 모습</h5></div><div class="meta">확정 산문에서 뽑은 인물 2 · 배경 1 · 🔒 9:16</div>' +
+      writerRun('씬을 나누는 중이에요 (씬 1/2). 끝나면 알려드릴게요.') +
+      '<div class="sect diff"><div class="sect-h">스타일 <small>고르면 이 작품의 스타일로 잠겨요. 나중에 바꾸면 리셋돼서 그림을 다시 만들어요</small></div><div class="styles">' +
+      STY.map(function (s, i) { return '<button class="sty' + (i === 0 ? ' on' : '') + '" data-pick-sty><div class="sw" style="background:' + s[2] + '"></div><span>' + s[0] + '<small>' + s[1] + '</small></span></button>'; }).join('') + '</div></div>' +
+      '<div class="sect"><div class="sect-h">인물·배경 <small>확정 산문에서 뽑은 목록</small></div>' + assets('pick') + '</div>' +
+      '<div class="foot-bar"><span class="est">인물 2 · 배경 1 · 예상 크레딧 표시 자리</span><button class="btn acc" data-go="A2">이 스타일로 잠그고 만들기</button></div>';
+    return studio({ main: main, on: 'Artist', run: 'Writer', locked: ['Producer'], crumbs: 'Artist', moved: 'Artist', chat: '<div class="msg"><b>Artist</b>산문을 받았어요. 인물 2명과 배경 1곳이에요. 스타일을 고르면 바로 그릴게요. 그동안 Writer는 씬·샷을 나눠요.</div>' });
+  }
+  function A2(genreMap, extraModal) {
+    var main = '<div class="title-row"><h5>Artist · 보이는 모습</h5></div><div class="meta">스타일 🔒 실사 · 🔒 9:16</div>' +
+      writerRun('씬 2개, 샷 5개를 나눴어요. 러프를 그리는 중이에요.') +
+      '<div class="stybar diff"><span class="sw" style="background:' + STY[0][2] + '"></span><b>스타일 실사</b><span class="lockb">🔒 잠김</span><span class="right"><button class="btn warn" data-go="A4">스타일 바꾸기 (리셋)</button></span></div>' +
+      '<div class="sect"><div class="sect-h">인물·배경 <small>카드마다 장르·톤을 따로 줄 수 있어요</small></div>' + assets(genreMap ? 'genre' : 'done', genreMap) + '</div>' +
+      '<div class="foot-bar"><span class="est">그림이 다 나왔어요. Writer가 끝나면 Director로 이어져요.</span><button class="btn" data-go="W1">Writer 화면 보기 →</button></div>';
+    return studio({ main: main, on: 'Artist', run: 'Writer', locked: ['Producer'], crumbs: 'Artist', moved: 'Artist', chat: '<div class="msg"><b>Artist</b>실사 스타일로 3장을 만들었어요. 특정 인물이나 배경만 분위기를 바꾸고 싶으면 카드의 장르·톤을 눌러 주세요.</div>', modal: extraModal || '' });
+  }
+  function A3() {
+    var m = modal('민호의 장르·톤', '<p>이 인물 그림에만 적용돼요. 작품 전체나 다른 인물에는 영향이 없고, 스타일(실사 🔒)은 그대로예요.</p>' +
+      opts([['작품 기본', '산문과 상관없이 그대로'], ['코미디', ''], ['호러', ''], ['로맨스', ''], ['직접 입력…', '']], 2) +
+      list([['다시 만드는 것', '민호 1장'], ['그대로인 것', '팀장 · 배경 · 스타일'], ['예상 크레딧', '표시 자리']]),
+      '<button class="btn" data-go="A2">취소</button><button class="btn acc" data-go="A3b">민호만 다시 만들기</button>');
+    return A2(null, m);
+  }
+  function A3b() { return A2({ 0: '호러' }); }
+  function A4() {
+    var m = modal('스타일을 바꾸면 리셋돼요', '<p>스타일은 이 작품 전체에 잠겨 있어요. 바꾸면 지금 그림을 모두 새 스타일로 다시 만들어요. Director에서 만든 실사가 있으면 그것도 다시 만들어야 해요.</p>' +
+      list([['다시 만드는 것', '인물 2 · 배경 1'], ['Director 실사', '아직 없음'], ['객체별 장르·톤', '그대로 유지'], ['예상 크레딧', '표시 자리']]),
+      '<button class="btn" data-go="A2">취소</button><button class="btn warn" data-go="A1">리셋하고 스타일 다시 고르기</button>');
+    return A2(null, m);
+  }
+  // Writer
+  var SHOTS = [['S1 · 샷 1', 3, '와이드 · 고정'], ['S1 · 샷 2', 2, '미디엄 · 고정'], ['S1 · 샷 3', 2, '클로즈업'], ['S2 · 샷 4', 4, '클로즈업 · 틸트 다운'], ['S2 · 샷 5', 3, '와이드']];
+  function W1(showOpt) {
+    var total = SHOTS.reduce(function (a, s) { return a + s[1]; }, 0);
+    var opt = '<div class="optpanel diff"><div class="dl"><b style="font-size:12px">대사 언어</b>' + opts(['한국어', 'English', '대사마다 따로'], 0) + '</div><p class="hint" style="margin:0">"대사마다 따로"를 고르면 샷 팝업에서 대사 줄마다 한/영을 바꿔 섞을 수 있어요.</p></div>';
+    var main = '<div class="title-row"><h5>Writers\' Room · 러프 스토리보드</h5><span style="display:flex;gap:6px"><button class="btn" data-go="' + (showOpt ? 'W1' : 'W1o') + '">옵션 ' + (showOpt ? '▴' : '▾') + '</button></span></div>' +
+      '<div class="meta">확정 산문 → 씬 2 · 샷 5 · Artist 그림은 목록으로만 받아요</div>' +
+      '<div class="rtbig diff"><span style="font-size:12px;color:var(--m-mut)">총 러닝타임</span><b>약 ' + total + '초</b><small>샷 길이의 합이에요. 여기서 직접 고치지 않고 "이 정도 나와요"로 보여줘요. 샷을 고치면 같이 바뀌어요.</small></div>' +
+      (showOpt ? opt : '') +
+      '<div class="shotgrid">' + SHOTS.map(function (s, i) { return '<button class="shot" data-go="W2"><div class="fr"><i></i><i></i><i></i></div><div class="cap"><span>' + s[0] + '</span><span>' + s[1] + '초</span></div><div class="cap" style="padding-top:0"><span>' + s[2] + '</span></div></button>'; }).join('') + '</div>';
+    return studio({ main: main, on: 'Writer', locked: ['Producer'], crumbs: 'Writer', chat: '<div class="msg"><b>Writer</b>씬 2개를 샷 5개로 나눴어요. 지금 길이면 약 ' + total + '초 나와요. 대사 언어는 옵션에서 바꿀 수 있어요.</div>' });
+  }
+  function W2() {
+    var m = modal('S1 · 샷 2 — 대사', '<p>대사마다 언어를 따로 고를 수 있어요. 바꾸면 그 대사만 다시 써요.</p>' +
+      '<div class="list">' +
+      '<div style="align-items:center"><span><span class="pill" style="margin:0"><i>민</i>민호</span></span><span style="flex:1;color:#d6d6dc;padding:0 8px">"…또 안 나와?"</span><span class="opts"><button class="opt on" data-tog>한</button><button class="opt" data-tog>영</button></span></div>' +
+      '<div style="align-items:center" class="diff"><span><span class="pill" style="margin:0"><i>팀</i>팀장</span></span><span style="flex:1;color:#d6d6dc;padding:0 8px">"Thanks, Minho."</span><span class="opts"><button class="opt" data-tog>한</button><button class="opt on" data-tog>영</button></span></div>' +
+      '</div><p class="hint">한국어 대사와 영어 대사를 한 샷 안에서 섞을 수 있어요.</p>',
+      '<button class="btn" data-go="W1o">닫기</button><button class="btn acc" data-go="W1o">적용</button>');
+    return W1(true) + m;
+  }
+  function D1() {
+    var main = '<div class="title-row"><h5>Director · 스토리보드</h5></div><div class="meta">🔒 9:16 · 스타일 실사 🔒 (Artist에서 정함)</div>' +
+      '<div class="banner diff">스타일은 Artist에서 잠겨 있어요. 여기서 바꾸면 리셋돼서 Artist부터 다시 만들어요.<span class="right"><button class="btn warn" data-go="A4">스타일 바꾸기 (리셋)</button></span></div>' +
+      '<div class="board">' + SHOTS.slice(0, 4).map(function (s, i) { return '<div class="frame"><div class="ph" style="' + (i < 2 ? 'background:linear-gradient(160deg,#59606a,#1c1f24);color:#fff' : 'background:repeating-linear-gradient(45deg,#16161a 0 8px,#1b1b20 8px 16px)') + '">' + (i < 2 ? '실사' : '아직 없음') + '</div><div class="cap">' + s[0] + '</div></div>'; }).join('') + '</div>';
+    return studio({ main: main, on: 'Director', locked: ['Producer'], crumbs: 'Director', chat: '<div class="msg"><b>Director</b>Writer 샷과 Artist 시트·배경으로 실사를 만들고 있어요.</div>' });
+  }
+
+  var FLOW = [
+    ['S1', '① 자료 + AI 개입 정도'], ['S2', '② 기초 세팅 (잠금 / 산문 조건)'], ['S3', '③ Producer 산문 · 다시 쓰기'], ['S4', '④ 산문 확정 · 넘기기', 1],
+    ['A1', '⑤ Artist 먼저 · 스타일 고르기', 1], ['A2', '⑥ 그림 완성 · 스타일 🔒', 1], ['A3', '⑦ 객체별 장르·톤', 1], ['A3b', '⑦ 민호만 호러', 1], ['A4', '⑧ 스타일 바꾸기 = 리셋', 1],
+    ['W1', '⑨ Writer 씬·샷 · 총 러닝타임', 1], ['W1o', '⑨ 옵션 · 대사 언어', 1], ['W2', '⑩ 대사마다 한/영', 1], ['D1', '⑪ Director · 스타일 잠김', 1]
+  ];
+  var SCREENS = { S1: S1, S2: S2, S3: S3, S4: S4, A1: A1, A2: function () { return A2(); }, A3: A3, A3b: A3b, A4: A4, W1: function () { return W1(false); }, W1o: function () { return W1(true); }, W2: W2, D1: D1 };
+  var NOTES = {
+    S1: { flow: '지금 제품의 1단계와 같은 자리예요. "AI가 얼마나 손댈까요"가 붙어요.', why: ['지금 글 파일의 쓰임새(대본 그대로 · 다듬어서 · 아이디어)를 아이디어만 넣은 경우까지 넓힌 거예요.', '산문에만 쓰이는 값이에요.'], dev: '' },
+    S2: { flow: '"무엇을 만들고 싶으세요" 자리예요. 잠기는 값과 산문 조건을 두 상자로 나눴어요.', why: ['잠기는 값(작업 언어, 화면 비율)은 여기서 정하면 끝까지 같아요.', '산문 조건(길이, 장르·톤)은 산문에만 영향을 주고, Producer에서 다시 쓰기로만 바꿔요.'], dev: '' },
+    S3: { flow: '제목 아래 설정 칩, Casting · Background가 없어요. 산문 머리에 예상 시간과 장르만 보여요.', why: ['길이·장르·톤·개입 정도는 다시 쓰기 카드의 조건이에요. 설정과 산문이 따로 놀 수 없어요.', '인물·배경과 스타일은 Artist에서 정해요.'], dev: '' },
+    S4: { flow: '넘기기 전에 무엇이 넘어가고, 무엇이 여기서 끝나는지 보여줘요.', why: ['산문 조건은 여기서 끊겨요. 뒤 단계는 확정 산문만 받아요.', '다음 화면은 Artist예요. Writer는 뒤에서 씬·샷을 나눠요.'], dev: '넘기기 때 러닝타임 일치 검사를 빼도 되는지 확인이 필요해요.' },
+    A1: { flow: '산문을 넘기면 Artist가 먼저 열려요. 위쪽에 Writer 진행 상태가 보여요.', why: ['Writer의 씬·샷 나누기와 러프가 오래 걸리니, 그동안 사용자는 그림을 정해요.', '스타일은 고르는 순간 이 작품의 스타일로 잠겨요.'], dev: '인물·배경 디자인이 Writer 01~03 결과 없이 확정 산문만으로 돌 수 있는지 확인이 필요해요.' },
+    A2: { flow: '그림이 다 나온 모습이에요. 스타일 막대에 🔒가 붙고, 카드마다 "장르·톤" 칩이 있어요.', why: ['스타일은 작품 전체에 하나예요.', '장르·톤은 카드마다 따로예요. 부모·자식으로 물려받지 않아요.'], dev: '' },
+    A3: { flow: '카드의 장르·톤 칩을 누르면 그 객체에만 적용할 장르·톤을 골라요.', why: ['예: 스타일은 애니인데 이 인물만 호러, 이 씬만 코미디.', '그 객체 한 장만 다시 만들고, 나머지와 스타일은 그대로예요.'], dev: '장르·톤을 이미지 객체마다 저장하고 그 객체만 다시 만들 수 있는지 확인이 필요해요.' },
+    A3b: { flow: '민호에게만 호러를 적용한 결과예요. 민호 카드의 칩이 강조돼요.', why: ['팀장과 배경은 그대로예요.'], dev: '' },
+    A4: { flow: '잠긴 스타일을 바꾸려 하면 리셋 안내가 떠요.', why: ['Artist에서든 Director에서든 스타일을 바꾸면 리셋이에요. 그림을 모두 다시 만들어요.', '객체별 장르·톤은 유지해요.'], dev: '스타일 잠금과 리셋 범위(시트·배경·실사)를 어떻게 처리할지 확인이 필요해요.' },
+    W1: { flow: 'Writer 화면이에요. 위쪽에 총 러닝타임이 크게 보여요.', why: ['러닝타임은 고치는 칸이 아니라 샷 길이의 합으로 "이 정도 나와요"를 보여줘요.', '샷을 고치면 숫자도 같이 바뀌어요.', 'Artist 그림은 받지 않고 인물·배경 목록만 받아요.'], dev: '총 러닝타임을 샷 길이 합으로 계산해 보여줄 수 있는지 확인이 필요해요.' },
+    W1o: { flow: '옵션을 펼치면 대사 언어를 바꿀 수 있어요.', why: ['한국어 / English / 대사마다 따로 중에서 골라요.', '대사 언어는 처음에 묻지 않고 여기서 정해요.'], dev: '' },
+    W2: { flow: '샷 팝업에서 대사 줄마다 한/영을 고를 수 있어요.', why: ['한 샷 안에서 한국어 대사와 영어 대사를 섞을 수 있어요.', '바꾸면 그 대사만 다시 써요.'], dev: '대사 언어를 대사마다 저장할 수 있는지 확인이 필요해요. 지금은 프로젝트 전체에 하나예요.' },
+    D1: { flow: 'Director에서는 스타일이 잠겨 있다고 보여줘요.', why: ['여기서 바꾸면 리셋이라 Artist부터 다시 만들어요.', 'Director와 Artist는 서로 영향을 주고받아요.'], dev: '' }
+  };
+
+  var device = $('#device'), notes = $('#notes'), steps = $('#steps');
+  steps.innerHTML = FLOW.map(function (f) { return '<button data-key="' + f[0] + '" aria-pressed="false" class="' + (f[2] ? 'new' : '') + '">' + f[1] + (f[2] ? '<small>새로</small>' : '') + '</button>'; }).join('');
+  function show(key) {
+    device.innerHTML = SCREENS[key]();
+    $$('button', steps).forEach(function (b) { b.setAttribute('aria-pressed', String(b.dataset.key === key)); });
+    var n = NOTES[key];
+    notes.innerHTML = '<div class="note flow"><h3>이 화면</h3><p>' + n.flow + '</p></div>' +
+      '<div class="note"><h3>왜 이렇게</h3><ul>' + n.why.map(function (w) { return '<li>' + w + '</li>'; }).join('') + '</ul></div>' +
+      (n.dev ? '<div class="note dev"><h3>개발 확인</h3><p>' + n.dev + '</p></div>' : '');
+  }
+  steps.addEventListener('click', function (e) { var b = e.target.closest('button[data-key]'); if (b) show(b.dataset.key); });
+  device.addEventListener('click', function (e) {
+    var go = e.target.closest('[data-go]'); if (go && !go.disabled) { show(go.dataset.go); return; }
+    var pick = e.target.closest('[data-pick]');
+    if (pick) { $$('.opt', pick.parentNode).forEach(function (o) { o.classList.toggle('on', o === pick); }); return; }
+    var s = e.target.closest('[data-pick-sty]');
+    if (s) { $$('.sty', s.parentNode).forEach(function (o) { o.classList.toggle('on', o === s); }); return; }
+    var t = e.target.closest('[data-tog]');
+    if (t) { $$('.opt', t.parentNode).forEach(function (o) { o.classList.toggle('on', o === t); }); }
+  });
+  show('S1');
+})();
+</script>
+</body>
+</html>

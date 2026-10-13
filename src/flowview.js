@@ -1,4 +1,4 @@
-/* 플로우차트 그리기 — index.html과 proto.html이 함께 쓴다.
+/* 플로우차트 그리기 — index.html(프로토타입)과 flow.html(플로우 문서)이 함께 쓴다.
  * FlowView.mount(box, { onSelect(id) }) → 단계마다 Mermaid로 그린다.
  * FlowView.mark(id) → 그 노드를 빨간 그라데이션 실선으로 표시.
  * FlowView.setPlan('A'|'B') → 그 안의 노드·엣지만 그린다. */

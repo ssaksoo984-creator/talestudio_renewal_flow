@@ -14,14 +14,24 @@
   var TONES = ['작품 기본', '코미디', '호러', '로맨스', '따뜻하게'];
   var CAMS = ['와이드 · 고정', '미디엄 · 고정', '클로즈업', '와이드 · 틸트 다운', '미디엄 · 팬'];
   var STYLES = [['실사', '#5b6470,#22262c'], ['애니메이션', '#ffb4a2,#8aa6ff'], ['웹툰', '#fff3c4,#ffd0e0'], ['3D', '#9be1d4,#5f7fd9'], ['수채화', '#d9ecf5,#f4d9c6'], ['견본 이미지', '#c9c2b8,#8f8a83']];
+  // 바꿈 정도: AI가 내 글을 얼마나 바꾸는지. 단계마다 지키는 것과 바꾸는 것을 못박는다.
+  var LEVELS = [
+    { n: '그대로', s: '한 글자도 안 바꿔요', keep: '문장 · 대사 · 장면 순서 · 결말', change: '장면 나누기만', need: true },
+    { n: '빈칸만 채우기', s: '내 글은 두고 빠진 것만 더해요', keep: '문장 · 대사 · 줄거리 · 결말', change: '빠진 장소 · 인물 묘사 · 연출', need: true },
+    { n: '다듬기', s: '줄거리는 두고 표현을 고쳐요', keep: '줄거리 · 인물 · 결말', change: '문장 · 대사 · 장면 순서' },
+    { n: '새로 쓰기', s: '소재만 가져가 새로 짜요', keep: '소재 · 장르·분위기 · 길이', change: '줄거리 · 인물 · 결말까지' },
+  ];
   var KINDS = {
-    '1-1': { name: '영상까지 고려된 대본', q: '대본을 어떻게 쓸까요?', o: [['그대로 영상화', '원본을 고치지 않고 바로 샷으로'], ['조금 다듬어서', '바뀐 부분만 새로 써요'], ['바탕으로 새로', '대본을 재료로 새 이야기']], keep: [0] },
-    '1-2': { name: '일반 대본 (연극·고전 대본)', q: '대본을 어떻게 쓸까요?', o: [['그대로 영상화', '빠진 연출·인물·배경만 채워요'], ['조금 다듬어서', ''], ['바탕으로 새로', '']], keep: [0] },
-    '1-3': { name: '아이디어 노트', q: '', o: [], keep: [] },
-    '2-1': { name: '캐릭터 시트 · 컨셉 아트', q: '이 이미지는 무엇인가요?', o: [['인물', '인물 목록에 넣어요'], ['배경', '배경 목록에 넣어요']], keep: [], note: '이야기 글감이 필요해요. 아이디어 칸에 적어 주세요.' },
-    '2-2': { name: '웹툰', q: '웹툰으로 무엇을 할까요?', o: [['그대로 영상화', '스토리·그림체 그대로'], ['다른 스타일로', '스토리만 가져와요'], ['그림체만', '다른 이야기를 이 그림체로'], ['아이디어로', '스토리를 바탕으로 대화']], keep: [0, 1], note: '"그대로"와 "다른 스타일로"는 러닝타임을 지정할 수 없어요.' },
-    '2-3': { name: '참조용 사진', q: '사진으로 무엇을 할까요?', o: [['이 느낌의 영상', '그림체·스타일을 가져와요'], ['아이디어로', 'AI가 사진을 읽고 대화']], keep: [] },
+    '1-1': { name: '영상까지 고려된 대본', rec: 0 },
+    '1-2': { name: '일반 대본 (연극·고전 대본)', rec: 1 },
+    '1-3': { name: '아이디어 노트', rec: 3 },
+    '2-1': { name: '캐릭터 시트 · 컨셉 아트', q: '이 이미지는 무엇인가요?', o: [['인물', '인물 목록에 넣어요'], ['배경', '배경 목록에 넣어요']], note: '이야기 글감은 아이디어 칸의 글을 써요.' },
+    '2-2': { name: '웹툰', q: '웹툰으로 무엇을 할까요?', o: [['그대로 영상화', '스토리·그림체 그대로'], ['다른 스타일로', '스토리만 가져와요'], ['그림체만', '다른 이야기를 이 그림체로'], ['아이디어로', '스토리를 바탕으로 대화']], note: '"그대로"와 "다른 스타일로"는 웹툰 길이를 따라가서 러닝타임을 지정할 수 없어요.' },
+    '2-3': { name: '참조용 사진', q: '사진으로 무엇을 할까요?', o: [['이 느낌의 영상', '그림체·스타일을 가져와요'], ['아이디어로', 'AI가 사진을 읽고 대화']] },
   };
+  var hasText = function () { return (st.file && !st.file.image) || st.idea.trim().length >= 60; };
+  var levelOk = function (i) { return !LEVELS[i].need || hasText(); };
+  var recLevel = function () { if (st.file && !st.file.image) return KINDS[st.kind].rec; return st.idea.trim().length >= 60 ? 2 : 3; };
   var SAMPLE_FILES = [['1-1', '자판기_촬영대본.docx'], ['1-2', '자판기_연극대본.pdf'], ['1-3', '아이디어_메모.txt'], ['2-1', '민호_캐릭터시트.png'], ['2-2', '자판기_웹툰_1화.png'], ['2-3', '복도_참조사진.jpg']];
   var EXTRA_PEOPLE = [['경비원', '50대. 남색 경비 제복, 무전기.'], ['청소부', '60대. 하늘색 작업복, 밀대.'], ['신입', '20대 초반. 사원증을 목에 건 신입 사원.'], ['고양이', '회색 길고양이. 꼬리가 짧다.']];
   var EXTRA_PLACES = [['옥상', '해 질 녘 회사 옥상, 난간과 물탱크.'], ['편의점', '1층 편의점 계산대 앞.'], ['회의실', '유리벽 회의실, 화이트보드.']];
@@ -29,7 +39,7 @@
   function initial() {
     return {
       idea: '회사 복도 자판기가 고장 나서 캔이 우르르 쏟아지는 코미디. 주인공 민호는 하나도 못 먹는다.',
-      file: null, kind: '1-3', level: 0, ratio: '9:16', ratioLocked: false,
+      file: null, kind: '1-3', level: 3, use: 0, ratio: '9:16', ratioLocked: false,
       title: '자판기의 반란',
       prose: [
         '회사 복도, 오후 세 시. 민호가 자판기 버튼을 누르지만 아무것도 나오지 않는다. 동전 반환 레버를 당겨 봐도 조용하다. 민호는 자판기를 툭 친다.',
@@ -117,16 +127,32 @@
   function say(stage, who, text) { st.chat[stage].push([who, text]); }
 
   /* ── 진입 ── */
+  function levelPicker() {
+    var rec = recLevel(), L = LEVELS[st.level];
+    return '<div class="w-q"><div class="w-q-t">AI가 내 글을 얼마나 바꿀까요? <small>바꿈 정도 · 산문을 쓸 때만 써요</small></div>' +
+      '<div class="w-levels" role="radiogroup">' + LEVELS.map(function (l, i) {
+        var ok = levelOk(i);
+        return '<button class="w-lv' + (i === st.level ? ' on' : '') + '" role="radio" aria-checked="' + (i === st.level) + '" data-bind="level" data-val="' + i + '"' + (ok ? '' : ' disabled') + '>' +
+          '<span class="w-lv-n">' + (i + 1) + '</span><b>' + esc(l.n) + (i === rec ? ' <em>추천</em>' : '') + '</b><small>' + esc(l.s) + '</small></button>';
+      }).join('') + '</div>' +
+      '<div class="w-lv-d"><span><i>지켜요</i>' + esc(L.keep) + '</span><span><i>바꿔요</i>' + esc(L.change) + '</span></div>' +
+      (hasText() ? '' : '<p class="w-note">1·2단계는 지킬 원문이 있어야 해요. 대본을 올리거나 줄거리를 60자 넘게 적으면 열려요.</p>') + '</div>';
+  }
   function E1() {
     var f = st.file;
     var can = st.idea.trim() || f;
-    return bar('Producer') + '<div class="w-entry"><h3>무엇을 만들어 볼까요?</h3>' +
-      '<textarea class="w-ta" id="idea" data-bind="idea" aria-label="아이디어" placeholder="아이디어를 적거나 파일을 올려 주세요">' + esc(st.idea) + '</textarea>' +
+    return bar('Producer') + '<div class="w-entry wide"><h3>무엇을 만들어 볼까요?</h3>' +
+      '<section class="w-grp"><div class="w-grp-h">이야기 재료</div>' +
+      '<textarea class="w-ta" id="idea" data-bind="idea" aria-label="아이디어" placeholder="아이디어나 줄거리를 적거나 파일을 올려 주세요">' + esc(st.idea) + '</textarea>' +
       '<div class="w-file">' + (f ? '<span class="w-chip">📎 ' + esc(f.name) + '<button class="w-x" data-act="clearFile" aria-label="파일 빼기">×</button></span>'
         : '<span class="w-mut">대본 · 기획 메모 · 캐릭터 시트 · 웹툰 · 사진</span>') +
         '<label class="w-btn">파일 첨부<input type="file" id="file-in" hidden></label></div>' +
-      '<div class="w-samples"><span class="w-mut">목업: 예시 파일로 해 보기</span>' + SAMPLE_FILES.map(function (s) { return '<button class="w-tab" data-act="sample" data-arg="' + s[0] + '">' + s[0] + ' ' + esc(s[1].split('.').pop()) + '</button>'; }).join('') + '</div>' +
-      '<div class="w-q"><div class="w-q-t">화면 비율 <small>시작하면 바꿀 수 없어요</small></div>' + opts('ratio', RATIOS, RATIOS.map(function (r) { return r[0]; }).indexOf(st.ratio), 1) + '</div>' +
+      '<div class="w-samples"><span class="w-mut">목업: 예시 파일로 해 보기</span>' + SAMPLE_FILES.map(function (s) { return '<button class="w-tab" data-act="sample" data-arg="' + s[0] + '">' + s[0] + ' ' + esc(s[1].split('.').pop()) + '</button>'; }).join('') + '</div></section>' +
+      '<section class="w-grp"><div class="w-grp-h">산문 조건 <small>Writer에서 다시 바꿀 수 있어요</small></div>' +
+      '<div class="w-q"><div class="w-q-t">장르·분위기</div>' + opts('mood', MOODS, st.mood) + '</div>' +
+      '<div class="w-q"><div class="w-q-t">길이</div>' + opts('runtime', RUNTIMES, st.runtime) + '</div>' +
+      levelPicker() + '</section>' +
+      '<section class="w-grp lock"><div class="w-grp-h">🔒 화면 비율 <small>시작하면 끝까지 바꿀 수 없어요</small></div>' + opts('ratio', RATIOS, RATIOS.map(function (r) { return r[0]; }).indexOf(st.ratio), 1) + '</section>' +
       '<div class="w-foot"><span class="w-mut">채팅은 사이트 언어(한국어)로 진행해요.</span>' + A('시작', 'start', 'pri', can ? ' data-need="idea|file"' : ' data-need="idea|file" disabled') + '</div></div>';
   }
   function E1m() {
@@ -137,16 +163,27 @@
   function E2() { return E1() + busy('자료를 읽고 있어요', ['파일 열기', '글인지 이미지인지 보기', '종류 판별']); }
   function E3() {
     var k = KINDS[st.kind];
-    if (!k.o.length) return E4();
-    return E1() + modal('이렇게 읽었어요',
-      '<div class="w-read"><span class="w-chip">📎 ' + esc(st.file ? st.file.name : '') + '</span><b>' + esc(st.kind + ' ' + k.name) + '</b>' + A('종류가 달라요', 'cycleKind', 'w-link') + '</div>' +
-      '<div class="w-q"><div class="w-q-t">' + esc(k.q) + '</div>' + opts('level', k.o, st.level, 0) + '</div>' + (k.note ? '<p class="w-note">' + esc(k.note) + '</p>' : ''),
-      B('이전', 'E1') + B('시작', 'E4', 'pri'));
+    var head = '<div class="w-read"><span class="w-chip">📎 ' + esc(st.file ? st.file.name : '') + '</span><b>' + esc(st.kind + ' ' + k.name) + '</b>' + A('종류가 달라요', 'cycleKind', 'w-link') + '</div>';
+    if (k.o) {
+      return E1() + modal('이렇게 읽었어요', head + '<div class="w-q"><div class="w-q-t">' + esc(k.q) + '</div>' + opts('use', k.o, st.use, 0) + '</div>' + (k.note ? '<p class="w-note">' + esc(k.note) + '</p>' : ''),
+        B('이전', 'E1') + B('다음', 'E4', 'pri'));
+    }
+    var L = LEVELS[st.level], fit = st.level === k.rec;
+    return E1() + modal('이렇게 읽었어요', head +
+      '<div class="w-lv-d"><span><i>바꿈 정도</i>' + (st.level + 1) + '단계 ' + esc(L.n) + '</span><span><i>지켜요</i>' + esc(L.keep) + '</span><span><i>바꿔요</i>' + esc(L.change) + '</span></div>' +
+      (fit ? '<p class="w-note">이 자료에 맞는 단계예요.</p>' : '<p class="w-note">이 자료는 ' + (k.rec + 1) + '단계 "' + esc(LEVELS[k.rec].n) + '"를 추천해요. ' + A('추천으로 바꾸기', 'useRec', 'w-link') + '</p>'),
+      B('이전', 'E1') + B('다음', 'E4', 'pri'));
   }
   function E4() {
-    var k = KINDS[st.kind];
-    var src = st.file ? esc(st.file.name) + (k.o.length ? ' · ' + esc(k.o[st.level][0]) : '') : '아이디어 글만';
-    return E1() + modal('이대로 시작할까요?', list([['🔒 화면 비율', esc(st.ratio) + ' · 시작하면 끝까지 바꿀 수 없어요'], ['채팅 언어', '한국어 (사이트 언어)'], ['자료', src]]),
+    var k = KINDS[st.kind], L = LEVELS[st.level];
+    var src = st.file ? esc(st.file.name) + (k.o ? ' · ' + esc(k.o[st.use][0]) : '') : '아이디어 글만';
+    var webtoonFixed = st.file && st.kind === '2-2' && st.use < 2;
+    return E1() + modal('이대로 시작할까요?', list([
+      ['🔒 화면 비율', esc(st.ratio) + ' · 시작하면 끝까지 바꿀 수 없어요'],
+      ['장르·분위기', esc(MOODS[st.mood])],
+      ['길이', webtoonFixed ? '웹툰 길이를 따라가요' : esc(RUNTIMES[st.runtime][0])],
+      ['바꿈 정도', (st.level + 1) + '단계 ' + esc(L.n) + ' — ' + esc(L.s)],
+      ['자료', src], ['채팅 언어', '한국어 (사이트 언어)']]) + '<p class="w-note">장르·분위기와 길이는 Writer에서 다시 바꿀 수 있어요.</p>',
       B('아니오, 고칠래요', 'E1') + A('예, 시작', 'confirmStart', 'pri'));
   }
   function E5() { return W1() + busy('산문 초안을 쓰고 있어요', ['자료 정리', '이야기 뼈대', '씬 스토리 쓰기']); }
@@ -364,10 +401,10 @@
   var DECISION_SCREEN = { E1q: 'E1', E1mq: 'E1m', E2q: 'E3', E5q: 'E4', W1q: 'W1', W3: 'W1', A1q: 'A1', A5q: 'A5', S1q: 'S1', S4q: 'S4' };
   // AI 작업이 끝나면 가는 곳
   var BUSY_NEXT = {
-    E2: function () { return !st.file || !KINDS[st.kind].o.length ? 'E4' : 'E3'; },
+    E2: function () { return st.file ? 'E3' : 'E4'; },
     E5: 'W1', W2: 'W4', A0: 'A1', A4: 'A5', A8: 'A5', S0: 'S1', S3: 'S1', S6: 'S1',
   };
-  var preserve = function () { return st.file && KINDS[st.kind].keep.indexOf(st.level) >= 0; };
+  var preserve = function () { return !!st.file && ((!st.file.image && st.level === 0) || (st.kind === '2-2' && st.use < 2)); };
 
   /* ── 동작 ── */
   // 목업용 수정안. 전체: 러닝타임에 맞춰 문단 수가 바뀐다. 일부분: 고른 문단만 바뀐다.
@@ -418,11 +455,12 @@
     if (added.length) st.generated = false;
   }
   var ACTS = {
-    sample: function (k) { var f = SAMPLE_FILES.filter(function (s) { return s[0] === k; })[0]; st.file = { name: f[1], image: k.charAt(0) === '2' }; st.kind = k; st.level = 0; },
-    clearFile: function () { st.file = null; st.kind = '1-3'; },
-    start: function () { return st.file && st.file.image ? 'E1m' : 'E2'; },
+    sample: function (k) { var f = SAMPLE_FILES.filter(function (s) { return s[0] === k; })[0]; st.file = { name: f[1], image: k.charAt(0) === '2' }; st.kind = k; st.use = 0; st.level = recLevel(); },
+    clearFile: function () { st.file = null; st.kind = '1-3'; if (!levelOk(st.level)) st.level = recLevel(); },
+    start: function () { if (!levelOk(st.level)) st.level = recLevel(); return st.file && st.file.image ? 'E1m' : 'E2'; },
     denyImage: function () { st.file = null; st.kind = '1-3'; return 'E1'; },
-    cycleKind: function () { var ks = Object.keys(KINDS).filter(function (k) { return KINDS[k].o.length; }); st.kind = ks[(ks.indexOf(st.kind) + 1) % ks.length]; st.level = 0; },
+    cycleKind: function () { var img = st.file && st.file.image; var ks = Object.keys(KINDS).filter(function (k) { return (k.charAt(0) === '2') === !!img; }); st.kind = ks[(ks.indexOf(st.kind) + 1) % ks.length]; st.use = 0; },
+    useRec: function () { st.level = KINDS[st.kind].rec; },
     confirmStart: function () {
       st.ratioLocked = true;
       if (preserve()) { st.proseLocked = true; return 'W1r'; }
@@ -535,6 +573,7 @@
   }
   // 입력이 있으면 버튼을 켠다 (오류 #10)
   function refresh() {
+    root.querySelectorAll('.w-lv').forEach(function (b) { b.disabled = !levelOk(+b.getAttribute('data-val')); });
     root.querySelectorAll('[data-need]').forEach(function (b) {
       var ok = b.getAttribute('data-need').split('|').some(function (p) { var v = getPath(st, p); return typeof v === 'string' ? v.trim() : !!v; });
       b.disabled = !ok;
@@ -596,7 +635,7 @@
       var t = e.target;
       if (t.id === 'file-in' && t.files && t.files[0]) {
         var f = t.files[0], img = /^image\//.test(f.type);
-        st.file = { name: f.name, image: img }; st.kind = img ? '2-3' : '1-1'; st.level = 0; paint();
+        st.file = { name: f.name, image: img }; st.kind = img ? '2-3' : '1-1'; st.use = 0; st.level = recLevel(); paint();
       } else if (t.tagName === 'SELECT' && t.getAttribute('data-bind') === 'dlgLang') paint();
     });
     el.addEventListener('keydown', function (e) {

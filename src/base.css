@@ -1,4 +1,4 @@
-/* 공용: 색 토큰 · 플로우차트 · 와이어프레임. index.html과 proto.html이 함께 쓴다 */
+/* 공용: 색 토큰 · 플로우차트 · 와이어프레임. index.html(프로토타입)과 flow.html(플로우 문서)이 함께 쓴다 */
 /* 레이아웃: 위 원칙 띠 → 왼쪽 플로우차트 / 오른쪽 노드 설명 + 화면 목업. 좁으면 위아래로 쌓는다 */
 :root {
   --bg: #f3f5f8; --surface: #ffffff; --ink: #18202b; --mut: #5c6878; --line: #d6dce4;
@@ -39,7 +39,7 @@ body { background: var(--bg); color: var(--ink); font: 14px/1.55 var(--font); ma
 .flow-box svg { max-width: none !important; height: auto }
 .stage { padding: 6px 0 14px; border-bottom: 1px solid var(--line) }
 .stage:last-child { border-bottom: 0 }
-.stage h3 { margin: 0 0 6px; font-size: 14px; position: sticky; left: 0 }
+.stage h3 { margin: 0 0 6px; font-size: 14px; position: sticky; left: 0; width: max-content; max-width: 100%; background: var(--surface); padding-right: 8px }
 .stage h3 small { font-weight: 400; color: var(--mut); font-size: 12px; margin-left: 4px }
 .stage .tbd { font-size: 11px; font-weight: 500; color: var(--lock); border: 1px dashed var(--lock); border-radius: 99px; padding: 0 7px }
 .stage-svg { display: flex; justify-content: center; min-width: max-content }
@@ -238,3 +238,30 @@ a.btn { text-decoration: none; display: inline-block }
 .seg-plan button:focus-visible { outline: 2px solid var(--accent); outline-offset: -2px }
 .w-chat, .w-chat > * { min-width: 0 }
 .w-chat-in input { width: 0; flex: 1 1 auto }
+
+/* ── Producer 시작 화면: 묶음 · 바꿈 정도 ── */
+.w-entry.wide { max-width: 780px }
+.w-grp { display: grid; gap: 10px; border-top: 1px solid var(--w-line); padding-top: 12px }
+.w-grp-h { font-size: 12px; font-weight: 600; color: var(--w-mut); letter-spacing: .02em }
+.w-grp-h small { font-weight: 400; margin-left: 6px }
+.w-grp.lock .w-grp-h { color: var(--lock) }
+.w-levels { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 0; border: 1px solid var(--w-line); border-radius: 9px; overflow: hidden }
+.w-lv { font: inherit; text-align: left; border: 0; border-left: 1px solid var(--w-line); background: var(--w-panel); color: var(--w-ink); padding: 8px 10px; cursor: pointer; display: grid; gap: 2px; align-content: start; min-width: 0 }
+.w-lv:first-child { border-left: 0 }
+.w-lv b { font-size: 12.5px }
+.w-lv b em { font-style: normal; font-size: 10px; color: var(--w-acc); margin-left: 2px }
+.w-lv small { font-size: 11px; color: var(--w-mut) }
+.w-lv-n { font-family: var(--mono); font-size: 10.5px; color: var(--w-mut) }
+.w-lv.on { background: color-mix(in srgb, var(--w-acc) 12%, var(--w-panel)); box-shadow: inset 0 -3px 0 var(--w-acc) }
+.w-lv.on .w-lv-n { color: var(--w-acc) }
+.w-lv:disabled { opacity: .4; cursor: not-allowed }
+.w-lv:focus-visible { outline: 2px solid var(--accent); outline-offset: -2px }
+.w-lv-d { display: flex; flex-wrap: wrap; gap: 4px 16px; font-size: 12px; background: var(--w-bg); border: 1px dashed var(--w-line); border-radius: 8px; padding: 7px 10px }
+.w-lv-d i { font-style: normal; color: var(--w-mut); margin-right: 6px; font-size: 11px }
+@media (max-width: 560px) { .w-levels { grid-template-columns: repeat(2, minmax(0, 1fr)) } .w-lv:nth-child(3) { border-left: 0 } .w-lv:nth-child(n+3) { border-top: 1px solid var(--w-line) } }
+
+/* ── 프로토 페이지: 플로우를 옆에 붙여 보기 ── */
+.w-dock-info { display: grid; gap: 6px; font-size: 12.5px; color: var(--ink) }
+.w-dock-info p { margin: 0 }
+.w-dock-info ul { margin: 0; padding-left: 16px; color: var(--mut) }
+.w-dock-info .open li { color: var(--lock) }

@@ -12,7 +12,9 @@
   var RUNTIMES = [['15초 이하', '숏폼', 15], ['15~60초', '광고·티저', 60], ['1~5분', 'MV·웹드라마', 300], ['5~20분', '단편', 1200]];
   var MOODS = ['코미디', '드라마', '로맨스', '스릴러', '호러', '액션', 'SF·판타지', '미스터리', '휴먼·가족', '일상·잔잔'];
   var TONES = ['작품 기본', '코미디', '호러', '로맨스', '따뜻하게'];
-  var CAMS = ['와이드 · 고정', '미디엄 · 고정', '클로즈업', '와이드 · 틸트 다운', '미디엄 · 팬'];
+  // 샷 촬영값 (v18 Writer 샷 옵션)
+  var SIZES = ['와이드', '풀', '미디엄', '바스트', '클로즈업'], ANGLES = ['아이 레벨', '하이 앵글', '로우 앵글', '버드 아이'], MOVES = ['고정', '팬', '틸트', '달리 인', '달리 아웃', '트래킹', '핸드헬드'];
+  var TIMES = ['낮', '오후', '해질녘', '밤', '새벽'], LENS = [1, 2, 3, 4, 5, 6, 8, 10];
   var STYLES = [['실사', '#5b6470,#22262c'], ['애니메이션', '#ffb4a2,#8aa6ff'], ['웹툰', '#fff3c4,#ffd0e0'], ['3D', '#9be1d4,#5f7fd9'], ['수채화', '#d9ecf5,#f4d9c6'], ['견본 이미지', '#c9c2b8,#8f8a83']];
   // 바꿈 정도: AI가 내 글을 얼마나 바꾸는지. 단계마다 지키는 것과 바꾸는 것을 못박는다.
   var LEVELS = [
@@ -87,22 +89,24 @@
       newItems: [],
       style: 1, styleLocked: false, generated: false, versions: [], ver: 0, regenStyle: null, styleRefs: [], renaming: false, acMode: null, afilter: 'all', editMode: null,
       target: 0, toneDraft: 0, tweak: '',
+      // 씬: 장소(배경 번호) · 시간대 · 한 줄 요약. 샷: 시작(지문·인물·배경·대사·크기·앵글) + 연출(무브먼트·방향·액션·길이)
+      scenes: [{ place: 0, time: 0, sum: '민호가 자판기와 씨름한다' }, { place: 0, time: 0, sum: '캔이 쏟아지고 팀장이 하나를 가져간다' }],
       shots: [
-        { sc: 1, len: 3, cam: 0, desc: '민호가 버튼을 누른다', who: [0], lines: [] },
-        { sc: 1, len: 2, cam: 2, desc: '반환 레버', who: [0], lines: [] },
-        { sc: 1, len: 2, cam: 1, desc: '자판기를 툭', who: [0], lines: [{ w: 0, t: '…또 안 나와?', lang: '한' }] },
-        { sc: 2, len: 4, cam: 3, desc: '캔이 쏟아진다', who: [0], lines: [] },
-        { sc: 2, len: 3, cam: 1, desc: '팀장이 캔을 집는다', who: [1], lines: [{ w: 1, t: '고마워.', lang: '한' }] },
-        { sc: 2, len: 2, cam: 2, desc: '멍한 민호', who: [0], lines: [] },
+        { sc: 1, len: 3, size: 2, ang: 0, move: 0, dir: '', desc: '@민호가 자판기 버튼을 누른다', who: [0], ws: {}, lines: [], drawn: true },
+        { sc: 1, len: 2, size: 4, ang: 0, move: 0, dir: '레버를 당긴다', desc: '반환 레버를 당기는 @민호의 손', who: [0], ws: {}, lines: [], drawn: true },
+        { sc: 1, len: 2, size: 2, ang: 2, move: 3, dir: '천천히 다가간다', desc: '@민호가 자판기를 툭 친다', who: [0], ws: {}, lines: [{ w: 0, t: '…또 안 나와?', lang: '한' }], drawn: true },
+        { sc: 2, len: 4, size: 0, ang: 1, move: 2, dir: '아래로 틸트', desc: '캔이 우르르 쏟아진다', who: [0], ws: { 0: 1 }, lines: [], drawn: true },
+        { sc: 2, len: 3, size: 2, ang: 0, move: 1, dir: '', desc: '@팀장이 캔 하나를 집어 든다', who: [1, 0], ws: { 0: 1 }, lines: [{ w: 1, t: '고마워.', lang: '한' }], drawn: true },
+        { sc: 2, len: 2, size: 4, ang: 0, move: 0, dir: '', desc: '멍하니 선 @민호', who: [0], ws: { 0: 1 }, lines: [], drawn: true },
       ],
-      shotSel: 4, shotDraft: null, dlgLang: 0,
-      add: { pos: 4, who: 0, bg: 0, desc: '' },
+      shotSel: 4, shotDraft: null, shotTab: 'start', shotNew: false, dirMode: 'opt', dlgLang: 0, sbView: 'rough', sbMenu: -1, sbChange: null, sbNudged: false, stateFrom: '',
+      scAdd: { place: 0, time: 0, sum: '', pos: 2 }, sheet: { range: 0, pic: 0, per: 0 },
       stateAdd: { who: 0, text: '10년 뒤, 머리가 희끗한 민호' },
       chatDraft: '',
       chat: {
         Writer: [['Writer', '씬 두 개로 산문을 썼어요. 마음에 안 들면 "다시 써줘"라고 하거나 조건을 바꿔 다시 쓰게 해 주세요.']],
         Artist: [['Artist', '인물 2명, 배경 1곳이에요. 민호는 S2에서 얼룩진 셔츠 상태가 하나 더 있어요.']],
-        Storyboard: [['Storyboard', '씬 2개를 샷 6개로 나눴어요.']],
+        Storyboard: [],
       },
       pending: null, busyStep: 0,
     };
@@ -603,16 +607,33 @@
       return '<button class="' + (st.afilter === f[0] ? 'on' : '') + '" data-act="afilter" data-arg="' + f[0] + '" aria-pressed="' + (st.afilter === f[0]) + '">' + f[1] + ' ' + n[f[0]] + '</button>';
     }).join('') + '</span></div>';
   }
+  // 상태(모습)마다 그림: 첫 상태는 o.cur, 나머지는 o.stImg[상태]. 따로 만든 적 없으면 같이 만든 그림으로 본다.
+  function stIdx(o, k) { return k <= 0 ? o.cur : o.stImg && o.stImg[o.states[k]] != null ? o.stImg[o.states[k]] : -1; }
+  function stateH(o, k) {
+    var i = stIdx(o, k), main = o.cur >= 0 ? o.hist[o.cur] : null;
+    if (i >= 0 && o.hist[i] && o.hist[i].style === st.style) return o.hist[i];
+    return k > 0 && main ? Object.assign({}, main, { r: (main.r || 0) + k * 2 }) : main;
+  }
+  // 카드: 인물·배경마다 한 묶음. 첫 그림이 크게, 나머지 모습은 오른쪽에 작게 (v18 Artist 그룹 카드 참고)
+  function gcell(o, i, k) {
+    var h = stateH(o, k), main = k === 0, name = o.isBg ? '배경' : o.states[k];
+    var dsc = h && h.traits && h.traits.length ? h.traits.join(' · ') : main ? o.d : '';
+    return '<button class="w-gcell' + (main ? ' main' : '') + '" data-act="openState" data-arg="' + i + ':' + k + '" aria-label="' + esc(o.n + ' · ' + name) + ' 열기">' +
+      '<span class="w-gimg">' + thumb(o, h, true) + '</span><span class="w-gname"><b>' + esc(name) + '</b></span>' + (dsc ? '<span class="w-gdesc">' + esc(dsc) + '</span>' : '') + '</button>';
+  }
   function imgCards() {
-    return '<div class="w-acards">' + objs().map(function (o, i) {
+    return '<div class="w-agrps">' + objs().map(function (o, i) {
       if (!showObj(o)) return '';
-      var h = o.cur >= 0 ? o.hist[o.cur] : null, isNew = st.newItems.indexOf(o.n) >= 0;
-      return '<div class="w-acard' + (o.isBg ? ' bg' : '') + (isNew ? ' is-new' : '') + '"><button class="w-acard-img" data-act="openTone" data-arg="' + i + '" aria-label="' + esc(o.n) + ' 크게 보기">' + thumb(o, h, true) + '</button>' +
-        '<div class="w-acard-b"><b>' + esc(o.n) + ' <small>' + (o.isBg ? '배경' : '인물') + (isNew ? ' · 새로' : '') + '</small></b>' +
-        (o.isBg ? '' : '<div class="w-row-st">' + o.states.map(function (x) { return '<span>' + esc(x) + '</span>'; }).join('') + '</div>') +
-        (h && h.traits && h.traits.length ? '<p class="w-tone">' + esc(h.traits.join(' · ')) + '</p>' : '') +
-        (o.refs.length ? '<p class="w-mut" style="margin:0;font-size:11px">레퍼런스 ' + o.refs.length + '장</p>' : '') +
-        (h ? A('열기 · 고치기', 'openTone', 'sm', ' data-arg="' + i + '"') : A('같은 스타일로 만들기', 'openTone', 'pri sm', ' data-arg="' + i + '"')) + '</div></div>';
+      var isNew = st.newItems.indexOf(o.n) >= 0, nv = o.isBg ? 0 : o.states.length - 1;
+      var vars = o.isBg ? '' : nv
+        ? '<div class="w-gvars"><div class="w-gvl">└ ' + esc(o.n) + '의 모습 ' + nv + '</div><div class="w-gvrow">' + o.states.slice(1).map(function (x, k) { return gcell(o, i, k + 1); }).join('') +
+          '<button class="w-gadd" data-act="openState" data-arg="' + i + ':-1">＋ 모습 추가</button></div></div>'
+        : '<button class="w-gadd solo" data-act="openState" data-arg="' + i + ':-1">＋<span>모습</span></button>';
+      return '<div class="w-agrp' + (o.isBg ? ' bg' : '') + (nv ? ' wide' : '') + (isNew ? ' is-new' : '') + '">' +
+        '<div class="w-agh"><b>' + esc(o.n) + '</b><span class="w-role">' + (o.isBg ? '배경' : '인물') + '</span>' + (isNew ? '<span class="w-tag-new">새로</span>' : '') +
+        (o.aliases && o.aliases.length > 1 ? '<span class="w-mut" style="font-size:11px">또는 ' + esc(o.aliases.filter(function (a) { return a !== o.n; }).join(' · ')) + '</span>' : '') +
+        '<span class="w-tbar-sp"></span>' + (o.refs.length ? '<span class="w-refcnt" title="레퍼런스 ' + o.refs.length + '장 · 상세에서 관리">🖼 ' + o.refs.length + '</span>' : '') + '</div>' +
+        '<div class="w-agcells">' + gcell(o, i, 0) + vars + '</div></div>';
     }).join('') + '</div>';
   }
   function rows(mode) { return '<ul class="w-rows">' + objs().map(function (o, i) { return showObj(o) ? row(o, i, mode) : ''; }).join('') + '</ul>'; }
@@ -709,10 +730,10 @@
   }
   // 카드를 누르면 열리는 상세: 큰 그림 · 이름 · 상태 탭 · 외형 프롬프트 · 캐릭터성 · 레퍼런스 · 생성 도구 · 기록
   function A7() {
-    var o = target(), i = st.target, path = objPath(i), h = o.cur >= 0 ? o.hist[o.cur] : null;
+    var o = target(), i = st.target, path = objPath(i), h = stateH(o, Math.max(0, o.sTab)), curK = stIdx(o, Math.max(0, o.sTab));
     // 기록: 그림 옆 시계 아이콘을 누르면 열린다. 같은 스타일 그림만 불러올 수 있다.
     var hist = o.hist.map(function (x, k) {
-      var same = x.style === st.style, on = k === o.cur;
+      var same = x.style === st.style, on = k === curK;
       return '<li class="' + (on ? 'on' : '') + (same ? '' : ' off') + '">' + thumb(o, x) + '<span>' + (on ? '지금' + (x.from ? ' · ' + esc(x.from) + ' 그림' : '') : same ? (x.from ? esc(x.from) + ' 그림' : x.state ? esc(x.state) : '') : esc(STYLES[x.style][0]) + ' · 다른 스타일') + '</span>' +
         (on ? '' : same ? A('불러오기', 'objLoad', 'sm', ' data-arg="' + k + '"') : A('불러오기', 'objLoad', 'sm', ' disabled title="다른 스타일이라 불러올 수 없어요"')) + '</li>';
     }).reverse().join('');
@@ -756,63 +777,140 @@
       B('아니오', 'A5') + A('예, 완료하기', 'toBoard', 'pri'));
   }
 
-  /* ── Storyboard ── */
-  function S1() {
-    var tt = total(), target = RUNTIMES[st.runtime][2], pct = Math.min(100, Math.round(tt / target * 100));
-    var over = tt > target;
-    var main = '<div class="w-title"><h3>Storyboard <small class="w-tbd">이름 미정</small></h3>' + B('다음: Director로 →', 'S7', 'pri') + '</div>' +
-      '<div class="w-rt' + (over ? ' over' : '') + '"><div class="w-rt-h"><span>러닝타임</span><b>' + tt + '초</b><span class="w-mut">/ 목표 ' + esc(RUNTIMES[st.runtime][0]) + '</span>' + (over ? '<span class="w-warn-t">목표보다 길어요</span>' : '') + '</div>' +
-      '<div class="w-rt-bar"><i style="width:' + pct + '%"></i></div><small class="w-mut">샷 길이의 합이에요. 고치는 칸이 아니라 지표예요. 샷 길이를 바꾸면 같이 바뀌어요.</small></div>' +
-      '<div class="w-tools">' + B('＋ 샷 추가', 'S4') + B('＋ 인물·배경 상태 추가', 'S5') +
-      '<label class="w-mut">대사 언어 <select data-bind="dlgLang" aria-label="대사 언어"><option value="0"' + (st.dlgLang == 0 ? ' selected' : '') + '>한국어</option><option value="1"' + (st.dlgLang == 1 ? ' selected' : '') + '>English</option><option value="2"' + (st.dlgLang == 2 ? ' selected' : '') + '>대사마다 따로</option></select></label></div>' +
-      '<div class="w-shots">' + st.shots.map(function (s, i) {
-        return '<div class="w-shot' + (s.fresh ? ' is-new' : '') + '"><div class="w-fr' + (s.redrawn ? ' drawn' : '') + '"><i></i><i></i><i></i></div><div class="w-shot-c"><b>' + shotLabel(i) + '</b><span>' + s.len + '초</span></div>' +
-          '<small>' + esc(CAMS[s.cam]) + ' · ' + esc(s.desc) + '</small>' +
-          (s.lines.length ? '<small class="w-dl">' + s.lines.map(function (l) { return esc(st.chars[l.w] ? st.chars[l.w].n : '') + ' "' + esc(l.t) + '" ' + (st.dlgLang == 2 ? '[' + l.lang + ']' : ''); }).join('<br>') + '</small>' : '') +
-          '<div class="w-card-acts">' + A('고치기', 'editShot', 'sm', ' data-arg="' + i + '"') + A('다시 그리기', 'redraw', 'sm', ' data-arg="' + i + '"') + '</div></div>';
-      }).join('') + '</div><p class="w-note">END 샷은 없어요. 마지막 샷이 끝이에요.</p>';
-    return studio('Storyboard', main, { ph: '예: S2를 더 빠르게' });
+  /* ── Storyboard ── (v18 Writer의 러프 스토리보드 흐름을 Artist 뒤로 옮김: 인물·배경 그림과 스타일은 이미 있다) */
+  var scShots = function (n) { return st.shots.map(function (x, i) { return [x, i]; }).filter(function (p) { return p[0].sc === n; }); };
+  var scLen = function (n) { return scShots(n).reduce(function (a, p) { return a + p[0].len; }, 0); };
+  var sceneName = function (n) { var c = st.scenes[n - 1]; return 'S' + n + ' ' + st.bgs[c.place].n + ' · ' + TIMES[c.time]; };
+  // 지문 속 @이름 을 칩으로
+  function atText(t) {
+    var names = st.chars.map(function (c) { return c.n; }).concat(st.bgs.map(function (b) { return b.n; })).sort(function (a, b) { return b.length - a.length; });
+    var out = esc(t); names.forEach(function (n) { out = out.split('@' + esc(n)).join('<span class="w-at">@' + esc(n) + '</span>'); }); return out;
   }
-  function S0() { return S1() + busy('씬·샷을 나누고 러프를 그리고 있어요', ['씬 촬영 계획', '샷 나누기', '샷 설계 · 대사', '러프 그리기']); }
+  function whoLabel(s) { return s.who.map(function (c) { var ch = st.chars[c]; if (!ch) return ''; var k = s.ws[c] || 0; return ch.n + (k ? '(' + ch.states[k] + ')' : ''); }).join(' · '); }
+  function sbShot(s, i) {
+    var badge = s.cand ? '<span class="w-tag-new">새 러프 · 적용 전</span>' : !s.drawn ? '<span class="w-tag-no">새로 추가 · 스케치 전</span>' : '';
+    var fr = s.drawn ? '<div class="w-fr drawn' + (s.cand ? ' cand' : '') + '"><i><em>시작</em></i><i><em>연출</em></i><i><em>끝</em></i></div>' : '<div class="w-fr none"><span>스케치 전</span></div>';
+    var menu = st.sbMenu === i ? '<div class="w-sbmenu" role="menu">' + A('← 앞으로', 'shotMove', 'sm', ' data-arg="' + i + ':-1"') + A('뒤로 →', 'shotMove', 'sm', ' data-arg="' + i + ':1"') + A('복제', 'shotDup', 'sm', ' data-arg="' + i + '"') + A('삭제', 'shotDel', 'sm warn', ' data-arg="' + i + '"') + '</div>' : '';
+    return '<div class="w-shot' + (s.fresh ? ' is-new' : '') + (s.chg ? ' chg' : '') + '"><div class="w-shot-c"><b>' + shotLabel(i) + '</b><span>' + s.len + '초</span>' + badge + '</div>' + fr +
+      '<small class="w-dl">' + atText(s.desc) + '</small>' +
+      (s.lines.length ? '<small class="w-dl">' + esc(st.chars[s.lines[0].w] ? st.chars[s.lines[0].w].n : '') + ' "' + esc(s.lines[0].t) + '"' + (st.dlgLang == 2 ? ' [' + s.lines[0].lang + ']' : '') + (s.lines.length > 1 ? ' …' : '') + '</small>' : '') +
+      '<div class="w-chips"><span>' + SIZES[s.size] + '</span><span>' + ANGLES[s.ang] + '</span><span>' + MOVES[s.move] + '</span>' + (s.dir ? '<span>연출 · ' + esc(s.dir) + '</span>' : '') + '</div>' +
+      (s.cand ? '<div class="w-cand"><span>이전 → 새로</span>' + A('되돌리기', 'candUndo', 'sm', ' data-arg="' + i + '"') + A('적용', 'candOk', 'pri sm', ' data-arg="' + i + '"') + '</div>' :
+      '<div class="w-card-acts">' + A('✎ 고치기', 'editShot', 'sm', ' data-arg="' + i + '"') + (s.drawn ? '' : A('스케치 그리기', 'redraw', 'pri sm', ' data-arg="' + i + '"')) + A('⋯', 'shotMenu', 'sm', ' data-arg="' + i + '" aria-label="더 보기"') + '</div>') + menu + '</div>';
+  }
+  function S1(o) {
+    o = o || {};
+    var tt = total(), target = RUNTIMES[st.runtime][2], pct = Math.min(100, Math.round(tt / target * 100)), over = tt > target;
+    var undrawn = st.shots.filter(function (x) { return !x.drawn; }).length;
+    var main = '<div class="w-title"><h3>Storyboard <small class="w-tbd">이름 미정</small></h3>' + B('다음: Director로 →', 'S7', 'pri') + '</div>' +
+      '<div class="w-rt' + (over ? ' over' : '') + '"><div class="w-rt-h"><span>씬 ' + st.scenes.length + ' · 샷 ' + st.shots.length + '</span><b>' + tt + '초</b><span class="w-mut">/ 목표 ' + esc(RUNTIMES[st.runtime][0]) + '</span>' + (over ? '<span class="w-warn-t">목표보다 길어요</span>' : '') +
+        '<span class="w-tbar-sp"></span>' + st.scenes.map(function (c, k) { return '<span class="w-scchip">S' + (k + 1) + ' · ' + scLen(k + 1) + '초</span>'; }).join('') + '</div>' +
+        '<div class="w-rt-bar"><i style="width:' + pct + '%"></i></div><small class="w-mut">러닝타임은 샷 길이의 합이에요. 고치는 칸이 아니라 지표예요.</small></div>' +
+      '<div class="w-tools"><span class="w-tabs">' + [['rough', '러프'], ['script', '대본']].map(function (v) { return '<button class="' + (st.sbView === v[0] ? 'on' : '') + '" data-act="sbView" data-arg="' + v[0] + '" aria-pressed="' + (st.sbView === v[0]) + '">' + v[1] + '</button>'; }).join('') + '</span>' +
+        B('＋ 씬 추가', 'S8', 'sm') + (undrawn ? A('스케치 없는 ' + undrawn + '컷 그리기', 'drawAll', 'sm pri') : '') + B('마스터 시트', 'SM', 'sm') +
+        '<label class="w-mut">대사 언어 <select data-bind="dlgLang" aria-label="대사 언어"><option value="0"' + (st.dlgLang == 0 ? ' selected' : '') + '>한국어</option><option value="1"' + (st.dlgLang == 1 ? ' selected' : '') + '>English</option><option value="2"' + (st.dlgLang == 2 ? ' selected' : '') + '>대사마다 따로</option></select></label></div>' +
+      st.scenes.map(function (c, k) {
+        var n = k + 1, list = scShots(n);
+        var body = !list.length ? '<p class="w-mut w-sc-empty">샷이 없어요. ' + A('＋ 샷', 'newShot', 'sm', ' data-arg="' + n + '"') + '</p>' : st.sbView === 'rough'
+          ? '<div class="w-shots">' + list.map(function (p) { return sbShot(p[0], p[1]); }).join('') + '</div>'
+          : '<ol class="w-script">' + list.map(function (p) { var x = p[0], i = p[1]; return '<li><b>' + shotLabel(i) + '</b><span class="w-mut">' + x.len + '초 · ' + SIZES[x.size] + ' · ' + ANGLES[x.ang] + ' · ' + MOVES[x.move] + '</span><p>' + atText(x.desc) + (x.dir ? ' <i class="w-mut">— ' + esc(x.dir) + '</i>' : '') + '</p>' +
+              x.lines.map(function (l) { return '<p class="w-dl">' + esc(st.chars[l.w] ? st.chars[l.w].n : '') + ': "' + esc(l.t) + '"</p>'; }).join('') + A('✎', 'editShot', 'sm', ' data-arg="' + i + '" aria-label="고치기"') + '</li>'; }).join('') + '</ol>';
+        return '<section class="w-sc"><div class="w-sc-h"><b>' + esc(sceneName(n)) + '</b><span class="w-mut">' + esc(c.sum) + ' · ' + list.length + '컷 · ' + scLen(n) + '초</span><span class="w-tbar-sp"></span>' + A('＋ 샷', 'newShot', 'sm', ' data-arg="' + n + '"') + '</div>' + body + '</section>';
+      }).join('');
+    return studio('Storyboard', main, { card: o.card, ph: '예: S2를 더 빠르게' });
+  }
+  function S0() { return S1() + busy('씬·샷을 나누고 러프를 그리고 있어요', ['산문 읽기', '씬 ' + st.scenes.length + '개로 나누기 · 인물 · 배경 배치', '카메라 자리 · 샷 ' + st.shots.length + '개', '샷 크기 · 앵글 · 무브먼트', '러프 스케치 그리기']); }
+  // 러프를 다 그리면 에이전트가 러닝타임을 먼저 짚는다 (목표와 차이가 클 때만)
+  function S1n() {
+    var tt = total(), target = RUNTIMES[st.runtime][2], gap = target - tt;
+    var t = '씬 ' + st.scenes.length + '개 · 샷 ' + st.shots.length + '개로 나누고 러프까지 그렸어요.';
+    if (tt <= target && tt >= target * 0.75) return S1({ card: chatCard(t, '<p style="margin:0">지금 ' + tt + '초로 목표(' + esc(RUNTIMES[st.runtime][0]) + ')에 맞아요. 카드에서 바로 고치거나 저에게 말해 주세요.</p>', 'Storyboard') });
+    return S1({ card: chatCard(t, '<p style="margin:0">지금 ' + tt + '초라 목표(' + esc(RUNTIMES[st.runtime][0]) + ')보다 ' + Math.abs(gap) + '초 ' + (gap > 0 ? '짧아요. 샷 길이를 늘려 맞출까요?' : '길어요. 샷 길이를 줄여 맞출까요?') + '</p><div class="w-card-acts">' + A('네, 맞춰 줘', 'fitLen', 'pri sm') + B('그대로 둘게요', 'S1', 'sm') + '</div>', 'Storyboard') });
+  }
+  // 에이전트가 바꾼 샷은 노랗게 표시되고, 적용 / 되돌리기 전에는 다른 요청을 받지 않는다
+  function SG() {
+    var c = st.sbChange || { note: '' };
+    return S1({ card: chatCard('이렇게 바꿨어요. 적용할까요?', '<p style="margin:0">' + esc(c.note) + '</p><p class="w-note">노랗게 표시된 샷이 바뀐 곳이에요.</p><div class="w-card-acts">' + A('되돌리기', 'sbUndo', 'sm') + A('적용', 'sbApply', 'pri sm') + '</div>', 'Storyboard') });
+  }
+  // 샷 고치기: 두 묶음. 시작을 고치면 연출 · 끝이 따라 바뀌고, 연출을 고치면 끝만 바뀐다.
+  function shotEditor(isNew) {
+    var d = st.shotDraft, tab = isNew ? 'start' : st.shotTab;
+    var strip = '<div class="w-2grp"><button class="' + (tab === 'start' ? 'on' : '') + '" data-act="shotTab" data-arg="start"><b>시작 고치기</b><small>지문 · 인물 · 배경 · 대사 · 샷 크기 · 앵글</small></button><i>→ 따라 바뀜</i>' +
+      '<button class="' + (tab === 'dir' ? 'on' : '') + '" data-act="shotTab" data-arg="dir"' + (isNew ? ' disabled' : '') + '><b>연출 고치기</b><small>카메라 무브먼트 · 방향 · 액션 · 길이 → 연출 · 끝</small></button></div>';
+    var body;
+    if (tab === 'start') {
+      body = '<div class="w-q"><div class="w-q-t">지문 <small>@로 인물 · 배경 불러오기</small></div><input class="w-in" data-bind="shotDraft.desc" value="' + esc(d.desc) + '" placeholder="예: @민호가 캔 하나를 겨우 줍는다" aria-label="지문"></div>' +
+        '<div class="w-q"><div class="w-q-t">등장인물 <small>Artist 목록에서만 · 모습을 고를 수 있어요</small></div><div class="w-whos">' + st.chars.map(function (c, k) {
+          var on = d.who.indexOf(k) >= 0;
+          return '<span class="w-who' + (on ? ' on' : '') + '"><button class="w-chipbtn' + (on ? ' on' : '') + '" data-act="shotWho" data-arg="' + k + '" aria-pressed="' + on + '">' + (on ? '✓ ' : '＋ ') + esc(c.n) + '</button>' +
+            (on ? '<select data-act-change="shotWs" data-arg="' + k + '" aria-label="' + esc(c.n) + ' 모습">' + c.states.map(function (x, j) { return '<option value="' + j + '"' + ((d.ws[k] || 0) === j ? ' selected' : '') + '>' + esc(x) + '</option>'; }).join('') + '<option value="new">＋ 새 모습…</option></select>' : '') + '</span>';
+        }).join('') + '</div></div>' +
+        '<div class="w-q"><div class="w-q-t">배경</div>' + opts('shotDraft.bg', st.bgs.map(function (b) { return b.n; }), d.bg || 0) + '</div>' +
+        '<div class="w-q"><div class="w-q-t">대사 <small>직접 쓴 대사는 그대로 보존돼요</small></div>' + d.lines.map(function (l, i) {
+          return '<div class="w-line"><select data-bind="shotDraft.lines.' + i + '.w" aria-label="누가">' + st.chars.map(function (c, k) { return '<option value="' + k + '"' + (k == l.w ? ' selected' : '') + '>' + esc(c.n) + '</option>'; }).join('') + '</select>' +
+            '<input class="w-in" data-bind="shotDraft.lines.' + i + '.t" value="' + esc(l.t) + '" aria-label="대사">' +
+            '<span class="w-opts">' + ['한', '영'].map(function (g) { return '<button class="w-opt sm' + (l.lang === g ? ' on' : '') + '" data-bind="shotDraft.lines.' + i + '.lang" data-sval="' + g + '">' + g + '</button>'; }).join('') + '</span>' +
+            '<button class="w-x" data-act="delLine" data-arg="' + i + '" aria-label="대사 지우기">×</button></div>';
+        }).join('') + A('＋ 대사', 'addLine', 'sm') + '</div>' +
+        '<div class="w-q"><div class="w-q-t">샷 크기</div>' + opts('shotDraft.size', SIZES, d.size) + '</div>' +
+        '<div class="w-q"><div class="w-q-t">카메라 앵글</div>' + opts('shotDraft.ang', ANGLES, d.ang) + '</div>' +
+        (isNew ? '' : '<p class="w-note">적용하면 시작이 바뀌고, 연출 · 끝도 이어서 다시 그려요.</p>');
+    } else {
+      body = '<div class="w-tabs w-dmode">' + [['opt', '옵션 + 텍스트'], ['draw', '그리기 + 텍스트']].map(function (m) { return '<button class="' + (st.dirMode === m[0] ? 'on' : '') + '" data-act="dirMode" data-arg="' + m[0] + '">' + m[1] + '</button>'; }).join('') + '</div>' +
+        (st.dirMode === 'draw' ? '<div class="w-drawpad"><span>시작 프레임 위에 ↗ 화살표 · ✎ 메모를 그려요 (목업)</span><small>테두리에서 시작한 화살표는 카메라 무브, 안쪽은 사물 · 인물 움직임으로 읽어요. 글로 고치면 글이 우선이에요.</small></div>' :
+          '<div class="w-q"><div class="w-q-t">카메라 무브먼트</div>' + opts('shotDraft.move', MOVES, d.move) + '</div>') +
+        '<div class="w-q"><div class="w-q-t">방향 · 사물 · 인물 액션 <small>안 써도 돼요</small></div><input class="w-in" data-bind="shotDraft.dir" value="' + esc(d.dir) + '" placeholder="예: 천천히 다가가며 캔이 굴러간다" aria-label="방향 · 액션"></div>' +
+        '<div class="w-q"><div class="w-q-t">길이</div>' + opts('shotDraft.lenI', LENS.map(function (x) { return x + '초'; }), d.lenI != null ? +d.lenI : LENS.indexOf(d.len)) + '</div>' +
+        '<p class="w-note">앵글은 시작에서 정해요. 적용하면 끝만 다시 그려요.</p>';
+    }
+    return strip + body;
+  }
   function S2() {
     if (!st.shotDraft) st.shotDraft = clone(st.shots[st.shotSel]);
-    var d = st.shotDraft;
-    return S1() + modal(shotLabel(st.shotSel) + ' 고치기',
-      '<div class="w-q"><div class="w-q-t">길이</div>' + opts('shotDraft.len', ['1초', '2초', '3초', '4초', '5초', '6초'].map(function (x) { return x; }), d.len - 1) + '</div>' +
-      '<div class="w-q"><div class="w-q-t">카메라</div>' + opts('shotDraft.cam', CAMS, d.cam) + '</div>' +
-      '<div class="w-q"><div class="w-q-t">무엇이 보이나</div><input class="w-in" data-bind="shotDraft.desc" value="' + esc(d.desc) + '" aria-label="샷 설명"></div>' +
-      '<div class="w-q"><div class="w-q-t">대사 <small>직접 쓴 대사는 그대로 보존돼요</small></div>' +
-      d.lines.map(function (l, i) {
-        return '<div class="w-line"><select data-bind="shotDraft.lines.' + i + '.w" aria-label="누가">' + st.chars.map(function (c, k) { return '<option value="' + k + '"' + (k == l.w ? ' selected' : '') + '>' + esc(c.n) + '</option>'; }).join('') + '</select>' +
-          '<input class="w-in" data-bind="shotDraft.lines.' + i + '.t" value="' + esc(l.t) + '" aria-label="대사">' +
-          '<span class="w-opts">' + ['한', '영'].map(function (g) { return '<button class="w-opt sm' + (l.lang === g ? ' on' : '') + '" data-bind="shotDraft.lines.' + i + '.lang" data-sval="' + g + '">' + g + '</button>'; }).join('') + '</span>' +
-          '<button class="w-x" data-act="delLine" data-arg="' + i + '" aria-label="대사 지우기">×</button></div>';
-      }).join('') + A('＋ 대사', 'addLine', 'sm') + '</div>',
-      A('취소', 'cancelShot') + A('적용하고 다시 그리기', 'applyShot', 'acc'), true);
+    var tab = st.shotTab;
+    return S1() + modal(shotLabel(st.shotSel) + ' 고치기', '<p class="w-mut">두 묶음으로 고쳐요 · 시작을 고치면 연출 · 끝이 따라 바뀌고, 연출을 고치면 끝만 바뀌어요.</p>' + shotEditor(false),
+      A('취소', 'cancelShot') + A(tab === 'start' ? '시작 적용 · 연출 · 끝도 다시' : '연출 적용 · 끝 다시 그리기', 'applyShot', 'acc'), true);
   }
-  function S3() { return S1() + busy('샷을 다시 그리고 있어요'); }
+  function S3() { return S1() + busy('러프를 그리고 있어요'); }
+  // 샷 추가: 같은 편집 팝업(시작만). 인물 · 배경은 Artist 목록에서만.
   function S4() {
-    var a = st.add;
-    var people = []; st.chars.forEach(function (c, i) { c.states.forEach(function (s) { people.push([c.n, s, i]); }); });
-    return S1() + modal('샷 추가', '<div class="w-q"><div class="w-q-t">어디에</div>' + opts('add.pos', st.shots.map(function (s, i) { return shotLabel(i) + ' 뒤'; }), a.pos) + '</div>' +
-      '<div class="w-q"><div class="w-q-t">인물 <small>지금 목록에서만 골라요</small></div>' + opts('add.who', people.map(function (p) { return [p[0], p[1]]; }), a.who) + '</div>' +
-      '<div class="w-q"><div class="w-q-t">배경</div>' + opts('add.bg', st.bgs.map(function (b) { return b.n; }), a.bg) + '</div>' +
-      '<div class="w-q"><div class="w-q-t">무엇이 보이나</div><input class="w-in" data-bind="add.desc" value="' + esc(a.desc) + '" placeholder="예: 민호가 캔 하나를 겨우 줍는다" aria-label="새 샷 설명"></div>' +
-      B('목록에 없는 인물·배경이 필요해요', 'S4q', 'w-link'),
-      B('취소', 'S1') + A('추가하고 그리기', 'addShot', 'acc'), true);
+    if (!st.shotDraft) ACTS.newShot(String(st.shots[st.shots.length - 1].sc));
+    return S1() + modal('새 샷 · S' + st.shotDraft.sc + '-' + (scShots(st.shotDraft.sc).length + 1), shotEditor(true) +
+      B('목록에 없는 인물 · 배경이 필요해요', 'R3', 'w-link'),
+      A('취소', 'cancelShot') + A('추가만', 'addShot', '', ' data-arg="0" data-need="shotDraft.desc"') + A('추가하고 러프 그리기', 'addShot', 'acc', ' data-arg="1" data-need="shotDraft.desc"'), true);
   }
-  function R3() { return S1() + rollbackModal('Storyboard', [['영향받는 것', '샷 ' + st.shots.length + ' · 러프 ' + st.shots.length * 3 + '장 (개발 확인: 바뀌지 않은 샷 유지 여부)'], ['그대로인 것', '🔒 화면 비율 · 🔒 스타일'], ['예상 크레딧', '표시 자리']], 'S4'); }
+  function R3() { return S1() + rollbackModal('Storyboard', [['영향받는 것', '샷 ' + st.shots.length + ' · 러프 (개발 확인: 바뀌지 않은 샷 유지 여부)'], ['그대로인 것', '🔒 화면 비율 · 🔒 스타일 · 인물·배경 그림'], ['예상 크레딧', '표시 자리']], 'S4'); }
   function S5() {
-    var who = st.chars.map(function (c) { return c.n; }).concat(st.bgs.map(function (b) { return b.n; }));
-    return S1() + modal('상태 추가', '<p>인물에 상태(옷·나이 등)를 하나 더해요. 롤백 없이 돼요.</p>' +
-      '<div class="w-q"><div class="w-q-t">누구 · 어디</div>' + opts('stateAdd.who', who, st.stateAdd.who) + '</div>' +
-      '<div class="w-q"><div class="w-q-t">어떤 상태</div><input class="w-in" data-bind="stateAdd.text" value="' + esc(st.stateAdd.text) + '" aria-label="상태"></div>',
-      B('취소', 'S1') + A('상태 만들기', 'addState', 'acc', ' data-need="stateAdd.text"'), true);
+    var who = st.chars.map(function (c) { return c.n; });
+    return (st.stateFrom === 'S2' ? S2() : st.stateFrom === 'S4' ? S4() : S1()) + modal('모습 추가', '<p>인물에 모습(옷·나이 등)을 하나 더해요. 지금 스타일로 그림도 만들어요. 롤백 없이 돼요.</p>' +
+      '<div class="w-q"><div class="w-q-t">누구</div>' + opts('stateAdd.who', who, st.stateAdd.who) + '</div>' +
+      '<div class="w-q"><div class="w-q-t">어떤 모습</div><input class="w-in" data-bind="stateAdd.text" value="' + esc(st.stateAdd.text) + '" aria-label="모습"></div>',
+      A('취소', 'stateCancel') + A('모습 만들기', 'addState', 'acc', ' data-need="stateAdd.text"'), true);
   }
-  function S6() { return S1() + busy('상태 시트를 만들고 있어요'); }
+  function S6() { return (st.stateFrom === 'S2' ? S2() : st.stateFrom === 'S4' ? S4() : S1()) + busy('모습 그림을 만들고 있어요'); }
+  function S8() {
+    var a = st.scAdd, where = st.scenes.map(function (c, k) { return k === 0 ? '맨 앞 · S1 앞' : 'S' + k + '와 S' + (k + 1) + ' 사이'; }).concat(['S' + st.scenes.length + ' 다음 · 맨 끝']);
+    return S1() + modal('씬 추가', '<div class="w-q"><div class="w-q-t">장소 <small>Artist 배경 목록에서만</small></div>' + opts('scAdd.place', st.bgs.map(function (b) { return b.n; }), a.place) + '</div>' +
+      '<div class="w-q"><div class="w-q-t">시간대</div>' + opts('scAdd.time', TIMES, a.time) + '</div>' +
+      '<div class="w-q"><div class="w-q-t">한 줄 요약</div><input class="w-in" data-bind="scAdd.sum" value="' + esc(a.sum) + '" placeholder="예: 다음 날 아침, 고쳐진 자판기" aria-label="한 줄 요약"></div>' +
+      '<div class="w-q"><div class="w-q-t">어디에 넣을까요</div>' + opts('scAdd.pos', where, a.pos) + '</div>' +
+      '<p class="w-note">새 씬은 샷 0개로 시작해요. 뒤 씬 번호는 하나씩 밀려요. 목록에 없는 장소는 산문을 고쳐야 해요.</p>',
+      B('취소', 'S1') + A('S' + (a.pos + 1) + '로 추가', 'addScene', 'acc'), true);
+  }
+  function SM() {
+    var undrawn = st.shots.filter(function (x) { return !x.drawn; }).length;
+    return S1() + modal('마스터 시트 내보내기', '<p class="w-mut">러프 스토리보드를 촬영용 시트로 정리해요. 컷마다 그림 · 촬영 · 액션 · 대사 · 시간이 들어가요.</p>' +
+      '<div class="w-q"><div class="w-q-t">범위</div>' + opts('sheet.range', ['전체', '씬 고르기'], st.sheet.range) + '</div>' +
+      '<div class="w-q"><div class="w-q-t">그림</div>' + opts('sheet.pic', ['시작 → 끝', '시작만'], st.sheet.pic) + '</div>' +
+      '<div class="w-q"><div class="w-q-t">한 장에</div>' + opts('sheet.per', ['4컷', '6컷'], st.sheet.per) + '</div>' +
+      (undrawn ? '<p class="w-warn-t">러프가 없는 컷 ' + undrawn + '개는 빈칸으로 들어가요.</p>' : ''),
+      B('닫기', 'S1') + (undrawn ? A('남은 컷 그리기', 'drawAll', '') : '') + A('인쇄 · PDF로 저장', 'printSheet', 'acc'), true);
+  }
   function S7() {
-    return S1() + modal('Director로 넘길까요?', list([['넘어가는 것', '샷 ' + st.shots.length + ' · 러프 · 인물 시트 · 배경'], ['러닝타임', total() + '초'], ['다음', 'Director가 시트를 참조해 실사 컷을 만들어요']]),
-      B('아니오', 'S1') + B('예, 넘기기', 'D1', 'pri'));
+    var undrawn = st.shots.filter(function (x) { return !x.drawn; }), ok = st.shots.length - undrawn.length;
+    return S1() + modal('Director로 넘길까요?', list([['넘어가는 것', '샷 ' + ok + ' · 러프 · 인물 · 배경 그림'], ['러닝타임', total() + '초 / 목표 ' + esc(RUNTIMES[st.runtime][0])], ['다음', 'Director가 러프와 Artist 그림을 참조해 컷을 만들어요']]) +
+      (undrawn.length ? '<p class="w-warn-t">러프가 없는 ' + undrawn.map(function (x) { return shotLabel(st.shots.indexOf(x)); }).join(', ') + '은(는) 이번에 빠져요.</p>' : ''),
+      B('아니오', 'S1') + (undrawn.length ? A('남은 컷 그리기', 'drawAll', '') : '') + B('예, 넘기기', 'D1', 'pri'));
   }
   function D1() {
     return bar('Director') + '<div class="w-entry"><h3>Director → Editor</h3><p class="w-mut">이번 축소 범위 밖이에요. 기존 화면을 그대로 써요.</p>' +
@@ -821,13 +919,13 @@
 
   var SCREENS = { A1c: A1c, WT: WT, WTm: WTm, EB1: EB1, EBX: EBX, EB2: EB2, EB3: EB3, EB4: EB4, EB5: EB5, EB6: EB6, EB7: EB7, E1: E1, E1e: E1e, EF: EF, EFe: EFe, E2: E2, E2e: E2e, E3: E3, E4: E4, E5: E5, W1: W1, W1r: W1r, WC1: WC1, WC2: WC2, WC3: WC3, W2: W2, W4: W4, W5: W5, W6: W6, WP: WP, WN: WN, W3: W3,
     A0: A0, A1: A1, R1: R1, A2: A2, A4: A4, A5: A5, A6: A6, A7: A7, A8: A8, R2: R2, A9: A9, AV: AV, AC1: AC1, AC2: AC2, AC3: AC3, AX: AX, AY: AY,
-    S0: S0, S1: S1, S2: S2, S3: S3, S4: S4, R3: R3, S5: S5, S6: S6, S7: S7, D1: D1 };
+    S0: S0, S1: S1, S1n: S1n, SG: SG, S2: S2, S3: S3, S4: S4, R3: R3, S5: S5, S6: S6, S7: S7, S8: S8, SM: SM, D1: D1 };
   // 갈림 노드는 그 갈림을 묻는 화면으로
-  var DECISION_SCREEN = { E1n: function () { return entryId(); }, EFq: 'EF', E2q: function () { return isB() ? 'EB3' : 'E3'; }, E5q: function () { return isB() ? 'EB7' : 'E4'; }, W1q: 'W1', WPq: 'WP', A5q: 'A5', S1q: 'S1', S4q: 'S4' };
+  var DECISION_SCREEN = { E1n: function () { return entryId(); }, EFq: 'EF', E2q: function () { return isB() ? 'EB3' : 'E3'; }, E5q: function () { return isB() ? 'EB7' : 'E4'; }, W1q: 'W1', WPq: 'WP', A5q: 'A5', S1q: 'S1' };
   // AI 작업이 끝나면 가는 곳
   var BUSY_NEXT = {
     E2: function () { if (st.file && st.file.noText) return 'E2e'; if (isB()) return st.file ? 'EB2' : nextQ(); return 'E3'; },
-    E5: 'W1', W2: 'W4', A0: 'A1', A4: 'A5', A8: 'A5', S0: 'S1', S3: 'S1', S6: 'S1',
+    E5: 'W1', W2: 'W4', A0: 'A1', A4: 'A5', A8: 'A5', S0: 'S1n', S3: 'S1', S6: function () { var f = st.stateFrom; st.stateFrom = ''; return f || 'S1'; },
   };
   var preserve = function () { return st.level === 0 && hasText(); };
 
@@ -933,8 +1031,13 @@
         st.target = hit < 0 ? 0 : hit;
         return 'AC1';
       }
-      st.pending = function () { st.shots.forEach(function (s) { s.redrawn = true; }); say('Storyboard', 'Storyboard', '요청을 반영해 샷을 다시 그렸어요.'); };
-      return 'S3';
+      if (st.sbChange) { say('Storyboard', 'Storyboard', '확인하지 않은 변경이 있어요. 먼저 [적용]하거나 [되돌리기]해 주세요.'); return 'SG'; }
+      if (/길|짧|맞춰|러닝/.test(t)) return ACTS.fitLen();
+      // 목업: "S2를 더 빠르게" → 그 씬 샷 길이를 줄인다. 그 밖엔 첫 샷 연출을 바꾼다.
+      var m = t.match(/S(\d+)/), n = m ? +m[1] : 0, before = clone(st.shots);
+      if (n && /빠르|짧게|줄/.test(t)) { st.shots.forEach(function (x) { if (x.sc === n && x.len > 1) { x.len--; x.chg = true; } }); st.sbChange = { before: before, note: 'S' + n + ' 샷 길이를 1초씩 줄였어요 (' + total() + '초).' }; }
+      else { var x = st.shots[0]; x.dir = t; x.chg = true; st.sbChange = { before: before, note: shotLabel(0) + '의 연출을 "' + t + '"로 바꿨어요. 적용하면 끝만 다시 그려요.' }; }
+      return 'SG';
     },
     rewrite: function () {
       st.rw = null; st.request = ''; st.partMode = false;
@@ -1049,7 +1152,8 @@
     regenCancel: function () { st.regenStyle = null; return 'A5'; },
     regenAll: function () { var sty = st.regenStyle == null ? st.style : st.regenStyle; st.regenStyle = null; st.pending = function () { st.style = sty; newVersion(sty); say('Artist', 'Artist', STYLES[sty][0] + '으로 v' + st.versions.length + '을 만들었어요. 이전 버전은 [불러오기]에 있어요.'); }; return 'A4'; },
     loadVer: function (i) { var v = st.versions[+i]; st.style = v.style; objs().forEach(function (o, k) { if (v.snap[k] != null) o.cur = v.snap[k]; }); st.ver = +i; say('Artist', 'Artist', 'v' + v.n + '(' + STYLES[v.style][0] + ')을 불러왔어요. 작품 스타일도 ' + STYLES[v.style][0] + '으로 바뀌었어요.'); return 'A5'; },
-    objLoad: function (k) { var o = target(); if (o.hist[+k].style !== st.style) return; o.cur = +k; st.versions[st.ver].snap[st.target] = o.cur; say('Artist', 'Artist', o.n + '의 이전 그림을 불러왔어요.'); return 'A5'; },
+    objLoad: function (k) { var o = target(); if (o.hist[+k].style !== st.style) return; if (o.sTab > 0) { o.stImg = o.stImg || {}; o.stImg[o.states[o.sTab]] = +k; } else { o.cur = +k; st.versions[st.ver].snap[st.target] = o.cur; } say('Artist', 'Artist', o.n + '의 이전 그림을 불러왔어요.'); return 'A5'; },
+    openState: function (a) { var p = a.split(':'), o = objs()[+p[0]]; o.sTab = +p[1]; ACTS.openTone(p[0]); st.target = +p[0]; return 'A7'; },
     openTone: function (i) { st.target = +i; st.renaming = false; st.editMode = null; st.histOpen = false; st.stateDraft = ''; return 'A7'; },
     renameStart: function () { st.renaming = true; },
     renameDone: function () { st.renaming = false; },
@@ -1078,8 +1182,10 @@
         if (newState) { t.states.push(newState); t.sTab = t.states.length - 1; }
         var v = st.versions[st.ver] ? st.versions[st.ver].n : 1;
         var r = t.hist.filter(function (h) { return h.v === v; }).length;
-        t.hist.push({ style: st.style, tone: traits.indexOf('호러') >= 0 ? 2 : 0, note: n, traits: traits, model: t.model, v: v, r: r, state: newState || (t.isBg ? '' : t.states[t.sTab]) }); t.cur = t.hist.length - 1;
-        if (st.versions[st.ver]) st.versions[st.ver].snap[ti] = t.cur;
+        t.hist.push({ style: st.style, tone: traits.indexOf('호러') >= 0 ? 2 : 0, note: n, traits: traits, model: t.model, v: v, r: r, state: newState || (t.isBg ? '' : t.states[t.sTab]) });
+        // 첫 상태면 대표 그림, 다른 상태면 그 상태의 그림이 바뀐다
+        if (!t.isBg && t.sTab > 0) { t.stImg = t.stImg || {}; t.stImg[t.states[t.sTab]] = t.hist.length - 1; }
+        else { t.cur = t.hist.length - 1; if (st.versions[st.ver]) st.versions[st.ver].snap[ti] = t.cur; }
         say('Artist', 'Artist', t.n + '을(를) ' + (newState ? '"' + newState + '" 상태를 더했어요' : mode === 'edit' ? '지금 그림을 바탕으로 고쳤어요' : '같은 스타일로 새로 만들었어요') + (n ? ' — ' + n : '') + '. 이전 그림은 상세의 기록에 있어요.');
       };
       return 'A8';
@@ -1095,34 +1201,75 @@
       };
       return 'A8';
     },
-    toBoard: function () { st.pending = function () { st.shots.forEach(function (s) { s.redrawn = false; s.fresh = false; }); say('Storyboard', 'Storyboard', '씬 ' + st.prose.length + '개를 샷 ' + st.shots.length + '개로 나눴어요. 지금 약 ' + total() + '초예요.'); }; return 'S0'; },
-    editShot: function (i) { st.shotSel = +i; st.shotDraft = clone(st.shots[+i]); return 'S2'; },
-    redraw: function (i) { var s = st.shots[+i]; st.pending = function () { s.redrawn = true; }; return 'S3'; },
+    toBoard: function () { st.pending = function () { st.shots.forEach(function (x) { x.fresh = false; x.cand = false; x.chg = false; x.drawn = true; }); }; st.sbNudged = false; return 'S0'; },
+    sbView: function (v) { st.sbView = v; },
+    shotMenu: function (i) { st.sbMenu = st.sbMenu === +i ? -1 : +i; },
+    shotMove: function (a) {
+      var p = a.split(':'), i = +p[0], j = i + +p[1]; st.sbMenu = -1;
+      if (j < 0 || j >= st.shots.length) return;
+      var x = st.shots[i], y = st.shots[j]; if (x.sc !== y.sc) { x.sc = y.sc; } else { st.shots[i] = y; st.shots[j] = x; }
+      say('Storyboard', 'Storyboard', '번호를 다시 매겼어요.');
+    },
+    shotDup: function (i) { var c = clone(st.shots[+i]); c.fresh = true; st.shots.splice(+i + 1, 0, c); st.sbMenu = -1; },
+    shotDel: function (i) { var x = st.shots.splice(+i, 1)[0]; st.sbMenu = -1; st.lastDel = [+i, x]; say('Storyboard', 'Storyboard', '샷을 지웠어요. 지금 ' + total() + '초예요.'); },
+    editShot: function (i) { st.shotSel = +i; st.shotDraft = clone(st.shots[+i]); st.shotTab = 'start'; st.sbMenu = -1; return 'S2'; },
+    shotTab: function (t) { st.shotTab = t; },
+    dirMode: function (m) { st.dirMode = m; },
+    shotWho: function (k) { k = +k; var d = st.shotDraft, j = d.who.indexOf(k); if (j >= 0) d.who.splice(j, 1); else d.who.push(k); },
+    redraw: function (i) { var x = st.shots[+i]; st.busyNames = null; st.pending = function () { x.drawn = true; x.fresh = false; }; return 'S3'; },
+    drawAll: function () { var xs = st.shots.filter(function (x) { return !x.drawn; }); st.busyNames = null; st.pending = function () { xs.forEach(function (x) { x.drawn = true; x.fresh = false; }); say('Storyboard', 'Storyboard', '스케치 없는 ' + xs.length + '컷을 그렸어요.'); }; return 'S3'; },
     addLine: function () { st.shotDraft.lines.push({ w: 0, t: '', lang: st.dlgLang == 1 ? '영' : '한' }); },
     delLine: function (i) { st.shotDraft.lines.splice(+i, 1); },
-    cancelShot: function () { st.shotDraft = null; return 'S1'; },
+    cancelShot: function () { st.shotDraft = null; st.shotNew = false; return 'S1'; },
+    // 적용하면 다시 그린 러프가 '적용 전'으로 카드에 붙는다: 이전 → 새로 [되돌리기] [적용]
     applyShot: function () {
-      var d = st.shotDraft, i = st.shotSel; st.shotDraft = null;
-      d.len = +d.len; d.cam = +d.cam;
+      var d = st.shotDraft, i = st.shotSel, before = clone(st.shots[i]); st.shotDraft = null;
+      if (d.lenI != null) { d.len = LENS[+d.lenI]; delete d.lenI; } ['len', 'size', 'ang', 'move', 'bg'].forEach(function (k) { d[k] = +d[k] || 0; }); if (!d.len) d.len = 1;
       d.lines = d.lines.filter(function (l) { return l.t.trim(); }).map(function (l) { l.w = +l.w; return l; });
-      st.pending = function () { d.redrawn = true; st.shots[i] = d; say('Storyboard', 'Storyboard', shotLabel(i) + '을(를) 고쳐서 다시 그렸어요. 지금 ' + total() + '초예요.'); };
+      var part = st.shotTab === 'start' ? '시작 · 연출 · 끝' : '끝';
+      st.pending = function () { d.cand = true; d.prev = before; d.drawn = true; st.shots[i] = d; say('Storyboard', 'Storyboard', shotLabel(i) + '의 ' + part + '을 다시 그렸어요. 카드에서 [적용]하거나 [되돌리기]해 주세요.'); };
       return 'S3';
     },
-    addShot: function () {
-      var a = st.add, people = []; st.chars.forEach(function (c, i) { c.states.forEach(function () { people.push(i); }); });
-      var after = st.shots[a.pos] || st.shots[st.shots.length - 1];
-      var shot = { sc: after.sc, len: 2, cam: 1, desc: a.desc.trim() || (st.chars[people[a.who]] || st.chars[0]).n + ' · ' + st.bgs[a.bg].n, who: [people[a.who] || 0], lines: [], fresh: true, redrawn: true };
-      var pos = a.pos;
-      st.pending = function () { st.shots.splice(pos + 1, 0, shot); say('Storyboard', 'Storyboard', '샷을 하나 추가했어요. 지금 ' + total() + '초예요.'); };
-      st.add.desc = '';
-      return 'S3';
+    candOk: function (i) { var x = st.shots[+i]; x.cand = false; delete x.prev; },
+    candUndo: function (i) { var x = st.shots[+i]; st.shots[+i] = x.prev; },
+    newShot: function (n) { n = +n; st.shotDraft = { sc: n, len: 3, size: 2, ang: 0, move: 0, dir: '', desc: '', who: [], ws: {}, bg: st.scenes[n - 1].place, lines: [], drawn: false }; st.shotTab = 'start'; st.shotNew = true; return 'S4'; },
+    addShot: function (draw) {
+      var d = st.shotDraft; if (!d || !d.desc.trim()) return;
+      if (d.lenI != null) { d.len = LENS[+d.lenI]; delete d.lenI; } ['len', 'size', 'ang', 'move', 'bg'].forEach(function (k) { d[k] = +d[k] || 0; }); if (!d.len) d.len = 3;
+      d.lines = d.lines.filter(function (l) { return l.t.trim(); }).map(function (l) { l.w = +l.w; return l; });
+      d.fresh = true; st.shotDraft = null; st.shotNew = false;
+      var last = -1; st.shots.forEach(function (x, k) { if (x.sc <= d.sc) last = k; }); st.shots.splice(last + 1, 0, d);
+      say('Storyboard', 'Storyboard', '샷을 하나 추가했어요. 지금 ' + total() + '초예요.');
+      if (draw === '1') { st.busyNames = null; st.pending = function () { d.drawn = true; d.fresh = false; }; return 'S3'; }
+      return 'S1';
     },
+    addScene: function () {
+      var a = st.scAdd, at = +a.pos;
+      st.shots.forEach(function (x) { if (x.sc > at) x.sc++; });
+      st.scenes.splice(at, 0, { place: +a.place, time: +a.time, sum: a.sum.trim() || '새 씬' });
+      say('Storyboard', 'Storyboard', 'S' + (at + 1) + '를 추가했어요. 뒤 씬 번호가 하나씩 밀렸어요. [＋ 샷]으로 샷을 넣어 주세요.');
+      st.scAdd = { place: 0, time: 0, sum: '', pos: st.scenes.length };
+      return 'S1';
+    },
+    printSheet: function () { say('Storyboard', 'Storyboard', '마스터 시트를 PDF로 저장했어요 (목업).'); return 'S1'; },
+    // 러닝타임 맞추기 · 채팅 요청: 에이전트가 샷을 바꾸고 노랗게 표시 → 적용 / 되돌리기
+    fitLen: function () {
+      var target = RUNTIMES[st.runtime][2], tt = total(), before = clone(st.shots), guard = 200;
+      // 목표 안(목표의 75%~100%)에 들 때까지 가장 긴 샷을 줄이거나 가장 짧은 샷을 늘린다
+      while (total() > target && guard--) { var a = st.shots.reduce(function (m, x) { return x.len > m.len ? x : m; }); if (a.len <= 1) break; a.len--; a.chg = true; }
+      while (total() < target * 0.75 && guard--) { var b = st.shots.reduce(function (m, x) { return x.len < m.len ? x : m; }); b.len++; b.chg = true; }
+      st.sbChange = { before: before, note: '샷 길이를 맞췄어요: ' + tt + '초 → ' + total() + '초.' };
+      return 'SG';
+    },
+    sbApply: function () { st.shots.forEach(function (x) { x.chg = false; }); st.sbChange = null; say('Storyboard', 'Storyboard', '적용했어요.'); return 'S1'; },
+    sbUndo: function () { if (st.sbChange) st.shots = st.sbChange.before; st.shots.forEach(function (x) { x.chg = false; }); st.sbChange = null; return 'S1'; },
+    stateCancel: function () { var f = st.stateFrom; st.stateFrom = ''; return f || 'S1'; },
     addState: function () {
-      var w = st.stateAdd.who, text = st.stateAdd.text.trim(); if (!text) return;
+      var w = +st.stateAdd.who, text = st.stateAdd.text.trim(); if (!text) return;
       st.pending = function () {
-        if (w < st.chars.length) st.chars[w].states.push(text);
-        else st.bgs[w - st.chars.length].d += ' / 상태: ' + text;
-        say('Storyboard', 'Storyboard', '"' + text + '" 상태 시트를 만들었어요. 샷 추가에서 고를 수 있어요.');
+        st.chars[w].states.push(text);
+        if (st.shotDraft && st.shotDraft.who.indexOf(w) >= 0) st.shotDraft.ws[w] = st.chars[w].states.length - 1;
+        say('Storyboard', 'Storyboard', st.chars[w].n + '에게 "' + text + '" 모습을 더했어요. Artist 카드에도 같이 보여요.');
       };
       return 'S6';
     },
@@ -1285,6 +1432,12 @@
         var f = t.files[0]; t.value = '';
         go(pickFile(f.name, null, f.size));
       } else if (t.tagName === 'SELECT' && t.getAttribute('data-bind') === 'dlgLang') paint();
+      else if (t.getAttribute && t.getAttribute('data-act-change') === 'shotWs') {
+        // 샷의 인물 모습 고르기. "＋ 새 모습…"이면 모습 추가 팝업으로 (편집 중인 샷은 그대로)
+        var k = +t.getAttribute('data-arg');
+        if (t.value === 'new') { st.stateFrom = cur; st.stateAdd = { who: k, text: '' }; go('S5'); }
+        else st.shotDraft.ws[k] = +t.value;
+      }
     });
     el.addEventListener('mouseup', function (e) {
       if (!e.target.closest || !e.target.closest('.w-tgprose') || e.target.closest('.w-tg')) return;

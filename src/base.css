@@ -679,3 +679,21 @@ a.btn { text-decoration: none; display: inline-block }
 .w-box { border: 1px solid var(--w-line); border-radius: 10px; padding: 10px 12px; display: grid; gap: 10px }
 .w-box .w-rglab { margin: 0 }
 .w-agent-hint { margin: 0; font-size: 12px; color: var(--w-acc) }
+/* 러프 크게 보기 · 다시 그린 러프 확인 */
+.w-frm { position: relative; display: grid; place-items: center; color: #fff; text-shadow: 0 1px 3px rgb(0 0 0 / .5); font-style: normal; font-size: 12px; border-radius: 3px; aspect-ratio: 16 / 10; min-width: 0 }
+.w-frm em { position: absolute; left: 4px; bottom: 2px; font-style: normal; font-size: 9px; color: #fff; opacity: .9 }
+.w-frm.big { aspect-ratio: 16 / 9; font-size: 20px; border-radius: 8px; width: 100% }
+.w-frm.big em { font-size: 11px; left: 8px; bottom: 6px }
+.w-sbv { display: grid; place-items: center; background: var(--w-bg) }
+.w-sbv .w-frm.big { height: 100%; border-radius: 0 }
+.w-sbthumbs { display: grid; grid-template-columns: repeat(2, 1fr); gap: 6px }
+.w-sbthumbs button { padding: 0; border: 2px solid transparent; border-radius: 6px; background: none; cursor: pointer; display: grid }
+.w-sbthumbs button.on { border-color: var(--w-pri) }
+.w-cmp { border: 1px solid var(--w-line); border-radius: 10px; padding: 10px 12px; display: grid; gap: 8px }
+.w-cmp + .w-cmp { margin-top: 8px }
+.w-cmp-h { display: flex; gap: 8px; align-items: baseline; font-size: 13px }
+.w-cmp-row { display: grid; grid-template-columns: 1fr auto 1fr; gap: 12px; align-items: center }
+.w-cmp-row small { display: block; font-size: 11px; color: var(--w-mut); margin-bottom: 4px } .w-cmp-row .w-new-t { color: var(--new); font-weight: 600 }
+.w-cmp-f { display: grid; grid-template-columns: 1fr 1fr; gap: 6px }
+.w-cmp-ar { font-size: 20px; color: var(--w-mut) }
+@media (max-width: 760px) { .w-cmp-row { grid-template-columns: 1fr } .w-cmp-ar { transform: rotate(90deg); justify-self: center } }

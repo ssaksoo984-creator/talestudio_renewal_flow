@@ -81,7 +81,7 @@ h2 { font-size: 13px; text-transform: uppercase; letter-spacing: .06em; color: v
 
   <div class="legend" id="legend">
     <span><i></i>화면</span><span><i class="lg-modal"></i>팝업 · 확인창</span><span><i class="lg-dec"></i>예/아니오 · 갈림</span>
-    <span><i class="lg-ai"></i>AI 작업 중 = 전체 잠금</span><span><i class="lg-new"></i>새로 생김</span><span><i class="lg-back"></i>롤백</span><span>🔒 여기서 잠기는 값</span>
+    <span><i class="lg-ai"></i>AI 작업 중 = 전체 잠금</span><span><i class="lg-err"></i>⚠ 오류 안내</span><span><i class="lg-new"></i>새로 생김</span><span><i class="lg-back"></i>롤백</span><span>🔒 여기서 잠기는 값</span>
   </div>
 
   <div class="split">
@@ -131,7 +131,7 @@ h2 { font-size: 13px; text-transform: uppercase; letter-spacing: .06em; color: v
   $('removed').innerHTML = rm.join('');
 
   var VS = { keep: '지금과 같음', change: '바뀜', 'new': '새로' };
-  var TYPE = { screen: '화면', modal: '팝업 · 확인창', decision: '갈림', ai: 'AI 작업 중 · 전체 잠금', ext: '범위 밖' };
+  var TYPE = { screen: '화면', modal: '팝업 · 확인창', decision: '갈림', ai: 'AI 작업 중 · 전체 잠금', error: '오류 안내', ext: '범위 밖' };
   var REV = [['ok', '확정'], ['fix', '수정 필요'], ['ask', '질문']];
 
   // 노드 고르기: 설명을 바꾸고, 목업을 그 화면으로 옮기고, 플로우에 빨간 표시

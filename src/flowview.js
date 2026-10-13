@@ -25,6 +25,7 @@
   function lbl(n) {
     var t = n.label + (n.lock ? '<br/>🔒 ' + n.lock : '');
     if (n.type === 'ai') t = '⏳ ' + t;
+    if (n.type === 'error') t = '⚠ ' + t;
     return '"' + n.id + ' · ' + t.replace(/"/g, '#quot;') + '"';
   }
   function shape(n) {
@@ -34,6 +35,7 @@
       case 'ai': return n.id + '{{' + L + '}}';
       case 'modal': return n.id + '[[' + L + ']]';
       case 'ext': return n.id + '[/' + L + '/]';
+      case 'error': return n.id + '>' + L + ']';
       default: return n.id + '[' + L + ']';
     }
   }
@@ -44,6 +46,7 @@
       'classDef modal fill:' + surf + ',stroke:' + css('--mut') + ',color:' + ink,
       'classDef decision fill:' + css('--accent-soft') + ',stroke:' + css('--accent') + ',color:' + ink,
       'classDef ai fill:' + surf + ',stroke:' + css('--ai') + ',stroke-width:2px,color:' + css('--ai'),
+      'classDef error fill:' + css('--surface') + ',stroke:' + css('--back') + ',stroke-width:2px,color:' + css('--back'),
       'classDef ext fill:' + css('--bg') + ',stroke:' + css('--line') + ',color:' + css('--mut'),
       'classDef stub fill:' + css('--bg') + ',stroke:' + css('--line') + ',color:' + css('--mut') + ',stroke-dasharray:2 2',
       'classDef stubback fill:' + css('--bg') + ',stroke:' + css('--back') + ',color:' + css('--back') + ',stroke-dasharray:2 2',

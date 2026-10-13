@@ -10,36 +10,55 @@
   /* ── 고정 데이터 ── */
   var RATIOS = [['16:9', '가로'], ['9:16', '세로 · 숏폼'], ['1:1', '정방형'], ['2.39:1', '시네마']];
   var RUNTIMES = [['15초 이하', '숏폼', 15], ['15~60초', '광고·티저', 60], ['1~5분', 'MV·웹드라마', 300], ['5~20분', '단편', 1200]];
-  var MOODS = ['코미디', '드라마', '로맨스', '스릴러', '호러'];
+  var MOODS = ['코미디', '드라마', '로맨스', '스릴러', '호러', '액션', 'SF·판타지', '미스터리', '휴먼·가족', '일상·잔잔'];
   var TONES = ['작품 기본', '코미디', '호러', '로맨스', '따뜻하게'];
   var CAMS = ['와이드 · 고정', '미디엄 · 고정', '클로즈업', '와이드 · 틸트 다운', '미디엄 · 팬'];
   var STYLES = [['실사', '#5b6470,#22262c'], ['애니메이션', '#ffb4a2,#8aa6ff'], ['웹툰', '#fff3c4,#ffd0e0'], ['3D', '#9be1d4,#5f7fd9'], ['수채화', '#d9ecf5,#f4d9c6'], ['견본 이미지', '#c9c2b8,#8f8a83']];
   // 바꿈 정도: AI가 내 글을 얼마나 바꾸는지. 단계마다 지키는 것과 바꾸는 것을 못박는다.
   var LEVELS = [
-    { n: '그대로', s: '한 글자도 안 바꿔요', keep: '문장 · 대사 · 장면 순서 · 결말', change: '장면 나누기만', need: true },
-    { n: '빈칸만 채우기', s: '내 글은 두고 빠진 것만 더해요', keep: '문장 · 대사 · 줄거리 · 결말', change: '빠진 장소 · 인물 묘사 · 연출', need: true },
-    { n: '다듬기', s: '줄거리는 두고 표현을 고쳐요', keep: '줄거리 · 인물 · 결말', change: '문장 · 대사 · 장면 순서' },
-    { n: '새로 쓰기', s: '소재만 가져가 새로 짜요', keep: '소재 · 장르·분위기 · 길이', change: '줄거리 · 인물 · 결말까지' },
+    { n: '그대로', s: '내 글을 그대로 써요', keep: '문장 · 대사 · 줄거리 · 결말', change: '장면 나누기와 빠진 연출만', need: true },
+    { n: '다듬기', s: '재료는 두고 표현을 고쳐요', keep: '소재 · 인물 · 줄거리 · 결말', change: '문장 · 대사 · 장면 순서' },
+    { n: '새롭게 키우기', s: '재료에서 출발해 아이디어를 더해요', keep: '소재 · 장르·분위기 · 길이', change: '줄거리 · 인물 · 결말에 새 아이디어' },
   ];
+  // 지금 읽는 자료: 글 파일과 글이 담긴 이미지. 웹툰 · 캐릭터 시트 · 참조 사진은 v2.
   var KINDS = {
-    '1-1': { name: '영상까지 고려된 대본', rec: 0 },
-    '1-2': { name: '일반 대본 (연극·고전 대본)', rec: 1 },
-    '1-3': { name: '아이디어 노트', rec: 3 },
-    '2-1': { name: '캐릭터 시트 · 컨셉 아트', q: '이 이미지는 무엇인가요?', o: [['인물', '인물 목록에 넣어요'], ['배경', '배경 목록에 넣어요']], note: '이야기 글감은 아이디어 칸의 글을 써요.' },
-    '2-2': { name: '웹툰', q: '웹툰으로 무엇을 할까요?', o: [['그대로 영상화', '스토리·그림체 그대로'], ['다른 스타일로', '스토리만 가져와요'], ['그림체만', '다른 이야기를 이 그림체로'], ['아이디어로', '스토리를 바탕으로 대화']], note: '"그대로"와 "다른 스타일로"는 웹툰 길이를 따라가서 러닝타임을 지정할 수 없어요.' },
-    '2-3': { name: '참조용 사진', q: '사진으로 무엇을 할까요?', o: [['이 느낌의 영상', '그림체·스타일을 가져와요'], ['아이디어로', 'AI가 사진을 읽고 대화']] },
+    '1-1': { name: '영상까지 고려된 대본', rec: 0, rt: 2 },
+    '1-2': { name: '일반 대본 (연극·고전 대본)', rec: 0, rt: 2 },
+    '1-3': { name: '아이디어 노트', rec: 2, rt: 1 },
+    'img': { name: '글이 담긴 이미지 (사진 찍은 대본·메모)', rec: 1, rt: 1 },
   };
-  var hasText = function () { return (st.file && !st.file.image) || st.idea.trim().length >= 60; };
+  var MIN_LEN = 20;
+  var TEXT_EXT = ['txt', 'md', 'docx', 'pdf', 'hwp'], IMG_EXT = ['png', 'jpg', 'jpeg'];
+  var OCR_LINE = '민호: "…또 안 나와?" / 팀장: "고마워." (사진에서 읽은 대본 첫 줄)';
+  var ideaLen = function () { return st.idea.trim().length; };
+  var hasText = function () { return (st.file && !st.file.noText) || ideaLen() >= 60; };
   var levelOk = function (i) { return !LEVELS[i].need || hasText(); };
-  var recLevel = function () { if (st.file && !st.file.image) return KINDS[st.kind].rec; return st.idea.trim().length >= 60 ? 2 : 3; };
-  var SAMPLE_FILES = [['1-1', '자판기_촬영대본.docx'], ['1-2', '자판기_연극대본.pdf'], ['1-3', '아이디어_메모.txt'], ['2-1', '민호_캐릭터시트.png'], ['2-2', '자판기_웹툰_1화.png'], ['2-3', '복도_참조사진.jpg']];
+  var recLevel = function () { if (st.file && !st.file.noText) return KINDS[st.kind].rec; return ideaLen() >= 60 ? 1 : 2; };
+  // AI가 글을 읽고 고르는 추천 (목업용 간단한 규칙)
+  function recommend() {
+    var t = st.idea, mood = -1, why = '';
+    MOODS.forEach(function (m, i) { if (mood < 0 && t.indexOf(m.split('·')[0]) >= 0) { mood = i; why = '글에 "' + m.split('·')[0] + '"라고 적혀 있어요'; } });
+    var H = [[/고장|자판기|웃기|엉뚱/, 0, '엉뚱한 사건이라 코미디로 읽었어요'], [/귀신|무서|밤 열|CCTV/, 4, '무서운 장면이 있어 호러로 읽었어요'], [/사랑|설레|옥상에서 마주/, 2, '두 사람의 감정이 중심이라 로맨스로 읽었어요'], [/가족|아버지|엄마|딸|아들/, 8, '가족 이야기라 휴먼·가족으로 읽었어요'], [/로봇|우주|미래|시간/, 6, '상상 속 설정이라 SF·판타지로 읽었어요'], [/범인|단서|사라진/, 7, '숨은 비밀을 쫓는 이야기라 미스터리로 읽었어요']];
+    if (mood < 0) H.some(function (h) { if (h[0].test(t)) { mood = h[1]; why = h[2]; return true; } });
+    if (mood < 0 && st.file && !st.file.noText) { mood = 0; why = '대본 대사가 가벼워 코미디로 읽었어요'; }
+    if (mood < 0) { mood = 1; why = '뚜렷한 장르가 없어 드라마로 골랐어요'; }
+    var rt, rwhy, m = t.match(/(\d+)\s*(초|분)/);
+    if (m) { var sec = +m[1] * (m[2] === '분' ? 60 : 1); rt = sec <= 15 ? 0 : sec <= 60 ? 1 : sec <= 300 ? 2 : 3; rwhy = '글에 "' + m[0] + '"이라고 적혀 있어요'; }
+    else if (st.file && !st.file.noText) { rt = KINDS[st.kind].rt; rwhy = '대본 분량으로 짐작했어요'; }
+    else { rt = ideaLen() < 60 ? 1 : 2; rwhy = ideaLen() < 60 ? '짧은 아이디어라 짧게 잡았어요' : '줄거리 분량으로 짐작했어요'; }
+    var lv = recLevel();
+    st.rec = { mood: mood, moodWhy: why, runtime: rt, runtimeWhy: rwhy, level: lv };
+    st.mood = mood; st.runtime = rt; st.level = lv;
+  }
+  // 목업용 예시 파일: [종류, 이름]. bad = 확장자 오류, notext = 글 없는 이미지
+  var SAMPLE_FILES = [['1-1', '자판기_촬영대본.docx'], ['1-2', '자판기_연극대본.hwp'], ['1-3', '아이디어_메모.txt'], ['img', '대본_사진.jpg'], ['notext', '복도_풍경.png'], ['bad', '예고편.mp4'], ['bad', '자료모음.zip']];
   var EXTRA_PEOPLE = [['경비원', '50대. 남색 경비 제복, 무전기.'], ['청소부', '60대. 하늘색 작업복, 밀대.'], ['신입', '20대 초반. 사원증을 목에 건 신입 사원.'], ['고양이', '회색 길고양이. 꼬리가 짧다.']];
   var EXTRA_PLACES = [['옥상', '해 질 녘 회사 옥상, 난간과 물탱크.'], ['편의점', '1층 편의점 계산대 앞.'], ['회의실', '유리벽 회의실, 화이트보드.']];
 
   function initial() {
     return {
       idea: '회사 복도 자판기가 고장 나서 캔이 우르르 쏟아지는 코미디. 주인공 민호는 하나도 못 먹는다.',
-      file: null, kind: '1-3', level: 3, use: 0, ratio: '9:16', ratioLocked: false,
+      file: null, kind: '1-3', level: 2, ratio: '9:16', ratioLocked: false, lenErr: false, fileErr: '', rec: null,
       title: '자판기의 반란',
       prose: [
         '회사 복도, 오후 세 시. 민호가 자판기 버튼을 누르지만 아무것도 나오지 않는다. 동전 반환 레버를 당겨 봐도 조용하다. 민호는 자판기를 툭 친다.',
@@ -126,66 +145,79 @@
   var total = function () { return st.shots.reduce(function (a, s) { return a + s.len; }, 0); };
   function say(stage, who, text) { st.chat[stage].push([who, text]); }
 
-  /* ── 진입 ── */
+  /* ── Producer (진입) ── */
+  var isB = function () { return st.plan === 'B'; };
+  var entryId = function () { return isB() ? 'EB1' : 'E1'; };
+  var entryBase = function () { return isB() ? EB1() : E1(); };
+  function counter() { return '<span class="w-count" data-count aria-live="polite"></span>'; }
+  function lenErrHtml() {
+    return st.lenErr && !st.file && ideaLen() < MIN_LEN ? '<p class="w-err" data-lenerr role="alert">조금 더 적어 주세요. ' + MIN_LEN + '자 이상이면 AI가 이야기를 잡을 수 있어요. (지금 ' + ideaLen() + '자)</p>' : '';
+  }
+  function fileRow() {
+    return '<div class="w-file">' + (st.file ? '<span class="w-chip">📎 ' + esc(st.file.name) + '<button class="w-x" data-act="clearFile" aria-label="파일 빼기">×</button></span>'
+      : '<span class="w-mut">대본 · 메모 파일이나 글이 담긴 이미지를 올릴 수 있어요. 없어도 돼요.</span>') + B('파일 첨부', 'EF') + '</div>';
+  }
+  function stepper(n) {
+    return '<ol class="w-stepper"><li class="' + (n === 1 ? 'on' : 'done') + '">① 이야기 재료</li><li class="' + (n === 2 ? 'on' : '') + '">② 설정</li></ol>';
+  }
+  function E1() {
+    return bar('Producer') + '<div class="w-entry wide">' + stepper(1) + '<h3>무엇을 만들어 볼까요?</h3>' +
+      '<div class="w-q"><div class="w-q-t">아이디어나 줄거리 ' + counter() + '</div>' +
+      '<textarea class="w-ta" id="idea" data-bind="idea" aria-label="아이디어" placeholder="누가, 어디서, 무슨 일을 겪는지 적어 주세요">' + esc(st.idea) + '</textarea>' + lenErrHtml() + '</div>' +
+      fileRow() +
+      '<div class="w-foot"><span class="w-mut">다음 화면에서 AI가 장르·분위기와 길이를 추천해요.</span>' + A('다음 →', 'next1', 'pri') + '</div></div>';
+  }
+  function E1e() { st.lenErr = true; return entryBase(); }
+  var ACCEPT = TEXT_EXT.concat(IMG_EXT).map(function (x) { return '.' + x; }).join(',');
+  function EF() {
+    return entryBase() + modal('파일 첨부',
+      '<label class="w-drop"><input type="file" id="file-in" accept="' + ACCEPT + '" hidden><b>여기를 눌러 파일 고르기</b><span class="w-mut">파일 하나 · 10MB까지</span></label>' +
+      '<dl class="w-list"><div><dt>글 파일</dt><dd>txt · md · docx · pdf · hwp</dd></div><div><dt>글이 담긴 이미지</dt><dd>png · jpg — 사진 찍은 대본, 메모 스크린샷</dd></div></dl>' +
+      (st.fileErr ? '<p class="w-err" role="alert">' + esc(st.fileErr) + '</p>' : '') +
+      '<p class="w-note">웹툰 · 캐릭터 시트 · 참조 사진은 다음 버전에서 읽어요.</p>' +
+      '<div class="w-samples"><span class="w-mut">목업: 예시 파일 고르기</span>' + SAMPLE_FILES.map(function (x, i) { return '<button class="w-tab' + (x[0] === 'bad' ? ' bad' : '') + '" data-act="pickSample" data-arg="' + i + '">' + esc(x[1]) + '</button>'; }).join('') + '</div>',
+      A('닫기', 'closeFile'));
+  }
+  function EFe() { if (!st.fileErr) st.fileErr = badExtMsg('예고편.mp4'); return EF(); }
+  function E2() {
+    var img = st.file && st.file.image;
+    return entryBase() + busy(img ? '이미지에서 글을 읽고 있어요' : '글을 읽고 있어요', img ? ['파일 열기', '이미지에서 글자 읽기', '추천 설정 만들기'] : ['글 읽기', '이야기 종류 판단', '추천 설정 만들기']);
+  }
+  function E2e() {
+    return entryBase() + modal('이미지에서 글을 찾지 못했어요', '<p>' + esc(st.file ? st.file.name : '이미지') + '에서 읽을 수 있는 글이 없어요. 글이 보이는 이미지나 글 파일을 올려 주세요.</p>' +
+      '<p class="w-note">그림을 읽어 인물·배경으로 쓰는 기능은 다음 버전에서 열려요.</p>',
+      A('파일 빼고 진행', 'dropFileGo') + A('다른 파일 올리기', 'retryFile', 'pri'));
+  }
   function levelPicker() {
     var rec = recLevel(), L = LEVELS[st.level];
-    return '<div class="w-q"><div class="w-q-t">AI가 내 글을 얼마나 바꿀까요? <small>바꿈 정도 · 산문을 쓸 때만 써요</small></div>' +
+    return '<div class="w-q"><div class="w-q-t">AI가 내 글을 얼마나 바꿀까요?</div>' +
       '<div class="w-levels" role="radiogroup">' + LEVELS.map(function (l, i) {
-        var ok = levelOk(i);
-        return '<button class="w-lv' + (i === st.level ? ' on' : '') + '" role="radio" aria-checked="' + (i === st.level) + '" data-bind="level" data-val="' + i + '"' + (ok ? '' : ' disabled') + '>' +
+        return '<button class="w-lv' + (i === st.level ? ' on' : '') + '" role="radio" aria-checked="' + (i === st.level) + '" data-bind="level" data-val="' + i + '"' + (levelOk(i) ? '' : ' disabled') + '>' +
           '<span class="w-lv-n">' + (i + 1) + '</span><b>' + esc(l.n) + (i === rec ? ' <em>추천</em>' : '') + '</b><small>' + esc(l.s) + '</small></button>';
       }).join('') + '</div>' +
       '<div class="w-lv-d"><span><i>지켜요</i>' + esc(L.keep) + '</span><span><i>바꿔요</i>' + esc(L.change) + '</span></div>' +
-      (hasText() ? '' : '<p class="w-note">1·2단계는 지킬 원문이 있어야 해요. 대본을 올리거나 줄거리를 60자 넘게 적으면 열려요.</p>') + '</div>';
+      (hasText() ? '' : '<p class="w-note">"그대로"는 지킬 원문이 있어야 해요. 대본 파일을 올리거나 줄거리를 60자 넘게 적으면 열려요.</p>') + '</div>';
   }
-  function E1() {
-    var f = st.file;
-    var can = st.idea.trim() || f;
-    return bar('Producer') + '<div class="w-entry wide"><h3>무엇을 만들어 볼까요?</h3>' +
-      '<section class="w-grp"><div class="w-grp-h">이야기 재료</div>' +
-      '<textarea class="w-ta" id="idea" data-bind="idea" aria-label="아이디어" placeholder="아이디어나 줄거리를 적거나 파일을 올려 주세요">' + esc(st.idea) + '</textarea>' +
-      '<div class="w-file">' + (f ? '<span class="w-chip">📎 ' + esc(f.name) + '<button class="w-x" data-act="clearFile" aria-label="파일 빼기">×</button></span>'
-        : '<span class="w-mut">대본 · 기획 메모 · 캐릭터 시트 · 웹툰 · 사진</span>') +
-        '<label class="w-btn">파일 첨부<input type="file" id="file-in" hidden></label></div>' +
-      '<div class="w-samples"><span class="w-mut">목업: 예시 파일로 해 보기</span>' + SAMPLE_FILES.map(function (s) { return '<button class="w-tab" data-act="sample" data-arg="' + s[0] + '">' + s[0] + ' ' + esc(s[1].split('.').pop()) + '</button>'; }).join('') + '</div></section>' +
-      '<section class="w-grp"><div class="w-grp-h">산문 조건 <small>Writer에서 다시 바꿀 수 있어요</small></div>' +
-      '<div class="w-q"><div class="w-q-t">장르·분위기</div>' + opts('mood', MOODS, st.mood) + '</div>' +
-      '<div class="w-q"><div class="w-q-t">길이</div>' + opts('runtime', RUNTIMES, st.runtime) + '</div>' +
-      levelPicker() + '</section>' +
-      '<section class="w-grp lock"><div class="w-grp-h">🔒 화면 비율 <small>시작하면 끝까지 바꿀 수 없어요</small></div>' + opts('ratio', RATIOS, RATIOS.map(function (r) { return r[0]; }).indexOf(st.ratio), 1) + '</section>' +
-      '<div class="w-foot"><span class="w-mut">채팅은 사이트 언어(한국어)로 진행해요.</span>' + A('시작', 'start', 'pri', can ? ' data-need="idea|file"' : ' data-need="idea|file" disabled') + '</div></div>';
-  }
-  var entryBase = function () { return st.plan === 'B' ? EB1() : E1(); };
-  function E1m() {
-    return entryBase() + modal('이미지를 쓸 권리가 있나요?', '<p>올린 이미지를 생성에 참조해요. 직접 만들었거나 쓸 권리가 있는 이미지만 올려 주세요.</p>' +
-      '<span class="w-chip">📎 ' + esc(st.file ? st.file.name : '이미지') + '</span>',
-      A('아니오 · 이미지 빼기', 'denyImage') + B('예, 동의해요', 'E2', 'pri'));
-  }
-  function E2() { return entryBase() + busy('자료를 읽고 있어요', ['파일 열기', '글인지 이미지인지 보기', '종류 판별']); }
+  function why(t) { return t ? '<p class="w-why">✦ ' + esc(t) + '</p>' : ''; }
   function E3() {
-    var k = KINDS[st.kind];
-    var head = '<div class="w-read"><span class="w-chip">📎 ' + esc(st.file ? st.file.name : '') + '</span><b>' + esc(st.kind + ' ' + k.name) + '</b>' + A('종류가 달라요', 'cycleKind', 'w-link') + '</div>';
-    if (k.o) {
-      return E1() + modal('이렇게 읽었어요', head + '<div class="w-q"><div class="w-q-t">' + esc(k.q) + '</div>' + opts('use', k.o, st.use, 0) + '</div>' + (k.note ? '<p class="w-note">' + esc(k.note) + '</p>' : ''),
-        B('이전', 'E1') + B('다음', 'E4', 'pri'));
-    }
-    var L = LEVELS[st.level], fit = st.level === k.rec;
-    return E1() + modal('이렇게 읽었어요', head +
-      '<div class="w-lv-d"><span><i>바꿈 정도</i>' + (st.level + 1) + '단계 ' + esc(L.n) + '</span><span><i>지켜요</i>' + esc(L.keep) + '</span><span><i>바꿔요</i>' + esc(L.change) + '</span></div>' +
-      (fit ? '<p class="w-note">이 자료에 맞는 단계예요.</p>' : '<p class="w-note">이 자료는 ' + (k.rec + 1) + '단계 "' + esc(LEVELS[k.rec].n) + '"를 추천해요. ' + A('추천으로 바꾸기', 'useRec', 'w-link') + '</p>'),
-      B('이전', 'E1') + B('다음', 'E4', 'pri'));
+    if (!st.rec) recommend();
+    var r = st.rec;
+    return bar('Producer') + '<div class="w-entry wide">' + stepper(2) + '<h3>이렇게 만들어 볼까요?</h3>' +
+      '<p class="w-mut" style="margin:0">AI가 이야기 재료를 읽고 골라 뒀어요. 맞으면 그대로 진행하세요.</p>' +
+      '<section class="w-grp"><div class="w-q"><div class="w-q-t">장르·분위기</div>' + opts('mood', MOODS, st.mood, r.mood) + why(r.moodWhy) + '</div>' +
+      '<div class="w-q"><div class="w-q-t">길이</div>' + opts('runtime', RUNTIMES, st.runtime, r.runtime) + why(r.runtimeWhy) + '</div>' +
+      levelPicker() + '</section>' +
+      '<section class="w-grp lock"><div class="w-grp-h">🔒 화면 비율 <small>시작하면 끝까지 바꿀 수 없어요</small></div>' + opts('ratio', RATIOS, RATIOS.map(function (x) { return x[0]; }).indexOf(st.ratio), 1) + '</section>' +
+      '<div class="w-foot">' + B('← 이야기 재료', 'E1') + B('AI로 진행', 'E4', 'acc') + '</div></div>';
   }
   function E4() {
-    var k = KINDS[st.kind], L = LEVELS[st.level];
-    var src = st.file ? esc(st.file.name) + (k.o ? ' · ' + esc(k.o[st.use][0]) : '') : '아이디어 글만';
-    var webtoonFixed = st.file && st.kind === '2-2' && st.use < 2;
-    return E1() + modal('이대로 시작할까요?', list([
+    var L = LEVELS[st.level];
+    return E3() + modal('이대로 시작할까요?', list([
       ['🔒 화면 비율', esc(st.ratio) + ' · 시작하면 끝까지 바꿀 수 없어요'],
-      ['장르·분위기', esc(MOODS[st.mood])],
-      ['길이', webtoonFixed ? '웹툰 길이를 따라가요' : esc(RUNTIMES[st.runtime][0])],
-      ['바꿈 정도', (st.level + 1) + '단계 ' + esc(L.n) + ' — ' + esc(L.s)],
-      ['자료', src], ['채팅 언어', '한국어 (사이트 언어)']]) + '<p class="w-note">장르·분위기와 길이는 Writer에서 다시 바꿀 수 있어요.</p>',
-      B('아니오, 고칠래요', 'E1') + A('예, 시작', 'confirmStart', 'pri'));
+      ['장르·분위기', esc(MOODS[st.mood])], ['길이', esc(RUNTIMES[st.runtime][0])],
+      ['바꿈 정도', (st.level + 1) + ' ' + esc(L.n) + ' — ' + esc(L.s)],
+      ['자료', st.file ? esc(st.file.name) : '아이디어 글만'], ['채팅 언어', '한국어 (사이트 언어)']]) + '<p class="w-note">장르·분위기와 길이는 Writer에서 다시 바꿀 수 있어요.</p>',
+      B('아니오, 고칠래요', 'E3') + A('예, 시작', 'confirmStart', 'pri'));
   }
 
   /* ── Producer 2안: 채팅으로 만들기 ── */
@@ -193,51 +225,51 @@
   var BQ_SCREEN = { file: 'EB2', mood: 'EB3', runtime: 'EB4', level: 'EB5', ratio: 'EB6', confirm: 'EB7' };
   var BQ_NAME = { mood: '장르·분위기', runtime: '길이', level: '바꿈 정도', ratio: '화면 비율' };
   var BQ_Q = { mood: '어떤 장르·분위기로 할까요?', runtime: '길이는 어느 정도로 할까요?', level: '내 글을 AI가 얼마나 바꿔도 될까요?', ratio: '화면 비율을 골라 주세요.' };
+  var EXAMPLES = [['직장 코미디', '회사 복도 자판기가 고장 나서 캔이 우르르 쏟아지는데, 주인공 민호만 하나도 못 먹는 이야기'], ['가족 드라마', '10년 만에 고향 집에 돌아온 딸이 아버지의 낡은 카메라에서 찍다 만 필름을 발견한다'], ['짧은 호러', '야근하던 직원의 모니터에 회사 CCTV 화면이 뜨고, 화면 속 자기 뒤에 누가 서 있다'], ['로맨스', '매일 같은 시간 옥상에서 마주치는 두 사람이 서로의 이름을 모른 채 1년을 보낸다'], ['SF', '고장 난 배달 로봇이 길을 잃고, 집에 혼자 있는 아이를 따라 하루를 보낸다']];
+  var GUIDES = ['누구 이야기: ', '어디서: ', '무슨 일이: ', '어떻게 끝나요: '];
   function nextQ() { for (var i = 0; i < BQ.length; i++) if (!st.bAns[BQ[i]]) return BQ_SCREEN[BQ[i]]; return 'EB7'; }
   function ansText(k) {
     if (k === 'mood') return MOODS[st.mood];
     if (k === 'runtime') return RUNTIMES[st.runtime][0];
-    if (k === 'level') return (st.level + 1) + '단계 ' + LEVELS[st.level].n;
+    if (k === 'level') return (st.level + 1) + ' ' + LEVELS[st.level].n;
     if (k === 'ratio') return st.ratio;
-    if (k === 'file') { var k2 = KINDS[st.kind]; return k2.name + (k2.o ? ' · ' + k2.o[st.use][0] : ''); }
+    if (k === 'file') return KINDS[st.kind].name;
     return '';
   }
-  // 글에서 장르·길이·바꿈 정도·비율을 읽어 미리 채운다 (목업용 간단한 규칙)
+  // 말에서 장르·길이·바꿈 정도·비율을 읽는다 (목업용 간단한 규칙)
   function parseInto(t) {
     var got = [];
-    MOODS.forEach(function (m, i) { if (t.indexOf(m) >= 0) { st.mood = i; got.push('mood'); } });
+    MOODS.forEach(function (m, i) { if (t.indexOf(m.split('·')[0]) >= 0) { st.mood = i; got.push('mood'); } });
     var m = t.match(/(\d+)\s*(초|분)/);
     if (m) { var sec = +m[1] * (m[2] === '분' ? 60 : 1); st.runtime = sec <= 15 ? 0 : sec <= 60 ? 1 : sec <= 300 ? 2 : 3; got.push('runtime'); }
     else if (/숏폼|쇼츠/.test(t)) { st.runtime = 0; got.push('runtime'); } else if (/단편/.test(t)) { st.runtime = 3; got.push('runtime'); }
-    if (/그대로/.test(t)) { st.level = 0; got.push('level'); } else if (/빈칸/.test(t)) { st.level = 1; got.push('level'); } else if (/다듬/.test(t)) { st.level = 2; got.push('level'); } else if (/새로/.test(t)) { st.level = 3; got.push('level'); }
-    if (got.indexOf('level') >= 0 && !levelOk(st.level)) { st.level = recLevel(); }
+    if (/그대로/.test(t) && levelOk(0)) { st.level = 0; got.push('level'); } else if (/다듬/.test(t)) { st.level = 1; got.push('level'); } else if (/새롭게|키워|새로/.test(t)) { st.level = 2; got.push('level'); }
     var r = t.match(/16:9|9:16|1:1|2\.39:1/); if (r) { st.ratio = r[0]; got.push('ratio'); } else if (/세로/.test(t)) { st.ratio = '9:16'; got.push('ratio'); } else if (/가로/.test(t)) { st.ratio = '16:9'; got.push('ratio'); }
     got = got.filter(function (k, i) { return got.indexOf(k) === i; });
     got.forEach(function (k) { st.bAns[k] = true; });
     return got;
   }
   function bubble(who, html, me) { return '<div class="w-b' + (me ? ' me' : '') + '">' + (me ? '' : '<b>' + who + '</b>') + '<div>' + html + '</div></div>'; }
-  function qr(key, arr, cur) {
+  function qr(key, arr, cur, rec) {
     return '<div class="w-qr">' + arr.map(function (o, i) {
       var t = Array.isArray(o) ? o : [o, ''];
-      return '<button class="w-opt' + (i === cur ? ' on' : '') + '" data-act="bAnswer" data-arg="' + key + ':' + i + '">' + esc(t[0]) + (t[1] ? '<small>' + esc(t[1]) + '</small>' : '') + '</button>';
+      return '<button class="w-opt' + (i === cur ? ' on' : '') + '" data-act="bAnswer" data-arg="' + key + ':' + i + '">' + (i === rec ? '<em>추천</em>' : '') + esc(t[0]) + (t[1] ? '<small>' + esc(t[1]) + '</small>' : '') + '</button>';
     }).join('') + '</div>';
   }
   function bCard(key) {
-    var rec = recLevel();
+    var r = st.rec || {};
     if (key === 'file') {
       var k = KINDS[st.kind];
-      return bubble('Producer', '📎 <b>' + esc(st.file ? st.file.name : '') + '</b>을(를) <b>' + esc(st.kind + ' ' + k.name) + '</b>(으)로 읽었어요.' +
-        (k.o ? '<div class="w-q-t" style="margin-top:6px">' + esc(k.q) + '</div>' + qr('use', k.o, st.use) : '<div class="w-qr">' + A('맞아요', 'bFileOk', 'pri sm') + A('종류가 달라요', 'cycleKind', 'sm') + '</div>') +
-        (k.note ? '<p class="w-note">' + esc(k.note) + '</p>' : ''));
+      return bubble('Producer', '📎 <b>' + esc(st.file ? st.file.name : '') + '</b>을(를) <b>' + esc(k.name) + '</b>(으)로 읽었어요.' +
+        (st.file && st.file.image ? '<p class="w-quote">' + esc(OCR_LINE) + '</p>' : '') + '<div class="w-qr">' + A('맞아요', 'bFileOk', 'pri sm') + '</div>');
     }
-    if (key === 'mood') return bubble('Producer', '어떤 장르·분위기로 할까요?' + qr('mood', MOODS, -1));
-    if (key === 'runtime') return bubble('Producer', '길이는 어느 정도로 할까요?' + qr('runtime', RUNTIMES, -1));
-    if (key === 'level') return bubble('Producer', '내 글을 AI가 얼마나 바꿔도 될까요?' +
+    if (key === 'mood') return bubble('Producer', BQ_Q.mood + qr('mood', MOODS, -1, r.mood) + why(r.moodWhy));
+    if (key === 'runtime') return bubble('Producer', BQ_Q.runtime + qr('runtime', RUNTIMES, -1, r.runtime) + why(r.runtimeWhy));
+    if (key === 'level') return bubble('Producer', BQ_Q.level +
       '<div class="w-qr col">' + LEVELS.map(function (l, i) {
-        return '<button class="w-opt lv" data-act="bAnswer" data-arg="level:' + i + '"' + (levelOk(i) ? '' : ' disabled') + '><b>' + (i + 1) + ' ' + esc(l.n) + (i === rec ? ' <em>추천</em>' : '') + '</b><small>지켜요 ' + esc(l.keep) + ' · 바꿔요 ' + esc(l.change) + '</small></button>';
-      }).join('') + '</div>' + (hasText() ? '' : '<p class="w-note">1·2단계는 지킬 원문이 있어야 해요.</p>'));
-    if (key === 'ratio') return bubble('Producer', '화면 비율을 골라 주세요. <b class="w-lock">🔒 고르면 끝까지 바꿀 수 없어요.</b>' + qr('ratio', RATIOS, -1));
+        return '<button class="w-opt lv" data-act="bAnswer" data-arg="level:' + i + '"' + (levelOk(i) ? '' : ' disabled') + '><b>' + (i + 1) + ' ' + esc(l.n) + (i === r.level ? ' <em>추천</em>' : '') + '</b><small>지켜요 ' + esc(l.keep) + ' · 바꿔요 ' + esc(l.change) + '</small></button>';
+      }).join('') + '</div>' + (hasText() ? '' : '<p class="w-note">"그대로"는 지킬 원문이 있어야 해요.</p>'));
+    if (key === 'ratio') return bubble('Producer', '화면 비율을 골라 주세요. <b class="w-lock">🔒 고르면 끝까지 바꿀 수 없어요.</b>' + qr('ratio', RATIOS, -1, 1));
     if (key === 'confirm') {
       return bubble('Producer', '이렇게 시작할게요.' + list([['장르·분위기', esc(ansText('mood'))], ['길이', esc(ansText('runtime'))], ['바꿈 정도', esc(ansText('level')) + ' — ' + esc(LEVELS[st.level].s)], ['🔒 화면 비율', esc(st.ratio) + ' · 끝까지 바꿀 수 없어요'], ['자료', st.file ? esc(st.file.name) : '아이디어 글만']]) +
         '<div class="w-qr">' + A('시작', 'confirmStart', 'pri sm') + '</div><p class="w-note">고치고 싶으면 위쪽 항목을 누르거나 "길이는 1분으로"처럼 말해 주세요.</p>');
@@ -246,8 +278,13 @@
   }
   function chatStage(curKey) {
     var order = (st.file ? ['file'] : []).concat(BQ, ['confirm']);
-    var h = bubble('Producer', '무엇을 만들어 볼까요? 아이디어나 줄거리를 적거나, 대본·이미지 파일을 올려 주세요.');
-    if (curKey) {
+    var h = bubble('Producer', '무엇을 만들어 볼까요? 한 줄이어도 괜찮아요. 무엇을 적을지 모르겠으면 아래 예시를 눌러 보세요.');
+    if (!curKey) {
+      h += '<div class="w-ex" aria-label="예시"><div class="w-ex-h">예시를 눌러 시작하기</div>' + EXAMPLES.map(function (x, i) {
+        return '<button class="w-ex-c" data-act="example" data-arg="' + i + '"><b>' + esc(x[0]) + '</b><span>' + esc(x[1]) + '</span></button>';
+      }).join('') + '</div>';
+      if (st.lenErr && !st.file && ideaLen() < MIN_LEN) h += bubble('Producer', '<span class="w-err-t">조금 더 적어 주세요. ' + MIN_LEN + '자 이상이면 이야기를 잡을 수 있어요. (지금 ' + ideaLen() + '자)</span> 아래 "누구 이야기 · 어디서 · 무슨 일이"를 눌러 채워 봐도 좋아요.');
+    } else {
       h += bubble('', esc(st.idea) + (st.file ? '<br><span class="w-chip">📎 ' + esc(st.file.name) + '</span>' : ''), true);
       var pre = BQ.filter(function (k) { return st.bPre[k]; });
       if (pre.length) h += bubble('Producer', '말씀에서 ' + pre.map(function (k) { return BQ_NAME[k] + ' <b>' + esc(ansText(k)) + '</b>'; }).join(', ') + '을(를) 읽었어요. 나머지만 물어볼게요.');
@@ -263,12 +300,11 @@
       return '<button class="w-sum-c' + (on ? ' on' : '') + (k === curKey ? ' cur' : '') + '" data-act="bReask" data-arg="' + k + '"' + (on ? '' : ' disabled') + '><i>' + (k === 'ratio' ? '🔒 ' : '') + BQ_NAME[k] + '</i>' + (on ? esc(ansText(k)) : '—') + '</button>';
     }).join('') + '</div>';
     var input = curKey
-      ? '<div class="w-cin"><input id="chat-in" data-bind="chatDraft" data-enter="bSend" value="' + esc(st.chatDraft) + '" placeholder="골라도 되고, 말로 해도 돼요. 예: 1분짜리 호러로" aria-label="채팅 입력"><button class="w-btn pri" data-act="bSend" data-need="chatDraft">보내기</button></div>'
-      : '<div class="w-cin first"><textarea class="w-ta sm" id="idea" data-bind="idea" rows="2" aria-label="아이디어" placeholder="예: 회사 자판기가 고장 나는 1분짜리 코미디">' + esc(st.idea) + '</textarea>' +
+      ? '<div class="w-cin"><input id="chat-in" data-bind="chatDraft" data-enter="bSend" value="' + esc(st.chatDraft) + '" placeholder="골라도 되고, 말로 해도 돼요. 예: 1분짜리로" aria-label="채팅 입력"><button class="w-btn pri" data-act="bSend" data-need="chatDraft">보내기</button></div>'
+      : '<div class="w-cin first"><div class="w-guides">' + GUIDES.map(function (g, i) { return '<button class="w-tab" data-act="guide" data-arg="' + i + '">＋ ' + esc(g.replace(': ', '')) + '</button>'; }).join('') + counter() + '</div>' +
+        '<textarea class="w-ta sm" id="idea" data-bind="idea" rows="3" aria-label="아이디어" placeholder="예: 회사 자판기가 고장 나는 1분짜리 코미디">' + esc(st.idea) + '</textarea>' +
         '<div class="w-cin-row">' + (st.file ? '<span class="w-chip">📎 ' + esc(st.file.name) + '<button class="w-x" data-act="clearFile" aria-label="파일 빼기">×</button></span>' : '') +
-        '<label class="w-btn sm">파일 첨부<input type="file" id="file-in" hidden></label>' +
-        '<span class="w-samples">' + SAMPLE_FILES.map(function (x) { return '<button class="w-tab" data-act="sample" data-arg="' + x[0] + '">' + x[0] + '</button>'; }).join('') + '</span>' +
-        '<span style="flex:1"></span>' + A('보내기', 'bStart', 'pri', ' data-need="idea|file"') + '</div></div>';
+        B('파일 첨부', 'EF', 'sm') + '<span style="flex:1"></span>' + A('보내기', 'bStart', 'pri') + '</div></div>';
     return bar('Producer') + '<div class="w-chatstage">' + (curKey ? sum : '') + '<div class="w-thread">' + h + '</div>' + input + '</div>';
   }
   function EB1() { return chatStage(null); }
@@ -486,17 +522,17 @@
       '<p class="w-note">함께 확인: Director가 Artist 인물 시트를 참조하는지 (오류 13), 러프 마네킹이 인물로 이어지지 않는지 (오류 12).</p>' + A('처음부터 다시', 'reset') + '</div>';
   }
 
-  var SCREENS = { EB1: EB1, EB2: EB2, EB3: EB3, EB4: EB4, EB5: EB5, EB6: EB6, EB7: EB7, E1: E1, E1m: E1m, E2: E2, E3: E3, E4: E4, E5: E5, W1: W1, W1r: W1r, WC1: WC1, WC2: WC2, WC3: WC3, W2: W2, W4: W4, W5: W5, W6: W6,
+  var SCREENS = { EB1: EB1, EB2: EB2, EB3: EB3, EB4: EB4, EB5: EB5, EB6: EB6, EB7: EB7, E1: E1, E1e: E1e, EF: EF, EFe: EFe, E2: E2, E2e: E2e, E3: E3, E4: E4, E5: E5, W1: W1, W1r: W1r, WC1: WC1, WC2: WC2, WC3: WC3, W2: W2, W4: W4, W5: W5, W6: W6,
     A0: A0, A1: A1, R1: R1, A2: A2, A3: A3, A4: A4, A5: A5, A6: A6, A7: A7, A8: A8, R2: R2, A9: A9,
     S0: S0, S1: S1, S2: S2, S3: S3, S4: S4, R3: R3, S5: S5, S6: S6, S7: S7, D1: D1 };
   // 갈림 노드는 그 갈림을 묻는 화면으로
-  var DECISION_SCREEN = { EB1q: 'EB1', E1q: 'E1', E1mq: 'E1m', E2q: 'E3', E5q: 'E4', W1q: 'W1', W3: 'W1', A1q: 'A1', A5q: 'A5', S1q: 'S1', S4q: 'S4' };
+  var DECISION_SCREEN = { E1n: function () { return entryId(); }, EFq: 'EF', E2q: function () { return isB() ? 'EB3' : 'E3'; }, E5q: function () { return isB() ? 'EB7' : 'E4'; }, W1q: 'W1', W3: 'W1', A1q: 'A1', A5q: 'A5', S1q: 'S1', S4q: 'S4' };
   // AI 작업이 끝나면 가는 곳
   var BUSY_NEXT = {
-    E2: function () { if (st.plan === 'B') return st.file ? 'EB2' : nextQ(); return st.file ? 'E3' : 'E4'; },
+    E2: function () { if (st.file && st.file.noText) return 'E2e'; if (isB()) return st.file ? 'EB2' : nextQ(); return 'E3'; },
     E5: 'W1', W2: 'W4', A0: 'A1', A4: 'A5', A8: 'A5', S0: 'S1', S3: 'S1', S6: 'S1',
   };
-  var preserve = function () { return !!st.file && ((!st.file.image && st.level === 0) || (st.kind === '2-2' && st.use < 2)); };
+  var preserve = function () { return st.level === 0 && hasText(); };
 
   /* ── 동작 ── */
   // 목업용 수정안. 전체: 러닝타임에 맞춰 문단 수가 바뀐다. 일부분: 고른 문단만 바뀐다.
@@ -505,6 +541,11 @@
     '드라마': ['야근 중인 민호. 자판기마저 응답이 없다. 팀장이 말없이 캔 하나를 건넨다.', '민호의 마지막 동전. 자판기는 멈추고, 복도엔 형광등 소리만 남는다.', '쏟아진 캔을 줍는 민호와 팀장. 처음으로 둘이 웃는다.'],
     '로맨스': ['자판기 앞에서 마주친 민호와 신입. 쏟아진 캔을 같이 줍는다.', '민호가 누른 버튼에서 두 개가 나온다. 하나를 옆 사람에게 건넨다.', '고장 난 자판기 앞, 같은 음료를 고른 두 사람.'],
     '스릴러': ['복도 불이 깜박인다. 자판기에서 캔 대신 낯선 열쇠가 떨어진다.', '민호가 자판기를 치자 안쪽에서 누군가 두드린다.', '캔이 쏟아지는 순간 CCTV가 꺼진다.'],
+    '액션': ['자판기가 쓰러지며 복도를 막는다. 민호는 캔을 피하며 비상구로 뛴다.', '캔 하나를 두고 민호와 팀장의 추격전이 시작된다.', '쏟아지는 캔 사이로 민호가 미끄러지듯 마지막 캔을 낚아챈다.'],
+    'SF·판타지': ['자판기가 말을 건다. "오늘의 행운을 고르세요."', '버튼을 누르자 자판기 안에서 내일 날짜의 캔이 나온다.', '자판기가 민호의 소원만큼 캔을 쏟아낸다.'],
+    '미스터리': ['자판기에서 나온 캔마다 같은 이름이 적혀 있다.', '고장 난 자판기 안쪽에 누군가 숨겨 둔 쪽지가 있다.', '매일 오후 세 시, 자판기는 한 사람에게만 캔을 준다.'],
+    '휴먼·가족': ['민호는 마지막 동전으로 아버지가 좋아하던 음료를 고른다.', '쏟아진 캔을 동료들과 나눠 마시며 처음으로 웃는다.', '퇴사하는 팀장에게 민호가 캔 하나를 건넨다.'],
+    '일상·잔잔': ['오후 세 시의 복도. 자판기 앞에서 민호는 잠깐 숨을 고른다.', '고장 난 자판기 앞에 오늘도 같은 사람들이 모인다.', '캔 하나가 굴러가는 소리만 남은 조용한 복도.'],
     '호러': ['밤 열한 시. 자판기 불빛만 켜진 복도에서 캔이 저절로 굴러온다.', '민호가 버튼을 누르자 자판기 유리에 다른 얼굴이 비친다.', '쏟아진 캔이 모두 같은 날짜로 찍혀 있다. 오늘 밤.'],
   };
   var NEW_SEED = {
@@ -512,6 +553,11 @@
     '드라마': ['퇴사 날, 민호는 처음 입사한 날의 사원증을 서랍에서 찾는다.', '민호와 팀장이 정전된 엘리베이터에 갇힌다.', '아버지가 일하던 공장 자리에 민호의 회사가 들어서 있다.'],
     '로맨스': ['매일 같은 시간, 옥상에서 마주치는 두 사람.', '잘못 온 택배 상자 속에 편지가 들어 있다.', '복사기 앞에서 매번 종이가 걸리는 사람.'],
     '스릴러': ['민호의 메일함에 내일 날짜로 보낸 메일이 와 있다.', '퇴근 후 사무실 불이 하나씩 다시 켜진다.', '회의실 화이트보드에 민호만 읽을 수 있는 글씨가 남아 있다.'],
+    '액션': ['출근길 지하철이 멈추고, 민호는 마지막 칸에서 소매치기를 쫓는다.', '택배 상자 하나를 두고 세 사람이 도시를 가로지른다.', '정전된 빌딩, 엘리베이터에 갇힌 사람들을 민호가 꺼낸다.'],
+    'SF·판타지': ['고장 난 배달 로봇이 길을 잃고 한 아이를 따라간다.', '민호의 우산을 펴면 그 자리만 시간이 멈춘다.', '회사 지하에 다른 세계로 가는 문이 있다.'],
+    '미스터리': ['매주 금요일, 민호 책상에 이름 없는 편지가 놓인다.', '회사 사람 모두가 어제 일을 기억하지 못한다.', '분실물 보관함에 민호의 물건이 하나씩 늘어난다.'],
+    '휴먼·가족': ['10년 만에 돌아온 고향 집, 아버지의 낡은 카메라.', '할머니의 요리 수첩을 따라 손녀가 장을 본다.', '이사 가는 날, 형제가 어릴 적 비밀 기지를 찾아간다.'],
+    '일상·잔잔': ['비 오는 날 동네 세탁소의 하루.', '새벽 첫차를 타는 사람들.', '오래된 단골 식당이 문을 닫는 마지막 날.'],
     '호러': ['13층 버튼이 생긴다. 아무도 누르지 않았는데.', '민호의 책상 위 사진 속 사람이 한 명 늘어 있다.', '야근하는 민호의 모니터에 회사 CCTV 화면이 뜬다. 민호 뒤에 누가 서 있다.'],
   };
   var CONT = ['일이 점점 커지고, 민호는 수습하려 애쓴다.', '예상하지 못한 사람이 끼어들며 판이 뒤집힌다.', '마지막에 민호는 작은 것 하나를 얻는다.', '다음 날, 같은 자리에서 비슷한 일이 다시 시작된다.'];
@@ -547,16 +593,23 @@
     if (added.length) st.generated = false;
   }
   var ACTS = {
-    sample: function (k) { var f = SAMPLE_FILES.filter(function (s) { return s[0] === k; })[0]; st.file = { name: f[1], image: k.charAt(0) === '2' }; st.kind = k; st.use = 0; st.level = recLevel(); },
-    clearFile: function () { st.file = null; st.kind = '1-3'; if (!levelOk(st.level)) st.level = recLevel(); },
-    start: function () { if (!levelOk(st.level)) st.level = recLevel(); return st.file && st.file.image ? 'E1m' : 'E2'; },
-    denyImage: function () { st.file = null; st.kind = '1-3'; return st.plan === 'B' ? 'EB1' : 'E1'; },
-    cycleKind: function () { var img = st.file && st.file.image; var ks = Object.keys(KINDS).filter(function (k) { return (k.charAt(0) === '2') === !!img; }); st.kind = ks[(ks.indexOf(st.kind) + 1) % ks.length]; st.use = 0; },
-    useRec: function () { st.level = KINDS[st.kind].rec; },
+    next1: function () {
+      if (!st.file && ideaLen() < MIN_LEN) { st.lenErr = true; return 'E1e'; }
+      st.lenErr = false;
+      st.pending = recommend;
+      return 'E2';
+    },
+    pickSample: function (i) { var f = SAMPLE_FILES[+i]; return pickFile(f[1], f[0]); },
+    clearFile: function () { st.file = null; st.kind = '1-3'; st.rec = null; if (!levelOk(st.level)) st.level = recLevel(); },
+    closeFile: function () { st.fileErr = ''; return entryId(); },
+    dropFileGo: function () { st.file = null; st.kind = '1-3'; if (ideaLen() < MIN_LEN) { st.lenErr = true; return 'E1e'; } st.pending = recommend; return 'E2'; },
+    retryFile: function () { st.file = null; st.kind = '1-3'; st.fileErr = ''; return 'EF'; },
+    example: function (i) { st.idea = EXAMPLES[+i][1]; st.lenErr = false; },
+    guide: function (i) { st.idea = (st.idea.trim() ? st.idea.replace(/\s+$/, '') + '\n' : '') + GUIDES[+i]; setTimeout(function () { var t = root && root.querySelector('#idea'); if (t) { t.focus(); t.setSelectionRange(t.value.length, t.value.length); } }, 0); },
     confirmStart: function () {
       st.ratioLocked = true;
       if (preserve()) { st.proseLocked = true; return 'W1r'; }
-      st.pending = function () { if (st.idea.trim()) st.title = st.idea.trim().split(/[.\n]/)[0].slice(0, 18) || st.title; };
+      st.pending = function () { if (st.idea.trim()) st.title = st.idea.trim().split(/[.,\n]/)[0].slice(0, 18) || st.title; };
       return 'E5';
     },
     send: function (arg) {
@@ -640,20 +693,21 @@
     skip: function () { return finishBusy(true); },
     reset: function () { var p = st.plan; st = initial(); st.plan = p; return p === 'B' ? 'EB1' : 'E1'; },
     bStart: function () {
-      if (!st.idea.trim() && !st.file) return;
-      st.bAns = {}; st.bPre = {}; st.bHint = ''; st.bSent = true;
-      parseInto(st.idea).forEach(function (k) { st.bPre[k] = true; });
-      if (!levelOk(st.level)) st.level = recLevel();
-      return st.file && st.file.image ? 'E1m' : 'E2';
+      if (!st.file && ideaLen() < MIN_LEN) { st.lenErr = true; return 'E1e'; }
+      st.lenErr = false; st.bAns = {}; st.bPre = {}; st.bHint = ''; st.bSent = true;
+      st.pending = function () {
+        recommend();
+        parseInto(st.idea).forEach(function (k) { st.bPre[k] = true; });
+      };
+      return 'E2';
     },
     bAnswer: function (a) {
       var kv = a.split(':'), k = kv[0], v = +kv[1];
       if (k === 'ratio') st.ratio = RATIOS[v][0]; else st[k] = v;
-      if (k === 'use') { st.bAns.file = true; return nextQ(); }
       st.bAns[k] = true; st.bPre[k] = false; st.bHint = '';
       return nextQ();
     },
-    bFileOk: function () { st.bAns.file = true; if (!st.bAns.level) st.level = recLevel(); return nextQ(); },
+    bFileOk: function () { st.bAns.file = true; return nextQ(); },
     bReask: function (k) { st.bAns[k] = false; st.bPre[k] = false; return BQ_SCREEN[k]; },
     bSend: function () {
       var t = st.chatDraft.trim(); if (!t) return;
@@ -665,6 +719,18 @@
     },
   };
 
+  function badExtMsg(name) { return '"' + name + '"은(는) 올릴 수 없어요. 글 파일(txt · md · docx · pdf · hwp)이나 글이 담긴 이미지(png · jpg)만 올릴 수 있어요.'; }
+  function pickFile(name, kind, size) {
+    var ext = (name.split('.').pop() || '').toLowerCase();
+    if (kind === 'bad' || (TEXT_EXT.indexOf(ext) < 0 && IMG_EXT.indexOf(ext) < 0)) { st.fileErr = badExtMsg(name); return 'EFe'; }
+    if (size > 10 * 1024 * 1024) { st.fileErr = '"' + name + '"은(는) 10MB가 넘어요. 10MB 이하로 올려 주세요.'; return 'EFe'; }
+    var img = IMG_EXT.indexOf(ext) >= 0;
+    st.file = { name: name, image: img, noText: kind === 'notext' };
+    st.kind = img ? 'img' : (kind && KINDS[kind] ? kind : ext === 'txt' || ext === 'md' ? '1-3' : '1-1');
+    st.fileErr = ''; st.lenErr = false; st.rec = null;
+    return entryId();
+  }
+
   /* ── 엔진 ── */
   var root = null, cur = null, host = {}, timer = null;
   function setPath(obj, path, val) {
@@ -675,7 +741,7 @@
     o[last] = val;
   }
   function getPath(obj, path) { return path.split('.').reduce(function (o, k) { return o == null ? o : o[k]; }, obj); }
-  function screenFor(id) { return SCREENS[id] ? id : DECISION_SCREEN[id] || null; }
+  function screenFor(id) { if (SCREENS[id]) return id; var d = DECISION_SCREEN[id]; return typeof d === 'function' ? d() : d || null; }
   function paint() {
     if (!root) return;
     var sid = screenFor(cur);
@@ -689,6 +755,12 @@
   }
   // 입력이 있으면 버튼을 켠다 (오류 #10)
   function refresh() {
+    var n = ideaLen();
+    root.querySelectorAll('[data-count]').forEach(function (el) {
+      el.textContent = n + '자' + (st.file ? '' : ' · 최소 ' + MIN_LEN + '자');
+      el.classList.toggle('short', !st.file && n < MIN_LEN);
+    });
+    if (n >= MIN_LEN) root.querySelectorAll('[data-lenerr]').forEach(function (el) { el.hidden = true; });
     root.querySelectorAll('.w-lv').forEach(function (b) { b.disabled = !levelOk(+b.getAttribute('data-val')); });
     root.querySelectorAll('[data-need]').forEach(function (b) {
       var ok = b.getAttribute('data-need').split('|').some(function (p) { var v = getPath(st, p); return typeof v === 'string' ? v.trim() : !!v; });
@@ -750,8 +822,8 @@
     el.addEventListener('change', function (e) {
       var t = e.target;
       if (t.id === 'file-in' && t.files && t.files[0]) {
-        var f = t.files[0], img = /^image\//.test(f.type);
-        st.file = { name: f.name, image: img }; st.kind = img ? '2-3' : '1-1'; st.use = 0; st.level = recLevel(); paint();
+        var f = t.files[0]; t.value = '';
+        go(pickFile(f.name, null, f.size));
       } else if (t.tagName === 'SELECT' && t.getAttribute('data-bind') === 'dlgLang') paint();
     });
     el.addEventListener('keydown', function (e) {

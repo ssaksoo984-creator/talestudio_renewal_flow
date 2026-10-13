@@ -76,7 +76,7 @@
         '회사 복도, 오후 세 시. 민호가 자판기 버튼을 누르지만 아무것도 나오지 않는다. 동전 반환 레버를 당겨 봐도 조용하다. 민호는 자판기를 툭 친다.',
         '자판기가 덜컹거리더니 캔이 우르르 쏟아진다. 지나가던 팀장이 하나를 집어 들고 "고마워" 하고 간다. 틴장은 뒤도 안 돌아본다. 복도 끝에서 경비 아저씨가 혀를 찬다. 바닥에 굴러다니는 캔 사이에서 민호는 멍하니 서 있다.',
       ],
-      plan: 'A', pop: null, ents: null, ignored: [], sug: null, mergeSel: [], mergeName: null, showEx: false, exPage: 0, rw: null, bAns: {}, bPre: {}, bHint: '', bSent: false, draft: [], runtime: 0, mood: 0, seed: 0, request: '', variants: [], vpick: 0, vnote: '', parts: [], partNote: '', partMode: false,
+      plan: 'A', pop: null, ents: null, pick: null, adding: false, editEnt: -1, entName: '', mergeInto: -1, showEx: false, exPage: 0, rw: null, bAns: {}, bPre: {}, bHint: '', bSent: false, draft: [], runtime: 0, mood: 0, seed: 0, request: '', variants: [], vpick: 0, vnote: '', parts: [], partNote: '', partMode: false,
       proseLocked: false, back: '', descEdit: -1,
       chars: [
         { n: '민호', d: '20대 후반 직장인. 흰 셔츠, 느슨한 넥타이, 피곤한 눈.', states: ['기본: 흰 셔츠', '파생: 셔츠에 콜라 얼룩 (S2)'], tone: 0, note: '' },
@@ -85,7 +85,7 @@
       ],
       bgs: [{ n: '회사 복도 자판기 앞', d: '낮, 형광등, 리놀륨 바닥, 빨간 자판기 한 대.', tone: 0 }],
       newItems: [],
-      style: 1, styleLocked: false, generated: false, versions: [], ver: 0, regenStyle: null, styleRefs: [], renaming: false, acMode: null, afilter: 'all', editMode: null, ents: null, ignored: [],
+      style: 1, styleLocked: false, generated: false, versions: [], ver: 0, regenStyle: null, styleRefs: [], renaming: false, acMode: null, afilter: 'all', editMode: null,
       target: 0, toneDraft: 0, tweak: '',
       shots: [
         { sc: 1, len: 3, cam: 0, desc: '민호가 버튼을 누른다', who: [0], lines: [] },
@@ -469,63 +469,65 @@
   }
   function W3() { if (!st.rw) st.rw = { runtime: st.runtime, mood: st.mood, seed: st.seed }; return W1(); }
   /* ── 산문 재점검: Artist 목록 위에 산문을 팝업으로 열어 인물·장소 표시를 고친다 ── */
-  // AI가 인식한 말마다 인물·장소로 표시하고, 애매한 말(오타 · 호칭 · 대명사 · 무리)은 점선으로 묻는다.
-  // 산문은 잠긴 채로 표시만 고치고, 같은 것끼리 합친 뒤 [목록에 반영]하면 목록이 표시대로 다시 채워진다.
-  var SUSPECT = ['틴장', '김 대리', '호야', '경비 아저씨', '그녀', '사장님', '동료들', '지나가던 사람들', '사무실 복도', '옥상', '편의점', '회의실', '고양이', '경비원', '청소부', '신입'];
+  // AI가 뽑은 것만 표시한다(AI가 모르는 건 표시하지 않는다). 빠진 말은 사용자가 산문에서 골라 [추가하기],
+  // 이름이 틀렸으면 [수정] — 이미 있는 이름으로 고치면 그 인물·장소와 합쳐진다. 산문은 잠긴 채 그대로다.
   var PLACE_ALIAS = { '회사 복도 자판기 앞': ['회사 복도', '복도', '자판기 앞'] };
   function initEnts() {
     st.ents = st.chars.map(function (c) { return { name: c.n, type: 'char', aliases: (c.aliases || [c.n]).slice() }; })
       .concat(st.bgs.map(function (b) { return { name: b.n, type: 'place', aliases: (b.aliases || PLACE_ALIAS[b.n] || [b.n]).slice() }; }));
-    st.sug = null; st.mergeSel = []; st.mergeName = null;
+    st.pick = null; st.adding = false; st.editEnt = -1; st.mergeInto = -1;
   }
   function tagProse() {
     var ali = []; st.ents.forEach(function (e, i) { e.aliases.forEach(function (a) { ali.push([a, i]); }); });
-    var sus = SUSPECT.filter(function (w) { return st.ignored.indexOf(w) < 0 && !ali.some(function (x) { return x[0] === w; }); });
-    var words = ali.map(function (x) { return x[0]; }).concat(sus).sort(function (a, b) { return b.length - a.length; });
+    if (!ali.length) return st.prose.map(function (p, k) { return '<p><span>S' + (k + 1) + '</span>' + esc(p) + '</p>'; }).join('');
+    var words = ali.map(function (x) { return x[0]; }).sort(function (a, b) { return b.length - a.length; });
     var re = new RegExp(words.map(function (w) { return w.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'); }).join('|'), 'g');
     return st.prose.map(function (p, k) {
       var out = '', last = 0;
       p.replace(re, function (m, idx) {
         out += esc(p.slice(last, idx)); last = idx + m.length;
-        var hit = ali.filter(function (x) { return x[0] === m; })[0];
-        if (hit) { var e = st.ents[hit[1]]; out += '<button class="w-tg ' + e.type + (st.mergeSel.indexOf(hit[1]) >= 0 ? ' sel' : '') + '" data-act="entPick" data-arg="' + hit[1] + '" title="' + esc(e.name) + '">' + esc(m) + '</button>'; }
-        else out += '<button class="w-tg sug" data-act="sugOpen" data-arg="' + esc(m) + '" title="확인이 필요해요">' + esc(m) + '</button>';
+        var i = ali.filter(function (x) { return x[0] === m; })[0][1], e = st.ents[i];
+        out += '<button class="w-tg ' + e.type + (st.editEnt === i ? ' sel' : '') + '" data-act="entEdit" data-arg="' + i + '" title="' + esc(e.name) + ' · 눌러서 수정">' + esc(m) + '</button>';
         return m;
       });
       return '<p><span>S' + (k + 1) + '</span>' + out + esc(p.slice(last)) + '</p>';
     }).join('');
   }
+  var entKind = function (e) { return e.type === 'char' ? '인물' : '장소'; };
   function WT() {
     if (!st.ents) initEnts();
-    var nSug = 0; st.prose.forEach(function (p) { SUSPECT.forEach(function (w) { if (p.indexOf(w) >= 0 && st.ignored.indexOf(w) < 0 && !st.ents.some(function (e) { return e.aliases.indexOf(w) >= 0; })) nSug++; }); });
-    var sugBox = st.sug ? '<div class="w-sugbox" role="dialog" aria-label="표시 고르기"><b>"' + esc(st.sug) + '"은(는) 무엇인가요?</b><div class="w-qr">' +
-      A('새 인물', 'sugAs', 'sm', ' data-arg="char"') + A('새 장소', 'sugAs', 'sm', ' data-arg="place"') +
-      st.ents.map(function (e, i) { return A('같은 ' + (e.type === 'char' ? '인물' : '장소') + ': ' + esc(e.name), 'sugAs', 'sm', ' data-arg="same:' + i + '"'); }).join('') +
-      A('표시 안 함', 'sugAs', 'sm', ' data-arg="ignore"') + A('닫기', 'sugClose', 'sm w-link') + '</div></div>' : '';
+    // 산문에서 고른 말 → [추가하기] → 인물로 / 장소로
+    var pickBar = '<div class="w-pickbar">' + (st.pick
+      ? '<span>고른 말 <b class="w-tg">' + esc(st.pick) + '</b></span>' + (st.adding
+        ? '<span class="w-qr">' + A('인물로 추가', 'addAs', 'pri sm', ' data-arg="char"') + A('장소로 추가', 'addAs', 'sm', ' data-arg="place"') + A('취소', 'pickClear', 'sm w-link') + '</span>'
+        : A('＋ 추가하기', 'addStart', 'pri sm') + A('다시 고르기', 'pickClear', 'sm w-link'))
+      : '<span class="w-mut">빠진 인물·장소가 있으면 산문에서 그 말을 드래그해서 고른 뒤 [추가하기]를 누르세요.</span>' + A('＋ 추가하기', 'addStart', 'sm', ' disabled title="산문에서 말을 먼저 골라 주세요"')) + '</div>';
     var listH = '<ul class="w-ents">' + st.ents.map(function (e, i) {
-      var on = st.mergeSel.indexOf(i) >= 0;
-      return '<li class="' + (on ? 'on' : '') + '"><label><input type="checkbox" data-act="entPick" data-arg="' + i + '"' + (on ? ' checked' : '') + '><span class="w-tg ' + e.type + '">' + esc(e.name) + '</span><small>' + (e.type === 'char' ? '인물' : '장소') + '</small></label>' +
-        (e.aliases.length > 1 ? '<span class="w-alias">또는 ' + esc(e.aliases.filter(function (a) { return a !== e.name; }).join(' · ')) + '</span>' : '') +
-        A('빼기', 'entDrop', 'sm w-link', ' data-arg="' + i + '"') + '</li>';
+      var others = e.aliases.filter(function (a) { return a !== e.name; });
+      if (st.editEnt === i) {
+        return '<li class="on edit"><div class="w-ent-ed"><input class="w-in" id="ent-name" data-bind="entName" data-enter="entSave" value="' + esc(st.entName) + '" list="ent-names" aria-label="이름 고치기">' +
+          '<datalist id="ent-names">' + st.ents.filter(function (x, k) { return k !== i && x.type === e.type; }).map(function (x) { return '<option value="' + esc(x.name) + '">'; }).join('') + '</datalist>' +
+          A('확인', 'entSave', 'pri sm') + A('취소', 'entCancel', 'sm') + '</div>' +
+          '<span class="w-alias">이미 있는 ' + entKind(e) + ' 이름으로 고치면 하나로 합쳐져요 · ' + A('목록에서 빼기', 'entDrop', 'sm w-link', ' data-arg="' + i + '"') + '</span></li>';
+      }
+      return '<li><span class="w-ent-n"><span class="w-tg ' + e.type + '">' + esc(e.name) + '</span><small>' + entKind(e) + '</small></span>' +
+        A('수정', 'entEdit', 'sm', ' data-arg="' + i + '"') +
+        (others.length ? '<span class="w-alias">또는 ' + esc(others.join(' · ')) + '</span>' : '') + '</li>';
     }).join('') + '</ul>';
-    var sameType = st.mergeSel.length > 1 && st.mergeSel.every(function (i) { return st.ents[i].type === st.ents[st.mergeSel[0]].type; });
     var body = '<p class="w-mut">🔒 산문은 잠긴 채로 표시만 고쳐요. [목록에 반영]하면 Artist 목록이 이 표시대로 다시 채워져요.</p>' +
-      (nSug ? '<div class="w-diag"><b>AI</b>확인이 필요한 말이 ' + nSug + '개 있어요. 점선으로 된 말을 눌러 인물·장소인지, 이미 있는 것과 같은지 알려 주세요. 빠진 말은 산문에서 드래그해서 표시할 수 있어요.</div>' : '<div class="w-diag"><b>AI</b>확인할 말은 다 정했어요. 같은 인물·장소가 둘로 나뉘어 있으면 오른쪽에서 골라 합쳐 주세요.</div>') +
-      '<div class="w-wt"><div class="w-wt-p">' + sugBox + '<article class="w-prose w-tgprose">' + tagProse() + '</article>' +
-        '<p class="w-note"><span class="w-tg char">인물</span> <span class="w-tg place">장소</span> <span class="w-tg sug">확인 필요</span> · 말을 드래그하면 새로 표시할 수 있어요</p></div>' +
-      '<aside class="w-wt-l"><div class="w-q-t">뽑을 목록 <small>' + st.ents.length + '개</small></div>' + listH +
-        (st.mergeSel.length > 1 ? (sameType ? B(st.mergeSel.length + '개 하나로 합치기', 'WTm', 'acc sm') : '<p class="w-note">인물과 장소는 합칠 수 없어요.</p>') : '<p class="w-note">같은 인물·장소가 둘 이상이면 체크해서 합치세요.</p>') + '</aside></div>' +
+      '<div class="w-wt"><div class="w-wt-p"><article class="w-prose w-tgprose">' + tagProse() + '</article>' +
+        '<p class="w-note"><span class="w-tg char">인물</span> <span class="w-tg place">장소</span> AI가 뽑은 것만 표시돼 있어요 · 표시된 말을 누르면 수정할 수 있어요</p>' + pickBar + '</div>' +
+      '<aside class="w-wt-l"><div class="w-q-t">뽑은 목록 <small>' + st.ents.length + '개</small></div>' + listH + '</aside></div>' +
       '<p class="w-note">산문에 없는 인물·배경이 필요하면 산문을 다시 써야 해요.</p>';
     return A1() + modal('산문 재점검', body,
-      A('취소', 'recheckCancel') + A('산문 다시 쓰기', 'recheckRewrite') + A('목록에 반영', 'extract', 'pri', nSug ? ' disabled title="점선으로 된 말을 먼저 정해 주세요"' : ''), 'xl');
+      A('취소', 'recheckCancel') + A('산문 다시 쓰기', 'recheckRewrite') + A('목록에 반영', 'extract', 'pri', st.editEnt >= 0 ? ' disabled title="수정 중인 이름을 먼저 확인해 주세요"' : ''), 'xl');
   }
+  // 이미 있는 이름으로 고쳤을 때: 합칠지 한 번 묻는다
   function WTm() {
-    var all = []; st.mergeSel.forEach(function (i) { st.ents[i].aliases.forEach(function (a) { if (all.indexOf(a) < 0) all.push(a); }); });
-    if (!st.mergeName || all.indexOf(st.mergeName) < 0) st.mergeName = st.ents[st.mergeSel[0]].name;
-    return WT() + modal('하나로 합칠까요?', '<p>' + esc(all.join(' · ')) + '을(를) 같은 ' + (st.ents[st.mergeSel[0]].type === 'char' ? '인물' : '장소') + '로 묶어요. 남길 이름을 골라 주세요. 나머지는 다른 이름(또는)으로 남아요.</p>' +
-      '<div class="w-opts">' + all.map(function (a) { return '<button class="w-opt' + (a === st.mergeName ? ' on' : '') + '" data-act="mergeKeep" data-arg="' + esc(a) + '">' + esc(a) + '</button>'; }).join('') + '</div>' +
-      '<p class="w-note">오타라면 산문 표기도 남길 이름으로 맞출지 개발 확인이 필요해요.</p>',
-      B('취소', 'WT') + A('합치기', 'mergeDo', 'acc'));
+    var e = st.ents[st.editEnt], t = st.ents[st.mergeInto];
+    return WT() + modal(e.name + ' → ' + t.name + ', 하나로 합칠까요?', '<p>' + esc(t.name) + '은(는) 이미 목록에 있어요. 합치면 한 ' + entKind(t) + '이 되고, 산문의 "' + esc(e.aliases.join('", "')) + '"은(는) ' + esc(t.name) + '의 다른 이름(또는)으로 남아요.</p>' +
+      '<p class="w-note">오타라면 산문 표기도 ' + esc(t.name) + '(으)로 맞출지 개발 확인이 필요해요.</p>',
+      A('취소', 'mergeCancel') + A('합치기', 'mergeDo', 'acc'));
   }
   function W6() {
     return W1() + modal('산문을 확정할까요?', list([['다음', 'Artist가 산문에서 인물·배경을 뽑아요'], ['🔒 산문', '브레이크다운하면 잠겨요'], ['나중에 인물·배경을 늘리려면', '여기 산문으로 돌아와야 해요']]),
@@ -949,8 +951,8 @@
     chatFree: function () { st.focusChat = true; return 'W1'; },
     breakdown: function () { st.back = ''; st.proseLocked = true; st.ents = null; return 'A0'; },
     // 재점검 팝업 열기 · 닫기: 닫으면 고친 표시를 되돌린다
-    recheck: function () { if (!st.ents) initEnts(); st.entsBak = JSON.parse(JSON.stringify(st.ents)); st.ignoredBak = st.ignored.slice(); st.sug = null; st.mergeSel = []; return 'WT'; },
-    recheckCancel: function () { if (st.entsBak) { st.ents = st.entsBak; st.ignored = st.ignoredBak; } st.entsBak = null; st.sug = null; st.mergeSel = []; return 'A1'; },
+    recheck: function () { if (!st.ents) initEnts(); st.entsBak = JSON.parse(JSON.stringify(st.ents)); st.pick = null; st.adding = false; st.editEnt = -1; return 'WT'; },
+    recheckCancel: function () { if (st.entsBak) st.ents = st.entsBak; st.entsBak = null; st.pick = null; st.editEnt = -1; return 'A1'; },
     recheckRewrite: function () { ACTS.recheckCancel(); return 'R1'; },
     // 표시한 대로 목록을 다시 채운다: 이미 있던 것은 설명·그림을 그대로 두고, 산문은 바꾸지 않는다
     extract: function () {
@@ -959,28 +961,32 @@
       st.chars = st.ents.filter(function (e) { return e.type === 'char'; }).map(function (e) { return keep(oldC, e, '산문에서 표시한 인물. 설명은 AI가 산문을 읽고 채워요.'); });
       st.bgs = st.ents.filter(function (e) { return e.type === 'place'; }).map(function (e) { return keep(oldB, e, '산문에서 표시한 장소.'); });
       st.newItems = st.ents.map(function (e) { return e.name; }).filter(function (n) { return before.indexOf(n) < 0; });
-      st.sug = null; st.mergeSel = []; st.entsBak = null;
+      st.pick = null; st.editEnt = -1; st.entsBak = null;
       return 'A1';
     },
-    sugOpen: function (w) { st.sug = w; },
-    sugClose: function () { st.sug = null; },
-    sugAs: function (a) {
-      var w = st.sug; if (!w) return;
-      if (a === 'ignore') st.ignored.push(w);
-      else if (a === 'char' || a === 'place') st.ents.push({ name: w, type: a, aliases: [w] });
-      else { var e = st.ents[+a.split(':')[1]]; if (e.aliases.indexOf(w) < 0) e.aliases.push(w); }
-      st.sug = null;
+    pickClear: function () { st.pick = null; st.adding = false; },
+    addStart: function () { if (st.pick) st.adding = true; },
+    addAs: function (t) {
+      var w = st.pick; if (!w) return;
+      var e = st.ents.filter(function (x) { return x.aliases.indexOf(w) >= 0; })[0];
+      if (!e) st.ents.push({ name: w, type: t, aliases: [w] });
+      st.pick = null; st.adding = false;
     },
-    entPick: function (i) { i = +i; var k = st.mergeSel.indexOf(i); if (k >= 0) st.mergeSel.splice(k, 1); else st.mergeSel.push(i); },
-    entDrop: function (i) { var e = st.ents.splice(+i, 1)[0]; e.aliases.forEach(function (a) { st.ignored.push(a); }); st.mergeSel = []; },
-    mergeKeep: function (n) { st.mergeName = n; },
+    entEdit: function (i) { i = +i; st.editEnt = st.editEnt === i ? -1 : i; st.entName = st.editEnt >= 0 ? st.ents[i].name : ''; st.pick = null; st.adding = false; },
+    entCancel: function () { st.editEnt = -1; },
+    entSave: function () {
+      var i = st.editEnt, e = st.ents[i], n = (st.entName || '').trim(); if (!e || !n) return;
+      var j = -1; st.ents.forEach(function (x, k) { if (k !== i && x.type === e.type && (x.name === n || x.aliases.indexOf(n) >= 0)) j = k; });
+      if (j >= 0) { st.mergeInto = j; return 'WTm'; }
+      if (e.aliases.indexOf(n) < 0 && st.prose.join(' ').indexOf(n) >= 0) e.aliases.push(n);
+      e.name = n; st.editEnt = -1;
+    },
+    entDrop: function (i) { st.ents.splice(+i, 1); st.editEnt = -1; },
+    mergeCancel: function () { st.mergeInto = -1; return 'WT'; },
     mergeDo: function () {
-      var sel = st.mergeSel.slice().sort(function (a, b) { return a - b; }), base = st.ents[sel[0]];
-      var all = []; sel.forEach(function (i) { st.ents[i].aliases.forEach(function (a) { if (all.indexOf(a) < 0) all.push(a); }); });
-      var keepName = st.mergeName && all.indexOf(st.mergeName) >= 0 ? st.mergeName : base.name;
-      var merged = { name: keepName, type: base.type, aliases: [keepName].concat(all.filter(function (a) { return a !== keepName; })) };
-      st.ents = st.ents.filter(function (e, i) { return sel.indexOf(i) < 0; }); st.ents.splice(sel[0], 0, merged);
-      st.mergeSel = []; st.mergeName = null;
+      var e = st.ents[st.editEnt], t = st.ents[st.mergeInto];
+      e.aliases.forEach(function (a) { if (t.aliases.indexOf(a) < 0) t.aliases.push(a); });
+      st.ents.splice(st.editEnt, 1); st.editEnt = -1; st.mergeInto = -1;
       return 'WT';
     },
     rollback: function (from) { st.proseLocked = false; st.back = from; st.ratioLocked = true; return 'W1'; },
@@ -1213,7 +1219,7 @@
     el.addEventListener('mouseup', function (e) {
       if (!e.target.closest || !e.target.closest('.w-tgprose') || e.target.closest('.w-tg')) return;
       var t = String(window.getSelection ? window.getSelection() : '').trim();
-      if (t && t.length <= 14 && !/\n/.test(t)) { st.sug = t; paint(); }
+      if (t && t.length <= 14 && !/\n/.test(t)) { st.pick = t; st.adding = false; st.editEnt = -1; paint(); }
     });
     el.addEventListener('keydown', function (e) {
       var t = e.target;

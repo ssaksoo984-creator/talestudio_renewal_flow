@@ -84,7 +84,7 @@
       ],
       bgs: [{ n: '회사 복도 자판기 앞', d: '낮, 형광등, 리놀륨 바닥, 빨간 자판기 한 대.', tone: 0 }],
       newItems: [],
-      style: 1, styleLocked: false, generated: false, versions: [], ver: 0, regenStyle: null,
+      style: 1, styleLocked: false, generated: false, versions: [], ver: 0, regenStyle: null, styleRefs: [], renaming: false, acMode: null,
       target: 0, toneDraft: 0, tweak: '',
       shots: [
         { sc: 1, len: 3, cam: 0, desc: '민호가 버튼을 누른다', who: [0], lines: [] },
@@ -416,7 +416,7 @@
   }
   function W1() { return writer(); }
   function W1r() { return st.plan === 'B' ? writerB() : studio('Writer', proseMain(true), { noChat: true }); }
-  function chatCard(title, body) { return '<div class="w-msg card"><b>Writer</b><div class="w-card-t">' + esc(title) + '</div>' + body + '</div>'; }
+  function chatCard(title, body, who) { return '<div class="w-msg card"><b>' + (who || 'Writer') + '</b><div class="w-card-t">' + esc(title) + '</div>' + body + '</div>'; }
   function WC1() {
     return writer({ card: chatCard('뭐가 마음에 안 드세요?', '<div class="w-card-acts">' + B('전부 다시', 'WC2', 'pri sm') + B('일부분만', 'WC3', 'sm') + '</div>') });
   }
@@ -477,9 +477,26 @@
   // 스타일은 작품에 하나라서: 전체 버전을 불러오면 스타일도 그 버전으로 바뀌고, 하나만 다시 만들기·불러오기는 지금 스타일 안에서만 된다.
   function objs() {
     var a = st.chars.concat(st.bgs);
-    a.forEach(function (o, i) { if (!o.hist) { o.hist = []; o.cur = -1; } o.isBg = i >= st.chars.length; });
+    a.forEach(function (o, i) {
+      if (!o.hist) { o.hist = []; o.cur = -1; }
+      if (!o.refs) { o.refs = []; o.traits = []; o.model = 0; o.prompt = o.d; o.sTab = 0; }
+      o.isBg = i >= st.chars.length;
+    });
     return a;
   }
+  var objPath = function (i) { return i < st.chars.length ? 'chars.' + i : 'bgs.' + (i - st.chars.length); };
+  var MODELS = ['GPT Image 2', 'Nano Banana 2', 'Seedream 4', 'Flux Kontext'];
+  // 캐릭터성: 눌러서 쌓는 칩. 여러 개 고를 수 있고, 같은 건 한 번만 들어간다.
+  var TRAITS = {
+    char: [['성격', ['냉철한', '다정한', '엉뚱한', '소심한', '당당한']], ['분위기·톤', ['코미디', '호러', '로맨스', '누아르', '따뜻한']], ['체형·인상', ['마른', '다부진', '동안', '날카로운 눈매', '웃는 상']], ['시대·패션', ['현대 오피스룩', '90년대', '캐주얼', '정장', '빈티지']]],
+    bg: [['시간·날씨', ['낮', '밤', '비', '노을']], ['분위기·톤', ['코미디', '호러', '따뜻한', '차가운']], ['공간감', ['좁은', '넓은', '어수선한', '깔끔한']]],
+  };
+  function refStrip(key, refs) {
+    return '<div class="w-refs">' + refs.map(function (r, k) { return '<span class="w-ref" title="' + esc(r) + '">' + esc(r.slice(0, 6)) + '<button class="w-x" data-act="delRef" data-arg="' + key + ':' + k + '" aria-label="레퍼런스 빼기">×</button></span>'; }).join('') +
+      '<label class="w-ref add" title="레퍼런스 이미지 올리기">＋<input type="file" accept="image/*" class="ref-in" data-ref="' + key + '" hidden></label>' +
+      A('예시 넣기', 'addRef', 'sm w-link', ' data-arg="' + key + '"') + '</div>';
+  }
+  var refsOf = function (key) { return key === 'style' ? st.styleRefs : objs()[+key].refs; };
   function newVersion(style) {
     var n = st.versions.length + 1;
     objs().forEach(function (o) { o.hist.push({ style: style, tone: o.tone || 0, note: '', v: n }); o.cur = o.hist.length - 1; });
@@ -503,17 +520,18 @@
     return '<li class="w-row' + (isNew ? ' is-new' : '') + '">' + (mode === 'img' ? thumb(o, h) : '') +
       '<div class="w-row-b"><b>' + esc(o.n) + ' <small>' + (o.isBg ? '배경' : '인물') + (isNew ? ' · 새로' : '') + '</small></b>' + desc +
       (o.isBg ? '' : '<div class="w-row-st">' + o.states.map(function (x) { return '<span>' + esc(x) + '</span>'; }).join('') + '</div>') +
-      (h && (h.tone || h.note) ? '<p class="w-tone">톤 ' + esc(TONES[h.tone]) + (h.note ? ' · ' + esc(h.note) : '') + '</p>' : '') + '</div>' +
+      '<div class="w-row-ref"><i>레퍼런스</i>' + refStrip(String(i), o.refs) + '</div></div>' +
       '<div class="w-row-a">' + acts + '</div></li>';
   }
   function imgCards() {
     return '<div class="w-acards">' + objs().map(function (o, i) {
       var h = o.cur >= 0 ? o.hist[o.cur] : null, isNew = st.newItems.indexOf(o.n) >= 0;
-      return '<div class="w-acard' + (o.isBg ? ' bg' : '') + (isNew ? ' is-new' : '') + '">' + thumb(o, h, true) +
+      return '<div class="w-acard' + (o.isBg ? ' bg' : '') + (isNew ? ' is-new' : '') + '"><button class="w-acard-img" data-act="openTone" data-arg="' + i + '" aria-label="' + esc(o.n) + ' 크게 보기">' + thumb(o, h, true) + '</button>' +
         '<div class="w-acard-b"><b>' + esc(o.n) + ' <small>' + (o.isBg ? '배경' : '인물') + (isNew ? ' · 새로' : '') + '</small></b>' +
         (o.isBg ? '' : '<div class="w-row-st">' + o.states.map(function (x) { return '<span>' + esc(x) + '</span>'; }).join('') + '</div>') +
-        (h && (h.tone || h.note) ? '<p class="w-tone">톤 ' + esc(TONES[h.tone]) + (h.note ? ' · ' + esc(h.note) : '') + '</p>' : '') +
-        A(h ? '다시 만들기' : '만들기', 'openTone', 'sm', ' data-arg="' + i + '"') + '</div></div>';
+        (h && h.traits && h.traits.length ? '<p class="w-tone">' + esc(h.traits.join(' · ')) + '</p>' : '') +
+        (o.refs.length ? '<p class="w-mut" style="margin:0;font-size:11px">레퍼런스 ' + o.refs.length + '장</p>' : '') +
+        A('열기 · 고치기', 'openTone', 'sm', ' data-arg="' + i + '"') + '</div></div>';
     }).join('') + '</div>';
   }
   function rows(mode) { return '<ul class="w-rows">' + objs().map(function (o, i) { return row(o, i, mode); }).join('') + '</ul>'; }
@@ -540,11 +558,12 @@
   function A2() {
     var n = st.chars.reduce(function (x, c) { return x + c.states.length; }, 0);
     return A1() + modal('어떤 스타일로 만들까요?', '<p>이 작품의 스타일은 하나예요. 나중에 [재생성하기]로 다른 스타일을 다시 고를 수 있고, 이전 버전은 기록에 남아요.</p>' +
-      styleRow('style', st.style) + list([['만드는 것', '인물 시트 ' + st.chars.length + ' (상태 ' + n + ') · 배경 ' + st.bgs.length], ['스타일', esc(STYLES[st.style][0])], ['예상 크레딧', '표시 자리']]),
+      styleRow('style', st.style) + '<div class="w-q"><div class="w-q-t">스타일 레퍼런스 <small>선택 · 이 그림체를 참고해요</small></div>' + refStrip('style', st.styleRefs) + '</div>' + list([['만드는 것', '인물 시트 ' + st.chars.length + ' (상태 ' + n + ') · 배경 ' + st.bgs.length], ['스타일', esc(STYLES[st.style][0])], ['예상 크레딧', '표시 자리']]),
       B('취소', 'A1') + A(esc(STYLES[st.style][0]) + '로 만들기', 'generate', 'acc'), true);
   }
   function A4() { return (st.versions.length ? A5() : A1()) + busy('그림을 만들고 있어요', objs().map(function (o) { return o.n; })); }
-  function A5() {
+  function A5(o) {
+    o = o || {};
     if (!st.versions.length) newVersion(st.style);
     var v = st.versions[st.ver];
     var main = '<div class="w-title"><h3>Artist</h3><span class="w-mut">인물 ' + st.chars.length + ' · 배경 ' + st.bgs.length + '</span></div>' +
@@ -552,12 +571,28 @@
       '<span class="w-tbar-sp"></span>' + B('불러오기 · 기록 ' + st.versions.length, 'AV', 'sm', st.versions.length > 1 ? '' : ' disabled title="재생성하면 이전 버전이 여기 남아요"') + B('재생성하기', 'A6', 'sm') + '</div>' +
       imgCards() +
       '<div class="w-foot">' + B('＋ 인물·배경 추가', 'R2') + B('완료하기 →', 'A9', 'pri') + '</div>';
-    return studio('Artist', main, { ph: '예: 민호 넥타이를 더 느슨하게' });
+    return studio('Artist', main, { card: o.card, ph: o.ph || '예: 민호 바꿔줘' });
+  }
+  // 에이전트에게 "민호 바꿔줘": 어떻게 바꿀지 세 갈래로 묻는다
+  function AC1() {
+    var t = target();
+    return A5({ card: chatCard(t.n + '을(를) 어떻게 바꿀까요?', '<div class="w-qr col">' +
+      B('그림체(스타일)부터 바꾸고 싶어요 <small>스타일은 작품에 하나라 전체를 다시 만들어요</small>', 'A6', 'sm') +
+      A('옷 · 소품 같은 작은 것만 <small>지금 그림을 바탕으로 고쳐요</small>', 'acPick', 'sm', ' data-arg="edit"') +
+      A('스타일은 좋은데 생김새가 별로예요 <small>같은 스타일로 새로 만들어요</small>', 'acPick', 'sm', ' data-arg="new"') + '</div>', 'Artist') });
+  }
+  function AC2() {
+    var t = target();
+    return A5({ ph: '예: 넥타이를 풀고 셔츠 소매를 걷어 줘', card: chatCard('어떤 식으로 바꿀까요?', '<p style="margin:0">지금 그림(' + esc(MODELS[t.model || 0]) + ')을 바탕으로 고칠게요. 괜찮죠? 아래 채팅에 바꿀 것을 적어 주세요.</p><div class="w-card-acts">' + B('다른 방법으로', 'AC1', 'sm') + '</div>', 'Artist') });
+  }
+  function AC3() {
+    var t = target();
+    return A5({ ph: '예: 더 앳된 얼굴, 짧은 머리', card: chatCard('생김새를 새로 만들게요', '<p style="margin:0">스타일(' + esc(STYLES[st.style][0]) + ')은 그대로 두고 ' + esc(t.n) + '의 생김새만 새로 만들어요. 원하는 생김새를 아래 채팅에 적거나, 상세에서 외형 프롬프트와 캐릭터성을 골라 주세요.</p><div class="w-card-acts">' + A('상세에서 직접 고르기', 'openTone', 'sm', ' data-arg="' + st.target + '"') + B('다른 방법으로', 'AC1', 'sm') + '</div>', 'Artist') });
   }
   function A6() {
     if (st.regenStyle == null) st.regenStyle = st.style;
     return A5() + modal('어떤 스타일로 다시 만들까요?', '<p>같은 스타일로 다시 만들어도 되고, 다른 스타일을 골라도 돼요. 지금 버전(v' + st.versions[st.ver].n + ' · ' + esc(STYLES[st.style][0]) + ')은 기록에 남아서 언제든 불러올 수 있어요.</p>' +
-      styleRow('regenStyle', st.regenStyle) + list([['다시 만드는 것', '인물 ' + st.chars.length + ' · 배경 ' + st.bgs.length + ' 전체'], ['스타일', esc(STYLES[st.regenStyle][0]) + (st.regenStyle === st.style ? ' (그대로)' : ' — 작품 스타일이 이걸로 바뀌어요')], ['예상 크레딧', '표시 자리']]),
+      styleRow('regenStyle', st.regenStyle) + '<div class="w-q"><div class="w-q-t">스타일 레퍼런스 <small>선택 · 이 그림체를 참고해요</small></div>' + refStrip('style', st.styleRefs) + '</div>' + list([['다시 만드는 것', '인물 ' + st.chars.length + ' · 배경 ' + st.bgs.length + ' 전체'], ['스타일', esc(STYLES[st.regenStyle][0]) + (st.regenStyle === st.style ? ' (그대로)' : ' — 작품 스타일이 이걸로 바뀌어요')], ['예상 크레딧', '표시 자리']]),
       A('취소', 'regenCancel') + A('다시 만들기', 'regenAll', 'acc'), true);
   }
   function AV() {
@@ -570,20 +605,38 @@
           (on ? '' : A('불러오기', 'loadVer', 'sm', ' data-arg="' + i + '"')) + '</li>';
       }).join('') + '</ul>', B('닫기', 'A5'), true);
   }
+  // 카드를 누르면 열리는 상세: 큰 그림 · 이름 · 상태 탭 · 외형 프롬프트 · 캐릭터성 · 레퍼런스 · 생성 도구 · 기록
   function A7() {
-    var o = target();
-    var hist = o.hist.map(function (h, k) {
-      var same = h.style === st.style, on = k === o.cur;
-      return '<li class="' + (on ? 'on' : '') + (same ? '' : ' off') + '">' + thumb(o, h) + '<span>' + (on ? '지금' : same ? '' : esc(STYLES[h.style][0]) + ' · 다른 스타일') + '</span>' +
+    var o = target(), i = st.target, path = objPath(i), h = o.cur >= 0 ? o.hist[o.cur] : null;
+    var hist = o.hist.map(function (x, k) {
+      var same = x.style === st.style, on = k === o.cur;
+      return '<li class="' + (on ? 'on' : '') + (same ? '' : ' off') + '">' + thumb(o, x) + '<span>' + (on ? '지금' : same ? '' : esc(STYLES[x.style][0]) + ' · 다른 스타일') + '</span>' +
         (!on && same ? A('불러오기', 'objLoad', 'sm', ' data-arg="' + k + '"') : '') + '</li>';
     }).join('');
-    return A5() + modal(o.n + ' 다시 만들기', '<p>스타일은 작품 스타일(' + esc(STYLES[st.style][0]) + ') 그대로예요. 이 ' + (o.isBg ? '배경' : '인물') + '만 다시 만들고 나머지는 그대로예요.</p>' +
-      '<div class="w-q"><div class="w-q-t">톤 <small>이 객체에만</small></div>' + opts('toneDraft', TONES, st.toneDraft) + '</div>' +
-      '<div class="w-q"><div class="w-q-t">AI에게 고칠 점 <small>선택</small></div><input class="w-in" data-bind="tweak" value="' + esc(st.tweak) + '" placeholder="예: 넥타이를 더 느슨하게" aria-label="고칠 점"></div>' +
-      (o.hist.length ? '<div class="w-q"><div class="w-q-t">이 ' + (o.isBg ? '배경' : '인물') + '의 기록 <small>같은 스타일만 불러올 수 있어요</small></div><ul class="w-ohist">' + hist + '</ul></div>' : ''),
-      B('취소', 'A5') + A(esc(o.n) + '만 다시 만들기', 'applyTone', 'acc'), true);
+    var groups = TRAITS[o.isBg ? 'bg' : 'char'];
+    var traits = '<div class="w-traits">' + groups.map(function (g) {
+      return '<div class="w-trait-g"><i>' + g[0] + '</i>' + g[1].map(function (t) {
+        var on = o.traits.indexOf(t) >= 0;
+        return '<button class="w-chipbtn' + (on ? ' on' : '') + '" data-act="toggleTrait" data-arg="' + esc(t) + '" aria-pressed="' + on + '">' + (on ? '✓ ' : '＋ ') + esc(t) + '</button>';
+      }).join('') + '</div>';
+    }).join('') + '</div>';
+    var head = '<div class="w-dt-h">' + (st.renaming
+        ? '<input class="w-in" data-bind="' + path + '.n" value="' + esc(o.n) + '" aria-label="이름">' + A('완료', 'renameDone', 'sm pri')
+        : '<b>' + esc(o.n) + '</b>' + A('✎ 이름 변경', 'renameStart', 'sm')) +
+      (o.isBg ? '' : '<span class="w-tbar-sp"></span><span class="w-tabs">' + o.states.map(function (x, k) { return '<button class="' + (k === o.sTab ? 'on' : '') + '" data-act="sTab" data-arg="' + k + '">' + esc(x.split(':')[0]) + '</button>'; }).join('') + '</span>') + '</div>';
+    var body = head +
+      '<div class="w-dt-img">' + thumb(o, h, true) + (o.isBg ? '' : '<span class="w-dt-cap">' + esc(o.states[o.sTab] || '') + ' · 턴어라운드 시트</span>') + '</div>' +
+      (o.hist.length > 1 ? '<div class="w-q"><div class="w-q-t">기록 <small>같은 스타일만 불러올 수 있어요</small></div><ul class="w-ohist">' + hist + '</ul></div>' : '') +
+      '<div class="w-q"><div class="w-q-t">외형 프롬프트 <small>고친 뒤 다시 만들면 반영돼요</small></div><textarea class="w-ta sm" rows="2" data-bind="' + path + '.prompt" aria-label="외형 프롬프트">' + esc(o.prompt) + '</textarea></div>' +
+      '<div class="w-q"><div class="w-q-t">' + (o.isBg ? '공간의 성격' : '캐릭터성') + ' <small>눌러서 쌓아요 · 여러 개 고를 수 있어요</small></div>' + traits +
+        '<p class="w-build"><i>AI에 들어가는 말</i>' + esc(o.prompt) + (o.traits.length ? ' + ' + esc(o.traits.join(', ')) : '') + '</p></div>' +
+      '<div class="w-q"><div class="w-q-t">레퍼런스 <small>이 ' + (o.isBg ? '배경' : '인물') + '만 참고해요</small></div>' + refStrip(String(i), o.refs) + '</div>' +
+      '<div class="w-q"><div class="w-q-t">이미지 생성 도구</div><select data-bind="' + path + '.model" aria-label="이미지 생성 도구">' + MODELS.map(function (m, k) { return '<option value="' + k + '"' + (k == o.model ? ' selected' : '') + '>' + esc(m) + '</option>'; }).join('') + '</select></div>' +
+      '<p class="w-note">스타일은 작품 스타일(' + esc(STYLES[st.style][0]) + ') 그대로예요. 이 ' + (o.isBg ? '배경' : '인물') + '만 바뀌어요.</p>';
+    return A5() + modal(o.n + (o.isBg ? ' · 배경' : ' · 인물'), body,
+      B('닫기', 'A5') + A('지금 그림에서 고치기', 'regenObj', '', ' data-arg="edit"' + (h ? '' : ' disabled')) + A('새로 만들기', 'regenObj', 'acc', ' data-arg="new"'), true);
   }
-  function A8() { return A5() + busy(target().n + '을(를) 다시 만들고 있어요'); }
+  function A8() { return A5() + busy(target().n + '을(를) ' + (st.regenMode === 'edit' ? '고치고' : '새로 만들고') + ' 있어요'); }
   function R2() { return A5() + rollbackModal('Artist', [['그대로인 것', '바뀌지 않은 인물·배경 그림 (제안 · 개발 확인)'], ['다시 하는 것', '산문 확정 → 브레이크다운 → 새 객체 그림'], ['스타일', esc(STYLES[st.style][0]) + ' 유지']], 'A5'); }
   function A9() {
     return A5() + modal('완료하고 Storyboard로 넘길까요?', list([['넘어가는 것', '확정 산문 · 인물 ' + st.chars.length + ' · 배경 ' + st.bgs.length + ' · 스타일 ' + esc(STYLES[st.style][0]) + ' (v' + st.versions[st.ver].n + ')'], ['다음', 'AI가 씬·샷을 나누고 러프를 그려요'], ['나중에 인물·배경을 늘리려면', '산문으로 롤백해야 해요. 상태는 Storyboard에서 추가할 수 있어요']]),
@@ -654,7 +707,7 @@
   }
 
   var SCREENS = { EB1: EB1, EBX: EBX, EB2: EB2, EB3: EB3, EB4: EB4, EB5: EB5, EB6: EB6, EB7: EB7, E1: E1, E1e: E1e, EF: EF, EFe: EFe, E2: E2, E2e: E2e, E3: E3, E4: E4, E5: E5, W1: W1, W1r: W1r, WC1: WC1, WC2: WC2, WC3: WC3, W2: W2, W4: W4, W5: W5, W6: W6, WP: WP, WN: WN, W3: W3,
-    A0: A0, A1: A1, R1: R1, A2: A2, A4: A4, A5: A5, A6: A6, A7: A7, A8: A8, R2: R2, A9: A9, AV: AV,
+    A0: A0, A1: A1, R1: R1, A2: A2, A4: A4, A5: A5, A6: A6, A7: A7, A8: A8, R2: R2, A9: A9, AV: AV, AC1: AC1, AC2: AC2, AC3: AC3,
     S0: S0, S1: S1, S2: S2, S3: S3, S4: S4, R3: R3, S5: S5, S6: S6, S7: S7, D1: D1 };
   // 갈림 노드는 그 갈림을 묻는 화면으로
   var DECISION_SCREEN = { E1n: function () { return entryId(); }, EFq: 'EF', E2q: function () { return isB() ? 'EB3' : 'E3'; }, E5q: function () { return isB() ? 'EB7' : 'E4'; }, W1q: 'W1', WPq: 'WP', A1q: 'A1', A5q: 'A5', S1q: 'S1', S4q: 'S4' };
@@ -759,7 +812,12 @@
         st.pending = function () { makeVariants(t); say('Writer', 'Writer', '요청대로 세 가지 안을 썼어요. 하나를 골라 주세요.'); };
         return 'W2';
       }
-      if (on === 'Artist') { st.target = 0; st.toneDraft = 0; st.tweak = t; return ACTS.applyTone(); }
+      if (on === 'Artist') {
+        if (st.acMode) { var m = st.acMode; st.acMode = null; return ACTS.regenObj(m, t); }
+        var hit = -1; objs().forEach(function (o, i) { if (hit < 0 && t.indexOf(o.n) >= 0) hit = i; });
+        st.target = hit < 0 ? 0 : hit;
+        return 'AC1';
+      }
       st.pending = function () { st.shots.forEach(function (s) { s.redrawn = true; }); say('Storyboard', 'Storyboard', '요청을 반영해 샷을 다시 그렸어요.'); };
       return 'S3';
     },
@@ -809,7 +867,26 @@
     regenAll: function () { var sty = st.regenStyle == null ? st.style : st.regenStyle; st.regenStyle = null; st.pending = function () { st.style = sty; newVersion(sty); say('Artist', 'Artist', STYLES[sty][0] + '으로 v' + st.versions.length + '을 만들었어요. 이전 버전은 [불러오기]에 있어요.'); }; return 'A4'; },
     loadVer: function (i) { var v = st.versions[+i]; st.style = v.style; objs().forEach(function (o, k) { if (v.snap[k] != null) o.cur = v.snap[k]; }); st.ver = +i; say('Artist', 'Artist', 'v' + v.n + '(' + STYLES[v.style][0] + ')을 불러왔어요. 작품 스타일도 ' + STYLES[v.style][0] + '으로 바뀌었어요.'); return 'A5'; },
     objLoad: function (k) { var o = target(); if (o.hist[+k].style !== st.style) return; o.cur = +k; st.versions[st.ver].snap[st.target] = o.cur; say('Artist', 'Artist', o.n + '의 이전 그림을 불러왔어요.'); return 'A5'; },
-    openTone: function (i) { st.target = +i; var t = target(), h = t.hist[t.cur]; st.toneDraft = h ? h.tone : 0; st.tweak = ''; return 'A7'; },
+    openTone: function (i) { st.target = +i; st.renaming = false; return 'A7'; },
+    renameStart: function () { st.renaming = true; },
+    renameDone: function () { st.renaming = false; },
+    sTab: function (k) { target().sTab = +k; },
+    toggleTrait: function (t) { var o = target(), k = o.traits.indexOf(t); if (k >= 0) o.traits.splice(k, 1); else o.traits.push(t); },
+    addRef: function (key) { var r = refsOf(key); r.push((key === 'style' ? '그림체' : '참고') + '_' + (r.length + 1) + '.jpg'); },
+    delRef: function (a) { var kv = a.split(':'); refsOf(kv[0]).splice(+kv[1], 1); },
+    acPick: function (m) { st.acMode = m; return m === 'edit' ? 'AC2' : 'AC3'; },
+    regenObj: function (mode, note) {
+      var t = target(), ti = st.target; st.regenMode = mode;
+      var traits = t.traits.slice(), n = note || '';
+      st.pending = function () {
+        var v = st.versions[st.ver] ? st.versions[st.ver].n : 1;
+        var r = t.hist.filter(function (h) { return h.v === v; }).length;
+        t.hist.push({ style: st.style, tone: traits.indexOf('호러') >= 0 ? 2 : 0, note: n, traits: traits, model: t.model, v: v, r: r }); t.cur = t.hist.length - 1;
+        if (st.versions[st.ver]) st.versions[st.ver].snap[ti] = t.cur;
+        say('Artist', 'Artist', t.n + '을(를) ' + (mode === 'edit' ? '지금 그림을 바탕으로 고쳤어요' : '같은 스타일로 새로 만들었어요') + (n ? ' — ' + n : '') + '. 이전 그림은 상세의 기록에 있어요.');
+      };
+      return 'A8';
+    },
     applyTone: function () {
       var t = target(), ti = st.target, tone = st.toneDraft, tw = st.tweak.trim();
       st.pending = function () {
@@ -996,6 +1073,7 @@
     });
     el.addEventListener('change', function (e) {
       var t = e.target;
+      if (t.classList && t.classList.contains('ref-in') && t.files && t.files[0]) { refsOf(t.getAttribute('data-ref')).push(t.files[0].name); t.value = ''; paint(); return; }
       if (t.id === 'file-in' && t.files && t.files[0]) {
         var f = t.files[0]; t.value = '';
         go(pickFile(f.name, null, f.size));

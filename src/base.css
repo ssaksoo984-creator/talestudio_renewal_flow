@@ -438,3 +438,32 @@ a.btn { text-decoration: none; display: inline-block }
 .w-acard-b b small { font-weight: 400; color: var(--w-mut); font-size: 11px }
 [hidden] { display: none !important }
 .w-th { text-shadow: 0 1px 2px rgb(0 0 0 / .7), 0 0 8px rgb(0 0 0 / .45) }
+
+/* ── Artist: 레퍼런스 · 상세 팝업 · 캐릭터성 ── */
+.w-refs { display: flex; flex-wrap: wrap; gap: 4px; align-items: center }
+.w-ref { position: relative; width: 38px; height: 38px; border-radius: 6px; background: linear-gradient(135deg, #c9b8a6, #7d8aa3); color: #fff; font-size: 8.5px; display: grid; place-items: end start; padding: 2px 3px; overflow: hidden; text-shadow: 0 1px 2px rgb(0 0 0 / .6) }
+.w-ref .w-x { position: absolute; top: 0; right: 1px; color: #fff; font-size: 12px; margin: 0 }
+.w-ref.add { background: none; border: 1px dashed var(--w-line); color: var(--w-mut); font-size: 16px; place-items: center; cursor: pointer; text-shadow: none }
+.w-ref.add:hover, .w-ref.add:focus-within { border-color: var(--w-acc); color: var(--w-acc) }
+.w-row-ref { display: flex; gap: 8px; align-items: center; margin-top: 2px }
+.w-row-ref > i { font-style: normal; font-size: 11px; color: var(--w-mut) }
+.w-acard-img { padding: 0; border: 0; background: none; cursor: zoom-in; display: block; width: 100% }
+.w-acard-img:focus-visible { outline: 2px solid var(--accent); outline-offset: -2px }
+.w-dt-h { display: flex; gap: 8px; align-items: center; flex-wrap: wrap; border: 1px solid var(--w-line); border-radius: 9px; padding: 8px 10px }
+.w-dt-h b { font-size: 14px }
+.w-dt-h .w-in { width: auto; flex: 1 }
+.w-tabs { display: inline-flex; gap: 4px }
+.w-tabs button { font: inherit; font-size: 11.5px; border: 1px solid var(--w-line); background: none; color: var(--w-mut); border-radius: 99px; padding: 2px 9px; cursor: pointer }
+.w-tabs button.on { background: var(--w-pri); color: var(--w-pri-ink); border-color: var(--w-pri) }
+.w-dt-img { position: relative }
+.w-dt-img .w-th.big { width: 100%; height: auto; aspect-ratio: 16 / 7; font-size: 22px; border-radius: 10px }
+.w-dt-cap { position: absolute; left: 8px; bottom: 8px; font-size: 11px; color: #fff; background: rgb(0 0 0 / .55); border-radius: 99px; padding: 2px 9px }
+.w-traits { display: grid; gap: 6px }
+.w-trait-g { display: flex; flex-wrap: wrap; gap: 4px; align-items: center }
+.w-trait-g > i { font-style: normal; font-size: 11px; color: var(--w-mut); width: 5.5em }
+.w-chipbtn { font: inherit; font-size: 11.5px; border: 1px solid var(--w-line); background: var(--w-panel); color: var(--w-ink); border-radius: 99px; padding: 2px 9px; cursor: pointer }
+.w-chipbtn.on { border-color: var(--w-acc); color: var(--w-acc); background: color-mix(in srgb, var(--w-acc) 10%, var(--w-panel)) }
+.w-chipbtn:focus-visible { outline: 2px solid var(--accent); outline-offset: 1px }
+.w-build { margin: 4px 0 0; font-size: 12px; background: var(--w-bg); border: 1px dashed var(--w-line); border-radius: 7px; padding: 6px 9px }
+.w-build i { font-style: normal; color: var(--w-mut); font-size: 11px; margin-right: 6px }
+.w-modal.wide { max-height: calc(100vh - 140px); overflow: auto }

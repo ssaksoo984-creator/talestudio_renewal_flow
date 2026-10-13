@@ -27,12 +27,24 @@
     '1-3': { name: '아이디어 노트', rec: 2, rt: 1 },
     'img': { name: '글이 담긴 이미지 (사진 찍은 대본·메모)', rec: 1, rt: 1 },
   };
+  // 대본 파일이면 유저 플로우 정리본(1-1 · 1-2)의 말로 묻는다: 바로 영상화 / 조금 다듬어서 / 완전 새롭게
+  var SCRIPT_LEVELS = {
+    '1-1': [{ n: '바로 영상화', s: '대본을 그대로 샷으로 나눠요', keep: '대본 전체', change: '샷 나누기만', need: true },
+      { n: '조금 다듬어서', s: '바뀐 부분만 새로 써요', keep: '고치지 않은 장면 · 대사', change: '고친 부분만' },
+      { n: '완전 새롭게', s: '대본을 바탕으로 새 영상을 만들어요', keep: '소재 · 인물 설정', change: '줄거리 · 장면 · 대사' }],
+    '1-2': [{ n: '바로 영상화', s: '원본은 그대로, 영상에 빠진 것만 채워요', keep: '대본 전체', change: '빠진 연출 · 인물 · 배경만', need: true },
+      { n: '조금 다듬어서', s: '바뀐 부분만 새로 써요', keep: '고치지 않은 장면 · 대사', change: '고친 부분만' },
+      { n: '완전 새롭게', s: '대본을 바탕으로 새 영상을 만들어요', keep: '소재 · 인물 설정', change: '줄거리 · 장면 · 대사' }],
+  };
+  var isScript = function () { return !!(st.file && !st.file.noText && SCRIPT_LEVELS[st.kind]); };
+  var LV = function () { return isScript() ? SCRIPT_LEVELS[st.kind] : LEVELS; };
+  var LV_Q = function () { return isScript() ? '대본을 어떻게 쓸까요?' : 'AI가 내 글을 얼마나 바꿀까요?'; };
   var MIN_LEN = 20;
   var TEXT_EXT = ['txt', 'md', 'docx', 'pdf', 'hwp'], IMG_EXT = ['png', 'jpg', 'jpeg'];
   var OCR_LINE = '민호: "…또 안 나와?" / 팀장: "고마워." (사진에서 읽은 대본 첫 줄)';
   var ideaLen = function () { return st.idea.trim().length; };
   var hasText = function () { return (st.file && !st.file.noText) || ideaLen() >= 60; };
-  var levelOk = function (i) { return !LEVELS[i].need || hasText(); };
+  var levelOk = function (i) { return !LV()[i].need || hasText(); };
   var recLevel = function () { if (st.file && !st.file.noText) return KINDS[st.kind].rec; return ideaLen() >= 60 ? 1 : 2; };
   // AI가 글을 읽고 고르는 추천 (목업용 간단한 규칙)
   function recommend() {
@@ -64,7 +76,7 @@
         '회사 복도, 오후 세 시. 민호가 자판기 버튼을 누르지만 아무것도 나오지 않는다. 동전 반환 레버를 당겨 봐도 조용하다. 민호는 자판기를 툭 친다.',
         '자판기가 덜컹거리더니 캔이 우르르 쏟아진다. 지나가던 팀장이 하나를 집어 들고 "고마워" 하고 간다. 바닥에 굴러다니는 캔 사이에서 민호는 멍하니 서 있다.',
       ],
-      plan: 'A', pop: null, applied: { runtime: 0, mood: 0, seed: 0 }, bAns: {}, bPre: {}, bHint: '', bSent: false, draft: [], runtime: 0, mood: 0, seed: 0, request: '', variants: [], vpick: 0, vnote: '', parts: [], partNote: '', partMode: false,
+      plan: 'A', pop: null, showEx: false, exPage: 0, rw: null, bAns: {}, bPre: {}, bHint: '', bSent: false, draft: [], runtime: 0, mood: 0, seed: 0, request: '', variants: [], vpick: 0, vnote: '', parts: [], partNote: '', partMode: false,
       proseLocked: false, back: '', descEdit: -1,
       chars: [
         { n: '민호', d: '20대 후반 직장인. 흰 셔츠, 느슨한 넥타이, 피곤한 눈.', states: ['기본: 흰 셔츠', '파생: 셔츠에 콜라 얼룩 (S2)'], tone: 0, note: '' },
@@ -189,9 +201,9 @@
       A('파일 빼고 진행', 'dropFileGo') + A('다른 파일 올리기', 'retryFile', 'pri'));
   }
   function levelPicker() {
-    var rec = recLevel(), L = LEVELS[st.level];
-    return '<div class="w-q"><div class="w-q-t">AI가 내 글을 얼마나 바꿀까요?</div>' +
-      '<div class="w-levels" role="radiogroup">' + LEVELS.map(function (l, i) {
+    var rec = recLevel(), L = LV()[st.level];
+    return '<div class="w-q"><div class="w-q-t">' + LV_Q() + '</div>' + (st.file && !st.file.noText ? '<p class="w-why" style="margin:0">📎 ' + esc(st.file.name) + '을(를) ' + esc(KINDS[st.kind].name) + '(으)로 읽었어요</p>' : '') +
+      '<div class="w-levels" role="radiogroup">' + LV().map(function (l, i) {
         return '<button class="w-lv' + (i === st.level ? ' on' : '') + '" role="radio" aria-checked="' + (i === st.level) + '" data-bind="level" data-val="' + i + '"' + (levelOk(i) ? '' : ' disabled') + '>' +
           '<span class="w-lv-n">' + (i + 1) + '</span><b>' + esc(l.n) + (i === rec ? ' <em>추천</em>' : '') + '</b><small>' + esc(l.s) + '</small></button>';
       }).join('') + '</div>' +
@@ -211,7 +223,7 @@
       '<div class="w-foot">' + B('← 이야기 재료', 'E1') + B('AI로 진행', 'E4', 'acc') + '</div></div>';
   }
   function E4() {
-    var L = LEVELS[st.level];
+    var L = LV()[st.level];
     return E3() + modal('이대로 시작할까요?', list([
       ['🔒 화면 비율', esc(st.ratio) + ' · 시작하면 끝까지 바꿀 수 없어요'],
       ['장르·분위기', esc(MOODS[st.mood])], ['길이', esc(RUNTIMES[st.runtime][0])],
@@ -225,15 +237,17 @@
   var BQ_SCREEN = { file: 'EB2', mood: 'EB3', runtime: 'EB4', level: 'EB5', ratio: 'EB6', confirm: 'EB7' };
   var BQ_NAME = { mood: '장르·분위기', runtime: '길이', level: '바꿈 정도', ratio: '화면 비율' };
   var BQ_Q = { mood: '어떤 장르·분위기로 할까요?', runtime: '길이는 어느 정도로 할까요?', level: '내 글을 AI가 얼마나 바꿔도 될까요?', ratio: '화면 비율을 골라 주세요.' };
-  var EXAMPLES = [['직장 코미디', '회사 복도 자판기가 고장 나서 캔이 우르르 쏟아지는데, 주인공 민호만 하나도 못 먹는 이야기'], ['가족 드라마', '10년 만에 고향 집에 돌아온 딸이 아버지의 낡은 카메라에서 찍다 만 필름을 발견한다'], ['짧은 호러', '야근하던 직원의 모니터에 회사 CCTV 화면이 뜨고, 화면 속 자기 뒤에 누가 서 있다'], ['로맨스', '매일 같은 시간 옥상에서 마주치는 두 사람이 서로의 이름을 모른 채 1년을 보낸다'], ['SF', '고장 난 배달 로봇이 길을 잃고, 집에 혼자 있는 아이를 따라 하루를 보낸다']];
+  var EXAMPLES = [['직장 코미디', '회사 복도 자판기가 고장 나서 캔이 우르르 쏟아지는데, 주인공 민호만 하나도 못 먹는 이야기'], ['가족 드라마', '10년 만에 고향 집에 돌아온 딸이 아버지의 낡은 카메라에서 찍다 만 필름을 발견한다'], ['짧은 호러', '야근하던 직원의 모니터에 회사 CCTV 화면이 뜨고, 화면 속 자기 뒤에 누가 서 있다'], ['로맨스', '매일 같은 시간 옥상에서 마주치는 두 사람이 서로의 이름을 모른 채 1년을 보낸다'], ['SF', '고장 난 배달 로봇이 길을 잃고, 집에 혼자 있는 아이를 따라 하루를 보낸다'], ['미스터리', '매주 금요일, 민호의 책상에 이름 없는 편지가 한 통씩 놓인다']];
   var GUIDES = ['누구 이야기: ', '어디서: ', '무슨 일이: ', '어떻게 끝나요: '];
-  function nextQ() { for (var i = 0; i < BQ.length; i++) if (!st.bAns[BQ[i]]) return BQ_SCREEN[BQ[i]]; return 'EB7'; }
+  // 파일이 있으면 자료 확인 카드에서 "어떻게 쓸까요"를 먼저 묻고(바꿈 정도), 글만 있으면 장르부터 묻는다
+  var bOrder = function () { return st.file ? ['file', 'mood', 'runtime', 'ratio'] : ['mood', 'runtime', 'level', 'ratio']; };
+  function nextQ() { var o = bOrder(); for (var i = 0; i < o.length; i++) if (!st.bAns[o[i]]) return BQ_SCREEN[o[i]]; return 'EB7'; }
   function ansText(k) {
     if (k === 'mood') return MOODS[st.mood];
     if (k === 'runtime') return RUNTIMES[st.runtime][0];
-    if (k === 'level') return (st.level + 1) + ' ' + LEVELS[st.level].n;
+    if (k === 'level') return (st.level + 1) + ' ' + LV()[st.level].n;
     if (k === 'ratio') return st.ratio;
-    if (k === 'file') return KINDS[st.kind].name;
+    if (k === 'file') return KINDS[st.kind].name + ' · ' + LV()[st.level].n;
     return '';
   }
   // 말에서 장르·길이·바꿈 정도·비율을 읽는다 (목업용 간단한 규칙)
@@ -256,43 +270,52 @@
       return '<button class="w-opt' + (i === cur ? ' on' : '') + '" data-act="bAnswer" data-arg="' + key + ':' + i + '">' + (i === rec ? '<em>추천</em>' : '') + esc(t[0]) + (t[1] ? '<small>' + esc(t[1]) + '</small>' : '') + '</button>';
     }).join('') + '</div>';
   }
+  function levelButtons(key, rec) {
+    return '<div class="w-qr col">' + LV().map(function (l, i) {
+      return '<button class="w-opt lv" data-act="bAnswer" data-arg="' + key + ':' + i + '"' + (levelOk(i) ? '' : ' disabled') + '><b>' + (i + 1) + ' ' + esc(l.n) + (i === rec ? ' <em>추천</em>' : '') + '</b><small>지켜요 ' + esc(l.keep) + ' · 바꿔요 ' + esc(l.change) + '</small></button>';
+    }).join('') + '</div>';
+  }
   function bCard(key) {
     var r = st.rec || {};
     if (key === 'file') {
       var k = KINDS[st.kind];
       return bubble('Producer', '📎 <b>' + esc(st.file ? st.file.name : '') + '</b>을(를) <b>' + esc(k.name) + '</b>(으)로 읽었어요.' +
-        (st.file && st.file.image ? '<p class="w-quote">' + esc(OCR_LINE) + '</p>' : '') + '<div class="w-qr">' + A('맞아요', 'bFileOk', 'pri sm') + '</div>');
+        (st.file && st.file.image ? '<p class="w-quote">' + esc(OCR_LINE) + '</p>' : '') +
+        '<div class="w-q-t" style="margin-top:8px">' + LV_Q() + '</div>' + levelButtons('file', r.level));
     }
     if (key === 'mood') return bubble('Producer', BQ_Q.mood + qr('mood', MOODS, -1, r.mood) + why(r.moodWhy));
     if (key === 'runtime') return bubble('Producer', BQ_Q.runtime + qr('runtime', RUNTIMES, -1, r.runtime) + why(r.runtimeWhy));
-    if (key === 'level') return bubble('Producer', BQ_Q.level +
-      '<div class="w-qr col">' + LEVELS.map(function (l, i) {
-        return '<button class="w-opt lv" data-act="bAnswer" data-arg="level:' + i + '"' + (levelOk(i) ? '' : ' disabled') + '><b>' + (i + 1) + ' ' + esc(l.n) + (i === r.level ? ' <em>추천</em>' : '') + '</b><small>지켜요 ' + esc(l.keep) + ' · 바꿔요 ' + esc(l.change) + '</small></button>';
-      }).join('') + '</div>' + (hasText() ? '' : '<p class="w-note">"그대로"는 지킬 원문이 있어야 해요.</p>'));
+    if (key === 'level') return bubble('Producer', BQ_Q.level + levelButtons('level', r.level) + (hasText() ? '' : '<p class="w-note">"그대로"는 지킬 원문이 있어야 해요. 지금은 다듬기나 새롭게 키우기를 골라 주세요.</p>'));
     if (key === 'ratio') return bubble('Producer', '화면 비율을 골라 주세요. <b class="w-lock">🔒 고르면 끝까지 바꿀 수 없어요.</b>' + qr('ratio', RATIOS, -1, 1));
     if (key === 'confirm') {
-      return bubble('Producer', '이렇게 시작할게요.' + list([['장르·분위기', esc(ansText('mood'))], ['길이', esc(ansText('runtime'))], ['바꿈 정도', esc(ansText('level')) + ' — ' + esc(LEVELS[st.level].s)], ['🔒 화면 비율', esc(st.ratio) + ' · 끝까지 바꿀 수 없어요'], ['자료', st.file ? esc(st.file.name) : '아이디어 글만']]) +
+      return bubble('Producer', '이렇게 시작할게요.' + list([['장르·분위기', esc(ansText('mood'))], ['길이', esc(ansText('runtime'))], ['바꿈 정도', esc(ansText('level')) + ' — ' + esc(LV()[st.level].s)], ['🔒 화면 비율', esc(st.ratio) + ' · 끝까지 바꿀 수 없어요'], ['자료', st.file ? esc(st.file.name) : '아이디어 글만']]) +
         '<div class="w-qr">' + A('시작', 'confirmStart', 'pri sm') + '</div><p class="w-note">고치고 싶으면 위쪽 항목을 누르거나 "길이는 1분으로"처럼 말해 주세요.</p>');
     }
     return '';
   }
   function chatStage(curKey) {
-    var order = (st.file ? ['file'] : []).concat(BQ, ['confirm']);
-    var h = bubble('Producer', '무엇을 만들어 볼까요? 한 줄이어도 괜찮아요. 무엇을 적을지 모르겠으면 아래 예시를 눌러 보세요.');
+    var order = bOrder().concat(['confirm']);
+    var h = bubble('Producer', '무엇을 만들까요? 자료가 있으면 올리거나 직접 적어 주세요. 아이디어가 아직 없으면 제가 여러 가지 예시를 들려드릴게요.' +
+      (curKey ? '' : '<div class="w-qr">' + B('📎 자료 올리기', 'EF', 'sm') + A('✎ 직접 적을게요', 'focusIdea', 'sm') + B('💡 예시 들려줘', 'EBX', 'sm' + (st.showEx ? ' on' : '')) + '</div>'));
     if (!curKey) {
-      h += '<div class="w-ex" aria-label="예시"><div class="w-ex-h">예시를 눌러 시작하기</div>' + EXAMPLES.map(function (x, i) {
-        return '<button class="w-ex-c" data-act="example" data-arg="' + i + '"><b>' + esc(x[0]) + '</b><span>' + esc(x[1]) + '</span></button>';
-      }).join('') + '</div>';
+      if (st.showEx) {
+        var ex = EXAMPLES.slice(st.exPage * 3, st.exPage * 3 + 3);
+        if (!ex.length) { st.exPage = 0; ex = EXAMPLES.slice(0, 3); }
+        h += bubble('', '예시 들려줘', true) + bubble('Producer', '이런 건 어때요? 마음에 드는 걸 누르면 입력칸에 넣어 드려요. 고쳐서 보내도 돼요.' +
+          '<div class="w-ex">' + ex.map(function (x) { var i = EXAMPLES.indexOf(x);
+            return '<button class="w-ex-c" data-act="example" data-arg="' + i + '"><b>' + esc(x[0]) + '</b><span>' + esc(x[1]) + '</span></button>';
+          }).join('') + '</div><div class="w-qr">' + A('다른 예시', 'moreEx', 'sm') + '</div>');
+      }
       if (st.lenErr && !st.file && ideaLen() < MIN_LEN) h += bubble('Producer', '<span class="w-err-t">조금 더 적어 주세요. ' + MIN_LEN + '자 이상이면 이야기를 잡을 수 있어요. (지금 ' + ideaLen() + '자)</span> 아래 "누구 이야기 · 어디서 · 무슨 일이"를 눌러 채워 봐도 좋아요.');
     } else {
       h += bubble('', esc(st.idea) + (st.file ? '<br><span class="w-chip">📎 ' + esc(st.file.name) + '</span>' : ''), true);
-      var pre = BQ.filter(function (k) { return st.bPre[k]; });
+      var pre = BQ.filter(function (k) { return st.bPre[k] && order.indexOf(k) >= 0; });
       if (pre.length) h += bubble('Producer', '말씀에서 ' + pre.map(function (k) { return BQ_NAME[k] + ' <b>' + esc(ansText(k)) + '</b>'; }).join(', ') + '을(를) 읽었어요. 나머지만 물어볼게요.');
       for (var i = 0; i < order.length; i++) {
         var k = order[i];
         if (k === curKey) { if (st.bHint) h += bubble('Producer', esc(st.bHint)); h += bCard(k); break; }
         if (st.bPre[k]) continue;
-        h += bubble('Producer', k === 'file' ? '자료를 이렇게 읽었어요.' : BQ_Q[k]) + bubble('', esc(ansText(k)), true);
+        h += bubble('Producer', k === 'file' ? '📎 ' + esc(KINDS[st.kind].name) + '(으)로 읽었어요. ' + LV_Q() : BQ_Q[k]) + bubble('', esc(k === 'file' ? LV()[st.level].n : ansText(k)), true);
       }
     }
     var sum = '<div class="w-sum" aria-label="지금까지 정한 것">' + BQ.map(function (k) {
@@ -307,7 +330,8 @@
         B('파일 첨부', 'EF', 'sm') + '<span style="flex:1"></span>' + A('보내기', 'bStart', 'pri') + '</div></div>';
     return bar('Producer') + '<div class="w-chatstage">' + (curKey ? sum : '') + '<div class="w-thread">' + h + '</div>' + input + '</div>';
   }
-  function EB1() { return chatStage(null); }
+  function EB1() { st.showEx = false; return chatStage(null); }
+  function EBX() { st.showEx = true; return chatStage(null); }
   function EB2() { return chatStage('file'); }
   function EB3() { return chatStage('mood'); }
   function EB4() { return chatStage('runtime'); }
@@ -330,23 +354,23 @@
         : '<p><span>S' + (i + 1) + '</span>' + esc(p) + '</p>';
     }).join('');
   }
-  // 1안: 산문 위 한 줄. 조건 칩을 누르면 바로 아래에 고르는 목록이 열린다.
-  var COND = { runtime: ['러닝타임', function (i) { return RUNTIMES[i][0]; }, function () { return RUNTIMES; }],
-    mood: ['장르·분위기', function (i) { return MOODS[i]; }, function () { return MOODS; }],
-    seed: ['소재', function (i) { return SEEDS[i][0]; }, function () { return SEEDS; }] };
-  var changedConds = function () { return Object.keys(COND).filter(function (k) { return st[k] !== st.applied[k]; }); };
-  function condBar() {
-    var ch = changedConds();
-    return '<div class="w-tbar" role="toolbar" aria-label="산문 도구">' + Object.keys(COND).map(function (k) {
-      var c = COND[k], open = st.pop === k, diff = ch.indexOf(k) >= 0;
-      return '<div class="w-popwrap"><button class="w-cchip' + (diff ? ' diff' : '') + (open ? ' open' : '') + '" data-act="pop" data-arg="' + k + '" aria-expanded="' + open + '" aria-haspopup="listbox"><i>' + c[0] + '</i><b>' + esc(c[1](st[k])) + '</b>' + (diff ? '<em>바뀜</em>' : '') + '<span aria-hidden="true">▾</span></button>' +
-        (open ? '<div class="w-pop" role="listbox" aria-label="' + c[0] + '">' + c[2]().map(function (o, i) {
-          var t = Array.isArray(o) ? o : [o, ''];
-          return '<button class="w-popo' + (i === st[k] ? ' on' : '') + '" role="option" aria-selected="' + (i === st[k]) + '" data-act="popPick" data-arg="' + k + ':' + i + '">' + esc(t[0]) + (t[1] ? '<small>' + esc(t[1]) + '</small>' : '') + (i === st.applied[k] ? '<em>지금 산문</em>' : '') + '</button>';
-        }).join('') + '</div>' : '') + '</div>';
+  // 1안: 산문 위 한 줄. 조건은 지금 산문이 쓰인 값만 글로 보여주고, 바꾸려면 [AI 다시 쓰기 ▾]를 눌러
+  // 아래로 펼쳐지는 옵션에서 고른 뒤 [다시 쓰기]로 적용한다. 다시 쓰지 않으면 값도 안 바뀐다.
+  var RW = { runtime: ['러닝타임', function () { return RUNTIMES; }], mood: ['장르·분위기', function () { return MOODS; }], seed: ['아이디어 소재', function () { return SEEDS; }] };
+  function rwPanel() {
+    var d = st.rw;
+    return '<div class="w-rwp" role="dialog" aria-label="다시 쓰기 옵션">' + Object.keys(RW).map(function (k) {
+      return '<div class="w-q"><div class="w-q-t">' + RW[k][0] + '</div><div class="w-opts">' + RW[k][1]().map(function (o, i) {
+        var t = Array.isArray(o) ? o : [o, ''];
+        return '<button class="w-opt' + (i === d[k] ? ' on' : '') + '" data-act="rwPick" data-arg="' + k + ':' + i + '">' + esc(t[0]) + (i === st[k] ? '<em>지금 산문</em>' : '') + '</button>';
+      }).join('') + '</div></div>';
     }).join('') +
+      '<div class="w-acts">' + A('취소', 'rwClose') + A('이 조건으로 다시 쓰기', 'rwApply', 'acc') + '</div></div>';
+  }
+  function condBar() {
+    return '<div class="w-tbar" role="toolbar" aria-label="산문 도구"><span class="w-cond"><i>지금 산문</i>' + esc(RUNTIMES[st.runtime][0]) + ' · ' + esc(MOODS[st.mood]) + ' · 소재 ' + esc(SEEDS[st.seed][0]) + '</span>' +
       '<span class="w-tbar-sp"></span>' + A('직접 작성', 'openDirect') +
-      A(ch.length ? '✦ AI 다시 쓰기 · 조건 ' + ch.length + '개 바뀜' : '✦ AI 다시 쓰기', 'rewrite', 'acc' + (ch.length ? ' glow' : ''), ' title="고른 조건으로 산문 전체를 다시 써요"') + '</div>';
+      '<div class="w-popwrap right">' + A('✦ AI 다시 쓰기 ▾', 'rwOpen', 'acc', ' aria-expanded="' + !!st.rw + '"') + (st.rw ? rwPanel() : '') + '</div></div>';
   }
   function proseMain(ro, pick) {
     var A_ = st.plan === 'A';
@@ -371,7 +395,7 @@
     return writer({ card: chatCard('뭐가 마음에 안 드세요?', '<div class="w-card-acts">' + B('전부 다시', 'WC2', 'pri sm') + B('일부분만', 'WC3', 'sm') + '</div>') });
   }
   function WC2() {
-    return writer({ card: chatCard('전부 다시 쓸게요. 조건을 골라 주세요.', condFields() + (st.plan === 'A' ? '<p class="w-note">고른 값은 산문 위 조건 칩에도 반영돼요.</p>' : '') +
+    return writer({ card: chatCard('전부 다시 쓸게요. 조건을 골라 주세요.', condFields() + (st.plan === 'A' ? '' : '') +
       '<div class="w-card-acts">' + B('뒤로', 'WC1', 'sm') + A('다시 쓰기', 'rewrite', 'acc sm') + '</div>') });
   }
   function WC3() {
@@ -539,7 +563,7 @@
       '<p class="w-note">함께 확인: Director가 Artist 인물 시트를 참조하는지 (오류 13), 러프 마네킹이 인물로 이어지지 않는지 (오류 12).</p>' + A('처음부터 다시', 'reset') + '</div>';
   }
 
-  var SCREENS = { EB1: EB1, EB2: EB2, EB3: EB3, EB4: EB4, EB5: EB5, EB6: EB6, EB7: EB7, E1: E1, E1e: E1e, EF: EF, EFe: EFe, E2: E2, E2e: E2e, E3: E3, E4: E4, E5: E5, W1: W1, W1r: W1r, WC1: WC1, WC2: WC2, WC3: WC3, W2: W2, W4: W4, W5: W5, W6: W6,
+  var SCREENS = { EB1: EB1, EBX: EBX, EB2: EB2, EB3: EB3, EB4: EB4, EB5: EB5, EB6: EB6, EB7: EB7, E1: E1, E1e: E1e, EF: EF, EFe: EFe, E2: E2, E2e: E2e, E3: E3, E4: E4, E5: E5, W1: W1, W1r: W1r, WC1: WC1, WC2: WC2, WC3: WC3, W2: W2, W4: W4, W5: W5, W6: W6,
     A0: A0, A1: A1, R1: R1, A2: A2, A3: A3, A4: A4, A5: A5, A6: A6, A7: A7, A8: A8, R2: R2, A9: A9,
     S0: S0, S1: S1, S2: S2, S3: S3, S4: S4, R3: R3, S5: S5, S6: S6, S7: S7, D1: D1 };
   // 갈림 노드는 그 갈림을 묻는 화면으로
@@ -626,7 +650,7 @@
     confirmStart: function () {
       st.ratioLocked = true;
       if (preserve()) { st.proseLocked = true; return 'W1r'; }
-      st.pending = function () { st.applied = { runtime: st.runtime, mood: st.mood, seed: st.seed }; if (st.idea.trim()) st.title = st.idea.trim().split(/[.,\n]/)[0].slice(0, 18) || st.title; };
+      st.pending = function () { if (st.idea.trim()) st.title = st.idea.trim().split(/[.,\n]/)[0].slice(0, 18) || st.title; };
       return 'E5';
     },
     send: function (arg) {
@@ -645,13 +669,15 @@
       return 'S3';
     },
     rewrite: function () {
-      st.pop = null; st.request = ''; st.partMode = false;
+      st.rw = null; st.request = ''; st.partMode = false;
       var from = cur === 'WC2' ? '채팅 카드' : '조건 패널';
-      st.pending = function () { makeVariants(''); say('Writer', 'Writer', RUNTIMES[st.runtime][0] + ' · ' + MOODS[st.mood] + ' · 소재 ' + SEEDS[st.seed][0] + '으로 세 가지 안을 썼어요.' + (st.plan === 'A' && from === '채팅 카드' ? ' 산문 위 조건 칩에도 반영했어요.' : '')); };
+      st.pending = function () { makeVariants(''); say('Writer', 'Writer', RUNTIMES[st.runtime][0] + ' · ' + MOODS[st.mood] + ' · 소재 ' + SEEDS[st.seed][0] + '으로 세 가지 안을 썼어요.' + (st.plan === 'A' && from === '채팅 카드' ? '' : '')); };
       return 'W2';
     },
-    pop: function (k) { st.pop = st.pop === k ? null : k; },
-    popPick: function (a) { var kv = a.split(':'); st[kv[0]] = +kv[1]; st.pop = null; },
+    rwOpen: function () { st.rw = st.rw ? null : { runtime: st.runtime, mood: st.mood, seed: st.seed }; },
+    rwPick: function (a) { var kv = a.split(':'); st.rw[kv[0]] = +kv[1]; },
+    rwClose: function () { st.rw = null; },
+    rwApply: function () { var d = st.rw; st.rw = null; st.runtime = d.runtime; st.mood = d.mood; st.seed = d.seed; return ACTS.rewrite(); },
     togglePart: function (i) { i = +i; var k = st.parts.indexOf(i); if (k >= 0) st.parts.splice(k, 1); else st.parts.push(i); st.parts.sort(); },
     rewritePart: function () {
       if (!st.parts.length) return;
@@ -663,7 +689,6 @@
     applyVariant: function () {
       var v = st.variants[st.vpick]; if (!v) return 'W1';
       st.prose = v.prose.slice(); st.variants = []; st.parts = []; st.partNote = ''; st.partMode = false;
-      st.applied = { runtime: st.runtime, mood: st.mood, seed: st.seed };
       say('Writer', 'Writer', '안 ' + (st.vpick + 1) + '을(를) 적용했어요.');
       return 'W1';
     },
@@ -723,12 +748,16 @@
     },
     bAnswer: function (a) {
       var kv = a.split(':'), k = kv[0], v = +kv[1];
-      if (k === 'ratio') st.ratio = RATIOS[v][0]; else st[k] = v;
+      if (k === 'ratio') st.ratio = RATIOS[v][0];
+      else if (k === 'file') { st.level = v; st.bAns.level = true; st.bAns.file = true; st.bHint = ''; return nextQ(); }
+      else st[k] = v;
       st.bAns[k] = true; st.bPre[k] = false; st.bHint = '';
       return nextQ();
     },
     bFileOk: function () { st.bAns.file = true; return nextQ(); },
-    bReask: function (k) { st.bAns[k] = false; st.bPre[k] = false; return BQ_SCREEN[k]; },
+    focusIdea: function () { setTimeout(function () { var t = root && root.querySelector('#idea'); if (t) t.focus(); }, 0); },
+    moreEx: function () { st.exPage = (st.exPage + 1) % Math.ceil(EXAMPLES.length / 3); },
+    bReask: function (k) { if (k === 'level' && st.file) k = 'file'; st.bAns[k] = false; st.bPre[k] = false; return BQ_SCREEN[k]; },
     bSend: function () {
       var t = st.chatDraft.trim(); if (!t) return;
       st.chatDraft = '';
@@ -770,7 +799,7 @@
     refresh();
     root.querySelectorAll('.w-chat-b').forEach(function (c) { c.scrollTop = c.scrollHeight; });
     if (focusId) { var el = root.querySelector('[data-bind="' + focusId + '"]:not(.w-opt)'); if (el && el.focus) el.focus(); }
-    if (st.pop) { var po = root.querySelector('.w-popo.on') || root.querySelector('.w-popo'); if (po) { po.focus({ preventScroll: true }); return; } }
+    if (st.rw) { var po = root.querySelector('.w-rwp .w-opt.on'); if (po) { po.focus({ preventScroll: true }); return; } }
     var dlg = root.querySelector('.w-modal');
     if (dlg && !focusId) { var f = dlg.querySelector('input, textarea, .w-acts .w-btn:last-child'); if (f) f.focus({ preventScroll: true }); }
   }
@@ -822,7 +851,7 @@
     root = el; host = h || {};
     el.addEventListener('click', function (e) {
       var t = e.target;
-      if (st.pop && !t.closest('.w-popwrap')) { st.pop = null; paint(); }
+      if (st.rw && !t.closest('.w-popwrap')) { st.rw = null; paint(); }
       var b = t.closest('[data-act]');
       if (b && !b.disabled) { e.preventDefault(); run(b.getAttribute('data-act'), b.getAttribute('data-arg')); return; }
       var g = t.closest('[data-go]');
@@ -851,7 +880,7 @@
     el.addEventListener('keydown', function (e) {
       var t = e.target;
       if (e.key === 'Enter' && !e.isComposing && t.getAttribute && t.getAttribute('data-enter')) { e.preventDefault(); run(t.getAttribute('data-enter')); }
-      if (e.key === 'Escape' && st.pop) { st.pop = null; paint(); var ob = root.querySelector('.w-cchip'); if (ob) ob.focus(); return; }
+      if (e.key === 'Escape' && st.rw) { st.rw = null; paint(); var ob = root.querySelector('[data-act="rwOpen"]'); if (ob) ob.focus(); return; }
       if (e.key === 'Escape') { var c = root.querySelector('.w-acts .w-btn'); if (c) c.click(); }
     });
   }

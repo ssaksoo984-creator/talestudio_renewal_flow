@@ -523,10 +523,21 @@
       A('취소', 'recheckCancel') + A('산문 다시 쓰기', 'recheckRewrite') + A('목록에 반영', 'extract', 'pri', st.editEnt >= 0 ? ' disabled title="수정 중인 이름을 먼저 확인해 주세요"' : ''), 'xl');
   }
   // 이미 있는 이름으로 고쳤을 때: 합칠지 한 번 묻는다
+  // 그림을 만든 뒤라면: 이 이름(들)이 지금 쓰는 그림의 주인
+  function picOwner(ent) {
+    if (ent.pic) return ent.pic;
+    var has = function (n) { return objs().some(function (o) { return o.n === n && o.cur >= 0; }); };
+    return has(ent.name) ? ent.name : ent.aliases.filter(has)[0] || null;
+  }
   function WTm() {
     var e = st.ents[st.editEnt], t = st.ents[st.mergeInto];
+    var pe = drawn() ? picOwner(e) : null, pt = drawn() ? picOwner(t) : null;
+    if (pe && pt && [pe, pt].indexOf(st.mergePic) < 0) st.mergePic = pt;
+    var picPick = pe && pt ? '<div class="w-q"><div class="w-q-t">어느 그림으로 할까요? <small>고르지 않은 그림은 ' + esc(t.name) + '의 기록에 남아요</small></div><div class="w-opts w-picpick" role="radiogroup">' +
+      [pt, pe].map(function (n) { var o = objs().filter(function (x) { return x.n === n; })[0];
+        return '<button class="w-opt' + (st.mergePic === n ? ' on' : '') + '" role="radio" aria-checked="' + (st.mergePic === n) + '" data-act="mergePic" data-arg="' + esc(n) + '">' + thumb(o, o.hist[o.cur]) + '<b>' + esc(n) + ' 그림</b></button>'; }).join('') + '</div></div>' : '';
     return WT() + modal(e.name + ' → ' + t.name + ', 하나로 합칠까요?', '<p>' + esc(t.name) + '은(는) 이미 목록에 있어요. 합치면 한 ' + entKind(t) + '이 되고, 산문의 "' + esc(e.aliases.join('", "')) + '"은(는) ' + esc(t.name) + '의 다른 이름(또는)으로 남아요.</p>' +
-      (drawn() ? '<p class="w-note">' + esc(e.name) + '의 그림은 ' + esc(t.name) + '의 기록으로 옮겨져요. 같은 스타일이라 기록 아이콘에서 불러올 수 있어요.</p>' : '') +
+      picPick +
       '<p class="w-note">오타라면 산문 표기도 ' + esc(t.name) + '(으)로 맞출지 개발 확인이 필요해요.</p>',
       A('취소', 'mergeCancel') + A('합치기', 'mergeDo', 'acc'));
   }
@@ -640,7 +651,7 @@
       styleRow('style', st.style) + '<div class="w-q"><div class="w-q-t">스타일 레퍼런스 <small>선택 · 이 그림체를 참고해요</small></div>' + refStrip('style', st.styleRefs) + '</div>' + list([['만드는 것', '인물 시트 ' + st.chars.length + ' (상태 ' + n + ') · 배경 ' + st.bgs.length], ['스타일', esc(STYLES[st.style][0])], ['예상 크레딧', '표시 자리']]),
       B('취소', 'A1') + A(esc(STYLES[st.style][0]) + '로 만들기', 'generate', 'acc'), true);
   }
-  function A4() { return (st.versions.length ? A5() : A1()) + busy('그림을 만들고 있어요', objs().map(function (o) { return o.n; })); }
+  function A4() { return (st.versions.length ? A5() : A1()) + busy(st.busyNames ? '새로 넣은 것을 같은 스타일로 만들고 있어요' : '그림을 만들고 있어요', st.busyNames || objs().map(function (o) { return o.n; })); }
   function A5(o) {
     o = o || {};
     if (!st.versions.length) newVersion(st.style);
@@ -702,7 +713,7 @@
     // 기록: 그림 옆 시계 아이콘을 누르면 열린다. 같은 스타일 그림만 불러올 수 있다.
     var hist = o.hist.map(function (x, k) {
       var same = x.style === st.style, on = k === o.cur;
-      return '<li class="' + (on ? 'on' : '') + (same ? '' : ' off') + '">' + thumb(o, x) + '<span>' + (on ? '지금' : same ? (x.from ? esc(x.from) + '에서 옴' : x.state ? esc(x.state) : '') : esc(STYLES[x.style][0]) + ' · 다른 스타일') + '</span>' +
+      return '<li class="' + (on ? 'on' : '') + (same ? '' : ' off') + '">' + thumb(o, x) + '<span>' + (on ? '지금' + (x.from ? ' · ' + esc(x.from) + ' 그림' : '') : same ? (x.from ? esc(x.from) + ' 그림' : x.state ? esc(x.state) : '') : esc(STYLES[x.style][0]) + ' · 다른 스타일') + '</span>' +
         (on ? '' : same ? A('불러오기', 'objLoad', 'sm', ' data-arg="' + k + '"') : A('불러오기', 'objLoad', 'sm', ' disabled title="다른 스타일이라 불러올 수 없어요"')) + '</li>';
     }).reverse().join('');
     var histBtn = '<button class="w-histbtn' + (st.histOpen ? ' on' : '') + '" data-act="histToggle" aria-expanded="' + !!st.histOpen + '" aria-label="기록 · 이전 그림 불러오기" title="기록 · 이전 그림 불러오기"' + (o.hist.length > 1 ? '' : ' disabled') + '>' +
@@ -977,8 +988,14 @@
         var o = same.filter(function (x) { return x.n === e.name; })[0] || same[0];
         if (!o) return { n: e.name, d: d, states: ['처음 모습'], tone: 0, note: '', aliases: e.aliases };
         // 합쳐진 쪽(틴장)의 그림은 남는 쪽(팀장) 기록 끝에 붙는다
-        same.forEach(function (x) { if (x !== o && x.hist) x.hist.forEach(function (h) { o.hist.push(Object.assign({}, h, { from: x.n })); }); });
-        o.n = e.name; o.aliases = e.aliases; return o;
+        same.forEach(function (x) {
+          if (x === o || !x.hist) return;
+          var base = o.hist.length;
+          x.hist.forEach(function (h) { o.hist.push(Object.assign({}, h, { from: x.n })); });
+          // 합칠 때 이쪽 그림을 고른 경우: 지금 그림을 그걸로
+          if (e.pic === x.n && x.cur >= 0) { o.cur = base + x.cur; if (o._sn) o._sn[st.ver] = o.cur; }
+        });
+        o.n = e.name; o.aliases = e.aliases; delete e.pic; return o;
       }
       st.chars = st.ents.filter(function (e) { return e.type === 'char'; }).map(function (e) { return keep(oldC, e, '산문에서 표시한 인물. 설명은 AI가 산문을 읽고 채워요.'); });
       st.bgs = st.ents.filter(function (e) { return e.type === 'place'; }).map(function (e) { return keep(oldB, e, '산문에서 표시한 장소.'); });
@@ -986,7 +1003,17 @@
       var all = objs(); st.versions.forEach(function (v, vi) { v.snap = all.map(function (o) { return o._sn ? o._sn[vi] : null; }); });
       all.forEach(function (o) { delete o._sn; });
       st.pick = null; st.editEnt = -1; st.entsBak = null;
-      return drawn() ? 'A5' : 'A1';
+      if (!drawn()) return 'A1';
+      // 그림을 만든 뒤 새로 넣은 인물·배경은 지금 스타일로 바로 그린다
+      var fresh = all.filter(function (o) { return o.cur < 0; });
+      if (!fresh.length) return 'A5';
+      st.busyNames = fresh.map(function (o) { return o.n; });
+      st.pending = function () {
+        var v = st.versions[st.ver];
+        objs().forEach(function (o, k) { if (o.cur >= 0) return; o.hist.push({ style: st.style, tone: 0, note: '', v: v.n, r: 0, state: o.isBg ? '' : o.states[0] }); o.cur = o.hist.length - 1; v.snap[k] = o.cur; });
+        say('Artist', 'Artist', st.busyNames.join(', ') + '을(를) 지금 스타일(' + STYLES[st.style][0] + ')로 만들었어요.'); st.busyNames = null;
+      };
+      return 'A4';
     },
     pickClear: function () { st.pick = null; st.adding = false; },
     addStart: function () { if (st.pick) st.adding = true; },
@@ -1009,6 +1036,8 @@
     mergeCancel: function () { st.mergeInto = -1; return 'WT'; },
     mergeDo: function () {
       var e = st.ents[st.editEnt], t = st.ents[st.mergeInto];
+      if (drawn()) { var pe = picOwner(e), pt = picOwner(t); t.pic = pe && pt ? st.mergePic || pt : pt || pe; }
+      st.mergePic = null;
       e.aliases.forEach(function (a) { if (t.aliases.indexOf(a) < 0) t.aliases.push(a); });
       st.ents.splice(st.editEnt, 1); st.editEnt = -1; st.mergeInto = -1;
       return 'WT';
@@ -1034,6 +1063,7 @@
     },
     histToggle: function () { st.histOpen = !st.histOpen; },
     traitsFold: function () { st.traitsOpen = !st.traitsOpen; },
+    mergePic: function (n) { st.mergePic = n; },
     editMode: function (m) { st.editMode = m; },
     afilter: function (f) { st.afilter = f; },
     addRef: function (key) { var r = refsOf(key); r.push((key === 'style' ? '그림체' : '참고') + '_' + (r.length + 1) + '.jpg'); },

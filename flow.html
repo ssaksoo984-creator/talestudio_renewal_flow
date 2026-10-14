@@ -218,6 +218,7 @@ body[data-tt="proto"] .dv-in:not(:has(.dv-in-r)) { display: none }
     V.mark(id, opt.scroll);
     if (!opt.fromProto && P.current() !== id) P.show(id);
     var scr = P.screenFor(id);
+    $('planSeg').hidden = ['entry', 'writer'].indexOf(n.stage) < 0;
     $('scrId').textContent = scr ? scr + (scr !== id ? ' (' + id + '는 이 화면에서)' : '') : '';
     $('protoOpen').href = 'index.html#' + id;
     var out = F.edges.filter(function (e) { return e[0] === id; });

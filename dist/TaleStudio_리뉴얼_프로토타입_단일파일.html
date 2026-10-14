@@ -738,6 +738,8 @@ a.btn { text-decoration: none; display: inline-block }
 .w-seg.wrap { border: 0; gap: 5px; overflow: visible }
 .w-seg.wrap button { border: 1px solid var(--w-line); border-radius: 7px; padding: 5px 10px }
 .w-fixrow { display: grid; gap: 5px }
+.w-seg.w-moves { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); width: 100%; max-width: 330px }
+.w-seg.w-moves button { white-space: nowrap; text-align: center; padding: 6px 4px }
 .w-fk { font-size: 12.5px; font-weight: 600 } .w-fk em { font-style: normal; font-weight: 400; color: var(--w-mut); font-size: 11px; margin-left: 6px }
 .w-step { display: inline-flex; align-items: center; gap: 0; border: 1px solid var(--w-line); border-radius: 8px; overflow: hidden; justify-self: start }
 .w-step button { font: inherit; width: 32px; height: 30px; border: 0; background: var(--w-bg); cursor: pointer; color: var(--w-ink) }
@@ -4613,7 +4615,7 @@ window.FLOW = {
     // 연출 고치기 (v18 2-c 그대로, 끝 그림만 뺌). 그리기는 왼쪽 연출 그림 위에서 한다.
     var dm = st.dmode || 'opt', durRow = '<div class="w-fixrow"><div class="w-fk">길이</div><div class="w-step"><button data-act="edDur" data-arg="-1" aria-label="1초 줄이기">−</button><b>' + d.len + '초</b><button data-act="edDur" data-arg="1" aria-label="1초 늘리기">+</button></div></div>';
     var inner = dm === 'opt'
-      ? '<div class="w-fixrow"><div class="w-fk">카메라 무브먼트</div><div class="w-seg wrap">' + MOVES.map(function (o, j) { return '<button data-act="edMove" data-arg="' + j + '" aria-pressed="' + (+d.move === j) + '" title="' + esc(o[1]) + '">' + o[0] + '</button>'; }).join('') + '</div></div>' +
+      ? '<div class="w-fixrow"><div class="w-fk">카메라 무브먼트</div><div class="w-seg wrap w-moves">' + MOVES.map(function (o, j) { return '<button data-act="edMove" data-arg="' + j + '" aria-pressed="' + (+d.move === j) + '" title="' + esc(o[1]) + '">' + o[0] + '</button>'; }).join('') + '</div></div>' +
         '<div class="w-fixrow"><div class="w-fk">방향 · 상세<em>어디서 어디로, 얼마나</em></div><textarea class="w-ta sm" rows="2" data-bind="shotDraft.dirMv" placeholder="예) 자판기 옆에서 천천히 다가가 민호 얼굴 앞에서 멈춘다" aria-label="방향 · 상세">' + esc(d.dirMv || '') + '</textarea></div>' +
         '<div class="w-fixrow"><div class="w-fk">사물 · 인물 액션<em>누가/무엇이 어떻게 움직이나</em></div><textarea class="w-ta sm" rows="2" data-bind="shotDraft.act" placeholder="예) 민호가 오른쪽으로 걸어가 자판기를 친다" aria-label="사물 · 인물 액션">' + esc(d.act || '') + '</textarea></div>' + durRow
       : drawTools() +
@@ -5373,6 +5375,7 @@ window.FLOW = {
     V.mark(id, opt.scroll);
     if (!opt.fromProto && P.current() !== id) P.show(id);
     var scr = P.screenFor(id);
+    $('planSeg').hidden = ['entry', 'writer'].indexOf(n.stage) < 0;
     $('scrId').textContent = scr ? scr + (scr !== id ? ' (' + id + '는 이 화면에서)' : '') : '';
     void 'TaleStudio_프로토타입_전체화면.html#' + id;
     var out = F.edges.filter(function (e) { return e[0] === id; });

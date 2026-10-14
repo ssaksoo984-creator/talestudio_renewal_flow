@@ -729,6 +729,8 @@ a.btn { text-decoration: none; display: inline-block }
 .w-seg.wrap { border: 0; gap: 5px; overflow: visible }
 .w-seg.wrap button { border: 1px solid var(--w-line); border-radius: 7px; padding: 5px 10px }
 .w-fixrow { display: grid; gap: 5px }
+.w-seg.w-moves { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); width: 100%; max-width: 330px }
+.w-seg.w-moves button { white-space: nowrap; text-align: center; padding: 6px 4px }
 .w-fk { font-size: 12.5px; font-weight: 600 } .w-fk em { font-style: normal; font-weight: 400; color: var(--w-mut); font-size: 11px; margin-left: 6px }
 .w-step { display: inline-flex; align-items: center; gap: 0; border: 1px solid var(--w-line); border-radius: 8px; overflow: hidden; justify-self: start }
 .w-step button { font: inherit; width: 32px; height: 30px; border: 0; background: var(--w-bg); cursor: pointer; color: var(--w-ink) }

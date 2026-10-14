@@ -1060,7 +1060,7 @@
     // 연출 고치기 (v18 2-c 그대로, 끝 그림만 뺌). 그리기는 왼쪽 연출 그림 위에서 한다.
     var dm = st.dmode || 'opt', durRow = '<div class="w-fixrow"><div class="w-fk">길이</div><div class="w-step"><button data-act="edDur" data-arg="-1" aria-label="1초 줄이기">−</button><b>' + d.len + '초</b><button data-act="edDur" data-arg="1" aria-label="1초 늘리기">+</button></div></div>';
     var inner = dm === 'opt'
-      ? '<div class="w-fixrow"><div class="w-fk">카메라 무브먼트</div><div class="w-seg wrap">' + MOVES.map(function (o, j) { return '<button data-act="edMove" data-arg="' + j + '" aria-pressed="' + (+d.move === j) + '" title="' + esc(o[1]) + '">' + o[0] + '</button>'; }).join('') + '</div></div>' +
+      ? '<div class="w-fixrow"><div class="w-fk">카메라 무브먼트</div><div class="w-seg wrap w-moves">' + MOVES.map(function (o, j) { return '<button data-act="edMove" data-arg="' + j + '" aria-pressed="' + (+d.move === j) + '" title="' + esc(o[1]) + '">' + o[0] + '</button>'; }).join('') + '</div></div>' +
         '<div class="w-fixrow"><div class="w-fk">방향 · 상세<em>어디서 어디로, 얼마나</em></div><textarea class="w-ta sm" rows="2" data-bind="shotDraft.dirMv" placeholder="예) 자판기 옆에서 천천히 다가가 민호 얼굴 앞에서 멈춘다" aria-label="방향 · 상세">' + esc(d.dirMv || '') + '</textarea></div>' +
         '<div class="w-fixrow"><div class="w-fk">사물 · 인물 액션<em>누가/무엇이 어떻게 움직이나</em></div><textarea class="w-ta sm" rows="2" data-bind="shotDraft.act" placeholder="예) 민호가 오른쪽으로 걸어가 자판기를 친다" aria-label="사물 · 인물 액션">' + esc(d.act || '') + '</textarea></div>' + durRow
       : drawTools() +

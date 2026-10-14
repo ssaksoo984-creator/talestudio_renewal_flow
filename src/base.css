@@ -66,7 +66,7 @@ body { background: var(--bg); color: var(--ink); font: 14px/1.55 var(--font); ma
 .w-rail span { white-space: nowrap; font-size: 12px; padding: 2px 9px; border-radius: 99px; color: var(--w-mut) }
 .w-rail .on { background: var(--w-pri); color: var(--w-pri-ink) }
 .w-rail .done { color: var(--w-ink) }
-.w-rail .done::before { content: "🔒 "; font-size: 10px }
+.w-rail .done::before { content: "✓ "; font-size: 10px; color: var(--yes) }
 .w-meta { display: flex; gap: 8px; font-size: 12px; color: var(--w-mut) }
 .w-lock { color: var(--lock); font-weight: 500 }
 .w-studio { display: grid; grid-template-columns: minmax(0, 1fr) 230px; min-height: 480px }
@@ -425,7 +425,7 @@ a.btn { text-decoration: none; display: inline-block }
 .w-rail button:hover { color: var(--w-ink); background: var(--w-bg) }
 .w-rail button.on { background: var(--w-pri); color: var(--w-pri-ink) }
 .w-rail button.done { color: var(--w-ink) }
-.w-rail button.done::before { content: "🔒 "; font-size: 10px }
+.w-rail button.done::before { content: "✓ "; font-size: 10px; color: var(--yes) }
 .w-rail button:focus-visible { outline: 2px solid var(--accent); outline-offset: 1px }
 /* Artist 결과 카드 */
 .w-acards { display: grid; grid-template-columns: repeat(auto-fill, minmax(170px, 1fr)); gap: 10px }
@@ -751,5 +751,3 @@ a.btn { text-decoration: none; display: inline-block }
 .w-shot.boot { opacity: .75; cursor: progress }
 .w-spin.sm { width: 12px; height: 12px; border-width: 2px; display: inline-block; vertical-align: -2px }
 .w-busy-card .w-btn.ghost { justify-self: start }
-/* 장르별 톤 조절 */
-.w-tone-row { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; font-size: 11.5px }

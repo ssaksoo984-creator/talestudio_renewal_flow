@@ -121,12 +121,14 @@
 
   /* ── 부품 ── */
   var STAGES = ['Producer', 'Writer', 'Artist', 'Storyboard', 'Director', 'Editor'];
+  // Storyboard는 Artist 그림(인물 · 배경 대표 그림)이 다 있어야 들어갈 수 있다
+  function canBoard() { return st.versions.length > 0 && objs().every(function (o) { return o.cur >= 0; }); }
   function rail(on) {
     var i = STAGES.indexOf(on);
     return '<nav class="w-rail" aria-label="단계">' + STAGES.map(function (s, k) {
       // Artist는 넘어간 뒤에도 잠기지 않는다: 돌아가 모습·그림을 고칠 수 있다 (인물·배경 목록만 산문을 따른다)
-      var open = k < i && s === 'Artist';
-      return '<button class="' + (k === i ? 'on' : open ? 'done open' : k < i ? 'done' : '') + '" data-act="jumpStage" data-arg="' + s + '"' + (k === i ? ' aria-current="step"' : '') + (open ? ' title="돌아가서 모습 · 그림을 고칠 수 있어요"' : '') + '>' + s + '</button>';
+      var open = k < i && s === 'Artist', block = s === 'Storyboard' && k !== i && !canBoard();
+      return '<button class="' + (k === i ? 'on' : open ? 'done open' : k < i ? 'done' : '') + '" data-act="jumpStage" data-arg="' + s + '"' + (k === i ? ' aria-current="step"' : '') + (open ? ' title="돌아가서 모습 · 그림을 고칠 수 있어요"' : '') + (block ? ' disabled title="Artist에서 인물 · 배경 그림을 다 만들어야 넘어갈 수 있어요"' : '') + '>' + (block ? '🔒 ' : '') + s + '</button>';
     }).join('') + '</nav>';
   }
   function bar(on) {
@@ -781,7 +783,7 @@
       }).join('') + '</div>' +
       (st.vadd ? '<div class="w-vaddf"><div class="w-q"><div class="w-q-t">이름</div><input class="w-in" data-bind="vaName" value="' + esc(st.vaName) + '" placeholder="예: 비 맞은 셔츠 · 10년 뒤" aria-label="모습 이름"></div>' +
         '<div class="w-q"><div class="w-q-t">설명</div><input class="w-in" data-bind="vaDesc" value="' + esc(st.vaDesc) + '" placeholder="예: 비에 흠뻑 젖은 흰 셔츠, 머리가 젖어 있다" aria-label="모습 설명"></div>' +
-        '<p class="w-note">기준 모습(' + esc(o.states[0]) + ')을 바탕으로 지금 스타일로 만들어요.</p><div class="w-edrow"><span></span>' + A('취소', 'vaddClose', 'sm') + A('추가만', 'vaddDo', 'sm', ' data-arg="0" data-need="vaName"') + A('추가하고 생성', 'vaddDo', 'pri sm', ' data-arg="1" data-need="vaName"') + '</div></div>'
+        '<p class="w-note">기준 모습(' + esc(o.states[0]) + ')을 바탕으로 지금 스타일로 만들어요.</p><div class="w-edrow"><span></span>' + A('취소', 'vaddClose', 'sm') + (from ? '' : A('추가만', 'vaddDo', 'sm', ' data-arg="0" data-need="vaName"')) + A('추가하고 생성', 'vaddDo', 'pri sm', ' data-arg="1" data-need="vaName"') + '</div></div>'
         : A('＋ ' + noun + ' 추가하기', 'vaddOpen', 'sm w-refadd'))) +
       '<div class="w-rglab">쓰인 샷 <small class="w-mut">' + (st.boarded ? '누르면 샷 정보를 볼 수 있어요' : 'Storyboard에서 샷을 나누면 보여요') + '</small></div>' +
       (st.boarded ? (used.length ? '<div class="w-usechips">' + used.map(function (j) { return '<button class="w-chipbtn' + (st.useSel === j ? ' on' : '') + '" data-act="useSel" data-arg="' + j + '">' + shotLabel(j) + '</button>'; }).join('') + '</div>' +
@@ -925,6 +927,7 @@
   }
   function sbShot(s, i) {
     var badge = !s.drawn ? '<span class="w-tag-no">새로 추가 · 스케치 전</span>' : '';
+    if (st.boot != null && i >= st.boot) return '<div class="w-shot boot"><div class="w-shot-c"><b>' + (st.boot < 0 ? '…' : shotLabel(i)) + '</b><span>' + (st.boot < 0 ? '' : s.len + '초') + '</span></div><div class="w-fr none"><span><span class="w-spin sm" aria-hidden="true"></span> ' + (st.boot < 0 ? '샷 나누는 중' : i === st.boot ? '그리는 중' : '기다리는 중') + '</span></div><small class="w-mut">' + (st.boot < 0 ? '' : atText(s.desc)) + '</small></div>';
     var fr = s.drawn ? '<div class="w-fr drawn">' + frameImg(s, i, 0) + frameImg(s, i, 1) + '</div>' : '<div class="w-fr none"><span>스케치 전</span></div>';
     var menu = st.sbMenu === i ? '<div class="w-sbmenu" role="menu">' + A('← 앞으로', 'shotMove', 'sm', ' data-arg="' + i + ':-1"') + A('뒤로 →', 'shotMove', 'sm', ' data-arg="' + i + ':1"') + A('복제', 'shotDup', 'sm', ' data-arg="' + i + '"') + A('삭제', 'shotDel', 'sm warn', ' data-arg="' + i + '"') + '</div>' : '';
     var L = s.light || { pos: 0, temp: 3, bri: 50 };
@@ -955,7 +958,28 @@
       ['S1-2를 클로즈업으로', 'S2 조명을 따뜻하게', 'S1-1 다음에 민호가 한숨 쉬는 샷 추가해 줘', 'S2-1을 로우 앵글로, 5초'].map(function (x) { return A('“' + x + '”', 'send', 'sm', ' data-arg="' + esc(x) + '"'); }).join('') + '</div>', 'Storyboard');
     return studio('Storyboard', main, { card: o.card || (st.sbChange ? '' : guide), ph: '예: S1-2를 클로즈업으로, 조명은 따뜻하게' });
   }
-  function S0() { return S1() + busy('씬·샷을 나누고 러프를 그리고 있어요', ['산문 읽기', '씬 ' + st.scenes.length + '개로 나누기 · 인물 · 배경 배치', '카메라 자리 · 샷 ' + st.shots.length + '개', '샷 크기 · 앵글 · 무브먼트', '러프 스케치 그리기']); }
+  // 씬 · 샷 나누기와 러프 그리기는 오래 걸린다 (v18 부트처럼): 진행 단계를 한 줄씩, 진행률 · 남은 시간,
+  // 다 그린 샷부터 뒤 보드에 하나씩 나타난다. 그동안 화면과 채팅은 잠긴다.
+  function S0() {
+    var n = st.shots.length, pre = [
+      '산문 ' + st.prose.length + '문단을 천천히 읽는 중이에요',
+      '씬을 ' + st.scenes.length + '개로 나누는 중 — ' + st.scenes.map(function (c, k) { return 'S' + (k + 1) + ' ' + st.bgs[c.place].n; }).join(' · '),
+      st.scenes.map(function (c, k) { var w = []; scShots(k + 1).forEach(function (p) { p[0].who.forEach(function (h) { var nm = st.chars[h] && st.chars[h].n; if (nm && w.indexOf(nm) < 0) w.push(nm); }); }); return 'S' + (k + 1) + '에 ' + (w.join(', ') || '배경만') + '을(를) 세웠어요'; }).join(' · '),
+      '카메라 자리를 잡는 중 · 샷 ' + n + '개',
+      '샷 크기 · 앵글 · 무브먼트를 정하는 중이에요'];
+    var cur = st.busyStep || 0, drawn = Math.max(0, Math.min(n, cur - pre.length)), all = pre.length + n, pct = Math.round(Math.min(cur, all) / all * 100);
+    var left = Math.max(0, all - cur) * 20, mm = Math.floor(left / 60), ss = left % 60;
+    st.boot = cur < 3 ? -1 : drawn;
+    var board = S1();
+    st.boot = null;
+    return board + '<div class="w-busy soft" role="status" aria-live="polite"><div class="w-busy-card wide"><div class="w-boot-h"><span class="w-spin" aria-hidden="true"></span><div><h4>Storyboard로 넘어가는 중이에요</h4><p>씬 · 샷을 나누고 러프를 그려요. 몇 분 걸릴 수 있어요.</p></div></div>' +
+      '<div class="w-boot-bar"><div class="w-prog"><i style="width:' + pct + '%"></i></div><span><b>' + pct + '%</b> · ' + (cur < pre.length ? (cur + 1) + '/' + pre.length + ' 단계' : '러프 ' + drawn + '/' + n) + ' · 남은 시간 약 ' + (mm ? mm + '분 ' : '') + ss + '초 (목업)</span></div>' +
+      '<ol class="w-steps">' + pre.map(function (t, k) { return '<li class="' + (k < cur ? 'done' : k === cur ? 'cur' : '') + '">' + esc(t) + '</li>'; }).join('') +
+        '<li class="w-boot-shots ' + (cur >= pre.length ? (drawn >= n ? 'done' : 'cur') : '') + '">러프 그리는 중 · ' + drawn + '/' + n + '<span>' + st.shots.map(function (x, k) { return '<i class="' + (k < drawn ? 'on' : '') + '" title="' + shotLabel(k) + '"></i>'; }).join('') + '</span></li>' +
+        st.shots.map(function () { return '<li hidden></li>'; }).slice(1).join('') + '</ol>' +
+      '<p class="w-note">다 그린 샷부터 뒤 보드에 하나씩 나타나요. 에이전트와 화면은 러프가 다 그려질 때까지 잠시 잠겨요.</p>' +
+      '<button class="w-btn ghost" data-act="skip">기다리지 않고 넘기기 (프로토타입) →</button></div></div>';
+  }
   // 채팅으로 고치기 (목업): "S1-2를 클로즈업으로", "S2 조명 따뜻하게", "S1-1 다음에 … 샷 추가해 줘", "S2-1 로우 앵글, 5초"
   function sbAgent(t) {
     var before = clone(st.shots), notes = [], m2 = t.match(/S(\d+)\s*-\s*(\d+)/), m1 = !m2 && t.match(/S(\d+)/);
@@ -1003,7 +1027,7 @@
     return '<div class="w-q"><div class="w-q-t">등장인물 <small>Artist 목록에서만 · 모습을 고를 수 있어요</small></div><div class="w-whos">' + st.chars.map(function (c, k) {
         var on = d.who.indexOf(k) >= 0;
         return '<span class="w-who' + (on ? ' on' : '') + '"><button class="w-chipbtn' + (on ? ' on' : '') + '" data-act="shotWho" data-arg="' + k + '" aria-pressed="' + on + '">' + (on ? '✓ ' : '＋ ') + esc(c.n) + '</button>' +
-          (on ? '<select data-act-change="shotWs" data-arg="' + k + '" aria-label="' + esc(c.n) + ' 모습">' + c.states.map(function (x, j) { return '<option value="' + j + '"' + ((d.ws[k] || 0) === j ? ' selected' : '') + '>' + esc(x) + '</option>'; }).join('') + '<option value="new">＋ 새 모습…</option></select>' : '') + '</span>';
+          (on ? '<select data-act-change="shotWs" data-arg="' + k + '" aria-label="' + esc(c.n) + ' 모습">' + c.states.map(function (x, j) { var no = !stateH(objs()[k], j); return '<option value="' + j + '"' + ((d.ws[k] || 0) === j ? ' selected' : '') + (no ? ' disabled' : '') + '>' + esc(x) + (no ? ' (이미지 없음 · Artist에서 만들기)' : '') + '</option>'; }).join('') + '<option value="new">＋ 새 모습…</option></select>' : '') + '</span>';
       }).join('') + '</div></div>' +
       '<div class="w-q"><div class="w-q-t">배경</div>' + opts('shotDraft.bg', st.bgs.map(function (b) { return b.n; }), d.bg || 0) + '</div>';
   }
@@ -1445,6 +1469,7 @@
       return 'A8';
     },
     toBoard: function () {
+      if (!canBoard()) { say('Artist', 'Artist', '그림이 없는 인물 · 배경이 있어서 아직 Storyboard로 갈 수 없어요. 먼저 만들어 주세요.'); return st.versions.length ? 'A5' : 'A1'; }
       if (st.boarded) return 'S1';  // Artist로 돌아왔다가 다시 가면 샷은 그대로
       st.boarded = true;
       st.pending = function () { st.shots.forEach(function (x) { x.fresh = false; x.cand = false; x.chg = false; x.drawn = true; }); say('Storyboard', 'Storyboard', '씬 ' + st.scenes.length + '개 · 샷 ' + st.shots.length + '개로 나누고 러프까지 그렸어요. 카드에서 바로 고치거나 저에게 말해 주세요.'); };
@@ -1551,7 +1576,7 @@
     skip: function () { return finishBusy(true); },
     // 목업 보기용: 위쪽 단계 탭을 누르면 그 단계 첫 화면으로
     jumpStage: function (name) {
-      return { Producer: entryId(), Writer: 'W1', Artist: st.versions.length ? 'A5' : 'A1', Storyboard: 'S1', Director: 'D1', Editor: 'D1' }[name];
+      return { Producer: entryId(), Writer: 'W1', Artist: st.versions.length ? 'A5' : 'A1', Storyboard: canBoard() ? 'S1' : st.versions.length ? 'A5' : 'A1', Director: 'D1', Editor: 'D1' }[name];
     },
     reset: function () { var p = st.plan; st = initial(); st.plan = p; return p === 'B' ? 'EB1' : 'E1'; },
     bStart: function () {

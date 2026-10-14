@@ -23,3 +23,15 @@ def bundle(src, out):
 bundle('flow.html', MAIN)
 bundle('index.html', FULL)
 print('dist/' + MAIN, 'dist/' + FULL)
+
+# 파일 하나로 끝: 프로토타입 + 사용자 플로우, 플로우 그림 도구까지 넣어서 인터넷 없이도 열린다
+SINGLE = 'TaleStudio_리뉴얼_프로토타입_단일파일.html'
+mm = os.path.join(ROOT, 'vendor/mermaid-10.9.1.min.js')
+if os.path.exists(mm):
+    s = open(os.path.join(ROOT, 'dist', MAIN), encoding='utf-8').read()
+    s = re.sub(r'<a class="btn" id="protoOpen"[^>]*>[^<]*</a>', '', s)
+    s = s.replace("$('protoOpen').href = ", "void ")
+    s = s.replace('<script src="https://cdn.jsdelivr.net/npm/mermaid@10.9.1/dist/mermaid.min.js"></script>',
+                  '<script>\n' + open(mm, encoding='utf-8').read().replace('</script', '<\\/script') + '\n</script>')
+    open(os.path.join(ROOT, 'dist', SINGLE), 'w', encoding='utf-8').write(s)
+    print('dist/' + SINGLE)

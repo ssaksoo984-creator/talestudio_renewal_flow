@@ -365,7 +365,7 @@ window.FLOW = {
 
   ],
 
-  /* 결정이 필요한 것 — 수민 */
+  /* 결정이 필요한 것 */
   questions: [
     { id: 'q-plan', node: 'E1', text: 'Producer·Writer를 1안(화면에서 고르기)으로 할지 2안(채팅으로 만들기)으로 할지. Artist부터는 같다. 위쪽 1안/2안 전환으로 비교.' },
     { id: 'q-name', node: 'S1', text: '3단계 이름. 후보: Storyboard(추천) · DOP · Shot Designer. 산문 단계가 Writer가 되었으니 여기는 Writer가 아니다.' },

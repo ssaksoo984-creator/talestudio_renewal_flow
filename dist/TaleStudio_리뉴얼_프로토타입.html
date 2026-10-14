@@ -1,5 +1,8 @@
 <!doctype html>
-<html lang="ko"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Tale Studio 프로토타입</title>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>Tale Studio 리뉴얼 프로토타입</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans+KR:wght@400;500;600;700&display=swap">
@@ -760,53 +763,101 @@ a.btn { text-decoration: none; display: inline-block }
 
 </style>
 <style>
-/* 레이아웃: 위 얇은 막대(지금 노드 · 1안/2안 · 플로우) → 화면 목업을 크게. 넓은 화면에서는 플로우를 오른쪽에 붙여 같이 본다 */
-.pbar { position: sticky; top: env(safe-area-inset-top, 0px); z-index: 20; display: flex; flex-wrap: wrap; gap: 8px 12px; align-items: center; padding: 10px 16px; background: var(--surface); border-bottom: 1px solid var(--line) }
-.pbar h1 { font-size: 15px; margin: 0; white-space: nowrap }
-.here { display: flex; gap: 6px; align-items: center; min-width: 0; flex: 1 }
-.here .id { font-family: var(--mono); font-size: 12px; border: 1px solid var(--hl); color: var(--hl); border-radius: 99px; padding: 1px 8px; white-space: nowrap }
-.here .lb { font-size: 13px; font-weight: 600; overflow: hidden; text-overflow: ellipsis; white-space: nowrap }
-.here .ty { font-size: 11.5px; color: var(--mut); white-space: nowrap }
-.pbar .acts { display: flex; gap: 6px; flex-wrap: wrap }
-.btn.on { border-color: var(--hl); color: var(--hl) }
-.stagewrap { padding: 16px; display: grid; justify-items: center }
-.frame { width: 100%; max-width: 1240px; border: 1px solid var(--line); border-radius: 12px; overflow: hidden; background: var(--w-bg); box-shadow: 0 6px 30px rgb(0 0 0 / .08) }
-.frame .screen { min-height: calc(100vh - 120px) }
-.drawer { position: fixed; z-index: 30; top: var(--barh, 56px); right: 0; bottom: 0; width: min(600px, 100%); background: var(--surface); border-left: 1px solid var(--line); box-shadow: -10px 0 40px rgb(0 0 0 / .18); display: grid; grid-template-rows: auto 1fr auto; padding-bottom: env(safe-area-inset-bottom, 0px) }
-.drawer-h { display: flex; gap: 8px; align-items: center; justify-content: space-between; padding: 10px 14px; border-bottom: 1px solid var(--line); flex-wrap: wrap }
-.drawer-h b { font-size: 14px }
-.drawer .flow-box { max-height: none; height: 100% }
-.drawer-f { border-top: 1px solid var(--line); padding: 10px 14px; font-size: 12px; color: var(--mut); display: grid; gap: 8px; max-height: 42%; overflow: auto }
-.drawer-f .sub { font-weight: 600; color: var(--mut) }
-body.docked .stagewrap { padding-right: calc(var(--dockw) + 16px) }
-body.docked .drawer { width: var(--dockw); box-shadow: none }
-:root { --dockw: min(560px, 42vw) }
-.drawer-f .next { display: flex; flex-wrap: wrap; gap: 6px }
-.lgd { display: inline-flex; align-items: center; gap: 6px }
-.lgd i { width: 22px; height: 10px; border-radius: 3px; border: 2.5px solid; border-image: linear-gradient(90deg, var(--hl), var(--hl2), var(--hl)) 1 }
-.zoom { display: flex; gap: 4px }
+.wrap { padding: 20px 20px 48px; max-width: 1680px; margin: 0 auto; display: grid; gap: 18px }
+h1 { font-size: 22px; margin: 0; letter-spacing: -.01em; text-wrap: balance }
+h2 { font-size: 13px; text-transform: uppercase; letter-spacing: .06em; color: var(--mut); margin: 0 0 10px; font-weight: 600 }
+.top { display: flex; flex-wrap: wrap; gap: 8px 16px; align-items: baseline; justify-content: space-between }
+.top p { margin: 4px 0 0; color: var(--mut); max-width: 70ch }
+
+.plans { display: grid; gap: 10px }
+.plans-h { display: flex; flex-wrap: wrap; gap: 8px 14px; align-items: center }
+.plans-b { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 10px }
+.plan { background: var(--surface); border: 1px solid var(--line); border-radius: 8px; padding: 10px 12px; min-width: 0; font-size: 13px }
+.plan b { display: block; margin-bottom: 2px }
+.plan span { color: var(--mut) }
+.plan.on { border-color: var(--hl); box-shadow: inset 0 0 0 1px var(--hl) }
+.principles { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 10px }
+.pr { background: var(--surface); border: 1px solid var(--line); border-radius: 8px; padding: 10px 12px; min-width: 0 }
+.pr b { display: block; font-size: 13px }
+.pr span { color: var(--mut); font-size: 12.5px }
+
+
+.split { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1.15fr); gap: 16px; align-items: start }
+.split.proto-first { grid-template-columns: minmax(0, 1.7fr) minmax(300px, 1fr) }
+.sec-h { margin: 8px 0 0; font-size: 16px } .sec-h small { font-weight: 400; color: var(--mut); font-size: 12.5px; margin-left: 8px }
+@media (max-width: 1100px) { .split { grid-template-columns: minmax(0, 1fr) } }
+.pane { background: var(--surface); border: 1px solid var(--line); border-radius: 10px; min-width: 0 }
+.pane-h { display: flex; gap: 8px; align-items: center; justify-content: space-between; padding: 10px 14px; border-bottom: 1px solid var(--line); flex-wrap: wrap }
+.pane-h b { font-size: 13px }
+
+.side { display: grid; gap: 16px; position: sticky; top: env(safe-area-inset-top, 0px) }
+@media (max-width: 1100px) { .side { position: static } }
+.info { padding: 14px 16px; display: grid; gap: 10px }
+.info-h { display: flex; flex-wrap: wrap; gap: 6px 10px; align-items: center }
+.info-h h3 { margin: 0; font-size: 18px }
+.tag { font-size: 11.5px; border-radius: 99px; padding: 1px 8px; border: 1px solid var(--line); color: var(--mut); white-space: nowrap }
+.tag.t-ai { color: var(--ai); border-color: var(--ai) }
+.tag.t-new { color: var(--new); border-color: var(--new) }
+.tag.t-change { color: var(--accent); border-color: var(--accent) }
+.tag.t-lock { color: var(--lock); border-color: var(--lock) }
+.info p { margin: 0; max-width: 72ch }
+.info ul { margin: 0; padding-left: 18px }
+.info .sub { font-size: 12px; font-weight: 600; color: var(--mut); margin-top: 2px }
+.info .removed li { text-decoration: line-through; text-decoration-color: var(--back); color: var(--mut) }
+.info .open li { color: var(--lock) }
+.next { display: flex; flex-wrap: wrap; gap: 6px }
+.next .btn { display: inline-flex; gap: 6px; align-items: center }
+.next .k-yes { border-color: var(--yes) } .next .k-no { border-style: dashed } .next .k-back { border-color: var(--back); color: var(--back) }
+.fix { font-size: 12.5px; color: var(--mut) }
+.fix b { color: var(--yes); font-weight: 600 }
+.review { display: flex; flex-wrap: wrap; gap: 6px; align-items: center; border-top: 1px solid var(--line); padding-top: 10px }
+.review label { font-size: 12px; color: var(--mut) }
+.review .seg { display: flex; gap: 4px }
+.review .seg button[aria-pressed="true"] { background: var(--accent-soft); border-color: var(--accent) }
+.review textarea { width: 100%; min-height: 54px; font: inherit; font-size: 13px; border: 1px solid var(--line); border-radius: 6px; background: var(--bg); color: var(--ink); padding: 6px 8px; resize: vertical }
+
 </style>
-<header class="pbar" id="pbar">
-  <h1>Tale Studio 프로토타입</h1>
-  <div class="here" aria-live="polite"><span class="id" id="hereId">E1</span><span class="lb" id="hereLabel"></span><span class="ty" id="hereType"></span></div>
-  <span class="seg-plan" id="planSeg" aria-label="Producer·Writer 안"></span>
-  <div class="acts">
-    <button class="btn" id="back" disabled>← 이전 화면</button>
-    <button class="btn" id="toggleFlow" aria-expanded="false" aria-controls="drawer">플로우 보기</button>
-    <button class="btn" id="reset">처음부터</button>
-    <a class="btn" id="toIndex" href="TaleStudio_플로우문서.html">플로우 문서 ↗</a>
+</head>
+<body>
+
+<div class="wrap">
+  <div class="top">
+    <div>
+      <h1>Tale Studio 리뉴얼 프로토타입</h1>
+      <p>Producer(아이디어) → Writer(산문) → Artist → Storyboard(가칭)까지 실제로 눌러 볼 수 있어요. 아래 사용자 플로우의 노드를 누르면 프로토타입이 그 화면으로 바뀌고, 프로토타입에서 움직이면 플로우에 빨갛게 표시돼요.</p>
+    </div>
+    <span class="mono" style="font-size:12px;color:var(--mut)" id="updated"></span>
   </div>
-</header>
 
-<main class="stagewrap"><div class="frame"><div class="screen" id="screen"></div></div></main>
+  <div class="split proto-first">
+    <section class="pane" aria-label="화면 목업">
+        <div class="pane-h"><b>프로토타입 <span class="mono" id="scrId" style="color:var(--mut);font-weight:400"></span></b><span class="seg-plan sm" id="planSeg" aria-label="1안 · 2안"></span><span class="zoom"><button class="btn" id="protoReset">처음부터</button><a class="btn" id="protoOpen" href="TaleStudio_프로토타입_전체화면.html">프로토타입에서 보기 ↗</a></span></div>
+        <div class="device"><div class="screen" id="screen"></div></div>
+      </section>
+    <div class="side">
+      <section class="pane" aria-label="노드 설명"><div class="info" id="info"></div></section>
+    </div>
+  </div>
 
-<aside class="drawer" id="drawer" aria-label="플로우" hidden>
-  <div class="drawer-h"><b>플로우 <span class="lgd" style="font-weight:400;font-size:12px;color:var(--mut)"><i></i>지금 화면</span></b>
-    <span class="seg-plan sm" id="stageSeg" aria-label="단계별 보기"></span>
-    <span class="zoom"><button class="btn" id="zout" aria-label="축소">−</button><button class="btn" id="zfit">맞춤</button><button class="btn" id="zin" aria-label="확대">＋</button><button class="btn" id="closeFlow" aria-label="플로우 닫기">닫기 ✕</button></span></div>
-  <div class="flow-box" id="flow"><div class="loading">플로우를 그리는 중…</div></div>
-  <div class="drawer-f"><div class="w-dock-info" id="nodeInfo"></div><span class="sub">여기서 갈 수 있는 곳 · 노드를 눌러도 이동해요</span><div class="next" id="nextList"></div></div>
-</aside>
+  <h2 class="sec-h">사용자 플로우 <small>노드를 누르면 위 프로토타입이 그 화면으로 바뀌어요</small></h2>
+  <div class="legend" id="legend">
+    <span><i></i>화면</span><span><i class="lg-modal"></i>팝업 · 확인창</span><span><i class="lg-dec"></i>예/아니오 · 갈림</span>
+    <span><i class="lg-ai"></i>AI 작업 중 = 전체 잠금</span><span><i class="lg-err"></i>⚠ 오류 안내</span><span><i class="lg-new"></i>새로 생김</span><span><i class="lg-back"></i>롤백</span><span>🔒 여기서 잠기는 값</span>
+  </div>
+
+  <section class="pane" aria-label="플로우차트">
+      <div class="pane-h"><b>플로우 <span class="mono" id="planTag" style="color:var(--mut);font-weight:400"></span></b><span class="seg-plan sm" id="stageSeg" aria-label="단계별 보기"></span><span class="zoom"><button class="btn" id="zout" aria-label="축소">−</button><button class="btn" id="zfit">맞춤</button><button class="btn" id="zin" aria-label="확대">＋</button></span></div>
+      <div class="flow-box" id="flow"><div class="loading">플로우를 그리는 중…</div></div>
+    </section>
+
+  <h2 class="sec-h">참고</h2>
+  <section class="plans" aria-label="Writer 1안 2안">
+    <div class="plans-h"><h2 style="margin:0">Producer · Writer 두 안 비교 <span style="text-transform:none;letter-spacing:0;font-weight:400">— Artist부터는 같아요</span></h2></div>
+    <div class="plans-b" id="plansBody"></div>
+  </section>
+
+  <section aria-label="원칙"><div class="principles" id="principles"></div></section>
+</div>
 
 <script src="https://cdn.jsdelivr.net/npm/mermaid@10.9.1/dist/mermaid.min.js"></script>
 <script>
@@ -1177,7 +1228,7 @@ window.FLOW = {
 
   ],
 
-  /* 결정이 필요한 것 — 수민 */
+  /* 결정이 필요한 것 */
   questions: [
     { id: 'q-plan', node: 'E1', text: 'Producer·Writer를 1안(화면에서 고르기)으로 할지 2안(채팅으로 만들기)으로 할지. Artist부터는 같다. 위쪽 1안/2안 전환으로 비교.' },
     { id: 'q-name', node: 'S1', text: '3단계 이름. 후보: Storyboard(추천) · DOP · Shot Designer. 산문 단계가 Writer가 되었으니 여기는 Writer가 아니다.' },
@@ -3176,72 +3227,61 @@ window.FLOW = {
 <script>
 (function () {
   var F = window.FLOW, V = window.FlowView, P = window.PROTO;
-  var byId = V.byId, esc = V.esc;
+  var byId = V.byId, stageName = V.stageName, esc = V.esc;
   var $ = function (id) { return document.getElementById(id); };
-  var TYPE = { screen: '화면', modal: '팝업 · 확인창', decision: '갈림', ai: 'AI 작업 중', error: '오류 안내', ext: '범위 밖' };
-  var trail = [], cur = null, mounted = false;
+  var cur = null;
 
-  function update(id, fromProto) {
-    if (!byId[id]) return;
-    if (cur && cur !== id) trail.push(cur);
-    if (trail.length > 50) trail.shift();
+  $('updated').textContent = '기준 ' + F.updated;
+  $('principles').innerHTML = F.principles.map(function (p) { return '<div class="pr"><b>' + esc(p.title) + '</b><span>' + esc(p.text) + '</span></div>'; }).join('');
+
+  var VS = { keep: '지금과 같음', change: '바뀜', 'new': '새로' };
+  var TYPE = { screen: '화면', modal: '팝업 · 확인창', decision: '갈림', ai: 'AI 작업 중 · 전체 잠금', error: '오류 안내', ext: '범위 밖' };
+
+  // 노드 고르기: 설명을 바꾸고, 목업을 그 화면으로 옮기고, 플로우에 빨간 표시
+  function select(id, opt) {
+    opt = opt || {};
+    var n = byId[id]; if (!n) return;
     cur = id;
-    if (!fromProto && P.current() !== id) P.show(id);
-    var n = byId[id];
-    $('hereId').textContent = id;
-    $('hereLabel').textContent = n.label;
-    $('hereType').textContent = TYPE[n.type] + ' · ' + V.stageName[n.stage];
-    // 1안/2안은 Producer · Writer에만 있다
-    $('planSeg').hidden = ['entry', 'writer'].indexOf(n.stage) < 0;
-    barH();
-    // 단계별로 보고 있으면 지금 화면의 단계로 따라간다
-    if (mounted && V.stage() && V.stage() !== n.stage) { V.setStage(n.stage).then(function () { V.mark(cur, true); }); paintStages(); }
-    $('back').disabled = !trail.length;
-    $('toIndex').href = 'TaleStudio_플로우문서.html#' + id;
-    $('nodeInfo').innerHTML = (n.desc ? '<p>' + esc(n.desc) + '</p>' : '') +
-      (n.items ? '<ul>' + n.items.map(function (x) { return '<li>' + esc(x) + '</li>'; }).join('') + '</ul>' : '') +
-      (n.lock ? '<p style="color:var(--lock)">🔒 여기서 잠겨요: ' + esc(n.lock) + '</p>' : '') +
-      (n.open ? '<ul class="open">' + n.open.map(function (x) { return '<li>' + esc(x) + '</li>'; }).join('') + '</ul>' : '') +
-      (n.fixes ? '<p style="color:var(--yes)">풀리는 오류 ' + n.fixes.map(function (k) { return '#' + k; }).join(' ') + '</p>' : '');
-    $('nextList').innerHTML = F.edges.filter(function (e) { return e[0] === id; }).map(function (e) {
-      return '<button class="btn" data-node="' + e[1] + '">' + (e[2] ? esc(e[2]) + ' → ' : '→ ') + '<span class="mono">' + e[1] + '</span> ' + esc(byId[e[1]].label) + '</button>';
-    }).join('') || '<span>없음</span>';
-    if (mounted) V.mark(id, !$('drawer').hidden);
+    if (V.stage() && V.stage() !== n.stage) { V.setStage(n.stage).then(function () { V.mark(cur, true); }); paintStages(); }
+    V.mark(id, opt.scroll);
+    if (!opt.fromProto && P.current() !== id) P.show(id);
+    var scr = P.screenFor(id);
+    $('scrId').textContent = scr ? scr + (scr !== id ? ' (' + id + '는 이 화면에서)' : '') : '';
+    $('protoOpen').href = 'TaleStudio_프로토타입_전체화면.html#' + id;
+    var out = F.edges.filter(function (e) { return e[0] === id; });
+    var h = '<div class="info-h"><span class="mono tag">' + n.id + '</span><h3>' + esc(n.label) + '</h3>' +
+      '<span class="tag' + (n.type === 'ai' ? ' t-ai' : '') + '">' + TYPE[n.type] + '</span>' +
+      (n.vs ? '<span class="tag t-' + n.vs + '">' + VS[n.vs] + '</span>' : '') +
+      (n.lock ? '<span class="tag t-lock">🔒 ' + esc(n.lock) + ' 잠김</span>' : '') +
+      '<span class="tag">' + esc(stageName[n.stage]) + '</span></div>';
+    if (n.desc) h += '<p>' + esc(n.desc) + '</p>';
+    if (n.items) h += '<div class="sub">들어가는 것</div><ul>' + n.items.map(function (x) { return '<li>' + esc(x) + '</li>'; }).join('') + '</ul>';
+    if (n.removed) h += '<div class="sub">빠지는 것</div><ul class="removed">' + n.removed.map(function (x) { return '<li>' + esc(x) + '</li>'; }).join('') + '</ul>';
+    if (n.open) h += '<div class="sub">확인 필요</div><ul class="open">' + n.open.map(function (x) { return '<li>' + esc(x) + '</li>'; }).join('') + '</ul>';
+    if (n.fixes) h += '<div class="fix"><b>풀리는 오류</b> ' + n.fixes.map(function (k) { return '#' + k + ' ' + esc(F.errors[k]); }).join(' · ') + '</div>';
+    if (out.length) h += '<div class="sub">여기서 갈 수 있는 곳</div><div class="next">' + out.map(function (e) {
+      return '<button class="btn k-' + (e[3] || 'go') + '" data-node="' + e[1] + '">' + (e[2] ? esc(e[2]) + ' → ' : '→ ') + '<span class="mono">' + e[1] + '</span> ' + esc(byId[e[1]].label) + '</button>';
+    }).join('') + '</div>';
+    $('info').innerHTML = h;
     if (history.replaceState) history.replaceState(null, '', '#' + id);
   }
-  var wide = window.matchMedia('(min-width: 1180px)');
-  function dock() { document.body.classList.toggle('docked', wide.matches && !$('drawer').hidden); }
-  if (wide.addEventListener) wide.addEventListener('change', dock);
-  function openFlow(open) {
-    $('drawer').hidden = !open;
-    try { localStorage.setItem('tale-flow-open', open ? '1' : '0'); } catch (e) {}
-    dock();
-    $('toggleFlow').setAttribute('aria-expanded', String(open));
-    $('toggleFlow').classList.toggle('on', open);
-    $('toggleFlow').textContent = open ? '플로우 닫기' : '플로우 보기';
-    if (!open) return;
-    if (!mounted) {
-      mounted = true;
-      V.mount($('flow'), { onSelect: function (id) { update(id); } }).then(function () { V.setZoom(.8); V.mark(cur, true); });
-    } else V.mark(cur, true);
-  }
 
-  function barH() { document.documentElement.style.setProperty('--barh', $('pbar').getBoundingClientRect().bottom + 'px'); }
-  barH(); window.addEventListener('resize', barH);
+  // 1안 / 2안
   var plan = 'A';
   try { plan = localStorage.getItem('tale-plan') === 'B' ? 'B' : 'A'; } catch (e) {}
-  function paintPlan() {
-    $('planSeg').innerHTML = F.plans.map(function (x) { return '<button data-plan="' + x.id + '" aria-pressed="' + (x.id === plan) + '" title="' + esc(x.text) + '">' + esc(x.name) + '</button>'; }).join('');
+  function paintPlans() {
+    $('planSeg').innerHTML = F.plans.map(function (x) { return '<button data-plan="' + x.id + '" aria-pressed="' + (x.id === plan) + '">' + esc(x.name) + '</button>'; }).join('');
+    $('plansBody').innerHTML = F.plans.map(function (x) { return '<div class="plan' + (x.id === plan ? ' on' : '') + '"><b>' + esc(x.name) + (x.id === plan ? ' · 지금 보는 안' : '') + '</b><span>' + esc(x.text) + '</span></div>'; }).join('');
+    $('planTag').textContent = F.plans.filter(function (x) { return x.id === plan; })[0].name;
   }
   function setPlan(p) {
     plan = p; try { localStorage.setItem('tale-plan', p); } catch (e) {}
-    paintPlan(); P.setPlan(p);
+    paintPlans(); P.setPlan(p);
     var cn = byId[cur], to = !cn || !cn.plan || cn.plan === p ? cur : (F.twin[cur] || 'W1');
-    if (to !== cur) update(to);
-    V.setPlan(p).then(function () { if (mounted) V.mark(cur, !$('drawer').hidden); });
+    V.setPlan(p).then(function () { select(to, { scroll: true }); });
   }
-  paintPlan(); V.setPlan(plan); P.setPlan(plan);
-  $('planSeg').addEventListener('click', function (e) { var b = e.target.closest('[data-plan]'); if (b) setPlan(b.dataset.plan); barH(); });
+  paintPlans(); V.setPlan(plan); P.setPlan(plan);
+  $('planSeg').addEventListener('click', function (e) { var b = e.target.closest('[data-plan]'); if (b) setPlan(b.dataset.plan); });
 
 
   // 플로우 단계별 보기: 전체 / Producer / Writer / Artist / Storyboard / Director
@@ -3254,20 +3294,20 @@ window.FLOW = {
   function showStage(id) { V.setStage(id || null).then(function () { V.mark(cur, true); }); paintStages(); }
   $('stageSeg').addEventListener('click', function (e) { var b = e.target.closest('[data-stage]'); if (b) showStage(b.dataset.stage); });
   paintStages();
-  P.mount($('screen'), { onNavigate: function (id) { update(id, true); } });
-  $('toggleFlow').onclick = function () { openFlow($('drawer').hidden); };
-  $('closeFlow').onclick = function () { openFlow(false); $('toggleFlow').focus(); };
+  P.mount($('screen'), { onNavigate: function (id) { if (byId[id]) select(id, { scroll: true, fromProto: true }); } });
+  V.mount($('flow'), { onSelect: function (id) { select(id, { scroll: true }); } });
   $('zin').onclick = V.zoomIn; $('zout').onclick = V.zoomOut; $('zfit').onclick = V.fit;
-  $('reset').onclick = function () { P.reset(); trail = []; cur = null; update(plan === 'B' ? 'EB1' : 'E1'); };
-  $('back').onclick = function () { var p = trail.pop(); if (!p) return; cur = null; update(p); };
-  $('nextList').addEventListener('click', function (e) { var b = e.target.closest('[data-node]'); if (b) update(b.dataset.node); });
-  document.addEventListener('keydown', function (e) { if (e.key === 'Escape' && !$('drawer').hidden && !document.body.classList.contains('docked') && !document.querySelector('#screen .w-modal')) openFlow(false); });
+  $('protoReset').onclick = function () { var s0 = plan === 'B' ? 'EB1' : 'E1'; P.reset(); P.show(s0); select(s0, { scroll: true, fromProto: true }); };
 
+  document.addEventListener('click', function (e) {
+    var t = e.target;
+    var nb = t.closest('[data-node]');
+    if (nb && !nb.closest('svg') && !nb.closest('#screen')) { select(nb.dataset.node, { scroll: true }); return; }
+  });
   var start = location.hash.slice(1);
   if (byId[start] && !V.visible(start)) start = F.twin[start] || '';
-  update(byId[start] ? start : (plan === 'B' ? 'EB1' : 'E1'));
-  // 넓은 화면에서는 플로우를 처음부터 옆에 붙여 보여준다
-  var savedOpen = null; try { savedOpen = localStorage.getItem('tale-flow-open'); } catch (e) {}
-  if (savedOpen === '1' || (savedOpen === null && wide.matches)) openFlow(true);
+  select(byId[start] ? start : (plan === 'B' ? 'EB1' : 'E1'));
 })();
 </script>
+</body>
+</html>

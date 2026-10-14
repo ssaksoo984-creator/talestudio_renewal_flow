@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<title>Tale Studio 리뉴얼 플로우</title>
+<title>Tale Studio 리뉴얼 프로토타입</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans+KR:wght@400;500;600;700&display=swap">
 <link rel="stylesheet" href="src/base.css">
@@ -28,6 +28,8 @@ h2 { font-size: 13px; text-transform: uppercase; letter-spacing: .06em; color: v
 
 
 .split { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1.15fr); gap: 16px; align-items: start }
+.split.proto-first { grid-template-columns: minmax(0, 1.7fr) minmax(300px, 1fr) }
+.sec-h { margin: 8px 0 0; font-size: 16px } .sec-h small { font-weight: 400; color: var(--mut); font-size: 12.5px; margin-left: 8px }
 @media (max-width: 1100px) { .split { grid-template-columns: minmax(0, 1fr) } }
 .pane { background: var(--surface); border: 1px solid var(--line); border-radius: 10px; min-width: 0 }
 .pane-h { display: flex; gap: 8px; align-items: center; justify-content: space-between; padding: 10px 14px; border-bottom: 1px solid var(--line); flex-wrap: wrap }
@@ -66,46 +68,40 @@ h2 { font-size: 13px; text-transform: uppercase; letter-spacing: .06em; color: v
 <div class="wrap">
   <div class="top">
     <div>
-      <h1>Tale Studio 리뉴얼 사용자 플로우</h1>
-      <p>Producer(아이디어) → Writer(산문) → Artist → Storyboard(가칭)까지. Producer·Writer는 1안(화면에서 고르기)과 2안(채팅으로 만들기)으로 비교해요. 노드를 누르면 오른쪽에 그 화면이 열려요. 목업은 실제로 동작해서, 입력하고 고른 값이 다음 화면까지 이어져요. <a href="index.html">프로토타입으로 ↗</a></p>
+      <h1>Tale Studio 리뉴얼 프로토타입</h1>
+      <p>Producer(아이디어) → Writer(산문) → Artist → Storyboard(가칭)까지 실제로 눌러 볼 수 있어요. 아래 사용자 플로우의 노드를 누르면 프로토타입이 그 화면으로 바뀌고, 프로토타입에서 움직이면 플로우에 빨갛게 표시돼요.</p>
     </div>
     <span class="mono" style="font-size:12px;color:var(--mut)" id="updated"></span>
   </div>
 
-  <section aria-label="원칙"><div class="principles" id="principles"></div></section>
+  <div class="split proto-first">
+    <section class="pane" aria-label="화면 목업">
+        <div class="pane-h"><b>프로토타입 <span class="mono" id="scrId" style="color:var(--mut);font-weight:400"></span></b><span class="seg-plan sm" id="planSeg" aria-label="1안 · 2안"></span><span class="zoom"><button class="btn" id="protoReset">처음부터</button><a class="btn" id="protoOpen" href="index.html">프로토타입에서 보기 ↗</a></span></div>
+        <div class="device"><div class="screen" id="screen"></div></div>
+      </section>
+    <div class="side">
+      <section class="pane" aria-label="노드 설명"><div class="info" id="info"></div></section>
+    </div>
+  </div>
 
-  <section class="plans" aria-label="Writer 1안 2안">
-    <div class="plans-h"><h2 style="margin:0">Producer · Writer 두 안 비교 <span style="text-transform:none;letter-spacing:0;font-weight:400">— Artist부터는 같아요</span></h2><span class="seg-plan" id="planSeg"></span></div>
-    <div class="plans-b" id="plansBody"></div>
-  </section>
-
+  <h2 class="sec-h">사용자 플로우 <small>노드를 누르면 위 프로토타입이 그 화면으로 바뀌어요</small></h2>
   <div class="legend" id="legend">
     <span><i></i>화면</span><span><i class="lg-modal"></i>팝업 · 확인창</span><span><i class="lg-dec"></i>예/아니오 · 갈림</span>
     <span><i class="lg-ai"></i>AI 작업 중 = 전체 잠금</span><span><i class="lg-err"></i>⚠ 오류 안내</span><span><i class="lg-new"></i>새로 생김</span><span><i class="lg-back"></i>롤백</span><span>🔒 여기서 잠기는 값</span>
   </div>
 
-  <div class="split">
-    <section class="pane" aria-label="플로우차트">
+  <section class="pane" aria-label="플로우차트">
       <div class="pane-h"><b>플로우 <span class="mono" id="planTag" style="color:var(--mut);font-weight:400"></span></b><span class="seg-plan sm" id="stageSeg" aria-label="단계별 보기"></span><span class="zoom"><button class="btn" id="zout" aria-label="축소">−</button><button class="btn" id="zfit">맞춤</button><button class="btn" id="zin" aria-label="확대">＋</button></span></div>
       <div class="flow-box" id="flow"><div class="loading">플로우를 그리는 중…</div></div>
     </section>
-    <div class="side">
-      <section class="pane" aria-label="노드 설명"><div class="info" id="info"></div></section>
-      <section class="pane" aria-label="화면 목업">
-        <div class="pane-h"><b>화면 목업 <span class="mono" id="scrId" style="color:var(--mut);font-weight:400"></span></b><span class="zoom"><button class="btn" id="protoReset">처음부터</button><a class="btn" id="protoOpen" href="index.html">프로토타입에서 보기 ↗</a></span></div>
-        <div class="device"><div class="screen" id="screen"></div></div>
-      </section>
-    </div>
-  </div>
 
-  <div class="lower">
-    <section class="box"><h2>수민이 정할 것</h2><ul id="questions"></ul></section>
-    <section class="box"><h2>지금 제품에서 빠지는 것</h2><ul id="removed"></ul></section>
-    <section class="box"><h2>검토 내보내기</h2>
-      <p style="margin:0;color:var(--mut);font-size:13px">노드마다 고른 검토 상태와 메모는 이 브라우저에만 저장돼요. 아래 내용을 복사해 다음 채팅에 붙여 넣으면 반영할 수 있어요.</p>
-      <div class="export"><button class="btn" id="copy">검토 내용 복사</button><span id="copied" style="font-size:12px;color:var(--yes)"></span><textarea id="exportTxt" readonly aria-label="검토 내용"></textarea></div>
-    </section>
-  </div>
+  <h2 class="sec-h">참고</h2>
+  <section class="plans" aria-label="Writer 1안 2안">
+    <div class="plans-h"><h2 style="margin:0">Producer · Writer 두 안 비교 <span style="text-transform:none;letter-spacing:0;font-weight:400">— Artist부터는 같아요</span></h2></div>
+    <div class="plans-b" id="plansBody"></div>
+  </section>
+
+  <section aria-label="원칙"><div class="principles" id="principles"></div></section>
 </div>
 
 <script src="https://cdn.jsdelivr.net/npm/mermaid@10.9.1/dist/mermaid.min.js"></script>
@@ -117,22 +113,13 @@ h2 { font-size: 13px; text-transform: uppercase; letter-spacing: .06em; color: v
   var F = window.FLOW, V = window.FlowView, P = window.PROTO;
   var byId = V.byId, stageName = V.stageName, esc = V.esc;
   var $ = function (id) { return document.getElementById(id); };
-  var store = {
-    get: function () { try { return JSON.parse(localStorage.getItem('tale-flow-review') || '{}'); } catch (e) { return {}; } },
-    set: function (v) { try { localStorage.setItem('tale-flow-review', JSON.stringify(v)); } catch (e) {} },
-  };
-  var review = store.get();
   var cur = null;
 
   $('updated').textContent = '기준 ' + F.updated;
   $('principles').innerHTML = F.principles.map(function (p) { return '<div class="pr"><b>' + esc(p.title) + '</b><span>' + esc(p.text) + '</span></div>'; }).join('');
-  $('questions').innerHTML = F.questions.map(function (q) { return '<li>' + esc(q.text) + ' <button class="linkbtn" data-node="' + q.node + '">' + q.node + '</button></li>'; }).join('');
-  var rm = []; F.nodes.forEach(function (n) { (n.removed || []).forEach(function (r) { rm.push('<li>' + esc(r) + ' <button class="linkbtn" data-node="' + n.id + '">' + n.id + '</button></li>'); }); });
-  $('removed').innerHTML = rm.join('');
 
   var VS = { keep: '지금과 같음', change: '바뀜', 'new': '새로' };
   var TYPE = { screen: '화면', modal: '팝업 · 확인창', decision: '갈림', ai: 'AI 작업 중 · 전체 잠금', error: '오류 안내', ext: '범위 밖' };
-  var REV = [['ok', '확정'], ['fix', '수정 필요'], ['ask', '질문']];
 
   // 노드 고르기: 설명을 바꾸고, 목업을 그 화면으로 옮기고, 플로우에 빨간 표시
   function select(id, opt) {
@@ -159,21 +146,9 @@ h2 { font-size: 13px; text-transform: uppercase; letter-spacing: .06em; color: v
     if (out.length) h += '<div class="sub">여기서 갈 수 있는 곳</div><div class="next">' + out.map(function (e) {
       return '<button class="btn k-' + (e[3] || 'go') + '" data-node="' + e[1] + '">' + (e[2] ? esc(e[2]) + ' → ' : '→ ') + '<span class="mono">' + e[1] + '</span> ' + esc(byId[e[1]].label) + '</button>';
     }).join('') + '</div>';
-    var r = review[id] || {};
-    h += '<div class="review"><label>검토</label><span class="seg">' + REV.map(function (x) { return '<button class="btn" data-rev="' + x[0] + '" aria-pressed="' + (r.s === x[0]) + '">' + x[1] + '</button>'; }).join('') + '</span>' +
-      '<textarea id="memo-' + id + '" placeholder="이 노드에 대한 메모" aria-label="메모">' + esc(r.m || '') + '</textarea></div>';
     $('info').innerHTML = h;
     if (history.replaceState) history.replaceState(null, '', '#' + id);
   }
-  function saveReview(id, patch) { review[id] = Object.assign({}, review[id] || {}, patch); store.set(review); exportText(); }
-  function exportText() {
-    var lines = Object.keys(review).filter(function (k) { return byId[k] && (review[k].s || review[k].m); }).map(function (k) {
-      var r = review[k], lab = { ok: '확정', fix: '수정 필요', ask: '질문' }[r.s] || '-';
-      return k + ' ' + byId[k].label + ' | ' + lab + (r.m ? ' | ' + r.m.replace(/\n/g, ' ') : '');
-    });
-    $('exportTxt').value = lines.length ? lines.join('\n') : '아직 검토한 노드가 없어요.';
-  }
-  exportText();
 
   // 1안 / 2안
   var plan = 'A';
@@ -212,17 +187,7 @@ h2 { font-size: 13px; text-transform: uppercase; letter-spacing: .06em; color: v
     var t = e.target;
     var nb = t.closest('[data-node]');
     if (nb && !nb.closest('svg') && !nb.closest('#screen')) { select(nb.dataset.node, { scroll: true }); return; }
-    var rv = t.closest('[data-rev]');
-    if (rv && cur) { var on = rv.getAttribute('aria-pressed') !== 'true'; saveReview(cur, { s: on ? rv.dataset.rev : '' }); select(cur, { fromProto: true }); }
   });
-  document.addEventListener('input', function (e) { if (e.target.id && e.target.id.indexOf('memo-') === 0) saveReview(e.target.id.slice(5), { m: e.target.value }); });
-  $('copy').onclick = function () {
-    var ta = $('exportTxt');
-    var done = function () { $('copied').textContent = '복사했어요'; };
-    if (navigator.clipboard) navigator.clipboard.writeText(ta.value).then(done, function () { ta.select(); });
-    else ta.select();
-  };
-
   var start = location.hash.slice(1);
   if (byId[start] && !V.visible(start)) start = F.twin[start] || '';
   select(byId[start] ? start : (plan === 'B' ? 'EB1' : 'E1'));

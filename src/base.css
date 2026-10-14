@@ -751,3 +751,5 @@ a.btn { text-decoration: none; display: inline-block }
 .w-shot.boot { opacity: .75; cursor: progress }
 .w-spin.sm { width: 12px; height: 12px; border-width: 2px; display: inline-block; vertical-align: -2px }
 .w-busy-card .w-btn.ghost { justify-self: start }
+/* 장르별 톤 조절 */
+.w-tone-row { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; font-size: 11.5px }

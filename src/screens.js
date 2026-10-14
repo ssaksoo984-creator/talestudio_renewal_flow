@@ -11,6 +11,17 @@
   var RATIOS = [['16:9', '가로'], ['9:16', '세로 · 숏폼'], ['1:1', '정방형'], ['2.39:1', '시네마']];
   var RUNTIMES = [['15초 이하', '숏폼', 15], ['15~60초', '광고·티저', 60], ['1~5분', 'MV·웹드라마', 300], ['5~20분', '단편', 1200]];
   var MOODS = ['코미디', '드라마', '로맨스', '스릴러', '호러', '액션', 'SF·판타지', '미스터리', '휴먼·가족', '일상·잔잔'];
+  // 장르마다 톤 조절: 이름(무엇을 조절하나)과 단계 이름이 장르 성격에 맞게 바뀐다
+  var GTONES = [['웃음 세기', ['잔잔한 웃음', '유쾌한', '슬랩스틱']], ['감정 깊이', ['담담한', '따뜻한', '격정적인']], ['설렘 온도', ['살짝 설렘', '달달한', '애절한']], ['긴장감', ['서늘한', '조여 오는', '숨 막히는']], ['공포 세기', ['은은한 불안', '오싹한', '극한 공포']],
+    ['박진감', ['경쾌한', '박진감 있는', '폭발적인']], ['세계관 스케일', ['일상 속 신비', '모험적인', '장대한']], ['수수께끼 농도', ['궁금증', '미스터리한', '반전 가득']], ['감동 세기', ['소소한', '뭉클한', '눈물 쏙']], ['온도', ['고요한', '포근한', '유쾌한 일상']]];
+  var toneName = function (m, t) { return GTONES[m][1][t == null ? 1 : t]; };
+  var moodText = function (m, t) { m = m == null ? st.mood : m; t = t == null ? st.tone : t; return MOODS[m] + ' · ' + toneName(m, t); };
+  // bind: 값을 저장할 곳(tone / rw.tone), act: 누르면 실행할 동작
+  function toneCtl(m, cur, act) {
+    var T = GTONES[m];
+    return '<div class="w-q w-tone"><div class="w-q-t">' + esc(MOODS[m]) + ' · ' + esc(T[0]) + ' <small>장르마다 이름이 바뀌어요</small></div><div class="w-tone-row"><span class="w-mut">약하게</span><div class="w-seg">' +
+      T[1].map(function (n, j) { return '<button data-act="' + act + '" data-arg="' + j + '" aria-pressed="' + (j === (cur == null ? 1 : +cur)) + '">' + esc(n) + '</button>'; }).join('') + '</div><span class="w-mut">세게</span></div></div>';
+  }
   var TONES = ['작품 기본', '코미디', '호러', '로맨스', '따뜻하게'];
   // 샷 촬영값 (v18 Writer 샷 옵션)
   var SHOT_TYPES = [['ECU', 'Extreme close-up: 눈·손처럼 아주 좁은 부분만'], ['CU', 'Close-up: 얼굴 위주'], ['MCU', 'Medium close-up: 가슴 위'], ['MS', 'Medium shot: 허리 위'], ['MFS', 'Medium full shot: 무릎 위'], ['FS', 'Full shot: 전신'], ['WS', 'Wide shot: 인물과 주변 공간'], ['EWS', 'Extreme wide shot: 광활한 배경, 인물은 작게'], ['OTS', 'Over-the-shoulder: 어깨 너머로 상대를'], ['POV', 'Point of view: 인물의 시점'], ['TRACK', 'Tracking shot: 피사체를 따라 이동'], ['2S', 'Two shot: 인물 둘을 한 프레임에']];
@@ -84,7 +95,7 @@
         '회사 복도, 오후 세 시. 민호가 자판기 버튼을 누르지만 아무것도 나오지 않는다. 동전 반환 레버를 당겨 봐도 조용하다. 민호는 자판기를 툭 친다.',
         '자판기가 덜컹거리더니 캔이 우르르 쏟아진다. 지나가던 팀장이 하나를 집어 들고 "고마워" 하고 간다. 틴장은 뒤도 안 돌아본다. 복도 끝에서 경비 아저씨가 혀를 찬다. 바닥에 굴러다니는 캔 사이에서 민호는 멍하니 서 있다.',
       ],
-      plan: 'A', pop: null, ents: null, pick: null, adding: false, editEnt: -1, entName: '', mergeInto: -1, showEx: false, exPage: 0, rw: null, bAns: {}, bPre: {}, bHint: '', bSent: false, draft: [], runtime: 0, mood: 0, seed: 0, request: '', variants: [], vpick: 0, vnote: '', parts: [], partNote: '', partMode: false,
+      plan: 'A', tone: 1, pop: null, ents: null, pick: null, adding: false, editEnt: -1, entName: '', mergeInto: -1, showEx: false, exPage: 0, rw: null, bAns: {}, bPre: {}, bHint: '', bSent: false, draft: [], runtime: 0, mood: 0, seed: 0, request: '', variants: [], vpick: 0, vnote: '', parts: [], partNote: '', partMode: false,
       proseLocked: false, back: '', descEdit: -1,
       chars: [
         { n: '민호', d: '20대 후반 직장인. 흰 셔츠, 느슨한 넥타이, 피곤한 눈.', states: ['흰 셔츠', '콜라 얼룩 셔츠 (S2)'], tone: 0, note: '' },
@@ -239,7 +250,7 @@
     var r = st.rec;
     return bar('Producer') + '<div class="w-entry wide">' + stepper(2) + '<h3>이렇게 만들어 볼까요?</h3>' +
       '<p class="w-mut" style="margin:0">AI가 이야기 재료를 읽고 골라 뒀어요. 맞으면 그대로 진행하세요.</p>' +
-      '<section class="w-grp"><div class="w-q"><div class="w-q-t">장르·분위기</div>' + opts('mood', MOODS, st.mood, r.mood) + why(r.moodWhy) + '</div>' +
+      '<section class="w-grp"><div class="w-q"><div class="w-q-t">장르·분위기</div>' + opts('mood', MOODS, st.mood, r.mood) + why(r.moodWhy) + '</div>' + toneCtl(st.mood, st.tone, 'setTone') +
       '<div class="w-q"><div class="w-q-t">길이</div>' + opts('runtime', RUNTIMES, st.runtime, r.runtime) + why(r.runtimeWhy) + '</div>' +
       levelPicker() + '</section>' +
       '<section class="w-grp lock"><div class="w-grp-h">🔒 화면 비율 <small>시작하면 끝까지 바꿀 수 없어요</small></div>' + opts('ratio', RATIOS, RATIOS.map(function (x) { return x[0]; }).indexOf(st.ratio), 1) + '</section>' +
@@ -249,7 +260,7 @@
     var L = LV()[st.level];
     return E3() + modal('이대로 시작할까요?', list([
       ['🔒 화면 비율', esc(st.ratio) + ' · 시작하면 끝까지 바꿀 수 없어요'],
-      ['장르·분위기', esc(MOODS[st.mood])], ['길이', esc(RUNTIMES[st.runtime][0])],
+      ['장르·분위기', esc(moodText())], ['길이', esc(RUNTIMES[st.runtime][0])],
       ['바꿈 정도', (st.level + 1) + ' ' + esc(L.n) + ' — ' + esc(L.s)],
       ['자료', st.file ? esc(st.file.name) : '아이디어 글만'], ['채팅 언어', '한국어 (사이트 언어)']]) + '<p class="w-note">장르·분위기와 길이는 Writer에서 다시 바꿀 수 있어요.</p>',
       B('아니오, 고칠래요', 'E3') + A('예, 시작', 'confirmStart', 'pri'));
@@ -266,7 +277,7 @@
   var bOrder = function () { return st.file ? ['file', 'mood', 'runtime', 'ratio'] : ['mood', 'runtime', 'level', 'ratio']; };
   function nextQ() { var o = bOrder(); for (var i = 0; i < o.length; i++) if (!st.bAns[o[i]]) return BQ_SCREEN[o[i]]; return 'EB7'; }
   function ansText(k) {
-    if (k === 'mood') return MOODS[st.mood];
+    if (k === 'mood') return moodText();
     if (k === 'runtime') return RUNTIMES[st.runtime][0];
     if (k === 'level') return (st.level + 1) + ' ' + LV()[st.level].n;
     if (k === 'ratio') return st.ratio;
@@ -307,7 +318,7 @@
         '<div class="w-q-t" style="margin-top:8px">' + LV_Q() + '</div>' + levelButtons('file', r.level));
     }
     if (key === 'mood') return bubble('Producer', BQ_Q.mood + qr('mood', MOODS, -1, r.mood) + why(r.moodWhy));
-    if (key === 'runtime') return bubble('Producer', BQ_Q.runtime + qr('runtime', RUNTIMES, -1, r.runtime) + why(r.runtimeWhy));
+    if (key === 'runtime') return bubble('Producer', '<b>' + esc(MOODS[st.mood]) + '</b>은(는) 이 정도 톤으로 할게요. 바꿔도 돼요.' + toneCtl(st.mood, st.tone, 'setTone')) + bubble('Producer', BQ_Q.runtime + qr('runtime', RUNTIMES, -1, r.runtime) + why(r.runtimeWhy));
     if (key === 'level') return bubble('Producer', BQ_Q.level + levelButtons('level', r.level) + (hasText() ? '' : '<p class="w-note">"그대로"는 지킬 원문이 있어야 해요. 지금은 다듬기나 새롭게 키우기를 골라 주세요.</p>'));
     if (key === 'ratio') return bubble('Producer', '화면 비율을 골라 주세요. <b class="w-lock">🔒 고르면 끝까지 바꿀 수 없어요.</b>' + qr('ratio', RATIOS, -1, 1));
     if (key === 'confirm') {
@@ -368,7 +379,7 @@
   var SEEDS = [['그대로', '지금 아이디어 소재 유지'], ['새롭게', '소재부터 새로']];
   function condFields() {
     return '<div class="w-q"><div class="w-q-t">러닝타임</div>' + opts('runtime', RUNTIMES, st.runtime) + '</div>' +
-      '<div class="w-q"><div class="w-q-t">글의 장르·분위기</div>' + opts('mood', MOODS, st.mood) + '</div>' +
+      '<div class="w-q"><div class="w-q-t">글의 장르·분위기</div>' + opts('mood', MOODS, st.mood) + '</div>' + toneCtl(st.mood, st.tone, 'setTone') +
       '<div class="w-q"><div class="w-q-t">아이디어 소재</div>' + opts('seed', SEEDS, st.seed) + '</div>';
   }
   function proseHtml(pick) {
@@ -388,11 +399,11 @@
         var t = Array.isArray(o) ? o : [o, ''];
         return '<button class="w-opt' + (i === d[k] ? ' on' : '') + '" data-act="rwPick" data-arg="' + k + ':' + i + '">' + esc(t[0]) + (i === st[k] ? '<em>지금 산문</em>' : '') + '</button>';
       }).join('') + '</div></div>';
-    }).join('') +
+    }).join('') + toneCtl(d.mood, d.tone == null ? st.tone : d.tone, 'rwTone') +
       '<div class="w-acts">' + A('취소', 'rwClose') + A('이 조건으로 다시 쓰기', 'rwApply', 'acc') + '</div></div>';
   }
   function condBar() {
-    return '<div class="w-tbar" role="toolbar" aria-label="산문 도구"><span class="w-cond"><i>지금 산문</i>' + esc(RUNTIMES[st.runtime][0]) + ' · ' + esc(MOODS[st.mood]) + ' · 소재 ' + esc(SEEDS[st.seed][0]) + '</span>' +
+    return '<div class="w-tbar" role="toolbar" aria-label="산문 도구"><span class="w-cond"><i>지금 산문</i>' + esc(RUNTIMES[st.runtime][0]) + ' · ' + esc(moodText()) + ' · 소재 ' + esc(SEEDS[st.seed][0]) + '</span>' +
       '<span class="w-tbar-sp"></span>' + A('직접 작성', 'openDirect') +
       '<div class="w-popwrap right">' + A('✦ AI 다시 쓰기 ▾', 'rwOpen', 'acc', ' aria-expanded="' + !!st.rw + '"') + (st.rw ? rwPanel() : '') + '</div></div>';
   }
@@ -403,7 +414,7 @@
       (ro ? '<div class="w-banner">대본을 그대로 쓰는 프로젝트예요. 산문을 고칠 수 없고, 확인한 뒤 브레이크다운만 할 수 있어요.</div>' : '') +
       (A_ && !ro ? condBar() :
       '<div class="w-prose-tools">' + B('✦ AI 다시 쓰기', 'WC1', 'acc', ro ? ' disabled' : '') + A('직접 작성', 'openDirect', '', ro ? ' disabled' : '') +
-      '<span class="w-mut">' + esc(RUNTIMES[st.runtime][0]) + ' · ' + esc(MOODS[st.mood]) + ' 기준으로 쓴 산문</span></div>') +
+      '<span class="w-mut">' + esc(RUNTIMES[st.runtime][0]) + ' · ' + esc(moodText()) + ' 기준으로 쓴 산문</span></div>') +
       (pick ? '<p class="w-note pick">고칠 문단을 눌러 고르세요. 고른 문단만 다시 써요.</p>' : '') +
       '<article class="w-prose' + (pick ? ' picking' : '') + '">' + proseHtml(pick) + '</article>';
   }
@@ -412,7 +423,7 @@
   function writerB(o) {
     o = o || {};
     var ro = st.proseLocked && !o.pick;
-    var head = '<div class="w-sys">Producer와 정한 것 · ' + esc(RUNTIMES[st.runtime][0]) + ' · ' + esc(MOODS[st.mood]) + ' · ' + esc(LV()[st.level].n) + ' · 🔒 ' + esc(st.ratio) + '</div>';
+    var head = '<div class="w-sys">Producer와 정한 것 · ' + esc(RUNTIMES[st.runtime][0]) + ' · ' + esc(moodText()) + ' · ' + esc(LV()[st.level].n) + ' · 🔒 ' + esc(st.ratio) + '</div>';
     var proseCard = '<div class="w-b doc"><b>Writer</b><div>' + (ro ? '대본을 그대로 옮겼어요. 확인하고 브레이크다운해 주세요.' : '산문을 썼어요. 마음에 안 들면 "다시 써줘"라고 하거나 고치고 싶은 걸 말해 주세요.') +
       '<article class="w-doc' + (o.pick ? ' picking' : '') + '"><h4>' + esc(st.title) + '</h4>' + (o.pick ? '<p class="w-note pick">고칠 문단을 눌러 고르세요.</p>' : '') + proseHtml(o.pick) + '</article>' +
       '<div class="w-qr">' + (ro ? '' : B('✦ 다시 써줘', 'WC1') + A('✎ 직접 고치기', 'openDirect')) + B('브레이크다운하기 →', 'W6', 'pri') + '</div></div></div>';
@@ -1279,7 +1290,7 @@
     rwOpen: function () { st.rw = st.rw ? null : { runtime: st.runtime, mood: st.mood, seed: st.seed }; },
     rwPick: function (a) { var kv = a.split(':'); st.rw[kv[0]] = +kv[1]; },
     rwClose: function () { st.rw = null; },
-    rwApply: function () { var d = st.rw; st.rw = null; st.runtime = d.runtime; st.mood = d.mood; st.seed = d.seed; return ACTS.rewrite(); },
+    rwApply: function () { var d = st.rw; st.rw = null; st.runtime = d.runtime; st.mood = d.mood; st.seed = d.seed; if (d.tone != null) st.tone = d.tone; return ACTS.rewrite(); },
     togglePart: function (i) { i = +i; var k = st.parts.indexOf(i); if (k >= 0) st.parts.splice(k, 1); else st.parts.push(i); st.parts.sort(); st.focusChat = true; },
     sendPart: function () {
       if (!st.parts.length) return;
@@ -1589,6 +1600,8 @@
       };
       return 'E2';
     },
+    setTone: function (j) { st.tone = +j; },
+    rwTone: function (j) { st.rw.tone = +j; },
     bAnswer: function (a) {
       var kv = a.split(':'), k = kv[0], v = +kv[1];
       if (k === 'ratio') st.ratio = RATIOS[v][0];

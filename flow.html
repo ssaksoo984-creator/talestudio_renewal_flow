@@ -37,6 +37,24 @@ h2 { font-size: 13px; text-transform: uppercase; letter-spacing: .06em; color: v
 .flow-open { writing-mode: vertical-rl; font: inherit; font-size: 13px; border: 1px solid var(--line); background: var(--surface); color: var(--ink); border-radius: 10px; padding: 14px 8px; cursor: pointer; align-self: start }
 .desc-pane > .pane { border-radius: 10px }
 @media (max-width: 1100px) { .split.proto-first { grid-template-columns: minmax(0, 1fr) } .flow-pane { position: static } }
+.tabs { display: flex; gap: 4px; border-bottom: 1px solid var(--line); flex-wrap: wrap }
+.tabs button { font: inherit; font-size: 14px; font-weight: 600; border: 0; border-bottom: 2px solid transparent; background: none; color: var(--mut); padding: 8px 14px; cursor: pointer; margin-bottom: -1px }
+.tabs button small { font-weight: 400; font-size: 11.5px; margin-left: 4px }
+.tabs button[aria-selected="true"] { color: var(--ink); border-bottom-color: var(--ink) }
+.tabs button:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px }
+body.tab-flow #mainSplit { grid-template-columns: minmax(0, 1fr) }
+body.tab-flow #mainSplit > .pane:first-child, body.tab-flow #flowOpen, body.tab-flow #flowClose { display: none }
+body.tab-flow #mainSplit.closed .flow-pane { display: block }
+body.tab-flow .flow-pane { position: static }
+body.tab-doc #mainSplit, body.tab-doc .desc-pane { display: none }
+.doc { display: grid; gap: 14px }
+.doc-stage { background: var(--surface); border: 1px solid var(--line); border-radius: 10px; padding: 12px 16px }
+.doc-stage h3 { margin: 0 0 8px; font-size: 15px }
+.doc-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 10px 18px }
+.doc-grid h4 { margin: 0 0 4px; font-size: 12.5px; color: var(--mut) }
+.doc-grid ul { margin: 0; padding-left: 18px; font-size: 13px; line-height: 1.6 }
+.doc-grid li button { font: inherit; border: 0; background: none; color: var(--accent); padding: 0; cursor: pointer; font-family: var(--mono); font-size: 11.5px; margin-right: 4px }
+.doc-grid .rm { text-decoration: line-through; color: var(--back) }
 .sec-h { margin: 8px 0 0; font-size: 16px } .sec-h small { font-weight: 400; color: var(--mut); font-size: 12.5px; margin-left: 8px }
 @media (max-width: 1100px) { .split { grid-template-columns: minmax(0, 1fr) } }
 .pane { background: var(--surface); border: 1px solid var(--line); border-radius: 10px; min-width: 0 }
@@ -82,6 +100,10 @@ h2 { font-size: 13px; text-transform: uppercase; letter-spacing: .06em; color: v
     <span class="mono" style="font-size:12px;color:var(--mut)" id="updated"></span>
   </div>
 
+  <nav class="tabs" role="tablist" aria-label="보기">
+    <button role="tab" data-tab="proto" aria-selected="true">프로토타입</button><button role="tab" data-tab="flow" aria-selected="false">플로우</button><button role="tab" data-tab="doc" aria-selected="false">내용 정리 <small>개발 전달 · 기존에서 무엇이 바뀌나</small></button>
+  </nav>
+
   <div class="split proto-first" id="mainSplit">
     <section class="pane" aria-label="화면 목업">
         <div class="pane-h"><b>프로토타입 <span class="mono" id="scrId" style="color:var(--mut);font-weight:400"></span></b><span class="seg-plan sm" id="planSeg" aria-label="1안 · 2안"></span><span class="zoom"><button class="btn" id="protoReset">처음부터</button><a class="btn" id="protoOpen" href="index.html">프로토타입에서 보기 ↗</a></span></div>
@@ -103,6 +125,9 @@ h2 { font-size: 13px; text-transform: uppercase; letter-spacing: .06em; color: v
   <section class="pane" aria-label="노드 설명"><div class="info" id="info"></div></section>
   </section>
 
+  <section id="doc" class="doc" aria-label="내용 정리" hidden>
+    <h2 class="sec-h" style="margin-top:0">개발 전달 · 기존에서 무엇이 바뀌나 <small>플로우 데이터에서 바로 만든 정리예요. 항목을 누르면 그 화면이 열려요.</small></h2>
+    <div id="docBody"></div>
   <h2 class="sec-h">참고</h2>
   <section class="plans" aria-label="Writer 1안 2안">
     <div class="plans-h"><h2 style="margin:0">Producer · Writer 두 안 비교 <span style="text-transform:none;letter-spacing:0;font-weight:400">— Artist부터는 같아요</span></h2></div>
@@ -110,6 +135,7 @@ h2 { font-size: 13px; text-transform: uppercase; letter-spacing: .06em; color: v
   </section>
 
   <section aria-label="원칙"><div class="principles" id="principles"></div></section>
+  </section>
 </div>
 
 <script src="https://cdn.jsdelivr.net/npm/mermaid@10.9.1/dist/mermaid.min.js"></script>
@@ -189,6 +215,30 @@ h2 { font-size: 13px; text-transform: uppercase; letter-spacing: .06em; color: v
   P.mount($('screen'), { onNavigate: function (id) { if (byId[id]) select(id, { scroll: true, fromProto: true }); } });
   V.mount($('flow'), { onSelect: function (id) { select(id, { scroll: true }); } });
   $('zin').onclick = V.zoomIn; $('zout').onclick = V.zoomOut; $('zfit').onclick = V.fit;
+  // 위쪽 탭: 프로토타입 / 플로우 / 내용 정리
+  function setTab(t) {
+    document.body.className = 'tab-' + t;
+    document.querySelectorAll('.tabs [data-tab]').forEach(function (b) { b.setAttribute('aria-selected', b.dataset.tab === t); });
+    $('doc').hidden = t !== 'doc';
+    try { localStorage.setItem('tale-tab', t); } catch (e) {}
+    if (t !== 'doc') setTimeout(function () { V.mark(cur, true); }, 50);
+  }
+  document.querySelector('.tabs').addEventListener('click', function (e) { var b = e.target.closest('[data-tab]'); if (b) setTab(b.dataset.tab); });
+  // 내용 정리: 단계마다 새로 생기는 것 · 바뀌는 것 · 빠지는 것 · 잠기는 값 · 풀리는 오류 · 확인 필요
+  function li(n, text, cls) { return '<li' + (cls ? ' class="' + cls + '"' : '') + '><button data-node="' + n.id + '" data-go-tab="proto">' + n.id + '</button>' + esc(text) + '</li>'; }
+  $('docBody').innerHTML = F.stages.map(function (stg) {
+    var ns = F.nodes.filter(function (n) { return n.stage === stg.id; });
+    var sec = [
+      ['새로 생기는 화면 · 팝업', ns.filter(function (n) { return n.vs === 'new' && n.type !== 'decision'; }).map(function (n) { return li(n, n.label + (n.plan ? ' (' + n.plan.replace('A', '1안').replace('B', '2안') + ')' : '')); })],
+      ['바뀌는 화면', ns.filter(function (n) { return n.vs === 'change'; }).map(function (n) { return li(n, n.label); })],
+      ['빠지는 것', [].concat.apply([], ns.map(function (n) { return (n.removed || []).map(function (r) { return li(n, r, 'rm'); }); }))],
+      ['잠기는 값 🔒', ns.filter(function (n) { return n.lock; }).map(function (n) { return li(n, n.lock + ' — ' + n.label); })],
+      ['풀리는 기존 오류', [].concat.apply([], ns.map(function (n) { return (n.fixes || []).map(function (k) { return li(n, '#' + k + ' ' + F.errors[k]); }); }))],
+      ['확인 필요', [].concat.apply([], ns.map(function (n) { return (n.open || []).map(function (o) { return li(n, o); }); }))]
+    ].filter(function (x) { return x[1].length; });
+    if (!sec.length) return '';
+    return '<section class="doc-stage"><h3>' + esc(stg.name) + ' <small style="font-weight:400;color:var(--mut)">' + esc(stg.sub || '') + '</small></h3><div class="doc-grid">' + sec.map(function (x) { return '<div><h4>' + x[0] + ' · ' + x[1].length + '</h4><ul>' + x[1].join('') + '</ul></div>'; }).join('') + '</div></section>';
+  }).join('');
   // 플로우 차트 여닫기
   function setFlow(open) { $('mainSplit').classList.toggle('closed', !open); $('flowOpen').hidden = open; try { localStorage.setItem('tale-flow-open', open ? '1' : '0'); } catch (e) {} if (open) setTimeout(function () { V.mark(cur, true); }, 50); }
   $('flowClose').onclick = function () { setFlow(false); }; $('flowOpen').onclick = function () { setFlow(true); };
@@ -198,8 +248,9 @@ h2 { font-size: 13px; text-transform: uppercase; letter-spacing: .06em; color: v
   document.addEventListener('click', function (e) {
     var t = e.target;
     var nb = t.closest('[data-node]');
-    if (nb && !nb.closest('svg') && !nb.closest('#screen')) { select(nb.dataset.node, { scroll: true }); return; }
+    if (nb && !nb.closest('svg') && !nb.closest('#screen')) { if (nb.dataset.goTab) setTab(nb.dataset.goTab); select(nb.dataset.node, { scroll: true }); return; }
   });
+  try { var t0 = localStorage.getItem('tale-tab'); setTab(t0 === 'flow' || t0 === 'doc' ? t0 : 'proto'); } catch (e) { setTab('proto'); }
   var start = location.hash.slice(1);
   if (byId[start] && !V.visible(start)) start = F.twin[start] || '';
   select(byId[start] ? start : (plan === 'B' ? 'EB1' : 'E1'));

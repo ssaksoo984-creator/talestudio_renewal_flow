@@ -719,3 +719,25 @@ a.btn { text-decoration: none; display: inline-block }
 .w-memo-in { position: absolute; z-index: 3; display: flex; gap: 4px; transform: translate(-4px, -50%); background: var(--w-panel); border: 1px solid var(--w-pri); border-radius: 8px; padding: 4px; box-shadow: 0 6px 16px rgb(0 0 0 / .25) }
 .w-memo-in .w-in { width: 200px; padding: 4px 7px; font-size: 12px }
 .w-drawend { display: flex; align-items: center; justify-content: flex-end; gap: 8px; flex-wrap: wrap; font-size: 12px }
+/* 연출 고치기 (v18 2-c) */
+.w-fixbox { border: 1px solid var(--w-line); border-radius: 10px; padding: 10px 12px; display: grid; gap: 10px }
+.w-dmode { display: grid; gap: 4px; font-size: 11.5px }
+.w-seg { display: inline-flex; flex-wrap: wrap; gap: 0; border: 1px solid var(--w-line); border-radius: 8px; overflow: hidden; justify-self: start }
+.w-seg button { font: inherit; font-size: 12.5px; border: 0; border-right: 1px solid var(--w-line); background: var(--w-panel); color: var(--w-ink); padding: 6px 11px; cursor: pointer }
+.w-seg button:last-child { border-right: 0 }
+.w-seg button[aria-pressed="true"] { background: var(--w-pri); color: var(--w-pri-ink) }
+.w-seg.wrap { border: 0; gap: 5px; overflow: visible }
+.w-seg.wrap button { border: 1px solid var(--w-line); border-radius: 7px; padding: 5px 10px }
+.w-fixrow { display: grid; gap: 5px }
+.w-fk { font-size: 12.5px; font-weight: 600 } .w-fk em { font-style: normal; font-weight: 400; color: var(--w-mut); font-size: 11px; margin-left: 6px }
+.w-step { display: inline-flex; align-items: center; gap: 0; border: 1px solid var(--w-line); border-radius: 8px; overflow: hidden; justify-self: start }
+.w-step button { font: inherit; width: 32px; height: 30px; border: 0; background: var(--w-bg); cursor: pointer; color: var(--w-ink) }
+.w-step b { min-width: 48px; text-align: center; font-size: 13px; font-variant-numeric: tabular-nums }
+.w-memol { display: grid; gap: 5px } .w-memol .w-rglab { margin: 0 }
+.w-mrow { display: flex; align-items: center; gap: 8px; border: 1px solid var(--w-line); border-radius: 8px; padding: 5px 8px; font-size: 12.5px } .w-mrow span { flex: 1 }
+.w-mk2 { font: inherit; font-size: 11px; border-radius: 5px; padding: 1px 7px; cursor: pointer; border: 1px solid }
+.w-mk2.cam { background: #dfe8ff; color: #3f6fe8; border-color: #3f6fe8 } .w-mk2.obj { background: #fff2b8; color: #9a7316; border-color: #c99a2e }
+.w-edfoot { display: flex; align-items: center; gap: 8px; flex-wrap: wrap } .w-edhint { font-size: 12px; color: var(--w-mut) }
+.w-dirlayer { position: absolute; inset: 0; width: 100%; height: 100%; pointer-events: none }
+.w-ro { position: relative }
+.w-memo-in select { font: inherit; font-size: 12px; border: 1px solid var(--w-line); border-radius: 6px; background: var(--w-panel); color: var(--w-ink); padding: 3px 4px }

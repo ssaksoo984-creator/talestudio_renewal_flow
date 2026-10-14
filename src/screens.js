@@ -15,7 +15,7 @@
   // 샷 촬영값 (v18 Writer 샷 옵션)
   var SHOT_TYPES = [['ECU', 'Extreme close-up: 눈·손처럼 아주 좁은 부분만'], ['CU', 'Close-up: 얼굴 위주'], ['MCU', 'Medium close-up: 가슴 위'], ['MS', 'Medium shot: 허리 위'], ['MFS', 'Medium full shot: 무릎 위'], ['FS', 'Full shot: 전신'], ['WS', 'Wide shot: 인물과 주변 공간'], ['EWS', 'Extreme wide shot: 광활한 배경, 인물은 작게'], ['OTS', 'Over-the-shoulder: 어깨 너머로 상대를'], ['POV', 'Point of view: 인물의 시점'], ['TRACK', 'Tracking shot: 피사체를 따라 이동'], ['2S', 'Two shot: 인물 둘을 한 프레임에']];
   var ANGLES = [['아이레벨', '눈높이: 가장 자연스러운 시선'], ['하이 앵글', '위에서 내려다봄: 작고 약해 보여요'], ['로우 앵글', '아래에서 올려다봄: 크고 강해 보여요'], ['버드아이', '바로 위에서: 상황 전체를 지도처럼'], ['웜즈아이', '바닥에서: 압도적인 느낌'], ['더치', '기울어진 화면: 불안 · 긴장']];
-  var MOVES = [['고정', '카메라가 움직이지 않아요'], ['팬', '제자리에서 좌우로 돌려요'], ['틸트', '제자리에서 위아래로 돌려요'], ['달리 인', '피사체에게 다가가요'], ['달리 아웃', '피사체에게서 멀어져요'], ['트래킹', '피사체를 따라 움직여요'], ['핸드헬드', '손에 든 듯 흔들려요'], ['줌', '렌즈로 당기거나 밀어요']];
+  var MOVES = [['고정', '카메라가 움직이지 않아요'], ['팬', '제자리에서 좌우로 돌려요'], ['틸트', '제자리에서 위아래로 돌려요'], ['달리 인', '피사체에게 다가가요'], ['달리 아웃', '피사체에게서 멀어져요'], ['트래킹', '피사체를 따라 움직여요'], ['크레인', '위아래로 크게 오르내려요'], ['핸드헬드', '손에 든 듯 흔들려요'], ['줌 인', '렌즈로 당겨요']];
   // 조명: 위치는 얼굴에 빛이 어디서 오는지, 색온도는 빛의 색. 모르는 사람도 보고 고를 수 있게 미리보기를 같이 보여준다.
   var LIGHT_POS = [['정면', '얼굴 전체가 고르게 밝아요'], ['왼쪽 측면', '왼쪽만 밝고 반대쪽은 그늘져요'], ['오른쪽 측면', '오른쪽만 밝고 반대쪽은 그늘져요'], ['역광', '뒤에서 비춰 윤곽만 빛나요'], ['위에서', '머리 위에서: 눈 밑이 그늘져요'], ['아래에서', '아래에서: 무섭고 낯선 느낌']];
   var LIGHT_TEMP = [['2700K', '촛불 · 전구: 아주 따뜻한 주황빛', '#ffb066'], ['3200K', '텅스텐 · 실내등: 따뜻한 노란빛', '#ffc98f'], ['4300K', '형광등: 살짝 따뜻한 흰빛', '#ffe6cc'], ['5600K', '주광 (기본): 한낮 햇빛', '#fff8ef'], ['6500K', '흐린 날: 살짝 푸른 흰빛', '#e9efff'], ['8000K', '그늘 · 밤: 차가운 푸른빛', '#c6d6ff']];
@@ -877,7 +877,8 @@
       ms.map(function (m, j) {
         var del = live && st.drawTool === 'erase' ? ' data-mark="' + j + '" class="w-mk-del"' : '';
         if (m.t === 'arrow') return '<g' + del + '><line x1="' + m.x1 + '" y1="' + m.y1 + '" x2="' + m.x2 + '" y2="' + m.y2 + '" stroke="' + MCOL[m.c] + '" stroke-width="1.6" stroke-linecap="round" marker-end="url(#ah' + m.c + (live ? 'L' : '') + ')"' + (isEdge(m.x1, m.y1) ? ' stroke-dasharray="4 2"' : '') + '/>' + (live ? '<line x1="' + m.x1 + '" y1="' + m.y1 + '" x2="' + m.x2 + '" y2="' + m.y2 + '" stroke="transparent" stroke-width="8"/>' : '') + '</g>';
-        return '<g' + del + '><rect x="' + (m.x - 1) + '" y="' + (m.y - 6) + '" width="' + (Math.min(60, m.text.length * 4.2) + 4) + '" height="8" rx="1.5" fill="#fff" fill-opacity=".85" stroke="' + MCOL[m.c] + '" stroke-width=".5"/><text x="' + (m.x + 1) + '" y="' + (m.y) + '" font-size="5" fill="' + MCOL[m.c] + '">' + (m.kind === 'cam' ? '🎥 ' : '') + esc(m.text.slice(0, 14)) + '</text></g>';
+        var cam = m.kind === 'cam', tg = cam ? '카메라' : '액션', txt = m.text.length > 16 ? m.text.slice(0, 15) + '…' : m.text, w = 6 + tg.length * 4 + txt.length * 4.6;
+        return '<g' + del + '><rect x="' + m.x + '" y="' + (m.y - 5) + '" width="' + w + '" height="9" rx="1.4" fill="' + (cam ? '#dfe8ff' : '#fff2b8') + '" stroke="' + (cam ? '#3f6fe8' : '#c99a2e') + '" stroke-width=".5"/><text x="' + (m.x + 2) + '" y="' + (m.y + 1.6) + '" font-size="4" font-weight="700" fill="' + (cam ? '#3f6fe8' : '#c99a2e') + '">' + tg + '</text><text x="' + (m.x + 4 + tg.length * 4) + '" y="' + (m.y + 1.6) + '" font-size="4.6" fill="#26272c">' + esc(txt) + '</text></g>';
       }).join('') + (live ? '<line class="w-mk-tmp" x1="0" y1="0" x2="0" y2="0" stroke="' + MCOL[st.drawColor || 'r'] + '" stroke-width="1.6" stroke-linecap="round" visibility="hidden"/>' : '') + '</svg>';
   }
   var isEdge = function (x, y) { return x < 14 || x > 146 || y < 10 || y > 80; };
@@ -901,13 +902,26 @@
     // 그리기 전에 있던 글은 그대로 두고, 이번에 그린 표시만 뒤에 붙인다. 그리는 중에 글을 고치면 글이 우선.
     if (!st.dirEdited) { var add = readMarks((d.marks || []).slice(st.markBase || 0)).map(function (x) { return x.text.replace(/^(카메라|액션): /, ''); }); d.dir = [st.dirBase || ''].concat(add).filter(Boolean).join(', '); }
   }
+  // 연출 프레임 표시 (v18 dirLayer): 카메라 무브 이름 · 기호 · 앵글, 사물 · 인물 액션, 아래 촬영 정보 띠
+  function dirLayer(d) {
+    var ink = '#26272c', F = 'font-family="Gaegu, IBM Plex Sans KR, sans-serif" font-weight="700"', stl = 'fill="none" stroke="' + ink + '" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round"';
+    var mv = MOVES[+d.move || 0][0];
+    var G = { '팬': 'M6 27h28M6 27l4-3M6 27l4 3M34 27l-4-3M34 27l-4 3', '틸트': 'M19 20v18M19 20l-3 4M19 20l3 4M19 38l-3-4M19 38l3-4', '달리 인': 'M6 24l22 8M28 32l-5.5.6M28 32l-3.5-4', '달리 아웃': 'M35 27H9M8 27l5-3.5M8 27l5 3.5', '트래킹': 'M6 27h27M35 27l-5-3.5M35 27l-5 3.5', '크레인': 'M8 37q2-14 21-14M29 23l-5-2.5M29 23l-3 4', '핸드헬드': 'M6 27l3-3 3 6 3-6 3 6 3-6 3 6 3-3', '줌 인': 'M20 31l6 6M13 27h4M15 25v4' };
+    var cam = '<g transform="translate(0 7)"><text x="6" y="10" font-size="5.6" fill="' + ink + '" ' + F + '>카메라</text><text x="6" y="17" font-size="6.6" fill="' + ink + '" ' + F + '>' + esc(mv) + '</text>' +
+      (G[mv] ? '<path d="' + G[mv] + '" ' + stl + '/>' + (mv === '줌 인' ? '<circle cx="15" cy="27" r="5" ' + stl + '/>' : '') : '<rect x="8" y="23" width="6" height="6" ' + stl + '/>') + '<text x="6" y="' + (/틸트|크레인/.test(mv) ? 46 : 38) + '" font-size="4.4" fill="' + ink + '" ' + F + '>' + esc(ANGLES[+d.ang || 0][0]) + '</text></g>';
+    var act = (d.act || '').replace(/[.。]$/, ''), obj = '';
+    if (act) { var t = act.length > 16 ? act.slice(0, 15) + '…' : act, a = t.slice(0, 8), b = t.slice(8); obj = '<path d="M96 72V58M96 58l-2.6 3.5M96 58l2.6 3.5" ' + stl + '/><text x="101" y="64" font-size="5.4" fill="' + ink + '" ' + F + '>' + esc(a) + '</text>' + (b ? '<text x="101" y="70.5" font-size="5.4" fill="' + ink + '" ' + F + '>' + esc(b) + '</text>' : ''); }
+    var desc = (d.desc || '').replace(/@/g, ''); desc = desc.length > 30 ? desc.slice(0, 29) + '…' : desc;
+    var strip = '<rect x="1" y="76" width="158" height="13" fill="#f4f1ea" stroke="' + ink + '" stroke-width=".4"/><text x="4" y="81.5" font-size="4" fill="' + ink + '" ' + F + '>' + esc(SHOT_TYPES[+d.size || 0][0] + ' · ' + ANGLES[+d.ang || 0][0] + ' · ' + mv) + '</text><text x="156" y="81.5" font-size="4" fill="' + ink + '" text-anchor="end" ' + F + '>' + (d.len || 0) + '초</text><text x="4" y="87" font-size="4" fill="' + ink + '" ' + F + '>FOCUS: ' + esc(desc) + '</text>';
+    return '<svg class="w-dirlayer" viewBox="0 0 160 90" preserveAspectRatio="none" aria-hidden="true">' + cam + obj + strip + '</svg>';
+  }
   function drawTools() {
     var t = st.drawTool || 'arrow', c = st.drawColor || 'r', d = st.shotDraft;
     return '<div class="w-drawbar" role="toolbar" aria-label="그리기 도구">' +
       [['arrow', '↗ 화살표'], ['memo', '✎ 메모'], ['erase', '⌫ 지우개']].map(function (x) { return '<button class="w-btn sm' + (t === x[0] ? ' on' : '') + '" data-act="drawTool" data-arg="' + x[0] + '" aria-pressed="' + (t === x[0]) + '">' + x[1] + '</button>'; }).join('') +
       '<span class="w-drawc">' + ['k', 'r'].map(function (x) { return '<button class="' + (c === x ? 'on' : '') + '" data-act="drawColor" data-arg="' + x + '" aria-label="' + (x === 'k' ? '검정' : '빨강') + '" style="background:' + MCOL[x] + '"></button>'; }).join('') + '</span><span class="w-tbar-sp"></span>' +
       A('↶ 되돌리기', 'drawUndo', 'sm', (d.marks || []).length ? '' : ' disabled') + A('표시 모두 지우기', 'drawClear', 'sm w-link', (d.marks || []).length ? '' : ' disabled') + '</div>' +
-      (t === 'memo' ? '<div class="w-drawmemo"><span class="w-mut">메모 종류</span><span class="w-tabs">' + [['cam', '카메라 무브'], ['obj', '사물 · 인물 액션']].map(function (x) { return '<button class="' + ((st.memoKind || 'obj') === x[0] ? 'on' : '') + '" data-act="memoKind" data-arg="' + x[0] + '">' + x[1] + '</button>'; }).join('') + '</span><span class="w-mut">그림을 누른 자리에 바로 적어요</span></div>' : '');
+      '';
   }
   function sbShot(s, i) {
     var badge = !s.drawn ? '<span class="w-tag-no">새로 추가 · 스케치 전</span>' : '';
@@ -960,7 +974,7 @@
     var kw = function (map) { var hit = null; map.forEach(function (p) { if (hit == null && p[0].test(t)) hit = p[1]; }); return hit; };
     var size = kw([[/익스트림 클로즈업|ECU/i, 0], [/미디엄 클로즈업|MCU/i, 2], [/클로즈업|CU\b|가까이/i, 1], [/미디엄 풀|MFS/i, 4], [/미디엄|MS\b/i, 3], [/풀\s*샷|전신|FS\b/i, 5], [/익스트림 와이드|EWS/i, 7], [/와이드|넓게|WS\b/i, 6], [/어깨|OTS/i, 8], [/시점|POV/i, 9], [/투\s*샷|2S/i, 11]]);
     var ang = kw([[/로우|올려다/, 2], [/하이|내려다/, 1], [/버드|위에서 수직/, 3], [/웜즈|바닥에서/, 4], [/더치|기울/, 5], [/아이\s*레벨|눈높이/, 0]]);
-    var move = kw([[/핸드헬드|흔들/, 6], [/따라|트래킹/, 5], [/다가|달리 인|줌 인/, 3], [/멀어|달리 아웃/, 4], [/팬/, 1], [/틸트/, 2], [/고정/, 0]]);
+    var move = kw([[/핸드헬드|흔들/, 7], [/크레인/, 6], [/따라|트래킹/, 5], [/다가|달리 인|줌 인/, 3], [/멀어|달리 아웃/, 4], [/팬/, 1], [/틸트/, 2], [/고정/, 0]]);
     var temp = kw([[/촛불|아주 따뜻/, 0], [/따뜻|노을|주황/, 1], [/차갑|푸른|파랗/, 5], [/흐린/, 4], [/한낮|햇빛|주광/, 3]]);
     var pos = kw([[/역광|실루엣/, 3], [/왼쪽/, 1], [/오른쪽/, 2], [/아래에서|무섭/, 5], [/위에서 (빛|조명)/, 4], [/정면/, 0]]);
     var bri = kw([[/어둡|어둑|밤/, 25], [/밝게|환하/, 80]]);
@@ -1012,14 +1026,22 @@
       '<div class="w-grid2"><div class="w-q"><div class="w-q-t">샷 타입 (카메라 초점)</div>' + dd('shotDraft.size', SHOT_TYPES, d.size, '샷 타입') + '</div><div class="w-q"><div class="w-q-t">카메라 앵글</div>' + dd('shotDraft.ang', ANGLES, d.ang, '카메라 앵글') + '</div></div>' +
       '<div class="w-q"><div class="w-q-t">조명</div>' + lightBox('shotDraft.light', d.light) + '</div>' +
       '<p class="w-note">적용하면 시작이 바뀌고, 연출도 이어서 다시 그려요.</p>' + agentHint;
-    var rd = readMarks(d.marks || []);
-    // 글이 기본. 그림을 그렸으면 AI가 읽은 내용이 아래에 붙고, 글로 고친 게 우선이다.
-    return strip +
-      '<div class="w-q"><div class="w-q-t">방향 · 사물 · 인물 액션 <small>' + (rd.length ? (st.dirEdited ? '글로 고친 내용이 우선이에요' : '그린 표시대로 채웠어요 · 고쳐도 돼요') : '어떻게 움직이는지 글로 적어 주세요') + '</small></div><textarea class="w-ta sm" rows="3" data-bind="shotDraft.dir" placeholder="예: 카메라가 천천히 다가가고, 캔이 바닥을 굴러간다" aria-label="방향 · 액션">' + esc(d.dir) + '</textarea></div>' +
-      '<div class="w-q"><div class="w-q-t">카메라 무브먼트 <small>' + (rd.some(function (x) { return x.cam && x.move === +d.move; }) ? '그린 화살표에서 읽었어요 · 바꿔도 돼요' : '') + '</small></div>' + dd('shotDraft.move', MOVES, d.move, '카메라 무브먼트') + '</div>' +
-      (rd.length ? '<div class="w-q"><div class="w-q-t">AI가 읽은 그림 <small>테두리에서 시작한 화살표 = 카메라 무브, 안쪽 = 인물 · 사물 움직임</small></div><ul class="w-read">' + rd.map(function (x) { return '<li><i>' + (x.cam ? '🎥' : '🏃') + '</i>' + esc(x.text) + '</li>'; }).join('') + '</ul></div>' : '') +
-      '<div class="w-q"><div class="w-q-t">길이</div>' + dd('shotDraft.lenI', lenItems(), d.lenI != null ? +d.lenI : d.len - 1, '길이') + '</div>' +
-      '<p class="w-note">앵글은 시작에서 정해요. 적용하면 연출만 다시 그려요.</p>' + agentHint;
+    // 연출 고치기 (v18 2-c 그대로, 끝 그림만 뺌). 그리기는 왼쪽 연출 그림 위에서 한다.
+    var dm = st.dmode || 'opt', durRow = '<div class="w-fixrow"><div class="w-fk">길이</div><div class="w-step"><button data-act="edDur" data-arg="-1" aria-label="1초 줄이기">−</button><b>' + d.len + '초</b><button data-act="edDur" data-arg="1" aria-label="1초 늘리기">+</button></div></div>';
+    var inner = dm === 'opt'
+      ? '<div class="w-fixrow"><div class="w-fk">카메라 무브먼트</div><div class="w-seg wrap">' + MOVES.map(function (o, j) { return '<button data-act="edMove" data-arg="' + j + '" aria-pressed="' + (+d.move === j) + '" title="' + esc(o[1]) + '">' + o[0] + '</button>'; }).join('') + '</div></div>' +
+        '<div class="w-fixrow"><div class="w-fk">방향 · 상세<em>어디서 어디로, 얼마나</em></div><textarea class="w-ta sm" rows="2" data-bind="shotDraft.dirMv" placeholder="예) 자판기 옆에서 천천히 다가가 민호 얼굴 앞에서 멈춘다" aria-label="방향 · 상세">' + esc(d.dirMv || '') + '</textarea></div>' +
+        '<div class="w-fixrow"><div class="w-fk">사물 · 인물 액션<em>누가/무엇이 어떻게 움직이나</em></div><textarea class="w-ta sm" rows="2" data-bind="shotDraft.act" placeholder="예) 민호가 오른쪽으로 걸어가 자판기를 친다" aria-label="사물 · 인물 액션">' + esc(d.act || '') + '</textarea></div>' + durRow
+      : drawTools() +
+        '<div class="w-memol"><div class="w-rglab">메모 <span class="w-mut">종류를 골라 적으면 그대로 카메라 · 액션 설명이 돼요</span></div>' + ((d.marks || []).map(function (m, j) { return m.t === 'memo' ? '<div class="w-mrow"><button class="w-mk2 ' + (m.kind === 'cam' ? 'cam' : 'obj') + '" data-act="mkKind" data-arg="' + j + '" title="종류 바꾸기">' + (m.kind === 'cam' ? '카메라 무브' : '사물 · 인물 액션') + '</button><span>' + esc(m.text) + '</span><button class="w-x" data-act="mkDel" data-arg="' + j + '" aria-label="메모 삭제">✕</button></div>' : ''; }).join('') || '<div class="w-mut" style="font-size:12px">아직 메모가 없어요 · 위 도구에서 ✎ 메모를 고르고 왼쪽 그림 위를 눌러 적어요</div>') + '</div>' + durRow;
+    return strip + '<div class="w-fixbox"><div class="w-dmode"><div class="w-seg"><button data-act="dmode" data-arg="opt" aria-pressed="' + (dm === 'opt') + '">옵션 + 텍스트</button><button data-act="dmode" data-arg="draw" aria-pressed="' + (dm === 'draw') + '">그리기 + 텍스트</button></div><span class="w-mut">앵글은 시작에서 정해요 · 연출 중 앵글이 바뀌면 틸트 · 크레인 같은 무브먼트와 방향 설명으로 적어요</span></div>' +
+      inner + '<div class="w-fixrow"><div class="w-fk">기타사항<em>더 자세히 원하는 것 · 안 써도 돼요</em></div><textarea class="w-ta sm" rows="2" data-bind="shotDraft.note" placeholder="예) 처음 2초는 멈춰 있다가 민호가 움직일 때 같이 따라가 줘" aria-label="기타사항">' + esc(d.note || '') + '</textarea></div></div>' +
+      '<div class="w-edfoot">' + A('↻ 연출만 다시 만들기', 'edRegen', 'sm') + '<span class="w-edhint" id="eddHint">' + (dDirty() ? '적용하면 시작은 그대로, 연출을 다시 그려요.' : '바꾸면 적용 버튼이 켜져요.') + '</span></div>' + agentHint;
+  }
+  // 연출에서 뭔가 바꿨나 (v18 dDirty)
+  function dDirty() {
+    var d = st.shotDraft, x = st.shots[st.shotSel]; if (!d || !x) return false;
+    return (d.dirMv || '') !== (x.dirMv || '') || (d.act || '') !== (x.act || '') || (d.note || '') !== (x.note || '') || +d.move !== +x.move || d.len !== x.len || JSON.stringify(d.marks || []) !== JSON.stringify(x.marks || []);
   }
   function S2() {
     if (!st.shotDraft) st.shotDraft = clone(st.shots[st.shotSel]);
@@ -1027,20 +1049,18 @@
     var x = st.shots[st.shotSel], f = st.sbFrame || 0; if (!st.shotDraft.marks) st.shotDraft.marks = [];
     // 왼쪽: 지금 러프를 크게 (시작 / 연출). 고친 내용은 적용해서 다시 그린 뒤 확인 팝업에서 본다.
     var view = '<div class="w-adview"><div class="w-advh"><b>' + shotLabel(st.shotSel) + '</b><span class="w-mut">' + x.len + '초 · ' + SHOT_TYPES[x.size][0] + ' · ' + ANGLES[x.ang][0] + '</span><span class="w-tbar-sp"></span><span class="w-tabs">' +
-        (tab === 'dir' ? '<button class="on">' + (st.drawing ? '연출 그림 위에 그리는 중' : '연출') + '</button>' : ['시작', '연출'].map(function (n, k) { return '<button class="' + (f === k ? 'on' : '') + '" data-act="sbFrame" data-arg="' + k + '" aria-pressed="' + (f === k) + '">' + n + '</button>'; }).join('')) + '</span></div>' +
-      (tab === 'dir' ? (st.drawing
-          // 그림 그리기: 지금 연출 그림 위에 바로. 메모는 누른 자리에 입력칸이 뜬다
-          ? drawTools() + '<div class="w-adv16 w-sbv w-canvas tool-' + (st.drawTool || 'arrow') + '">' + frameImg(Object.assign({}, st.shotDraft, { marks: [] }), st.shotSel, 1, true) + marksSvg(st.shotDraft.marks || [], true) +
-            (st.memoAt ? '<div class="w-memo-in" style="left:' + (st.memoAt.x / 1.6) + '%;top:' + (st.memoAt.y / 0.9) + '%"><input class="w-in" data-bind="memoText" data-enter="memoPut" value="' + esc(st.memoText || '') + '" placeholder="' + ((st.memoKind || 'obj') === 'cam' ? '카메라: 예) 천천히 다가가기' : '액션: 예) 캔이 굴러감') + '" aria-label="메모"><button class="w-btn sm pri" data-act="memoPut">붙이기</button></div>' : '') + '</div>' +
-            '<div class="w-drawend">' + A('그리기 끝', 'drawEnd', 'pri sm') + '</div>'
-          // 기본: 지금 연출 그림을 보여주고, 고치는 건 오른쪽 글로
-          : '<div class="w-adv16 w-sbv">' + (x.drawn ? frameImg(st.shotDraft, st.shotSel, 1, true) : '<span class="w-mut">스케치 전</span>') + '</div>' +
-            '<div class="w-drawend"><span class="w-mut">글로 고치는 게 기본이에요. 움직임을 그림으로 보여 주고 싶으면</span>' + A('✎ 그림 그리기', 'drawStart', 'sm') + '</div>')
+        (tab === 'dir' ? '<button class="on">연출</button>' : ['시작', '연출'].map(function (n, k) { return '<button class="' + (f === k ? 'on' : '') + '" data-act="sbFrame" data-arg="' + k + '" aria-pressed="' + (f === k) + '">' + n + '</button>'; }).join('')) + '</span></div>' +
+      (tab === 'dir' ? ((st.dmode || 'opt') === 'draw'
+          ? '<div class="w-adv16 w-sbv w-canvas tool-' + (st.drawTool || 'arrow') + '">' + frameImg(Object.assign({}, st.shotDraft, { marks: [] }), st.shotSel, 1, true) + dirLayer(st.shotDraft) + marksSvg(st.shotDraft.marks || [], true) +
+            (st.memoAt ? '<div class="w-memo-in" style="left:' + Math.min(st.memoAt.x / 1.6, 48) + '%;top:' + (st.memoAt.y / 0.9) + '%"><select data-bind="memoKind" aria-label="메모 종류"><option value="cam"' + (st.memoKind === 'cam' ? ' selected' : '') + '>카메라 무브</option><option value="obj"' + (st.memoKind !== 'cam' ? ' selected' : '') + '>사물 · 인물 액션</option></select><input class="w-in" data-bind="memoText" data-enter="memoPut" value="' + esc(st.memoText || '') + '" placeholder="메모 적고 Enter" aria-label="메모 내용"></div>' : '') + '</div>' +
+            '<p class="w-mut" style="margin:0;font-size:12px">' + (st.drawTool === 'memo' ? '그림 위를 누르면 메모 칸이 떠요 · 종류(카메라 무브 / 사물 · 인물 액션)를 고르고 적어요' : '가장자리에서 시작한 화살표 = 카메라 · 인물/사물에서 시작 = 그 움직임') + '</p>'
+          : '<div class="w-adv16 w-sbv w-ro">' + frameImg(Object.assign({}, st.shotDraft, { marks: [] }), st.shotSel, 1, true) + dirLayer(st.shotDraft) + marksSvg(st.shotDraft.marks || [], false) + '</div>' +
+            '<p class="w-mut" style="margin:0;font-size:12px">고르는 대로 연출 표시가 바로 바뀌어요 · 적용하면 연출을 다시 그려요</p>')
         : '<div class="w-adv16 w-sbv">' + (x.drawn ? frameImg(x, st.shotSel, f, true) : '<span class="w-mut">스케치 전</span>') + '</div>' +
           '<div class="w-sbthumbs">' + [0, 1].map(function (k) { return '<button class="' + (f === k ? 'on' : '') + '" data-act="sbFrame" data-arg="' + k + '" aria-label="' + (k ? '연출' : '시작') + ' 크게 보기">' + (x.drawn ? frameImg(x, st.shotSel, k) : '') + '</button>'; }).join('') + '</div>') +
       '<p class="w-mut" style="margin:0;font-size:12px">' + atText(x.desc) + '</p></div>';
     return S1() + modal(shotLabel(st.shotSel) + ' 고치기', '<p class="w-mut">두 묶음으로 고쳐요 · 시작을 고치면 연출도 따라 바뀌고, 연출을 고치면 연출만 바뀌어요. 적용하면 다시 그린 그림을 먼저 보여 드려요.</p><div class="w-adet">' + view + '<div class="w-adr">' + shotEditor() + '</div></div>',
-      A('취소', 'cancelShot') + A(tab === 'start' ? '시작 적용 · 연출도 다시' : '연출 적용 · 다시 그리기', 'applyShot', 'acc'), 'xxl');
+      A('취소', 'cancelShot') + A(tab === 'start' ? '시작 적용 · 연출도 다시' : '연출 적용 · 다시 그리기', 'applyShot', 'acc', tab === 'dir' && !dDirty() ? ' disabled' : ''), 'xxl');
   }
   function S3() { return S1() + busy('러프를 그리고 있어요'); }
   // 다시 그린 러프 확인: 이전 → 새로를 크게 보고 [적용] / [되돌리기] / [다시 고치기]
@@ -1440,7 +1460,7 @@
     },
     shotDup: function (i) { var c = clone(st.shots[+i]); c.fresh = true; st.shots.splice(+i + 1, 0, c); st.sbMenu = -1; },
     shotDel: function (i) { var x = st.shots.splice(+i, 1)[0]; st.sbMenu = -1; st.lastDel = [+i, x]; say('Storyboard', 'Storyboard', '샷을 지웠어요. 지금 ' + total() + '초예요.'); },
-    editShot: function (i) { st.sbFrame = 0; st.dirEdited = false; st.drawTool = 'arrow'; st.drawing = false; st.memoAt = null; st.shotSel = +i; st.shotDraft = clone(st.shots[+i]); st.shotTab = 'start'; st.sbMenu = -1; st.ddOpen = ''; return 'S2'; },
+    editShot: function (i) { var o = st.shots[+i]; if (o.dirMv == null && o.act == null) { o.dirMv = o.dir || ''; o.act = ''; } st.sbFrame = 0; st.dmode = 'opt'; st.drawTool = 'arrow'; st.memoAt = null; st.memoKind = 'obj'; st.shotSel = +i; st.shotDraft = clone(st.shots[+i]); st.shotTab = 'start'; st.sbMenu = -1; st.ddOpen = ''; return 'S2'; },
     shotTab: function (t) { st.shotTab = t; st.ddOpen = ''; st.drawing = false; st.memoAt = null; },
     dirMode: function (m) { st.dirMode = m; },
     shotWho: function (k) { k = +k; var d = st.shotDraft, j = d.who.indexOf(k); if (j >= 0) d.who.splice(j, 1); else d.who.push(k); },
@@ -1454,6 +1474,7 @@
       var d = st.shotDraft, i = st.shotSel, before = clone(st.shots[i]); st.shotDraft = null;
       if (d.lenI != null) { d.len = LENS[+d.lenI]; delete d.lenI; } ['len', 'size', 'ang', 'move', 'bg'].forEach(function (k) { d[k] = +d[k] || 0; }); if (!d.len) d.len = 1;
       d.lines = d.lines.filter(function (l) { return l.t.trim(); }).map(function (l) { l.w = +l.w; return l; });
+      d.dir = [d.dirMv, d.act].filter(function (t) { return t && t.trim(); }).join(' · ');
       var part = st.shotTab === 'start' ? '시작 · 연출' : '연출';
       d.rv = (before.rv || 0) + 1;
       st.pending = function () { d.drawn = true; st.shots[i] = d; st.cands = [{ i: i, prev: before, what: part + '을 다시 그렸어요' }]; };
@@ -1464,13 +1485,19 @@
     candEdit: function () { var c = st.cands[0], cur = st.shots[c.i]; st.shots[c.i] = c.prev; st.cands = null; st.shotSel = c.i; st.shotDraft = clone(cur); delete st.shotDraft.rv; st.shotDraft.rv = c.prev.rv || 0; st.ddOpen = ''; return 'S2'; },
     sbFrame: function (k) { st.sbFrame = +k; },
     drawTool: function (t) { st.drawTool = t; st.memoAt = null; },
+    dmode: function (m) { st.dmode = m; st.memoAt = null; },
+    edMove: function (j) { st.shotDraft.move = +j; },
+    edDur: function (v) { var d = st.shotDraft; d.len = Math.max(1, Math.min(30, d.len + +v)); delete d.lenI; },
+    mkKind: function (j) { var m = st.shotDraft.marks[+j]; m.kind = m.kind === 'cam' ? 'obj' : 'cam'; },
+    mkDel: function (j) { st.shotDraft.marks.splice(+j, 1); },
+    edRegen: function () { var i = st.shotSel, before = clone(st.shots[i]), x = st.shots[i]; x.rv = (x.rv || 0) + 1; st.shotDraft = null; st.pending = function () { st.cands = [{ i: i, prev: before, what: '같은 설정으로 연출을 새로 그렸어요' }]; }; return 'S3'; },
     drawStart: function () { st.drawing = true; st.dirEdited = false; st.dirBase = st.shotDraft.dir || ''; st.markBase = (st.shotDraft.marks || []).length; st.drawTool = 'arrow'; st.memoAt = null; },
     drawEnd: function () { st.drawing = false; st.memoAt = null; },
-    memoPut: function () { var txt = (st.memoText || '').trim(), at = st.memoAt; if (!at) return; if (txt) st.shotDraft.marks.push({ t: 'memo', x: at.x, y: at.y, text: txt, kind: st.memoKind || 'obj', c: st.drawColor || 'r' }); st.memoAt = null; st.memoText = ''; syncMarks(); },
+    memoPut: function () { var txt = (st.memoText || '').trim(), at = st.memoAt; if (!at) return; if (txt) st.shotDraft.marks.push({ t: 'memo', x: at.x, y: at.y, text: txt, kind: st.memoKind || 'obj', c: st.drawColor || 'r' }); st.memoAt = null; st.memoText = ''; },
     drawColor: function (c) { st.drawColor = c; },
     memoKind: function (k) { st.memoKind = k; },
-    drawUndo: function () { st.shotDraft.marks.pop(); syncMarks(); },
-    drawClear: function () { st.shotDraft.marks = []; syncMarks(); },
+    drawUndo: function () { st.shotDraft.marks.pop(); },
+    drawClear: function () { st.shotDraft.marks = []; },
     // [＋ 샷]: 씬 머리에서 누르면 그 씬 끝, 위쪽에서 누르면 자리 없이 열고 왼쪽에서 고른다
     newShot: function (a) {
       var p = String(a || '').split(':'), n = +p[0] || 0;
@@ -1669,9 +1696,14 @@
     el.addEventListener('input', function (e) {
       var t = e.target, p = t.getAttribute && t.getAttribute('data-bind');
       if (!p || t.tagName === 'BUTTON') return;
-      setPath(st, p, t.tagName === 'SELECT' || t.type === 'range' ? +t.value : t.value);
+      setPath(st, p, (t.tagName === 'SELECT' && t.value !== '' && !isNaN(+t.value)) || t.type === 'range' ? +t.value : t.value);
       if (/\.prompt$/.test(p)) syncTraits();
-      if (p === 'shotDraft.dir') st.dirEdited = true;
+      if (/^shotDraft\.(dirMv|act|note)$/.test(p) && st.shotTab === 'dir') {
+        // v18처럼: 바꾸면 적용 버튼이 켜지고, 액션은 연출 표시에 바로 보인다
+        var go = root.querySelector('.w-acts [data-act="applyShot"]'), hn = root.querySelector('#eddHint'), dirty = dDirty();
+        if (go) go.disabled = !dirty; if (hn) hn.textContent = dirty ? '적용하면 시작은 그대로, 연출을 다시 그려요.' : '바꾸면 적용 버튼이 켜져요.';
+        var dl = root.querySelector('.w-dirlayer'); if (dl) dl.outerHTML = dirLayer(st.shotDraft);
+      }
       refresh();
     });
     el.addEventListener('change', function (e) {
@@ -1694,8 +1726,9 @@
     el.addEventListener('pointerdown', function (e) {
       var svg = e.target.closest && e.target.closest('svg[data-draw]'); if (!svg || !st.shotDraft) return;
       e.preventDefault(); var pt = svgPt(svg, e), tool = st.drawTool || 'arrow', c = st.drawColor || 'r';
-      if (tool === 'erase') { var g = e.target.closest('[data-mark]'); if (g) { st.shotDraft.marks.splice(+g.getAttribute('data-mark'), 1); syncMarks(); paint(); } return; }
-      if (tool === 'memo') { if (st.memoAt && (st.memoText || '').trim()) ACTS.memoPut(); st.memoAt = { x: Math.min(pt.x, 110), y: Math.max(pt.y, 8) }; st.memoText = ''; paint(); var mi = root.querySelector('.w-memo-in input'); if (mi) mi.focus(); return; }
+      if (tool === 'erase') { var g = e.target.closest('[data-mark]'); if (g) { st.shotDraft.marks.splice(+g.getAttribute('data-mark'), 1); paint(); } return; }
+      if (st.memoAt) { ACTS.memoPut(); paint(); return; }
+      if (tool === 'memo') { st.memoAt = { x: pt.x, y: Math.max(pt.y, 8) }; st.memoText = ''; paint(); var mi = root.querySelector('.w-memo-in input'); if (mi) mi.focus(); return; }
       drag = { svg: svg, x1: pt.x, y1: pt.y, line: svg.querySelector('.w-mk-tmp') };
       if (drag.line) { drag.line.setAttribute('x1', pt.x); drag.line.setAttribute('y1', pt.y); drag.line.setAttribute('x2', pt.x); drag.line.setAttribute('y2', pt.y); drag.line.setAttribute('visibility', 'visible'); }
     });
@@ -1703,7 +1736,7 @@
     window.addEventListener('pointerup', function (e) {
       if (!drag) return; var pt = svgPt(drag.svg, e), d0 = drag; drag = null;
       if (Math.hypot(pt.x - d0.x1, pt.y - d0.y1) < 6) { if (d0.line) d0.line.setAttribute('visibility', 'hidden'); return; }
-      st.shotDraft.marks.push({ t: 'arrow', x1: d0.x1, y1: d0.y1, x2: pt.x, y2: pt.y, c: st.drawColor || 'r' }); syncMarks(); paint();
+      st.shotDraft.marks.push({ t: 'arrow', x1: d0.x1, y1: d0.y1, x2: pt.x, y2: pt.y, c: st.drawColor || 'r' }); paint();
     });
     el.addEventListener('mouseup', function (e) {
       if (!e.target.closest || !e.target.closest('.w-tgprose') || e.target.closest('.w-tg')) return;

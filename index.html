@@ -38,6 +38,7 @@ body.docked .drawer { width: var(--dockw); box-shadow: none }
     <button class="btn" id="toggleFlow" aria-expanded="false" aria-controls="drawer">플로우 보기</button>
     <button class="btn" id="reset">처음부터</button>
     <a class="btn" id="toIndex" href="flow.html">플로우 문서 ↗</a>
+    <a class="btn" href="https://github.com/ssaksoo984-creator/talestudio_renewal_flow/tree/claude/cool-goodall-wury8h" target="_blank" rel="noopener">GitHub ↗</a>
   </div>
 </header>
 
@@ -60,7 +61,7 @@ body.docked .drawer { width: var(--dockw); box-shadow: none }
   var F = window.FLOW, V = window.FlowView, P = window.PROTO;
   var byId = V.byId, esc = V.esc;
   var $ = function (id) { return document.getElementById(id); };
-  var TYPE = { screen: '화면', modal: '팝업 · 확인창', decision: '갈림', ai: 'AI 작업 중', error: '오류 안내', ext: '범위 밖' };
+  var TYPE = { screen: '화면', modal: '팝업 · 확인창', decision: '분기 (예/아니오)', ai: 'AI 작업 중', error: '예외 흐름 (오류)', ext: '범위 밖' };
   var trail = [], cur = null, mounted = false;
 
   function update(id, fromProto) {

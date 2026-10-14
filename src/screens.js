@@ -898,7 +898,8 @@
   function syncMarks() {
     var d = st.shotDraft; if (!d) return; var r = readMarks(d.marks || []);
     var cam = r.filter(function (x) { return x.cam && x.move != null; })[0]; if (cam) d.move = cam.move;
-    if (!st.dirEdited) d.dir = r.map(function (x) { return x.text.replace(/^(카메라|액션): /, ''); }).join(', ');
+    // 그리기 전에 있던 글은 그대로 두고, 이번에 그린 표시만 뒤에 붙인다. 그리는 중에 글을 고치면 글이 우선.
+    if (!st.dirEdited) { var add = readMarks((d.marks || []).slice(st.markBase || 0)).map(function (x) { return x.text.replace(/^(카메라|액션): /, ''); }); d.dir = [st.dirBase || ''].concat(add).filter(Boolean).join(', '); }
   }
   function drawTools() {
     var t = st.drawTool || 'arrow', c = st.drawColor || 'r', d = st.shotDraft;
@@ -906,7 +907,7 @@
       [['arrow', '↗ 화살표'], ['memo', '✎ 메모'], ['erase', '⌫ 지우개']].map(function (x) { return '<button class="w-btn sm' + (t === x[0] ? ' on' : '') + '" data-act="drawTool" data-arg="' + x[0] + '" aria-pressed="' + (t === x[0]) + '">' + x[1] + '</button>'; }).join('') +
       '<span class="w-drawc">' + ['k', 'r'].map(function (x) { return '<button class="' + (c === x ? 'on' : '') + '" data-act="drawColor" data-arg="' + x + '" aria-label="' + (x === 'k' ? '검정' : '빨강') + '" style="background:' + MCOL[x] + '"></button>'; }).join('') + '</span><span class="w-tbar-sp"></span>' +
       A('↶ 되돌리기', 'drawUndo', 'sm', (d.marks || []).length ? '' : ' disabled') + A('표시 모두 지우기', 'drawClear', 'sm w-link', (d.marks || []).length ? '' : ' disabled') + '</div>' +
-      (t === 'memo' ? '<div class="w-drawmemo"><span class="w-tabs">' + [['cam', '카메라 무브'], ['obj', '사물 · 인물 액션']].map(function (x) { return '<button class="' + ((st.memoKind || 'obj') === x[0] ? 'on' : '') + '" data-act="memoKind" data-arg="' + x[0] + '">' + x[1] + '</button>'; }).join('') + '</span><input class="w-in" data-bind="memoText" value="' + esc(st.memoText || '') + '" placeholder="메모를 적고 그림을 누르면 붙어요" aria-label="메모"></div>' : '');
+      (t === 'memo' ? '<div class="w-drawmemo"><span class="w-mut">메모 종류</span><span class="w-tabs">' + [['cam', '카메라 무브'], ['obj', '사물 · 인물 액션']].map(function (x) { return '<button class="' + ((st.memoKind || 'obj') === x[0] ? 'on' : '') + '" data-act="memoKind" data-arg="' + x[0] + '">' + x[1] + '</button>'; }).join('') + '</span><span class="w-mut">그림을 누른 자리에 바로 적어요</span></div>' : '');
   }
   function sbShot(s, i) {
     var badge = !s.drawn ? '<span class="w-tag-no">새로 추가 · 스케치 전</span>' : '';
@@ -1012,10 +1013,11 @@
       '<div class="w-q"><div class="w-q-t">조명</div>' + lightBox('shotDraft.light', d.light) + '</div>' +
       '<p class="w-note">적용하면 시작이 바뀌고, 연출도 이어서 다시 그려요.</p>' + agentHint;
     var rd = readMarks(d.marks || []);
-    return strip + '<p class="w-mut" style="margin:0;font-size:12px">왼쪽 시작 그림 위에 바로 그려요. 테두리에서 시작한 화살표는 카메라 무브, 안쪽은 사물 · 인물 움직임으로 읽어요.</p>' +
-      '<div class="w-q"><div class="w-q-t">AI가 읽은 내용</div>' + (rd.length ? '<ul class="w-read">' + rd.map(function (x) { return '<li><i>' + (x.cam ? '🎥' : '🏃') + '</i>' + esc(x.text) + '</li>'; }).join('') + '</ul>' : '<p class="w-mut" style="margin:0;font-size:12px">아직 그린 표시가 없어요. 그림에 그리거나 아래에 글로 적어 주세요.</p>') + '</div>' +
-      '<div class="w-q"><div class="w-q-t">카메라 무브먼트 <small>' + (rd.some(function (x) { return x.cam && x.move != null; }) ? '화살표에서 읽었어요 · 바꿔도 돼요' : '') + '</small></div>' + dd('shotDraft.move', MOVES, d.move, '카메라 무브먼트') + '</div>' +
-      '<div class="w-q"><div class="w-q-t">방향 · 사물 · 인물 액션 <small>' + (st.dirEdited ? '글로 고친 내용이 우선이에요' : '그린 표시대로 채워져요 · 고쳐도 돼요') + '</small></div><textarea class="w-ta sm" rows="2" data-bind="shotDraft.dir" placeholder="예: 천천히 다가가며 캔이 굴러간다" aria-label="방향 · 액션">' + esc(d.dir) + '</textarea></div>' +
+    // 글이 기본. 그림을 그렸으면 AI가 읽은 내용이 아래에 붙고, 글로 고친 게 우선이다.
+    return strip +
+      '<div class="w-q"><div class="w-q-t">방향 · 사물 · 인물 액션 <small>' + (rd.length ? (st.dirEdited ? '글로 고친 내용이 우선이에요' : '그린 표시대로 채웠어요 · 고쳐도 돼요') : '어떻게 움직이는지 글로 적어 주세요') + '</small></div><textarea class="w-ta sm" rows="3" data-bind="shotDraft.dir" placeholder="예: 카메라가 천천히 다가가고, 캔이 바닥을 굴러간다" aria-label="방향 · 액션">' + esc(d.dir) + '</textarea></div>' +
+      '<div class="w-q"><div class="w-q-t">카메라 무브먼트 <small>' + (rd.some(function (x) { return x.cam && x.move === +d.move; }) ? '그린 화살표에서 읽었어요 · 바꿔도 돼요' : '') + '</small></div>' + dd('shotDraft.move', MOVES, d.move, '카메라 무브먼트') + '</div>' +
+      (rd.length ? '<div class="w-q"><div class="w-q-t">AI가 읽은 그림 <small>테두리에서 시작한 화살표 = 카메라 무브, 안쪽 = 인물 · 사물 움직임</small></div><ul class="w-read">' + rd.map(function (x) { return '<li><i>' + (x.cam ? '🎥' : '🏃') + '</i>' + esc(x.text) + '</li>'; }).join('') + '</ul></div>' : '') +
       '<div class="w-q"><div class="w-q-t">길이</div>' + dd('shotDraft.lenI', lenItems(), d.lenI != null ? +d.lenI : d.len - 1, '길이') + '</div>' +
       '<p class="w-note">앵글은 시작에서 정해요. 적용하면 연출만 다시 그려요.</p>' + agentHint;
   }
@@ -1025,8 +1027,15 @@
     var x = st.shots[st.shotSel], f = st.sbFrame || 0; if (!st.shotDraft.marks) st.shotDraft.marks = [];
     // 왼쪽: 지금 러프를 크게 (시작 / 연출). 고친 내용은 적용해서 다시 그린 뒤 확인 팝업에서 본다.
     var view = '<div class="w-adview"><div class="w-advh"><b>' + shotLabel(st.shotSel) + '</b><span class="w-mut">' + x.len + '초 · ' + SHOT_TYPES[x.size][0] + ' · ' + ANGLES[x.ang][0] + '</span><span class="w-tbar-sp"></span><span class="w-tabs">' +
-        (tab === 'dir' ? '<button class="on">시작 그림 위에 그리기</button>' : ['시작', '연출'].map(function (n, k) { return '<button class="' + (f === k ? 'on' : '') + '" data-act="sbFrame" data-arg="' + k + '" aria-pressed="' + (f === k) + '">' + n + '</button>'; }).join('')) + '</span></div>' +
-      (tab === 'dir' ? drawTools() + '<div class="w-adv16 w-sbv w-canvas tool-' + (st.drawTool || 'arrow') + '">' + frameImg(x, st.shotSel, 0, true) + marksSvg(st.shotDraft.marks || [], true) + '</div>'
+        (tab === 'dir' ? '<button class="on">' + (st.drawing ? '연출 그림 위에 그리는 중' : '연출') + '</button>' : ['시작', '연출'].map(function (n, k) { return '<button class="' + (f === k ? 'on' : '') + '" data-act="sbFrame" data-arg="' + k + '" aria-pressed="' + (f === k) + '">' + n + '</button>'; }).join('')) + '</span></div>' +
+      (tab === 'dir' ? (st.drawing
+          // 그림 그리기: 지금 연출 그림 위에 바로. 메모는 누른 자리에 입력칸이 뜬다
+          ? drawTools() + '<div class="w-adv16 w-sbv w-canvas tool-' + (st.drawTool || 'arrow') + '">' + frameImg(Object.assign({}, st.shotDraft, { marks: [] }), st.shotSel, 1, true) + marksSvg(st.shotDraft.marks || [], true) +
+            (st.memoAt ? '<div class="w-memo-in" style="left:' + (st.memoAt.x / 1.6) + '%;top:' + (st.memoAt.y / 0.9) + '%"><input class="w-in" data-bind="memoText" data-enter="memoPut" value="' + esc(st.memoText || '') + '" placeholder="' + ((st.memoKind || 'obj') === 'cam' ? '카메라: 예) 천천히 다가가기' : '액션: 예) 캔이 굴러감') + '" aria-label="메모"><button class="w-btn sm pri" data-act="memoPut">붙이기</button></div>' : '') + '</div>' +
+            '<div class="w-drawend">' + A('그리기 끝', 'drawEnd', 'pri sm') + '</div>'
+          // 기본: 지금 연출 그림을 보여주고, 고치는 건 오른쪽 글로
+          : '<div class="w-adv16 w-sbv">' + (x.drawn ? frameImg(st.shotDraft, st.shotSel, 1, true) : '<span class="w-mut">스케치 전</span>') + '</div>' +
+            '<div class="w-drawend"><span class="w-mut">글로 고치는 게 기본이에요. 움직임을 그림으로 보여 주고 싶으면</span>' + A('✎ 그림 그리기', 'drawStart', 'sm') + '</div>')
         : '<div class="w-adv16 w-sbv">' + (x.drawn ? frameImg(x, st.shotSel, f, true) : '<span class="w-mut">스케치 전</span>') + '</div>' +
           '<div class="w-sbthumbs">' + [0, 1].map(function (k) { return '<button class="' + (f === k ? 'on' : '') + '" data-act="sbFrame" data-arg="' + k + '" aria-label="' + (k ? '연출' : '시작') + ' 크게 보기">' + (x.drawn ? frameImg(x, st.shotSel, k) : '') + '</button>'; }).join('') + '</div>') +
       '<p class="w-mut" style="margin:0;font-size:12px">' + atText(x.desc) + '</p></div>';
@@ -1431,8 +1440,8 @@
     },
     shotDup: function (i) { var c = clone(st.shots[+i]); c.fresh = true; st.shots.splice(+i + 1, 0, c); st.sbMenu = -1; },
     shotDel: function (i) { var x = st.shots.splice(+i, 1)[0]; st.sbMenu = -1; st.lastDel = [+i, x]; say('Storyboard', 'Storyboard', '샷을 지웠어요. 지금 ' + total() + '초예요.'); },
-    editShot: function (i) { st.sbFrame = 0; st.dirEdited = false; st.drawTool = 'arrow'; st.shotSel = +i; st.shotDraft = clone(st.shots[+i]); st.shotTab = 'start'; st.sbMenu = -1; st.ddOpen = ''; return 'S2'; },
-    shotTab: function (t) { st.shotTab = t; st.ddOpen = ''; },
+    editShot: function (i) { st.sbFrame = 0; st.dirEdited = false; st.drawTool = 'arrow'; st.drawing = false; st.memoAt = null; st.shotSel = +i; st.shotDraft = clone(st.shots[+i]); st.shotTab = 'start'; st.sbMenu = -1; st.ddOpen = ''; return 'S2'; },
+    shotTab: function (t) { st.shotTab = t; st.ddOpen = ''; st.drawing = false; st.memoAt = null; },
     dirMode: function (m) { st.dirMode = m; },
     shotWho: function (k) { k = +k; var d = st.shotDraft, j = d.who.indexOf(k); if (j >= 0) d.who.splice(j, 1); else d.who.push(k); },
     redraw: function (i) { var x = st.shots[+i]; st.busyNames = null; st.pending = function () { x.drawn = true; x.fresh = false; }; return 'S3'; },
@@ -1454,7 +1463,10 @@
     candUndo: function () { (st.cands || []).forEach(function (c) { st.shots[c.i] = c.prev; }); st.cands = null; st.shots.forEach(function (x) { x.chg = false; }); say('Storyboard', 'Storyboard', '되돌렸어요. 이전 그림 그대로예요.'); return 'S1'; },
     candEdit: function () { var c = st.cands[0], cur = st.shots[c.i]; st.shots[c.i] = c.prev; st.cands = null; st.shotSel = c.i; st.shotDraft = clone(cur); delete st.shotDraft.rv; st.shotDraft.rv = c.prev.rv || 0; st.ddOpen = ''; return 'S2'; },
     sbFrame: function (k) { st.sbFrame = +k; },
-    drawTool: function (t) { st.drawTool = t; },
+    drawTool: function (t) { st.drawTool = t; st.memoAt = null; },
+    drawStart: function () { st.drawing = true; st.dirEdited = false; st.dirBase = st.shotDraft.dir || ''; st.markBase = (st.shotDraft.marks || []).length; st.drawTool = 'arrow'; st.memoAt = null; },
+    drawEnd: function () { st.drawing = false; st.memoAt = null; },
+    memoPut: function () { var txt = (st.memoText || '').trim(), at = st.memoAt; if (!at) return; if (txt) st.shotDraft.marks.push({ t: 'memo', x: at.x, y: at.y, text: txt, kind: st.memoKind || 'obj', c: st.drawColor || 'r' }); st.memoAt = null; st.memoText = ''; syncMarks(); },
     drawColor: function (c) { st.drawColor = c; },
     memoKind: function (k) { st.memoKind = k; },
     drawUndo: function () { st.shotDraft.marks.pop(); syncMarks(); },
@@ -1683,7 +1695,7 @@
       var svg = e.target.closest && e.target.closest('svg[data-draw]'); if (!svg || !st.shotDraft) return;
       e.preventDefault(); var pt = svgPt(svg, e), tool = st.drawTool || 'arrow', c = st.drawColor || 'r';
       if (tool === 'erase') { var g = e.target.closest('[data-mark]'); if (g) { st.shotDraft.marks.splice(+g.getAttribute('data-mark'), 1); syncMarks(); paint(); } return; }
-      if (tool === 'memo') { var txt = (st.memoText || '').trim(); if (!txt) { var mi = root.querySelector('[data-bind="memoText"]'); if (mi) mi.focus(); return; } st.shotDraft.marks.push({ t: 'memo', x: pt.x, y: pt.y, text: txt, kind: st.memoKind || 'obj', c: c }); st.memoText = ''; syncMarks(); paint(); return; }
+      if (tool === 'memo') { if (st.memoAt && (st.memoText || '').trim()) ACTS.memoPut(); st.memoAt = { x: Math.min(pt.x, 110), y: Math.max(pt.y, 8) }; st.memoText = ''; paint(); var mi = root.querySelector('.w-memo-in input'); if (mi) mi.focus(); return; }
       drag = { svg: svg, x1: pt.x, y1: pt.y, line: svg.querySelector('.w-mk-tmp') };
       if (drag.line) { drag.line.setAttribute('x1', pt.x); drag.line.setAttribute('y1', pt.y); drag.line.setAttribute('x2', pt.x); drag.line.setAttribute('y2', pt.y); drag.line.setAttribute('visibility', 'visible'); }
     });
@@ -1703,6 +1715,8 @@
       if ((e.key === 'Enter' || e.key === ' ') && t.getAttribute && t.getAttribute('role') === 'button' && t.tagName !== 'BUTTON' && t.getAttribute('data-act')) { e.preventDefault(); run(t.getAttribute('data-act'), t.getAttribute('data-arg')); return; }
       if (e.key === 'Enter' && !e.isComposing && !(e.shiftKey && t.tagName === 'TEXTAREA') && t.getAttribute && t.getAttribute('data-enter')) { e.preventDefault(); run(t.getAttribute('data-enter')); }
       if (e.key === 'Escape' && st.rw) { st.rw = null; paint(); var ob = root.querySelector('[data-act="rwOpen"]'); if (ob) ob.focus(); return; }
+      if (e.key === 'Escape' && st.memoAt) { st.memoAt = null; st.memoText = ''; paint(); return; }
+      if (e.key === 'Escape' && st.ddOpen) { st.ddOpen = ''; paint(); return; }
       if (e.key === 'Escape') { var c = root.querySelector('.w-acts .w-btn'); if (c) c.click(); }
     });
   }

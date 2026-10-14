@@ -716,3 +716,6 @@ a.btn { text-decoration: none; display: inline-block }
 .w-read { margin: 0; padding: 0; list-style: none; display: grid; gap: 4px; font-size: 12.5px }
 .w-read li { display: flex; gap: 6px; border: 1px solid var(--w-line); border-radius: 7px; padding: 5px 8px; background: var(--w-bg) } .w-read i { font-style: normal }
 .w-chips span { max-width: 100%; white-space: nowrap; overflow: hidden; text-overflow: ellipsis }
+.w-memo-in { position: absolute; z-index: 3; display: flex; gap: 4px; transform: translate(-4px, -50%); background: var(--w-panel); border: 1px solid var(--w-pri); border-radius: 8px; padding: 4px; box-shadow: 0 6px 16px rgb(0 0 0 / .25) }
+.w-memo-in .w-in { width: 200px; padding: 4px 7px; font-size: 12px }
+.w-drawend { display: flex; align-items: center; justify-content: flex-end; gap: 8px; flex-wrap: wrap; font-size: 12px }

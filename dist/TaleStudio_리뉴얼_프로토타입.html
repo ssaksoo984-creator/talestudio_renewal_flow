@@ -783,7 +783,15 @@ h2 { font-size: 13px; text-transform: uppercase; letter-spacing: .06em; color: v
 
 
 .split { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1.15fr); gap: 16px; align-items: start }
-.split.proto-first { grid-template-columns: minmax(0, 1.7fr) minmax(300px, 1fr) }
+.split.proto-first { grid-template-columns: minmax(0, 1.35fr) minmax(360px, 1fr) }
+.split.proto-first.closed { grid-template-columns: minmax(0, 1fr) auto }
+.split.proto-first.closed .flow-pane { display: none }
+.flow-pane { position: sticky; top: 12px }
+.flow-pane .flow-box { max-height: calc(100vh - 170px) }
+.legend.in-pane { padding: 8px 14px 0; font-size: 11.5px; gap: 6px 12px }
+.flow-open { writing-mode: vertical-rl; font: inherit; font-size: 13px; border: 1px solid var(--line); background: var(--surface); color: var(--ink); border-radius: 10px; padding: 14px 8px; cursor: pointer; align-self: start }
+.desc-pane > .pane { border-radius: 10px }
+@media (max-width: 1100px) { .split.proto-first { grid-template-columns: minmax(0, 1fr) } .flow-pane { position: static } }
 .sec-h { margin: 8px 0 0; font-size: 16px } .sec-h small { font-weight: 400; color: var(--mut); font-size: 12.5px; margin-left: 8px }
 @media (max-width: 1100px) { .split { grid-template-columns: minmax(0, 1fr) } }
 .pane { background: var(--surface); border: 1px solid var(--line); border-radius: 10px; min-width: 0 }
@@ -824,31 +832,31 @@ h2 { font-size: 13px; text-transform: uppercase; letter-spacing: .06em; color: v
   <div class="top">
     <div>
       <h1>Tale Studio 리뉴얼 프로토타입</h1>
-      <p>Producer(아이디어) → Writer(산문) → Artist → Storyboard(가칭)까지 실제로 눌러 볼 수 있어요. 아래 사용자 플로우의 노드를 누르면 프로토타입이 그 화면으로 바뀌고, 프로토타입에서 움직이면 플로우에 빨갛게 표시돼요.</p>
+      <p>Producer(아이디어) → Writer(산문) → Artist → Storyboard(가칭)까지 실제로 눌러 볼 수 있어요. 오른쪽 플로우 차트의 노드를 누르면 프로토타입이 그 화면으로 바뀌고, 프로토타입에서 움직이면 플로우에 빨갛게 표시돼요. 화면 설명은 아래에 있어요.</p>
     </div>
     <span class="mono" style="font-size:12px;color:var(--mut)" id="updated"></span>
   </div>
 
-  <div class="split proto-first">
+  <div class="split proto-first" id="mainSplit">
     <section class="pane" aria-label="화면 목업">
         <div class="pane-h"><b>프로토타입 <span class="mono" id="scrId" style="color:var(--mut);font-weight:400"></span></b><span class="seg-plan sm" id="planSeg" aria-label="1안 · 2안"></span><span class="zoom"><button class="btn" id="protoReset">처음부터</button><a class="btn" id="protoOpen" href="TaleStudio_프로토타입_전체화면.html">프로토타입에서 보기 ↗</a></span></div>
         <div class="device"><div class="screen" id="screen"></div></div>
       </section>
-    <div class="side">
-      <section class="pane" aria-label="노드 설명"><div class="info" id="info"></div></section>
-    </div>
-  </div>
-
-  <h2 class="sec-h">사용자 플로우 <small>노드를 누르면 위 프로토타입이 그 화면으로 바뀌어요</small></h2>
-  <div class="legend" id="legend">
+    <button class="flow-open" id="flowOpen" hidden aria-label="플로우 차트 열기">플로우 차트 ◂</button>
+  <section class="pane flow-pane" aria-label="플로우 차트">
+      <div class="pane-h"><b>플로우 차트 <span class="mono" id="planTag" style="color:var(--mut);font-weight:400"></span></b><span class="seg-plan sm" id="stageSeg" aria-label="단계별 보기"></span><span class="zoom"><button class="btn" id="zout" aria-label="축소">−</button><button class="btn" id="zfit">맞춤</button><button class="btn" id="zin" aria-label="확대">＋</button></span><button class="btn" id="flowClose" aria-label="플로우 차트 닫기">닫기 ✕</button></div>
+        <div class="legend in-pane" id="legend">
     <span><i></i>화면</span><span><i class="lg-modal"></i>팝업 · 확인창</span><span><i class="lg-dec"></i>예/아니오 · 갈림</span>
     <span><i class="lg-ai"></i>AI 작업 중 = 전체 잠금</span><span><i class="lg-err"></i>⚠ 오류 안내</span><span><i class="lg-new"></i>새로 생김</span><span><i class="lg-back"></i>롤백</span><span>🔒 여기서 잠기는 값</span>
   </div>
 
-  <section class="pane" aria-label="플로우차트">
-      <div class="pane-h"><b>플로우 <span class="mono" id="planTag" style="color:var(--mut);font-weight:400"></span></b><span class="seg-plan sm" id="stageSeg" aria-label="단계별 보기"></span><span class="zoom"><button class="btn" id="zout" aria-label="축소">−</button><button class="btn" id="zfit">맞춤</button><button class="btn" id="zin" aria-label="확대">＋</button></span></div>
       <div class="flow-box" id="flow"><div class="loading">플로우를 그리는 중…</div></div>
     </section>
+  </div>
+
+  <section class="desc-pane" aria-label="화면 설명">
+  <section class="pane" aria-label="노드 설명"><div class="info" id="info"></div></section>
+  </section>
 
   <h2 class="sec-h">참고</h2>
   <section class="plans" aria-label="Writer 1안 2안">
@@ -3297,6 +3305,10 @@ window.FLOW = {
   P.mount($('screen'), { onNavigate: function (id) { if (byId[id]) select(id, { scroll: true, fromProto: true }); } });
   V.mount($('flow'), { onSelect: function (id) { select(id, { scroll: true }); } });
   $('zin').onclick = V.zoomIn; $('zout').onclick = V.zoomOut; $('zfit').onclick = V.fit;
+  // 플로우 차트 여닫기
+  function setFlow(open) { $('mainSplit').classList.toggle('closed', !open); $('flowOpen').hidden = open; try { localStorage.setItem('tale-flow-open', open ? '1' : '0'); } catch (e) {} if (open) setTimeout(function () { V.mark(cur, true); }, 50); }
+  $('flowClose').onclick = function () { setFlow(false); }; $('flowOpen').onclick = function () { setFlow(true); };
+  try { if (localStorage.getItem('tale-flow-open') === '0') setFlow(false); } catch (e) {}
   $('protoReset').onclick = function () { var s0 = plan === 'B' ? 'EB1' : 'E1'; P.reset(); P.show(s0); select(s0, { scroll: true, fromProto: true }); };
 
   document.addEventListener('click', function (e) {

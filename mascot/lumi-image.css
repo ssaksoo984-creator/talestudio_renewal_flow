@@ -1,0 +1,47 @@
+/* LumiImage: 원본 그림은 그대로 두고, 둥실거림 · 미세한 기울기 · 뒤쪽 발광만 더한다 */
+.lumi-i { position: relative; display: inline-block; vertical-align: middle; line-height: 0 }
+.lumi-i__float { position: absolute; inset: 0; display: block; transform-origin: 58% 60% }
+.lumi-i__float img { width: 100%; height: 100%; display: block; object-fit: contain; user-select: none; -webkit-user-drag: none }
+/* 뒤쪽 발광: 몸 중심(오른쪽으로 치우침) 뒤에서 코랄 → 라벤더로 번진다 */
+.lumi-i__glow { position: absolute; left: 22%; top: -6%; width: 86%; height: 112%; border-radius: 50%;
+  background: radial-gradient(closest-side, rgba(255, 128, 140, .55), rgba(232, 180, 255, .28) 55%, rgba(232, 180, 255, 0) 100%);
+  filter: blur(10px); opacity: .7; transform-origin: center }
+.lumi-i__shadow { position: absolute; left: 34%; bottom: -9%; width: 56%; height: 9%; border-radius: 50%;
+  background: radial-gradient(closest-side, rgba(176, 120, 200, .35), rgba(176, 120, 200, 0)); transform-origin: center }
+.lumi-i[data-small] .lumi-i__glow { filter: blur(4px); opacity: .55 }
+.lumi-i[data-small] .lumi-i__shadow { display: none }
+
+/* Idle: 3.6초 주기로 떠오르고 ±2도 기울며, 발광이 함께 숨 쉰다 */
+.lumi-i .lumi-i__float { animation: lumi-i-float 3.6s ease-in-out infinite }
+.lumi-i .lumi-i__glow { animation: lumi-i-glow 3.6s ease-in-out infinite }
+.lumi-i .lumi-i__shadow { animation: lumi-i-shadow 3.6s ease-in-out infinite }
+
+/* Listening: 사용자 쪽(오른쪽)으로 조금 더 기운다 */
+.lumi-i[data-state="listening"] .lumi-i__float { animation-name: lumi-i-lean; animation-duration: 2.4s }
+/* Thinking: 3% 커졌다 작아지고 발광이 천천히 맥박 */
+.lumi-i[data-state="thinking"] .lumi-i__float { animation-name: lumi-i-breathe; animation-duration: 2.6s }
+.lumi-i[data-state="thinking"] .lumi-i__glow { animation-duration: 2.6s }
+/* Creating: 발광이 더 밝게, 코랄 ↔ 라벤더로 천천히 돈다 */
+.lumi-i[data-state="creating"] .lumi-i__glow { animation: lumi-i-create 2.4s ease-in-out infinite; opacity: .95 }
+.lumi-i[data-state="creating"] .lumi-i__float { animation-name: lumi-i-breathe; animation-duration: 2.4s }
+/* Complete: 한 번 튀어 오르고 반짝 */
+.lumi-i[data-state="complete"] .lumi-i__float { animation: lumi-i-hop 1.3s cubic-bezier(.3, .7, .4, 1) 1 }
+.lumi-i[data-state="complete"] .lumi-i__glow { animation: lumi-i-flash 1.3s ease-out 1 }
+/* Error: 작게 흔들리고 빛이 약해진다 */
+.lumi-i[data-state="error"] .lumi-i__float { animation: lumi-i-shake .42s ease-in-out 2 }
+.lumi-i[data-state="error"] .lumi-i__glow { animation: none; opacity: .2 }
+.lumi-i[data-state="error"] img { filter: saturate(.75) brightness(.95); transition: filter .3s }
+
+@keyframes lumi-i-float { 0%, 100% { transform: translateY(0) rotate(-1.6deg) } 50% { transform: translateY(-5%) rotate(1.6deg) } }
+@keyframes lumi-i-lean { 0%, 100% { transform: translateY(0) rotate(2deg) } 50% { transform: translateY(-3%) rotate(4.5deg) } }
+@keyframes lumi-i-breathe { 0%, 100% { transform: translateY(-2%) scale(1) } 50% { transform: translateY(-4%) scale(1.03) } }
+@keyframes lumi-i-glow { 0%, 100% { opacity: .55; transform: scale(.96) } 50% { opacity: .8; transform: scale(1.04) } }
+@keyframes lumi-i-shadow { 0%, 100% { transform: scaleX(1); opacity: 1 } 50% { transform: scaleX(.86); opacity: .6 } }
+@keyframes lumi-i-create { 0%, 100% { transform: scale(1) rotate(0); filter: blur(10px) hue-rotate(0deg) } 50% { transform: scale(1.1) rotate(180deg); filter: blur(12px) hue-rotate(28deg) } }
+@keyframes lumi-i-hop { 0% { transform: translateY(0) } 35% { transform: translateY(-14%) rotate(-3deg) } 62% { transform: translateY(1%) scale(1.03, .97) } 100% { transform: translateY(0) } }
+@keyframes lumi-i-flash { 0% { opacity: .6; transform: scale(1) } 30% { opacity: 1; transform: scale(1.2) } 100% { opacity: .6; transform: scale(1) } }
+@keyframes lumi-i-shake { 0%, 100% { transform: translateX(0) } 25% { transform: translateX(-3%) rotate(-2deg) } 75% { transform: translateX(3%) rotate(2deg) } }
+
+@media (prefers-reduced-motion: reduce) {
+  .lumi-i *, .lumi-i *::before { animation: none !important }
+}

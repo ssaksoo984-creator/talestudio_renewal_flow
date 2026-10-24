@@ -1,0 +1,448 @@
+<title>Lumi 마스코트 가이드</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Jost:wght@400;500;600&family=IBM+Plex+Sans+KR:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500&display=swap">
+<style>
+/* 레이아웃: 레퍼런스 보드처럼 부드러운 살구빛 바탕에 카드 묶음. 위에서 아래로 디자인 → 상태 → 실제로 눌러 보기 → 만드는 법. */
+:root {
+  color-scheme: light;
+  --bg: #fbf1ef;
+  --card: #fff8f6;
+  --line: #f1dcd8;
+  --ink: #3a2230;
+  --mut: #8b6c75;
+  --red: #ff5d68;
+  --coral: #ff8d8d;
+  --purple: #6b4fc8;
+  --night: #1e1020;
+  --display: "Jost", "Futura", "Helvetica Neue", sans-serif;
+  --body: "IBM Plex Sans KR", "Apple SD Gothic Neo", "Malgun Gothic", sans-serif;
+  --mono: "IBM Plex Mono", ui-monospace, Menlo, monospace;
+}
+* { box-sizing: border-box }
+html, body { background: var(--bg); color: var(--ink) }
+body { font-family: var(--body); font-size: 14.5px; line-height: 1.65; -webkit-font-smoothing: antialiased }
+h1, h2, h3 { margin: 0; font-weight: 500; text-wrap: balance }
+p { margin: 0 }
+button { font: inherit; color: inherit }
+:focus-visible { outline: 2px solid var(--purple); outline-offset: 2px }
+.wrap { max-width: 1240px; margin: 0 auto; padding-left: max(16px, env(safe-area-inset-left, 0px)); padding-right: max(16px, env(safe-area-inset-right, 0px)); padding-block: 24px 64px; display: grid; gap: 14px }
+.card { background: var(--card); border: 1px solid var(--line); border-radius: 20px; padding: 20px 22px; display: grid; grid-template-columns: minmax(0, 1fr); gap: 14px; align-content: start; min-width: 0 }
+.h { display: grid; gap: 2px }
+.h h2 { font-family: var(--display); font-size: 21px; letter-spacing: .01em }
+.h p { color: var(--mut); font-size: 13.5px }
+.grid2 { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 14px }
+.top { display: grid; grid-template-columns: minmax(0, .9fr) minmax(0, 1.1fr); gap: 14px }
+
+.hero { background: radial-gradient(70% 60% at 50% 50%, #ffe3e3 0%, #fbeeee 70%); text-align: center; justify-items: center; padding-block: 30px 26px }
+.brand { font-family: var(--display); font-weight: 500; letter-spacing: .32em; font-size: clamp(20px, 2.4vw, 28px) }
+.brand small { display: block; font-size: 10.5px; letter-spacing: .34em; color: var(--mut); margin-top: 4px }
+.hero p { font-size: 15.5px }
+.principles { display: flex; flex-wrap: wrap; gap: 6px; justify-content: center }
+.principles span { font-size: 12px; padding: 3px 10px; border-radius: 99px; background: #fff; border: 1px solid var(--line); color: var(--mut) }
+
+.stage { border-radius: 16px; display: grid; place-items: center; padding: 26px 10px; position: relative; background: radial-gradient(70% 70% at 50% 50%, #ffeaea 0%, #fbf0ef 75%) }
+.stage.dark { background: radial-gradient(70% 70% at 50% 50%, #3a1730 0%, var(--night) 75%) }
+.stage .cap { position: absolute; left: 14px; bottom: 10px; font-size: 12px; color: var(--mut) }
+.stage.dark .cap { color: #c9a6bf }
+
+.states { display: grid; grid-template-columns: repeat(6, minmax(0, 1fr)); gap: 10px }
+.st { border-radius: 16px; background: radial-gradient(70% 70% at 50% 45%, #ffeaea 0%, #fbf0ef 75%); padding: 14px 8px 12px; display: grid; justify-items: center; gap: 4px; text-align: center }
+.st b { font-family: var(--display); font-weight: 500; font-size: 15px }
+.st small { color: var(--mut); font-size: 12px; line-height: 1.45 }
+
+.proto { display: grid; grid-template-columns: minmax(0, 1.15fr) minmax(0, .85fr); gap: 14px }
+.ctrl { display: flex; flex-wrap: wrap; gap: 6px }
+.ctrl button { border: 1px solid var(--line); background: #fff; border-radius: 99px; padding: 6px 13px; font-size: 13px; cursor: pointer }
+.ctrl button[aria-pressed="true"] { background: var(--ink); color: #fff; border-color: var(--ink) }
+.ctrl .sep { width: 1px; background: var(--line); margin-inline: 4px }
+.chat { border: 1px solid var(--line); border-radius: 16px; background: #fff; display: grid; grid-template-rows: auto 1fr auto; min-height: 360px; overflow: hidden }
+.chat-h { display: flex; align-items: center; gap: 8px; padding: 8px 12px; border-bottom: 1px solid var(--line); font-size: 13px }
+.chat-h small { color: var(--mut) }
+.msgs { padding: 12px; display: grid; gap: 10px; align-content: start; max-height: 300px; overflow: auto }
+.msg { display: grid; grid-template-columns: 40px minmax(0, 1fr); gap: 6px; align-items: start }
+.bub { background: #fbf1ef; border-radius: 4px 14px 14px 14px; padding: 8px 12px; font-size: 13.5px; justify-self: start }
+.me { justify-self: end; background: linear-gradient(135deg, #ff8d8d, #ff5d68); color: #fff; border-radius: 14px 4px 14px 14px; padding: 8px 12px; font-size: 13.5px; max-width: 85% }
+.inp { display: flex; gap: 6px; padding: 10px; border-top: 1px solid var(--line) }
+.inp input { flex: 1; min-width: 0; border: 1px solid var(--line); border-radius: 12px; padding: 9px 12px; font: inherit; font-size: 13.5px; background: #fff; color: var(--ink) }
+.inp button { border: 0; border-radius: 12px; padding: 0 14px; background: linear-gradient(135deg, #ff8d8d, #ff5d68); color: #fff; cursor: pointer; font-weight: 600 }
+.hint { font-size: 12.5px; color: var(--mut) }
+
+.icons { display: flex; gap: 22px; align-items: end; flex-wrap: wrap }
+.icons div { display: grid; justify-items: center; gap: 4px; font-size: 12px; color: var(--mut) }
+.icons .bubble { width: 52px; height: 52px; border-radius: 50%; background: #fff; border: 1px solid var(--line); display: grid; place-items: center }
+
+.pal { display: flex; gap: 14px; flex-wrap: wrap; align-items: end }
+.pal div { display: grid; justify-items: center; gap: 4px; font-size: 11.5px; color: var(--mut); text-align: center }
+.pal i { width: 46px; height: 46px; border-radius: 50%; display: block }
+.pal .big i { width: 76px; height: 76px }
+.pal code { font-family: var(--mono); color: var(--ink); font-size: 11.5px }
+
+table { width: 100%; border-collapse: collapse; font-size: 13px }
+th, td { text-align: left; padding: 8px 10px; border-bottom: 1px solid var(--line); vertical-align: top }
+th { font-weight: 600; color: var(--mut); font-size: 12px }
+td code, p code, li code { font-family: var(--mono); font-size: 12px; background: #fbeeee; padding: 1px 5px; border-radius: 4px }
+.tbl { overflow-x: auto }
+.note { background: #fff; border: 1px solid var(--line); border-left: 3px solid var(--purple); border-radius: 10px; padding: 10px 14px; font-size: 13.5px }
+ol, ul { margin: 0; padding-left: 20px; display: grid; gap: 6px }
+pre { margin: 0; background: #2a1726; color: #fbe6ea; border-radius: 12px; padding: 14px 16px; font-family: var(--mono); font-size: 12.5px; line-height: 1.6; overflow-x: auto }
+
+@media (max-width: 1080px) { .states { grid-template-columns: repeat(3, minmax(0, 1fr)) } .top, .proto { grid-template-columns: minmax(0, 1fr) } }
+@media (max-width: 620px) { .grid2 { grid-template-columns: minmax(0, 1fr) } .card { padding: 16px 14px } .states { grid-template-columns: repeat(2, minmax(0, 1fr)) } }
+
+/* Lumi 애니메이션. 레이어마다 따로 움직이고, 상태는 [data-state] 하나로 바뀐다. */
+.lumi { display: inline-block; position: relative; line-height: 0; vertical-align: middle }
+.lumi svg { overflow: visible; display: block }
+.lumi .lumi-float, .lumi .lumi-lean, .lumi .lumi-eye, .lumi .lumi-burst { transform-box: fill-box; transform-origin: center }
+.lumi .lumi-body { transform-box: fill-box; transform-origin: 50% 92% }
+.lumi .lumi-tail { transform-box: fill-box; transform-origin: 92% 45% }
+.lumi .lumi-core, .lumi .lumi-orbit { transform-box: view-box; transform-origin: 192px 118px }
+.lumi-light { transition: opacity .5s ease }
+.lumi-aura { fill: #ff8d8d; opacity: .32 }
+.lumi-shadow { fill: #c9a8ef; opacity: .4 }
+.lumi[data-ground="dark"] .lumi-aura { opacity: .5 }
+.lumi[data-ground="dark"] .lumi-shadow { fill: #ff5d68; opacity: .22 }
+.lumi-orbit, .lumi-waves, .lumi-burst { opacity: 0; transition: opacity .4s ease }
+.lumi-eyes { transition: translate .4s ease }
+.lumi[data-compact] .lumi-eye { scale: 1.35 }
+
+/* A. Idle: 3.6초 주기로 떠 있고, 살짝 기울고, 젤리처럼 눌렸다 펴진다 */
+.lumi .lumi-float { animation: lumi-float 3.6s ease-in-out infinite }
+.lumi .lumi-body { animation: lumi-jelly 3.6s ease-in-out infinite }
+.lumi .lumi-tail { animation: lumi-tail 3.6s ease-in-out infinite }
+.lumi .lumi-eye { animation: lumi-blink 4.8s ease-in-out infinite }
+
+/* B. Listening: 사용자 쪽으로 살짝 기울고, 더 자주 깜빡이고, 듣는 물결 */
+.lumi[data-state="listening"] .lumi-lean { animation: lumi-nod 1.8s ease-in-out infinite }
+.lumi[data-state="listening"] .lumi-eye { animation-duration: 2.4s }
+.lumi[data-state="listening"] .lumi-waves { opacity: 1; animation: lumi-wave 1.8s ease-in-out infinite }
+
+/* C. Thinking: 몸이 4% 커졌다 작아지고, 내부 빛이 흐르고, 입자가 주변을 돈다. 시선은 살짝 위 */
+.lumi[data-state="thinking"] .lumi-body { animation: lumi-breathe 2.6s ease-in-out infinite }
+.lumi[data-state="thinking"] .lumi-core { animation: lumi-drift 5s ease-in-out infinite }
+.lumi[data-state="thinking"] .lumi-orbit { opacity: 1; animation: lumi-spin 5s linear infinite }
+.lumi[data-state="thinking"] .lumi-eyes { translate: 2px -4px }
+
+/* D. Creating: 내부의 레드 · 핑크 빛이 천천히 순환하고, 빛의 꼬리가 규칙적으로 넓어진다 */
+.lumi[data-state="creating"] .lumi-core { animation: lumi-spin 4.8s linear infinite }
+.lumi[data-state="creating"] .lumi-tail { animation: lumi-tail-wide 2.4s ease-in-out infinite }
+.lumi[data-state="creating"] .lumi-body { animation: lumi-breathe 2.4s ease-in-out infinite }
+.lumi[data-state="creating"] .lumi-orbit { opacity: .8; animation: lumi-spin 3.2s linear infinite }
+
+/* E. Complete: 1.3초 동안 한 번 튀어 오르고 반짝인 뒤 Idle 로 (onDone) */
+.lumi[data-state="complete"] .lumi-float { animation: lumi-hop 1.3s cubic-bezier(.3, .7, .4, 1) 1 }
+.lumi[data-state="complete"] .lumi-burst { animation: lumi-burst 1.3s ease-out 1 }
+.lumi[data-state="complete"] .lumi-eye { animation: lumi-smile 1.3s ease-in-out 1 }
+
+/* F. Error: 작게 좌우로 흔들리고, 빛이 약해지고, 눈이 당황한 듯 눌리며 안쪽으로 기운다 */
+.lumi[data-state="error"] .lumi-float { animation: lumi-shake .42s ease-in-out 2 }
+.lumi[data-state="error"] .lumi-light { opacity: .4 }
+.lumi[data-state="error"] .lumi-aura { opacity: .15 }
+.lumi[data-state="error"] .lumi-eye { animation: none; scale: 1 .62; translate: 0 3px }
+.lumi[data-state="error"] .lumi-eye-l { rotate: 14deg }
+.lumi[data-state="error"] .lumi-eye-r { rotate: -14deg }
+.lumi[data-state="error"] .lumi-body { animation: none }
+
+@keyframes lumi-float { 0%, 100% { transform: translateY(0) rotate(-1deg) } 50% { transform: translateY(-6%) rotate(1.2deg) } }
+@keyframes lumi-jelly { 0%, 100% { transform: scale(1, 1) } 50% { transform: scale(.985, 1.015) } }
+@keyframes lumi-tail { 0%, 100% { transform: rotate(0) } 50% { transform: rotate(-4deg) } }
+@keyframes lumi-tail-wide { 0%, 100% { transform: rotate(0) scale(1) } 50% { transform: rotate(-10deg) scale(1.12, 1.06) } }
+@keyframes lumi-blink { 0%, 90%, 100% { transform: scaleY(1) } 94% { transform: scaleY(.1) } }
+@keyframes lumi-nod { 0%, 100% { transform: rotate(3deg) } 50% { transform: rotate(5deg) translateY(-1%) } }
+@keyframes lumi-wave { 0%, 100% { opacity: .2 } 50% { opacity: 1 } }
+@keyframes lumi-breathe { 0%, 100% { transform: scale(1) } 50% { transform: scale(1.04) } }
+@keyframes lumi-drift { 0%, 100% { transform: translate(0, 0) } 50% { transform: translate(18px, 22px) } }
+@keyframes lumi-spin { to { transform: rotate(360deg) } }
+@keyframes lumi-hop { 0% { transform: translateY(0) } 35% { transform: translateY(-16%) } 60% { transform: translateY(1%) scale(1.03, .97) } 100% { transform: translateY(0) } }
+@keyframes lumi-burst { 0% { opacity: 0; transform: scale(.4) } 30% { opacity: 1 } 100% { opacity: 0; transform: scale(1.3) } }
+@keyframes lumi-smile { 0%, 100% { transform: scaleY(1) } 30%, 70% { transform: scaleY(.45) } }
+@keyframes lumi-shake { 0%, 100% { transform: translateX(0) } 25% { transform: translateX(-2.5%) } 75% { transform: translateX(2.5%) } }
+
+/* 움직임 줄이기: 애니메이션만 멈추고 상태 표시(빛 세기 · 눈)는 그대로 */
+@media (prefers-reduced-motion: reduce) {
+  .lumi *, .lumi *::before { animation: none !important }
+}
+
+</style>
+
+<div id="app" class="wrap" style="padding-bottom:14px"><p class="hint">Lumi를 불러오는 중이에요…</p></div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/react/18.3.1/umd/react.production.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/react-dom/18.3.1/umd/react-dom.production.min.js"></script>
+<script>
+(function () {
+  var React = window.React;
+  // --- core start
+var LUMI_BODY = 'M120 112 C118 70 160 44 200 46 C246 48 268 84 266 122 C264 160 236 190 194 192 C150 194 122 160 120 112 Z';
+var LUMI_TAIL = 'M176 184 C140 182 96 176 62 160 C42 150 30 134 38 120 C46 132 62 140 84 138 C106 136 118 126 124 100 C130 130 150 160 176 184 Z';
+var LUMI_TAIL_EDGE = 'M40 124 C48 134 62 140 84 138 C98 137 108 133 114 126';
+var LUMI_DONE_MS = { complete: 1400, error: 1700 };
+
+function lumiSpark(cx, cy, r) {
+  var k = r * 0.18;
+  return 'M' + cx + ' ' + (cy - r) + ' C' + (cx + k) + ' ' + (cy - k) + ' ' + (cx + k) + ' ' + (cy - k) + ' ' + (cx + r) + ' ' + cy +
+    ' C' + (cx + k) + ' ' + (cy + k) + ' ' + (cx + k) + ' ' + (cy + k) + ' ' + cx + ' ' + (cy + r) +
+    ' C' + (cx - k) + ' ' + (cy + k) + ' ' + (cx - k) + ' ' + (cy + k) + ' ' + (cx - r) + ' ' + cy +
+    ' C' + (cx - k) + ' ' + (cy - k) + ' ' + (cx - k) + ' ' + (cy - k) + ' ' + cx + ' ' + (cy - r) + ' Z';
+}
+
+function Lumi(props) {
+  var e = React.createElement;
+  var state = props.state || 'idle';
+  var size = props.size || 160;
+  var tilt = props.angle === 'tilt';
+  var ground = props.ground || 'light';
+  var compact = size < 56;
+  var onDone = props.onDone;
+  var raw = React.useId ? React.useId() : 'x';
+  var id = 'lumi' + String(raw).replace(/[^a-zA-Z0-9]/g, '');
+  var u = function (k) { return 'url(#' + id + k + ')'; };
+
+  React.useEffect(function () {
+    if (!LUMI_DONE_MS[state] || !onDone) return undefined;
+    var t = setTimeout(onDone, LUMI_DONE_MS[state]);
+    return function () { clearTimeout(t); };
+  }, [state, onDone]);
+
+  // 정면: 몸 가운데보다 살짝 오른쪽을 본다. 기울임: 눈 사이가 좁아지고 오른쪽으로 더 돈다.
+  var eyes = tilt ? [[193, 119, 4.5, 9], [222, 116, 5.2, 9.4]] : [[178, 118, 5.2, 9.4], [213, 116, 5.2, 9.4]];
+
+  function stop(o, c, a) { return e('stop', { key: o + c, offset: o, stopColor: c, stopOpacity: a == null ? 1 : a }); }
+
+  var defs = e('defs', null,
+    e('linearGradient', { id: id + 'b', x1: '.15', y1: '0', x2: '.85', y2: '1' },
+      stop(0, '#ff5d68'), stop(0.32, '#ff8d8d'), stop(0.6, '#ffc1cd'), stop(0.82, '#f0c4ee'), stop(1, '#d6b6ff')),
+    e('radialGradient', { id: id + 'r', cx: '50%', cy: '50%', r: '50%' }, stop(0, '#ff4658', 0.9), stop(1, '#ff4658', 0)),
+    e('radialGradient', { id: id + 'p', cx: '50%', cy: '50%', r: '50%' }, stop(0, '#ff9ab8', 0.8), stop(1, '#ff9ab8', 0)),
+    e('radialGradient', { id: id + 'w', cx: '50%', cy: '50%', r: '50%' }, stop(0, '#ffffff', 0.85), stop(1, '#ffffff', 0)),
+    e('linearGradient', { id: id + 'e', x1: '0', y1: '0', x2: '1', y2: '1' }, stop(0, '#b48cff', 0), stop(0.55, '#b48cff', 0.15), stop(1, '#9a74f0', 0.75)),
+    e('linearGradient', { id: id + 't', gradientUnits: 'userSpaceOnUse', x1: '160', y1: '160', x2: '36', y2: '122' },
+      stop(0, '#ffa0b0', 0.95), stop(0.4, '#f6b9df', 0.8), stop(1, '#d8b6ff', 0.3)),
+    e('filter', { id: id + 'f1', x: '-50%', y: '-50%', width: '200%', height: '200%' }, e('feGaussianBlur', { stdDeviation: 1.4 })),
+    e('filter', { id: id + 'f2', x: '-50%', y: '-50%', width: '200%', height: '200%' }, e('feGaussianBlur', { stdDeviation: 6 })),
+    e('filter', { id: id + 'f3', x: '-50%', y: '-50%', width: '200%', height: '200%' }, e('feGaussianBlur', { stdDeviation: 16 })),
+    e('clipPath', { id: id + 'c' }, e('path', { d: LUMI_BODY }))
+  );
+
+  var tail = e('g', { className: 'lumi-tail' },
+    e('path', { d: LUMI_TAIL, fill: u('t'), filter: compact ? undefined : u('f1') }),
+    e('path', { d: LUMI_TAIL_EDGE, fill: 'none', stroke: '#fff', strokeWidth: 2.2, strokeLinecap: 'round', opacity: 0.55 }));
+
+  var body = e('g', { className: 'lumi-body' },
+    e('path', { d: LUMI_BODY, fill: u('b') }),
+    e('g', { clipPath: u('c') },
+      e('g', { className: 'lumi-core lumi-light' },
+        e('ellipse', { cx: 170, cy: 98, rx: 70, ry: 58, fill: u('r') }),
+        e('ellipse', { cx: 226, cy: 150, rx: 44, ry: 40, fill: u('p') })),
+      e('ellipse', { className: 'lumi-light', cx: 196, cy: 150, rx: 52, ry: 36, fill: u('w'), opacity: 0.75 }),
+      e('path', { d: LUMI_BODY, fill: 'none', stroke: u('e'), strokeWidth: 18, filter: u('f2') })),
+    e('path', { d: LUMI_BODY, fill: 'none', stroke: '#fff', strokeOpacity: 0.45, strokeWidth: 1.4 }),
+    e('ellipse', { cx: 168, cy: 76, rx: 34, ry: 15, fill: u('w'), opacity: 0.9, transform: 'rotate(-22 168 76)' }),
+    e('ellipse', { cx: 156, cy: 72, rx: 9, ry: 4, fill: '#fff', opacity: 0.75, transform: 'rotate(-22 156 72)', filter: compact ? undefined : u('f1') }));
+
+  var eyeEls = e('g', { className: 'lumi-eyes' }, eyes.map(function (p, k) {
+    return e('g', { key: k, className: 'lumi-eye ' + (k ? 'lumi-eye-r' : 'lumi-eye-l') },
+      e('ellipse', { cx: p[0], cy: p[1], rx: p[2], ry: p[3], fill: '#2a1640' }));
+  }));
+
+  var extra = compact ? null : [
+    e('g', { key: 'o', className: 'lumi-orbit' },
+      e('circle', { cx: 300, cy: 120, r: 4, fill: '#ff8d8d' }),
+      e('circle', { cx: 80, cy: 120, r: 3, fill: '#c7a6ff' }),
+      e('circle', { cx: 190, cy: 22, r: 2.6, fill: '#ffb3b3' })),
+    e('g', { key: 'w', className: 'lumi-waves', fill: 'none', stroke: '#ff8d8d', strokeWidth: 3, strokeLinecap: 'round' },
+      e('path', { d: 'M282 104 q8 14 0 28' }), e('path', { d: 'M294 96 q12 22 0 44', opacity: 0.6 })),
+    e('g', { key: 'b', className: 'lumi-burst' },
+      e('path', { d: lumiSpark(84, 58, 10), fill: '#ff8d8d' }),
+      e('path', { d: lumiSpark(288, 70, 8), fill: '#ffb3b3' }),
+      e('path', { d: lumiSpark(276, 186, 6), fill: '#c7a6ff' }),
+      e('path', { d: lumiSpark(112, 196, 5), fill: '#ff8d8d' }))
+  ];
+
+  return e('span', {
+      className: 'lumi', 'data-state': state, 'data-ground': ground, 'data-compact': compact ? '1' : undefined,
+      style: { width: size, maxWidth: '100%', aspectRatio: '4 / 3' }, role: 'img', 'aria-label': props.label || 'Lumi'
+    },
+    e('svg', { viewBox: '0 0 320 240', width: '100%', height: '100%', 'aria-hidden': true }, defs,
+      e('ellipse', { className: 'lumi-shadow', cx: 196, cy: 224, rx: 64, ry: 8, filter: u('f2') }),
+      e('g', { className: 'lumi-float' },
+        e('g', { className: 'lumi-lean' },
+          e('g', { transform: tilt ? 'rotate(-9 192 120)' : undefined },
+            e('path', { className: 'lumi-aura', d: LUMI_BODY, filter: u('f3') }),
+            tail, body, eyeEls))),
+      extra));
+}
+
+  window.__Lumi = Lumi;
+
+  var e = React.createElement, useState = React.useState, useEffect = React.useEffect, useCallback = React.useCallback;
+  var STATES = [
+    ['idle', '01. Idle', '기본 상태 · 3.6초 주기로 떠 있어요'],
+    ['listening', '02. Listening', '입력 중 · 기울고 더 자주 깜빡여요'],
+    ['thinking', '03. Thinking', '응답 대기 · 4% 숨 쉬고 입자가 돌아요'],
+    ['creating', '04. Creating', '생성 중 · 내부 빛 순환, 꼬리가 넓어져요'],
+    ['complete', '05. Complete', '완료 · 한 번 튀어 오르고 반짝여요'],
+    ['error', '06. Error', '오류 · 작게 흔들리고 빛이 약해져요']
+  ];
+
+  function H(t, s) { return e('div', { className: 'h' }, e('h2', null, t), s ? e('p', null, s) : null); }
+
+  // 미리보기 카드: 완료 · 오류는 한 번 재생 후 잠깐 쉬었다 다시 보여 준다
+  function Preview(p) {
+    var s = useState(p.state), cur = s[0], set = s[1];
+    var once = p.state === 'complete' || p.state === 'error';
+    var back = useCallback(function () { set('idle'); }, []);
+    useEffect(function () {
+      if (!once || cur !== 'idle') return undefined;
+      var t = setTimeout(function () { set(p.state); }, 1600);
+      return function () { clearTimeout(t); };
+    }, [cur]);
+    return e('div', { className: 'st' }, e(Lumi, { state: cur, size: 150, onDone: once ? back : undefined }), e('b', null, p.title), e('small', null, p.desc));
+  }
+
+  function Proto() {
+    var st = useState('idle'), state = st[0], setState = st[1];
+    var gd = useState('light'), ground = gd[0], setGround = gd[1];
+    var an = useState('front'), angle = an[0], setAngle = an[1];
+    var tx = useState(''), text = tx[0], setText = tx[1];
+    var ms = useState([['ai', '어떤 이야기를 만들어 볼까요? 아이디어 한 줄이면 충분해요.']]), msgs = ms[0], setMsgs = ms[1];
+    var back = useCallback(function () { setState('idle'); }, []);
+    var timers = React.useRef([]);
+    function later(fn, ms2) { timers.current.push(setTimeout(fn, ms2)); }
+    function clear() { timers.current.forEach(clearTimeout); timers.current = []; }
+    useEffect(function () { return clear; }, []);
+    function send() {
+      var t = text.trim(); if (!t) return;
+      clear(); setText(''); setMsgs(function (m) { return m.concat([['me', t]]); });
+      setState('thinking');
+      later(function () { setState('creating'); setMsgs(function (m) { return m.concat([['ai', '좋아요! 산문 초안을 쓰고 있어요…']]); }); }, 1400);
+      later(function () { setState('complete'); setMsgs(function (m) { return m.concat([['ai', '산문 초안을 만들었어요. 마음에 안 드는 곳은 말해 주세요.']]); }); }, 4200);
+    }
+    var big = e('div', { className: 'stage' + (ground === 'dark' ? ' dark' : ''), style: { minHeight: 340 } },
+      e(Lumi, { state: state, size: 340, ground: ground, angle: angle, onDone: back }),
+      e('span', { className: 'cap' }, '지금: ' + state));
+    var ctrl = e('div', { className: 'ctrl', role: 'group', 'aria-label': '상태 바꾸기' },
+      STATES.map(function (x) { return e('button', { key: x[0], 'aria-pressed': state === x[0], onClick: function () { clear(); setState(x[0]); } }, x[1].slice(4)); }),
+      e('span', { className: 'sep' }),
+      e('button', { 'aria-pressed': ground === 'dark', onClick: function () { setGround(ground === 'dark' ? 'light' : 'dark'); } }, ground === 'dark' ? '어두운 배경' : '밝은 배경'),
+      e('button', { 'aria-pressed': angle === 'tilt', onClick: function () { setAngle(angle === 'tilt' ? 'front' : 'tilt'); } }, angle === 'tilt' ? '기울인 각도' : '정면'));
+    var chat = e('div', { className: 'chat' },
+      e('div', { className: 'chat-h' }, e(Lumi, { state: state, size: 40, onDone: back }), e('b', null, 'Lumi'), e('small', null, '채팅 아이콘 크기 · 같은 상태를 따라가요')),
+      e('div', { className: 'msgs' }, msgs.map(function (m, k) {
+        return m[0] === 'me' ? e('div', { key: k, className: 'me' }, m[1]) : e('div', { key: k, className: 'msg' }, e(Lumi, { state: 'idle', size: 40 }), e('div', { className: 'bub' }, m[1]));
+      })),
+      e('div', { className: 'inp' },
+        e('input', { id: 'lumi-input', value: text, placeholder: '예: 회사 자판기가 고장 나는 코미디', 'aria-label': '메시지',
+          onFocus: function () { if (state === 'idle') setState('listening'); },
+          onBlur: function () { if (state === 'listening') setState('idle'); },
+          onChange: function (ev) { setText(ev.target.value); if (state === 'idle') setState('listening'); },
+          onKeyDown: function (ev) { if (ev.key === 'Enter') send(); } }),
+        e('button', { onClick: send }, '보내기')));
+    return e('section', { className: 'card', 'aria-label': '프로토타입' },
+      H('React 프로토타입', '버튼으로 상태를 바꾸거나, 오른쪽 채팅에 입력해 보세요. 입력하면 Listening, 보내면 Thinking → Creating → Complete → Idle 로 이어져요.'),
+      e('div', { className: 'proto' }, e('div', { style: { display: 'grid', gap: 10 } }, big, ctrl), chat));
+  }
+
+  function App() {
+    return e(React.Fragment, null,
+      e('div', { className: 'top' },
+        e('section', { className: 'card hero', 'aria-label': '대표 이미지' },
+          e('div', { className: 'brand' }, 'TALE STUDIO', e('small', null, 'AI CREATIVE PARTNER')),
+          e(Lumi, { state: 'idle', size: 330 }),
+          e('p', null, '이야기가 피어나는 작은 빛,', e('br'), 'Tale Studio의 AI 파트너 Lumi'),
+          e('div', { className: 'principles' }, ['Keep the red', 'Keep the softness', 'Simplify the character', 'Make the silhouette iconic'].map(function (t) { return e('span', { key: t }, t); }))),
+        e('section', { className: 'card' },
+          H('A. Core Design · 최종 마스코트', '머리와 몸이 하나인 말랑한 젤리. 몸의 왼쪽 아래가 빛의 꼬리로 이어지고, 얼굴은 작은 세로 타원 눈 두 개뿐이에요.'),
+          e('div', { className: 'grid2' },
+            e('div', { className: 'stage' }, e(Lumi, { state: 'idle', size: 250 }), e('span', { className: 'cap' }, '밝은 배경 · 정면')),
+            e('div', { className: 'stage dark' }, e(Lumi, { state: 'idle', size: 250, ground: 'dark' }), e('span', { className: 'cap' }, '어두운 배경 · 정면')),
+            e('div', { className: 'stage' }, e(Lumi, { state: 'idle', size: 250, angle: 'tilt' }), e('span', { className: 'cap' }, '밝은 배경 · 약간 기울인 각도')),
+            e('div', { className: 'stage dark' }, e(Lumi, { state: 'idle', size: 250, angle: 'tilt', ground: 'dark' }), e('span', { className: 'cap' }, '어두운 배경 · 약간 기울인 각도'))))),
+      e('section', { className: 'card', 'aria-label': '상태' },
+        H('Motion States · 6가지 상태', '실루엣과 얼굴은 모든 상태에서 같고, 빛과 꼬리와 눈의 깜빡임만 달라져요. 움직임 줄이기 설정이면 멈춘 기본 상태로 보여요.'),
+        e('div', { className: 'states' }, STATES.map(function (x) { return e(Preview, { key: x[0], state: x[0], title: x[1], desc: x[2] }); }))),
+      e(Proto));
+  }
+
+  ReactDOM.createRoot(document.getElementById('app')).render(e(App));
+})();
+</script>
+
+<div class="wrap" style="padding-top:0">
+  <section class="card" aria-label="아이콘 크기와 색">
+    <div class="h"><h2>아이콘 크기 · 색</h2><p>56px 아래에서는 입자를 숨기고 눈을 1.35배로 키워 작아도 얼굴이 보여요. 레드가 중심이고, 아래로 갈수록 피치 · 라벤더로 풀려요.</p></div>
+    <div class="grid2">
+      <div class="icons" id="icons"></div>
+      <div class="pal">
+        <div class="big"><i style="background:linear-gradient(160deg,#ff5d68 0%,#ff8d8d 30%,#ffc1cd 60%,#f0c4ee 82%,#d6b6ff 100%)"></i>몸 그라데이션</div>
+        <div><i style="background:#ff8d8d"></i><code>#FF8D8D</code>Coral Red</div>
+        <div><i style="background:#ffb3b3"></i><code>#FFB3B3</code>Soft Coral</div>
+        <div><i style="background:#ffd7e1"></i><code>#FFD7E1</code>Peach Pink</div>
+        <div><i style="background:#e6c6ff"></i><code>#E6C6FF</code>Lavender</div>
+        <div><i style="background:#6b4fc8"></i><code>#6B4FC8</code>Accent Purple</div>
+      </div>
+    </div>
+    <p class="hint">몸 위쪽 레드는 <code>#FF5D68</code>로 조금 더 진하게 두어 레드가 중심 색으로 읽히게 했어요. 네온처럼 쨍한 브랜드 레드(<code>#F0303F</code>)는 쓰지 않았어요. 정식 브랜드 레드 값이 정해지면 그 값으로 바꿔요.</p>
+  </section>
+
+  <section class="card" aria-label="에셋 분리">
+    <div class="h"><h2>에셋 분리 · 제작 방법</h2><p>이 프로토타입이 할 수 있는 것과, 원본 이미지 수준을 내려면 추가로 필요한 것을 나눠 적었어요.</p></div>
+    <div class="note">이 페이지의 Lumi는 레퍼런스의 A. Core Design을 보고 <b>SVG로 다시 그린 벡터 버전</b>이에요. 형태 · 색 · 움직임은 맞췄지만, 레퍼런스 이미지의 렌더링 질감(빛이 안에서 퍼지는 서브서피스, 젤리 굴절)과 픽셀 단위로 같지는 않아요. 원본과 같은 질감이 필요하면 아래 레이어를 디자이너가 따로 만들어 이미지로 바꿔 끼워야 해요. 레퍼런스 이미지 한 장을 잘라 쓰는 방법은 레이어가 한 덩어리라 눈 · 꼬리 · 빛을 따로 움직일 수 없어요.</div>
+    <div class="tbl"><table>
+      <thead><tr><th>레이어</th><th>클래스</th><th>움직임</th><th>지금 (SVG)</th><th>원본 질감으로 바꾸려면</th></tr></thead>
+      <tbody>
+        <tr><td>바닥 그림자</td><td><code>.lumi-shadow</code></td><td>떠 있을 때 고정</td><td>흐린 타원</td><td>SVG 그대로 충분해요</td></tr>
+        <tr><td>바깥 빛</td><td><code>.lumi-aura</code></td><td>오류 때 약해짐</td><td>몸 모양을 흐리게</td><td>SVG 그대로 충분해요</td></tr>
+        <tr><td>빛의 꼬리</td><td><code>.lumi-tail</code></td><td>흔들림 · Creating 때 넓어짐</td><td>그라데이션 패스</td><td>투명 PNG/WebP 한 장 (몸과 겹치는 부분 포함)</td></tr>
+        <tr><td>몸 바탕</td><td><code>.lumi-body</code></td><td>젤리 눌림 · 숨쉬기</td><td>그라데이션 + 라벤더 가장자리</td><td>투명 PNG/WebP (눈 · 하이라이트 · 내부 빛을 뺀 몸만)</td></tr>
+        <tr><td>내부 빛</td><td><code>.lumi-core</code></td><td>Thinking 흐름 · Creating 순환</td><td>레드 · 핑크 빛 덩어리 두 개</td><td>빛 덩어리만 따로 그린 PNG, 몸 모양 마스크 안에서 회전</td></tr>
+        <tr><td>하이라이트</td><td>몸 안 흰 타원</td><td>고정</td><td>넓은 반사 + 작은 반사</td><td>몸 위에 겹치는 반투명 PNG 한 장</td></tr>
+        <tr><td>눈 (왼쪽 · 오른쪽)</td><td><code>.lumi-eye-l</code> <code>.lumi-eye-r</code></td><td>깜빡임 · 시선 · 오류 때 눌림</td><td>세로 타원</td><td>SVG 그대로 쓰는 걸 권해요 (작아도 선명)</td></tr>
+        <tr><td>입자 · 반짝임</td><td><code>.lumi-orbit</code> <code>.lumi-burst</code></td><td>Thinking 회전 · Complete 터짐</td><td>점 · 네 갈래 별</td><td>SVG 그대로 충분해요</td></tr>
+      </tbody>
+    </table></div>
+    <ul>
+      <li><b>추천 방식</b>: 지금처럼 <b>SVG + CSS</b>. 가볍고(라이브러리 없음, 그림 몇 KB), 아이콘 크기에서도 선명하고, 움직임 줄이기 설정을 따라요.</li>
+      <li><b>원본 질감이 꼭 필요할 때</b>: 3D 툴이나 일러스트 툴에서 위 표의 레이어를 따로 렌더해 투명 PNG/WebP(2배 해상도)로 받고, 같은 클래스의 SVG 레이어 자리에 <code>&lt;image&gt;</code>로 넣어요. 움직임 CSS는 그대로 써요.</li>
+      <li><b>Rive</b>: 상태 전환을 디자이너가 직접 조율하고 싶을 때 좋아요. Rive 에디터에서 같은 레이어로 State Machine(idle · listening · thinking · creating · complete · error)을 만들어야 하고, 이 작업은 이 페이지만으로는 할 수 없어요.</li>
+    </ul>
+  </section>
+
+  <section class="card" aria-label="통합 방법">
+    <div class="h"><h2>Tale Studio 챗봇에 넣는 방법</h2><p>저장소의 <code>mascot/Lumi.js</code>와 <code>mascot/lumi.css</code> 두 파일이면 돼요. 이 페이지에서 돌아가는 것과 같은 코드예요.</p></div>
+    <ol>
+      <li>두 파일을 프로젝트에 복사하고, 앱 진입점에서 <code>lumi.css</code>를 한 번 불러와요.</li>
+      <li>챗봇 아바타 자리에 <code>&lt;Lumi size={40} state={state} /&gt;</code>를 넣어요. 로딩 화면처럼 크게 보여 줄 곳에는 <code>size={200}</code> 정도로 써요.</li>
+      <li>챗봇 이벤트를 상태로 연결해요.</li>
+    </ol>
+    <pre>import Lumi from './mascot/Lumi';
+import './mascot/lumi.css';
+
+// 챗봇 이벤트 → Lumi 상태
+//   입력칸에 포커스 · 타이핑        → 'listening'
+//   메시지 보냄 · 첫 응답 기다림     → 'thinking'
+//   산문 초안 · 그림 · 스토리보드 생성 중 → 'creating'
+//   생성 끝                       → 'complete'  (1.4초 뒤 onDone → 'idle')
+//   요청 실패 · 읽기 실패           → 'error'     (1.7초 뒤 onDone → 'idle')
+function AgentHeader({ state, setState }) {
+  return &lt;Lumi size={40} state={state} onDone={() =&gt; setState('idle')} /&gt;;
+}</pre>
+    <ul>
+      <li><b>프로토타입 화면과 맞추면</b>: 에이전트 채팅 머리글과 말풍선 아바타 → 40px. 생성 로딩 화면(산문 초안 E5, 산문 고치기 W2, 그림 만들기 A4, 스토리보드 준비 S0) → <code>creating</code> 200px. 오류 안내(E2e 읽기 실패 등) → <code>error</code>.</li>
+      <li><b>움직임 줄이기</b>: 운영체제 설정을 자동으로 따르고, 멈춰도 기본 상태 그림이 그대로 보여요.</li>
+      <li><b>React 버전</b>: React 18 이상 (<code>useId</code> 사용). JSX 변환 없이도 동작해요.</li>
+    </ul>
+  </section>
+</div>
+
+<script>
+// 아이콘 크기 줄 (React 앱이 그린 뒤 채운다)
+setTimeout(function () {
+  var host = document.getElementById('icons');
+  if (!host || !window.ReactDOM) return;
+  var e = React.createElement;
+  ReactDOM.createRoot(host).render(e(React.Fragment, null,
+    [72, 52, 40, 28].map(function (s) { return e('div', { key: s }, e('span', { className: 'bubble', style: { width: s + 18, height: s + 18 } }, e(window.__Lumi, { size: s })), s + 'px'); })));
+}, 0);
+</script>

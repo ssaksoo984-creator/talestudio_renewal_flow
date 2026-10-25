@@ -2,13 +2,18 @@
 
 ## 최종: 원본 이미지 그대로 쓰기 (`LumiImage`)
 
-레퍼런스 보드 왼쪽 위의 큰 Lumi를 잘라, 배경만 투명하게 뺀 에셋을 써요. 얼굴 · 비율 · 실루엣 · 색 · 질감은 원본 픽셀 그대로예요.
+받은 고해상도 Lumi(1536×1024, 검은 배경)에서 배경만 투명하게 뺀 에셋을 써요. 얼굴 · 비율 · 실루엣 · 색 · 질감은 원본 픽셀 그대로예요.
 
-| 파일 | 내용 |
+| 파일 | 크기 | 쓰는 곳 |
+|---|---|---|
+| `assets/lumi.webp` | 320×237 · 13KB | 채팅 아이콘 · 작은 자리 |
+| `assets/lumi@2x.webp` | 640×474 · 33KB | 로딩 화면 · 레티나 |
+| `assets/lumi-hd.webp` | 1126×834 · 53KB | 큰 화면 · 원본 크기 |
+| `assets/lumi-glow@2x.webp` | 709×550 · 47KB | 어두운 배경, 원본의 흰 빛 번짐 포함 (`glow`) |
+
+| 코드 | 내용 |
 |---|---|
-| `assets/lumi.png` | 투명 배경 원본 (281×214) |
-| `assets/lumi@2x.png` | 같은 그림을 매끄럽게 2배로 키운 것 (새 디테일은 없음) |
-| `LumiImage.js` | 이미지를 감싸는 React 컴포넌트 |
+| `LumiImage.js` | 이미지를 감싸는 React 컴포넌트. 화면 크기에 맞는 파일을 `srcset`으로 골라요 |
 | `lumi-image.css` | 둥실거림 · ±1.6도 기울기 · 뒤쪽 발광, 상태별 빛 세기 · 튀어 오름 · 흔들림 |
 | `lumi-original.html` | 확인용 페이지 |
 
@@ -16,11 +21,13 @@
 import LumiImage from './mascot/LumiImage';
 import './mascot/lumi-image.css';
 
-<LumiImage size={40} state={state} onDone={() => setState('idle')} />
+<LumiImage size={40} state={state} onDone={() => setState('idle')} />  // 채팅 아바타
+<LumiImage size={220} state="creating" />                               // 생성 로딩
+<LumiImage size={320} glow />                                           // 어두운 화면
 ```
 
 - `state`: `idle` · `listening` · `thinking` · `creating` · `complete` · `error`. 상태는 이미지 전체에만 적용돼요.
-- 해상도: 원본 보드가 1536px이라 Lumi는 가로 281px이에요. 200px 안팎까지 선명해요. Lumi만 크게 렌더한 원본이 있으면 같은 방법으로 다시 분리하면 돼요.
+- `.webp` import는 웹팩 · Vite 기본 설정으로 동작해요.
 
 ### 눈 · 꼬리를 따로 움직이려면
 

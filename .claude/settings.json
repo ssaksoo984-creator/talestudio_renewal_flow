@@ -2,7 +2,8 @@
   "permissions": {
     "allow": [
       "mcp__Figma",
-      "mcp__figma"
+      "mcp__figma",
+      "mcp__claude_ai_Figma"
     ]
   }
 }

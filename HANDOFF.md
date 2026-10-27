@@ -89,3 +89,4 @@
 - 플로우 · 프로토타입: https://claude.ai/artifact/C5xmoMhBQq9Juh3AeTP4Z2
 - 디자인 시안(로고 · 캐릭터 · W1 시안 · 기준): https://claude.ai/artifact/SXpdWww154q9pB9HMStn8w
 - Lumi 원본 에셋: https://claude.ai/artifact/MpbM4C24A8nLUN1m9zt9ZN
+- **Lumi 상태 · 움직임(기준)**: https://claude.ai/artifact/LbhbVTNxmxQLcq8WyPzAc1

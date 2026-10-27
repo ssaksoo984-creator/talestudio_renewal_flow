@@ -59,7 +59,7 @@
 
 ## Figma 진행 (2026-10-26)
 - 파일: https://www.figma.com/design/X3F0vvX6w4ZLARa0DyLspr (팀 "싹수의 일상의 팀")
-- 페이지: Components · **Producer v2**(1안 E1~E5, 2안 EB1~EB7) · **Writer v2**(W1 · W1r · W2~W6 · WC2 · WC3 · WP · WN) · **Artist v2**(A0~A9 · WT · WTm · R1 · R2 · AC2 · AC3 · AX · AY · AR · AV) · **Storyboard v2**(S0~S8 · S3c · SG · SM · R3 · S7) · W1 Writer · v2 시안 · Producer 진입(v1 참고용)
+- 페이지: Components · **Producer v2**(1안 E1~E5, 2안 EB1~EB7) · **Writer v2**(W1 · W1r · W2 · W4~W6 · W1 채팅 접힘, W3 다시 쓰기 옵션은 뺌 · WC2 · WC3 · WP · WN) · **Artist v2**(A0~A9 · WT · WTm · R1 · R2 · AC2 · AC3 · AX · AY · AR · AV) · **Storyboard v2**(S0~S8 · S3c · SG · SM · R3 · S7) · W1 Writer · v2 시안 · Producer 진입(v1 참고용)
 - 정한 것
   - 배치: 왼쪽 사이드바(홈 → 단계 진행 → 도구) → 작업 화면(대시보드) → 채팅(오른쪽)
   - **패널 분리**: 바깥 bg/shell(#040303). 가운데 작업 화면은 따로 상자 없이 바탕 그대로. 왼쪽 사이드바 · 오른쪽 채팅만 bg/side(#181415) 둥근 패널(모서리 16)로, 위아래 끝까지 채워요. 패널 간격 8
@@ -67,7 +67,7 @@
   - 채팅 패널 머리 오른쪽에 접기 버튼(v2/Chat Toggle, » 접기 / « 펼치기). 접으면 56px 레일에 펼치기 버튼 + Lumi 아바타 + 새 메시지 점(예시: Writer v2 'W1 · 채팅 접힘')
   - Lumi 말풍선 앞에는 항상 Lumi 아바타(v2/Lumi Avatar 28px). v2/Chat · Lumi · Lumi Ask 컴포넌트에 포함
   - **보라 포인트(로고 색)**: 상단 단계 배지(Producer · Writer …)는 Gradient/Stage(#8A3E86 → #5B4BB0) + 흰 글자. S1 · S2 · @인물 태그는 text/ref = 로고 보라(#9B7CE8). 나머지 포인트는 레드 그대로
-  - 사이드바 홈 자리는 T 이니셜(t + 별) 흰색. 지난 단계 완료 배지는 Gradient/Done(#FF5C66 → #E0303F)
+  - 사이드바 홈 자리는 T 이니셜(t + 별), 은은한 흰색 그라데이션(Gradient/T Soft White). 지난 단계 완료 배지는 Gradient/Done(#FF5C66 → #E0303F)
   - 연필 · 화면에서 고르기 · 채팅으로 만들기 · 직접 작성 아이콘은 채움 아이콘(icon-fill/pencil · list · chat)
   - 아이콘은 선 없이 채움만. 공유 · 내보내기는 통통한 화살표 + 알약 받침으로 다시 그림(마스터 시트 버튼도 같은 아이콘)
   - 사이드바 아이콘은 Tale 전용 채움(Filled) 아이콘. 지금 단계만 Lumi 그라데이션(코랄 → 라벤더), 지난 단계는 ✓ 완료 배지

@@ -68,7 +68,7 @@
   - Lumi 말풍선 앞에는 항상 Lumi 아바타(v2/Lumi Avatar 28px). v2/Chat · Lumi · Lumi Ask 컴포넌트에 포함
   - **보라 포인트(로고 색)**: 상단 단계 배지(Producer · Writer …)는 Gradient/Stage(#8A3E86 → #5B4BB0) + 흰 글자. S1 · S2 · @인물 태그는 text/ref = 로고 보라(#9B7CE8). 나머지 포인트는 레드 그대로
   - 사이드바 홈 자리는 T 이니셜(t + 별), 흰색 100% → 60% 세로 그라데이션(Gradient/Icon Current · White). 현재 단계 아이콘도 같은 그라데이션, 현재 단계 바탕 bg/nav-active = 흰색 5%. 지난 단계 완료 배지는 Gradient/Done(#FF5C66 → #E0303F)
-  - 연필 · 화면에서 고르기 · 채팅으로 만들기 · 직접 작성 아이콘은 채움 아이콘(icon-fill/pencil · list · chat)
+  - 연필 · 화면에서 고르기 · 채팅으로 만들기 아이콘은 채움 아이콘(icon-fill/pencil · list · chat). 직접 작성 · 직접 고치기는 icon-fill/draw(손글씨 펜), 버튼은 Secondary 바탕
   - 아이콘은 선 없이 채움만. 공유 · 내보내기는 통통한 화살표 + 알약 받침으로 다시 그림(마스터 시트 버튼도 같은 아이콘)
   - 사이드바 아이콘은 Tale 전용 채움(Filled) 아이콘. 지금 단계만 Lumi 그라데이션(코랄 → 라벤더), 지난 단계는 ✓ 완료 배지
   - 일반 카드 · 칩에는 테두리를 쓰지 않아요. 구분선도 여백으로 대신해요

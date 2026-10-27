@@ -1,15 +1,14 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 226.82 70.47">
   <defs>
-    <linearGradient id="tale-brand-c" gradientUnits="userSpaceOnUse" x1="0" y1="0" x2="226.82" y2="0">
-      <stop offset="0" stop-color="#EE9078"/>
-      <stop offset=".3" stop-color="#DC4B55"/>
-      <stop offset=".55" stop-color="#9E3348"/>
-      <stop offset=".8" stop-color="#B9A3F0"/>
-      <stop offset="1" stop-color="#F2A08A"/>
+    <linearGradient id="tale-brand" gradientUnits="userSpaceOnUse" x1="0" y1="0" x2="226.82" y2="0">
+      <stop offset="0" stop-color="#F0434F"/>
+      <stop offset=".35" stop-color="#C2416A"/>
+      <stop offset=".68" stop-color="#8A3E86"/>
+      <stop offset="1" stop-color="#4A3A94"/>
     </linearGradient>
   </defs>
-  <g fill="url(#tale-brand-c)">
+  <g fill="url(#tale-brand)">
     <circle cx="91.19" cy="58.29" r="11.5"/>
     <path d="M45.69,35.1V13.37c0-1.48-.3-2.96-.82-4.36-.95-3.16-3.22-5.74-6.18-7.12-.03-.01-.05-.02-.08-.04-.17-.08-.35-.16-.53-.23-1.22-.52-2.53-.83-3.9-.83-.06,0-.12,0-.18,.01-.08,0-.15-.01-.23-.01H11.5C5.15,.79,0,5.94,0,12.29H0c0,6.35,5.15,11.5,11.5,11.5h11.19v12.07c0,.48,.04,.94,.1,1.4,1.26,17.67,16.18,31.62,34.4,31.62,3.99,0,7.82-.68,11.39-1.91-13.33-4.62-22.89-17.14-22.89-31.88Z"/>
     <rect x="160.69" y="31.79" width="23" height="38" rx="11.5" ry="11.5"/>

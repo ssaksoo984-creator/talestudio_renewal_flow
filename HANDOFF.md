@@ -59,7 +59,7 @@
 
 ## Figma 진행 (2026-10-26)
 - 파일: https://www.figma.com/design/X3F0vvX6w4ZLARa0DyLspr (팀 "싹수의 일상의 팀")
-- 페이지: Components · **Producer v2**(1안 E1~E5, 2안 EB1~EB7) · **Artist v2**(A0~A9 · WT · WTm · R1 · R2 · AC2 · AC3 · AX · AY · AR · AV) · W1 Writer · v2 시안 · Producer 진입(v1 참고용)
+- 페이지: Components · **Producer v2**(1안 E1~E5, 2안 EB1~EB7) · **Writer v2**(W1 · W1r · W2~W6 · WC2 · WC3 · WP · WN) · **Artist v2**(A0~A9 · WT · WTm · R1 · R2 · AC2 · AC3 · AX · AY · AR · AV) · W1 Writer · v2 시안 · Producer 진입(v1 참고용)
 - 정한 것
   - 배치: 왼쪽 사이드바(홈 → 단계 진행 → 도구) → 채팅 → 결과물(오른쪽)
   - 사이드바 아이콘은 Tale 전용 채움(Filled) 아이콘. 지금 단계만 Lumi 그라데이션(코랄 → 라벤더), 지난 단계는 ✓ 완료 배지
@@ -68,9 +68,9 @@
   - 배경에 Lumi 색이 은은하게 번지는 분위기, 큰 입력 카드, 예시 카드
   - Lumi는 빛 번짐 없는 밝은 버전을 써요. 채팅 아바타 28px
 - 남은 것
-  - 글꼴을 Pretendard로 바꾸기: Figma 글꼴 목록에 없어서 텍스트 스타일 14개만 바꾸면 돼요(데스크톱 앱에서 직접 또는 팀 글꼴 업로드)
+  - 글꼴: 한글 · 영문 모두 Pretendard(텍스트 스타일 11개를 데스크톱 앱에서 바꿔야 해요), 숫자는 Inter(Number/Tag · Number/Meta, 적용됨)
   - 로고 미정(임시 컴포넌트), Lumi 상태 17종 컴포넌트화(키 포즈 PNG는 Lumi 상태 17종 아티팩트의 keyposes/)
-  - Storyboard 이후 단계, W1을 v2 톤으로 다시 다듬기
+  - Storyboard 이후 단계
 
 ## 참고 링크 (owner만 열림)
 - 플로우 · 프로토타입: https://claude.ai/artifact/C5xmoMhBQq9Juh3AeTP4Z2

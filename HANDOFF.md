@@ -59,7 +59,7 @@
 
 ## Figma 진행 (2026-10-26)
 - 파일: https://www.figma.com/design/X3F0vvX6w4ZLARa0DyLspr (팀 "싹수의 일상의 팀")
-- 페이지: Components · **Producer v2**(1안 E1~E5, 2안 EB1~EB7) · **Writer v2**(W1 · W1r · W2 · W4~W6 · W1 채팅 접힘, W3 다시 쓰기 옵션은 뺌 · WC2 · WC3 · WP · WN) · **Artist v2**(A0~A9 · WT · WTm · R1 · R2 · AC2 · AC3 · AX · AY · AR · AV) · **Storyboard v2**(S0~S8 · S3c · SG · SM · R3 · S7) · W1 Writer · v2 시안 · Producer 진입(v1 참고용)
+- 페이지: Components · **Producer v2**(1안 E1~E5, 2안 EB1~EB7) · **Writer v2**(W1 · W1r · W2 · W4~W6 · W1 채팅 접힘, W3 다시 쓰기 옵션은 뺌 · WC2 · WC3 · WP · WN) · **Artist v2**(A0~A9 · WT · WTm · R1 · R2 · AC2 · AC3 · AX · AY · AR · AV) · **Storyboard v2**(S0~S8 · S3c · SG · SM · R3 · S7) · v2 시안(이전 참고용). W1 Writer · Producer 진입 페이지는 삭제(2026-10-27)
 - 정한 것
   - 배치: 왼쪽 사이드바(홈 → 단계 진행 → 도구) → 작업 화면(대시보드) → 채팅(오른쪽)
   - **패널 분리**: 바깥 bg/shell(#040303). 가운데 작업 화면은 따로 상자 없이 바탕 그대로. 왼쪽 사이드바는 bg/side 둥근 패널(여백 8 · 모서리 16). 오른쪽 채팅은 위 · 아래 · 오른쪽 여백 없이 화면 끝까지 꽉 차고, 작업 화면과는 왼쪽 8 틈 + 왼쪽 모서리만 16
@@ -82,7 +82,8 @@
   - 글꼴: 한글 · 영문 모두 Pretendard, 숫자는 Inter(Number/Tag · Number/Meta) — 모든 페이지에 적용됨
   - 로고 미정(임시 컴포넌트), Lumi 상태 17종 컴포넌트화(키 포즈 PNG는 Lumi 상태 17종 아티팩트의 keyposes/)
   - Director · Editor 단계
-  - 공통 컴포넌트(Components 페이지의 v2/…): Badge · Choice Chip · Option Card · Chat · Me · Chat · Lumi · Chat · Lumi Ask · Loading Card · Art Placeholder. 화면의 칩 · 선택 카드 · 말풍선은 이 인스턴스로 바꿔 둠
+  - Components 페이지는 섹션 8개(Logo · Icons 채움 · Icons 선 · Navigation · Controls · Chat · Content · 보관)로 정리, 이름은 그룹/이름(Control/Choice Chip, Chat/Lumi …). 안 쓰는 이전 컴포넌트 26개 삭제
+  - 개발 공유 가이드(Claude Docs): https://claude.ai/artifact/DZQeNYVBJdM8t98sPPq5B6
 
 ## 참고 링크 (owner만 열림)
 - 플로우 · 프로토타입: https://claude.ai/artifact/C5xmoMhBQq9Juh3AeTP4Z2

@@ -90,3 +90,11 @@
 - 디자인 시안(로고 · 캐릭터 · W1 시안 · 기준): https://claude.ai/artifact/SXpdWww154q9pB9HMStn8w
 - Lumi 원본 에셋: https://claude.ai/artifact/MpbM4C24A8nLUN1m9zt9ZN
 - **Lumi 상태 · 움직임(기준)**: https://claude.ai/artifact/LbhbVTNxmxQLcq8WyPzAc1
+
+## v3 시안 (2026-10-29, 진행 중)
+- 방향: 레드 포인트를 걷어내고 Claude처럼 톤다운된 따뜻한 무채색. 눈이 덜 피로하게
+- Figma 페이지 "v3 시안 (Claude 톤)": E3 · W1 · A5 · S1 복사본 + v3 Palette 보드. v2 페이지는 그대로
+- 변수: Color 컬렉션에 모드 "Dark v3" 추가(바탕 #262624 · 사이드 #1F1E1D · 카드 #30302E · 글자 #F5F4EE). 새 컬렉션 "Stage"(모드 Producer · Writer · Artist · Storyboard · Director · Editor)에 stage/accent · tint · tint-strong · on-accent
+- 메인 버튼 · 보내기는 크림 #EDEAE0(v3/Fill/Primary · Cream) + 진한 글자. 선택 = stage/tint 바탕 + stage/accent 테두리. 단계 배지 · 추천 배지 · 현재 단계 아이콘 = stage/accent
+- Lumi는 무채색(이미지 채도 -100). 단계마다 페르소나 색: Producer 앰버 #D4A35F · Writer 세이지 #93B48B · Artist 클레이 #D98E7E · Storyboard 페리윙클 #8EA5D8 · Director 라일락 #A898D8 · Editor 틸 #6DB2AB
+- 그림 자리는 무채색 그라데이션(#4D4B46 → #2E2D2A)으로 임시

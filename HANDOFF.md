@@ -98,3 +98,5 @@
 - 메인 버튼 · 보내기는 크림 #EDEAE0(v3/Fill/Primary · Cream) + 진한 글자. 선택 = stage/tint 바탕 + stage/accent 테두리. 단계 배지 · 추천 배지 · 현재 단계 아이콘 = stage/accent
 - Lumi는 무채색(이미지 채도 -100). 단계마다 페르소나 색: Producer 앰버 #D4A35F · Writer 세이지 #93B48B · Artist 클레이 #D98E7E · Storyboard 페리윙클 #8EA5D8 · Director 라일락 #A898D8 · Editor 틸 #6DB2AB
 - 그림 자리는 무채색 그라데이션(#4D4B46 → #2E2D2A)으로 임시
+- **브랜드 색 = 완성된 Lumi의 진주빛(Pearl Vivid)**: #FFB547 → #FF7A5C → #F04FA0 → #A066FF → #4F86FF → #22C3B5. 검정 위 로고 · 홈 헤드라인 · 앱 아이콘 · 완성 순간에만. 광택 버전은 위 45%에 흰색 45% → 0% 겹침(v3/Gradient/Pearl Vivid · 광택). 앱 안 기능 색은 크림 + 단계 페르소나 색(톤다운)
+- v3 페이지: v3 · Logo Study(워드마크 2종 · 앱 아이콘 2종), v3 · Home 예시(talestudio.art 히어로에 적용)

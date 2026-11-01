@@ -104,3 +104,4 @@
 - **단계 포인트 색(선명, Pearl 순서와 일치 · Figma · Google식 2026-11-01)**: Producer #FFB547 · Writer #FF6A4D · Artist #A066FF · Storyboard #4F86FF · Director #22C3B5 · Editor #3DCB7A. 단계별 그라데이션 스타일 v3/Stage/<단계>
 - **시스템 색(Claude · Figma처럼 담백)**: 무채색 바탕 · 크림 메인 버튼 + 상태 Info #0D99FF · Success #14AE5C · Warning #FFCD29 · Danger #F24822 (변수 system/*)
 - v3 페이지 "Brand Guide v3" 보드: 로고 변형 설명 · 브랜드 그라데이션 · 단계 색 · 시스템 색 · 쓰는 규칙
+- **Lumi 페르소나 브리프**: mascot/LUMI_PERSONA_BRIEF.md (Claude Docs: https://claude.ai/artifact/QZ7SKMMCXcxoizU2WngSD8). 무채색 → 단계별 색 · 소품 → 완성 진주빛 Lumi, 채팅창 가이드 포함

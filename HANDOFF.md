@@ -30,7 +30,7 @@
   - Artist ⇄ Storyboard는 오가며 고쳐요.
 - **디자인 방향**: B안 크리에이티브 툴형이에요. 어두운 작업대 위에 결과물이 떠 있고, 강조는 레드 그라데이션이에요.
   - 작업대 `#0C0A0B` · 패널 `#151213` · 카드 `#1D191A` · 글자 `#F5EEEE` · 보조 글자 `#A0938F`
-  - 레드 `#F0303F` · 코랄(선택 표시) `#FF6B57` · 메인 버튼 그라데이션 `#FF8A3D → #F0303F → #B0123C`
+  - 레드 `#F0303F` · 코랄(선택 표시) `#FF6B57` · 메인 버튼 그라데이션 `#FF6A4D → #F0303F → #B0123C`
   - 메인(레드) 버튼은 한 화면에 하나만 써요. 다음 단계로 가는 버튼이에요.
   - 선택 표시는 모든 화면에서 같아요: 코랄 테두리 + 옅은 레드 바탕
   - 글자: 제목 Archivo ExtraBold, 본문 IBM Plex Sans KR, 산문은 16px · 행간 1.85
@@ -98,9 +98,9 @@
 - 메인 버튼 · 보내기는 크림 #EDEAE0(v3/Fill/Primary · Cream) + 진한 글자. 선택 = stage/tint 바탕 + stage/accent 테두리. 단계 배지 · 추천 배지 · 현재 단계 아이콘 = stage/accent
 - Lumi는 무채색(이미지 채도 -100). 단계마다 페르소나 색: Producer 앰버 #D4A35F · Writer 세이지 #93B48B · Artist 클레이 #D98E7E · Storyboard 페리윙클 #8EA5D8 · Director 라일락 #A898D8 · Editor 틸 #6DB2AB
 - 그림 자리는 무채색 그라데이션(#4D4B46 → #2E2D2A)으로 임시
-- **브랜드 색 = 완성된 Lumi의 진주빛(Pearl Vivid)**: #FFC247 → #FF8A3D → #FF5E5B → #9B6BFF → #5A7CFF → #3FB8E8. 검정 위 로고 · 홈 헤드라인 · 앱 아이콘 · 완성 순간에만. 광택 버전은 위 45%에 흰색 45% → 0% 겹침(v3/Gradient/Pearl Vivid · 광택). 앱 안 기능 색은 크림 + 단계 페르소나 색(톤다운)
+- **브랜드 색 = 완성된 Lumi의 진주빛(Pearl Vivid)**: #FFB547 → #FF6A4D → #A066FF → #4F86FF → #22C3B5 → #3DCB7A. 검정 위 로고 · 홈 헤드라인 · 앱 아이콘 · 완성 순간에만. 광택 버전은 위 45%에 흰색 45% → 0% 겹침(v3/Gradient/Pearl Vivid · 광택). 앱 안 기능 색은 크림 + 단계 페르소나 색(톤다운)
 - v3 페이지: v3 · Logo Study(워드마크 2종 · 앱 아이콘 2종), v3 · Home 예시(talestudio.art 히어로에 적용)
 - **로고 확정(v3)**: 심볼 `Logo/Tale Symbol`(리본 두 겹이 책 두 권처럼 눕혀 쌓인 모양, 흰 광택 없음) + 흰 글자 "tale studio" = `Logo/Tale Lockup`. 사이드바 홈 자리 · 홈 예시 로고 교체. SVG: brand/tale-symbol.svg
-- **단계 포인트 색(선명, Pearl 순서와 일치 · Gemini/Apple Intelligence식 2026-11-01)**: Producer #FFC247 · Writer #FF8A3D · Artist #FF5E5B · Storyboard #9B6BFF · Director #5A7CFF · Editor #3FB8E8. 단계별 그라데이션 스타일 v3/Stage/<단계>
+- **단계 포인트 색(선명, Pearl 순서와 일치 · Figma · Google식 2026-11-01)**: Producer #FFB547 · Writer #FF6A4D · Artist #A066FF · Storyboard #4F86FF · Director #22C3B5 · Editor #3DCB7A. 단계별 그라데이션 스타일 v3/Stage/<단계>
 - **시스템 색(Claude · Figma처럼 담백)**: 무채색 바탕 · 크림 메인 버튼 + 상태 Info #0D99FF · Success #14AE5C · Warning #FFCD29 · Danger #F24822 (변수 system/*)
 - v3 페이지 "Brand Guide v3" 보드: 로고 변형 설명 · 브랜드 그라데이션 · 단계 색 · 시스템 색 · 쓰는 규칙

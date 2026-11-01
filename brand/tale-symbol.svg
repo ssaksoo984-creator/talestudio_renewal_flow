@@ -25,17 +25,17 @@
 <feBlend mode="normal" in="SourceGraphic" in2="effect1_dropShadow_156_655" result="shape"/>
 </filter>
 <linearGradient id="paint0_linear_156_655" x1="104.5" y1="72.0371" x2="23" y2="75.5371" gradientUnits="userSpaceOnUse">
-<stop stop-color="#FFB547"/>
-<stop offset="0.2" stop-color="#FF7A5C"/>
-<stop offset="0.4" stop-color="#F04FA0"/>
-<stop offset="0.6" stop-color="#A066FF"/>
-<stop offset="0.8" stop-color="#4F86FF"/>
-<stop offset="1" stop-color="#22C3B5"/>
+<stop stop-color="#FFC247"/>
+<stop offset="0.2" stop-color="#FF8A3D"/>
+<stop offset="0.4" stop-color="#FF5E5B"/>
+<stop offset="0.6" stop-color="#9B6BFF"/>
+<stop offset="0.8" stop-color="#5A7CFF"/>
+<stop offset="1" stop-color="#3FB8E8"/>
 </linearGradient>
 <linearGradient id="paint1_linear_156_655" x1="36.5" y1="81.5371" x2="36.5" y2="14.5395" gradientUnits="userSpaceOnUse">
-<stop stop-color="#A066FF" stop-opacity="0"/>
-<stop offset="0.6" stop-color="#4F86FF"/>
-<stop offset="1" stop-color="#22C3B5"/>
+<stop stop-color="#9B6BFF" stop-opacity="0"/>
+<stop offset="0.6" stop-color="#5A7CFF"/>
+<stop offset="1" stop-color="#3FB8E8"/>
 </linearGradient>
 </defs>
 </svg>

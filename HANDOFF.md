@@ -107,3 +107,4 @@
 - **Lumi 페르소나 브리프**: mascot/LUMI_PERSONA_BRIEF.md (Claude Docs: https://claude.ai/artifact/QZ7SKMMCXcxoizU2WngSD8). 화이트 펄 → 단계별 색 · 소품 → 완성 컬러 진주빛 Lumi, 채팅창 가이드 포함
 - **v3 페이지 정리(2026-11-02)**: 섹션 01 브랜드 가이드(로고 구조 카드 4장 · 로고 쓰는 법 · 브랜드 그라데이션 · 단계 색 · 시스템 색 · 규칙) / 02 화면 시안(홈 + E3 · W1 · A5 · S1) / 03 로고 · 색 작업 과정(비교안 아카이브)
 - **메인(랜딩) 시안 2종(2026-11-03)**: v3 페이지 섹션 04. A = 제품이 주인공(Ponder형: 왼쪽 정렬 큰 헤드라인 + 실제 앱 창 + 여섯 단계 + 마지막 CTA), B = 바로 만들기(Seedance형 입력창 히어로 + WowMade형 결과 카드 부채꼴 + 단계별 Lumi 타임라인). 레퍼런스: wowmade.ai · ponder.ai · seedance25ai.im
+- **포인트 색 최소화(2026-11-03)**: 단계 색은 ① 상단 단계 배지 · 지금 단계 스텝퍼(그라데이션 v3/Stage Badge/<단계>, 흰 글자) ② 사이드바 현재 단계 아이콘 ③ 선택 칩 · 카드 테두리에만. 완료 ✓ · 체크는 흰색(#F5F4EE), S1 · S2 씬 번호는 text/primary 흰색, @인물 태그(text/ref)는 밝은 파랑 #8EB2FF

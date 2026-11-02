@@ -100,7 +100,7 @@
 - 그림 자리는 무채색 그라데이션(#4D4B46 → #2E2D2A)으로 임시
 - **브랜드 색 = 완성된 Lumi의 진주빛(Pearl Vivid)**: #FFB547 → #FF6A4D → #A066FF → #4F86FF → #22C3B5 → #3DCB7A. 검정 위 로고 · 홈 헤드라인 · 앱 아이콘 · 완성 순간에만. 광택 버전은 위 45%에 흰색 45% → 0% 겹침(v3/Gradient/Pearl Vivid · 광택). 앱 안 기능 색은 크림 + 단계 페르소나 색(톤다운)
 - v3 페이지: v3 · Logo Study(워드마크 2종 · 앱 아이콘 2종), v3 · Home 예시(talestudio.art 히어로에 적용)
-- **로고 확정(v3)**: 심볼 `Logo/Tale Symbol`(리본 두 겹이 책 두 권처럼 눕혀 쌓인 모양, 흰 광택 없음) + 흰 글자 "tale studio" = `Logo/Tale Lockup`. 사이드바 홈 자리 · 홈 예시 로고 교체. SVG: brand/tale-symbol.svg
+- **로고 확정(v3)**: 심볼 `Logo/Tale Symbol`(리본 두 겹이 책 두 권처럼 쌓인 모양. 색은 Figma식 6색 블록: 세로 기둥 바이올렛 · 윗줄 블루 · 틸 · 그린, 아래 책 코랄 · 앰버, 그라데이션 없음) + 흰 글자 "tale studio" = `Logo/Tale Lockup`. 사이드바 홈 자리 · 홈 예시 로고 교체. SVG: brand/tale-symbol.svg
 - **단계 포인트 색(선명, Pearl 순서와 일치 · Figma · Google식 2026-11-01)**: Producer #FFB547 · Writer #FF6A4D · Artist #A066FF · Storyboard #4F86FF · Director #22C3B5 · Editor #3DCB7A. 단계별 그라데이션 스타일 v3/Stage/<단계>
 - **시스템 색(Claude · Figma처럼 담백)**: 무채색 바탕 · 크림 메인 버튼 + 상태 Info #0D99FF · Success #14AE5C · Warning #FFCD29 · Danger #F24822 (변수 system/*)
 - v3 페이지 "Brand Guide v3" 보드: 로고 변형 설명 · 브랜드 그라데이션 · 단계 색 · 시스템 색 · 쓰는 규칙

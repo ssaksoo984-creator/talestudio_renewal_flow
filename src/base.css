@@ -61,7 +61,7 @@ body { background: var(--bg); color: var(--ink); font: 14px/1.55 var(--font); ma
 
 /* ── 와이어프레임 ── */
 .w-bar { display: flex; align-items: center; gap: 14px; padding: 8px 14px; border-bottom: 1px solid var(--w-line); background: var(--w-panel) }
-.w-logo { font-size: 13px }
+.w-logo { font-size: 13px; white-space: nowrap }
 .w-rail { display: flex; gap: 4px; flex: 1 }
 .w-rail span { white-space: nowrap; font-size: 12px; padding: 2px 9px; border-radius: 99px; color: var(--w-mut) }
 .w-rail .on { background: var(--w-pri); color: var(--w-pri-ink) }
@@ -753,3 +753,28 @@ a.btn { text-decoration: none; display: inline-block }
 .w-shot.boot { opacity: .75; cursor: progress }
 .w-spin.sm { width: 12px; height: 12px; border-width: 2px; display: inline-block; vertical-align: -2px }
 .w-busy-card .w-btn.ghost { justify-self: start }
+
+/* 시리즈 · 다음 화 */
+.w-serwrap { position: relative; display: inline-flex; margin-left: 8px }
+.w-serchip { font: inherit; font-size: 12px; border: 1px solid var(--w-acc); color: var(--w-acc); background: var(--w-panel); border-radius: 99px; padding: 3px 10px; cursor: pointer; white-space: nowrap }
+.w-serchip[aria-expanded="true"] { background: var(--w-acc); color: #fff }
+.w-serpop { position: absolute; top: calc(100% + 6px); left: 0; z-index: 30; width: min(420px, 80vw); background: var(--w-panel); border: 1px solid var(--w-line); border-radius: 10px; padding: 12px 14px; box-shadow: 0 12px 30px -16px rgba(20, 10, 40, .45); display: grid; gap: 6px; font-size: 13px; line-height: 1.6 }
+.w-serpop p { margin: 0 } .w-serpop .w-pid { font-size: 11px; color: var(--w-mut); margin-right: 6px }
+.w-tag-inh { font-size: 10.5px; border-radius: 99px; padding: 0 7px; margin-left: 4px; background: color-mix(in srgb, var(--w-acc) 14%, transparent); color: var(--w-acc); white-space: nowrap; font-weight: 500 }
+.w-row-b b .w-tag-new { margin-left: 4px }
+.w-keep { border: 1px dashed var(--w-line); border-radius: 8px; padding: 8px 12px; display: grid; gap: 4px; font-size: 12.5px }
+.w-keep-h { font: inherit; font-weight: 600; background: none; border: 0; padding: 0; color: var(--w-ink); cursor: pointer; justify-self: start }
+.w-keep ul { list-style: none; margin: 4px 0 0; padding: 0; display: grid; gap: 6px } .w-keep li p { margin: 2px 0 0 }
+.w-plist .w-title { display: flex; align-items: center; gap: 8px; flex-wrap: wrap }
+.w-slot { font-size: 12px; border: 1px solid var(--w-line); border-radius: 99px; padding: 3px 10px; color: var(--w-mut); white-space: nowrap }
+.w-slot.full { border-color: var(--back); color: var(--back) }
+.w-plist-ul { list-style: none; margin: 0; padding: 0; display: grid; gap: 8px }
+.w-pcard { display: flex; gap: 12px; align-items: center; border: 1px solid var(--w-line); border-radius: 10px; padding: 10px 12px; background: var(--w-panel); flex-wrap: wrap }
+.w-pth { width: 56px; height: 40px; border-radius: 6px; flex: none; color: #fff; font-size: 10px; display: flex; align-items: flex-end; padding: 3px 5px; filter: saturate(.7) }
+.w-pcb { display: grid; gap: 2px; flex: 1; min-width: 160px } .w-pcb .w-mut { font-size: 12px }
+.w-why-l { font-size: 12px; color: var(--back) }
+.w-pca { display: flex; gap: 6px }
+.w-demo { display: flex; gap: 6px; align-items: center; flex-wrap: wrap; border-top: 1px dashed var(--w-line); padding-top: 10px; font-size: 12px }
+.w-inh { display: flex; gap: 10px; align-items: center; font-size: 13px; flex-wrap: wrap }
+.w-faces { display: flex } .w-faces i { font-style: normal; width: 30px; height: 30px; border-radius: 50%; border: 2px solid var(--w-panel); margin-left: -8px; background: linear-gradient(135deg, #f7c3a5, #b9a6f2); font-size: 9.5px; display: grid; place-items: center; color: #3b1820 } .w-faces i:first-child { margin-left: 0 }
+.w-check { display: flex; gap: 8px; align-items: center; font-size: 13px; cursor: pointer }

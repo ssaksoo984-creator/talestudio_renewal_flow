@@ -115,6 +115,12 @@
         Storyboard: [],
       },
       pending: null, busyStep: 0,
+      // 시리즈: 다음 화는 만들 때 한 번에 전부 복사하고, 그 뒤로 앞 화를 다시 보지 않는다
+      series: null, serPop: false, keep: [], keepOpen: false,
+      proj: { plan: 'p15', max: 3, fail: false, cont: true, pick: 0, del: -1, list: [
+        { t: '자판기의 반란', stage: 'Director', date: '10-20', made: true, no: 1, hasEnd: true, id: 1 },
+        { t: '옥상 고양이', stage: 'Writer', date: '10-21', made: false, no: 1, id: 2 },
+      ] },
     };
   }
   var st = initial();
@@ -133,8 +139,16 @@
     }).join('') + '</nav>';
   }
   function bar(on) {
-    return '<header class="w-bar"><b class="w-logo">Tale Studio</b>' + (on ? rail(on) : '<span style="flex:1"></span>') +
-      '<span class="w-meta">' + (st.ratioLocked ? '<span class="w-lock">🔒 ' + esc(st.ratio) + '</span>' : '') + '<span>한국어 · 사이트 언어</span></span></header>';
+    return '<header class="w-bar"><b class="w-logo">Tale Studio</b>' + (on && st.series ? serChip() : '') + (on ? rail(on) : '<span style="flex:1"></span>') +
+      '<span class="w-meta">' + (st.ratioLocked ? '<span class="w-lock">🔒 ' + esc(st.ratio) + '</span>' : '') + (st.series ? '<span title="대사 언어는 앞 화와 같게 잠겨 있어요">🔒 한국어</span>' : '<span>한국어 · 사이트 언어</span>') + '</span></header>';
+  }
+  // 시리즈 표시는 이 칩 하나. 누르면 앞 화 줄거리(만들 때 복사한 것)
+  function serChip() {
+    var s = st.series;
+    return '<span class="w-serwrap"><button class="w-serchip" data-act="serPop" aria-expanded="' + !!st.serPop + '">' + s.no + '화 · ← ' + esc(s.prevTitle) + '</button>' +
+      (st.serPop ? '<div class="w-serpop" role="dialog" aria-label="앞 화 줄거리"><b>앞 화 줄거리 · ' + (s.no - 1) + '화 「' + esc(s.prevTitle) + '」</b>' +
+        s.prevProse.map(function (t, i) { return '<p><span class="w-pid">S' + (i + 1) + '</span>' + esc(t) + '</p>'; }).join('') +
+        '<p class="w-mut">' + s.no + '화를 만들 때 복사한 내용이에요. 앞 화를 고치거나 지워도 바뀌지 않아요.</p></div>' : '') + '</span>';
   }
   function studio(on, main, o) {
     o = o || {};
@@ -197,7 +211,8 @@
     return '<ol class="w-stepper"><li class="' + (n === 1 ? 'on' : 'done') + '">① 이야기 재료</li><li class="' + (n === 2 ? 'on' : '') + '">② 설정</li></ol>';
   }
   function E1() {
-    return bar('Producer') + '<div class="w-entry wide">' + stepper(1) + '<h3>무엇을 만들어 볼까요?</h3>' +
+    return bar('Producer') + '<div class="w-entry wide">' + stepper(1) + '<h3>' + (st.series ? '이번 화에서는 무슨 일이 일어나요?' : '무엇을 만들어 볼까요?') + '</h3>' +
+      (st.series ? '<p class="w-mut" style="margin:0">앞 화 줄거리는 Writer가 읽어요. 이번 화에서 일어나는 일만 적어 주세요.</p>' : '') +
       '<div class="w-q"><div class="w-q-t">아이디어나 줄거리 ' + counter() + '</div>' +
       '<textarea class="w-ta" id="idea" data-bind="idea" aria-label="아이디어" placeholder="누가, 어디서, 무슨 일을 겪는지 적어 주세요">' + esc(st.idea) + '</textarea>' + lenErrHtml() + '</div>' +
       fileRow() +
@@ -243,7 +258,7 @@
       '<section class="w-grp"><div class="w-q"><div class="w-q-t">장르·분위기</div>' + opts('mood', MOODS, st.mood, r.mood) + why(r.moodWhy) + '</div>' +
       '<div class="w-q"><div class="w-q-t">길이</div>' + opts('runtime', RUNTIMES, st.runtime, r.runtime) + why(r.runtimeWhy) + '</div>' +
       levelPicker() + '</section>' +
-      '<section class="w-grp lock"><div class="w-grp-h">🔒 화면 비율 <small>시작하면 끝까지 바꿀 수 없어요</small></div>' + opts('ratio', RATIOS, RATIOS.map(function (x) { return x[0]; }).indexOf(st.ratio), 1) + '</section>' +
+      '<section class="w-grp lock"><div class="w-grp-h">🔒 화면 비율 <small>' + (st.series ? '앞 화와 같은 값으로 골라 뒀어요 · 바꿀 수 있고 시작하면 잠겨요' : '시작하면 끝까지 바꿀 수 없어요') + '</small></div>' + opts('ratio', RATIOS, RATIOS.map(function (x) { return x[0]; }).indexOf(st.ratio), 1) + '</section>' +
       '<div class="w-foot">' + B('← 이야기 재료', 'E1') + B('AI로 진행', 'E4', 'acc') + '</div></div>';
   }
   function E4() {
@@ -252,8 +267,90 @@
       ['🔒 화면 비율', esc(st.ratio) + ' · 시작하면 끝까지 바꿀 수 없어요'],
       ['장르·분위기', esc(MOODS[st.mood])], ['길이', esc(RUNTIMES[st.runtime][0])],
       ['바꿈 정도', (st.level + 1) + ' ' + esc(L.n) + ' — ' + esc(L.s)],
-      ['자료', st.file ? esc(st.file.name) : '아이디어 글만'], ['채팅 언어', '한국어 (사이트 언어)']]) + '<p class="w-note">장르·분위기와 길이는 Writer에서 다시 바꿀 수 있어요.</p>',
+      ['자료', st.file ? esc(st.file.name) : '아이디어 글만'], ['채팅 언어', st.series ? '🔒 한국어 (앞 화와 같음)' : '한국어 (사이트 언어)']].concat(st.series ? [['이어받는 것', serSummary() + (st.series.cont ? ' · 앞 화 마지막 장면에서 시작' : '')]] : [])) + '<p class="w-note">장르·분위기와 길이는 Writer에서 다시 바꿀 수 있어요.</p>',
       B('아니오, 고칠래요', 'E3') + A('예, 시작', 'confirmStart', 'pri'));
+  }
+
+  /* ── 시리즈 · 다음 화 ── 만들 때 한 번에 전부 복사, 그 뒤 앞 화를 다시 보지 않는다 */
+  var inhObjs = function () { return objs().filter(function (o) { return o.inh; }); };
+  var freshObjs = function () { return objs().filter(function (o) { return !o.inh; }); };
+  var names = function (a) { return a.map(function (o) { return o.n; }).join(' · ') || '없음'; };
+  function serTag(o) { return !st.series ? '' : o.inh ? '<span class="w-tag-inh">' + (st.series.no - 1) + '화</span>' : '<span class="w-tag-new">새로</span>'; }
+  function serSummary() { var all = inhObjs().concat(st.keep), c = all.filter(function (o) { return !o.isBg; }).length, b = all.length - c; return '인물 ' + c + ' · 배경 ' + b + ' · 그림체 · 말투 · 앞 화 줄거리'; }
+  function keepFold() {
+    if (!st.series || !st.keep.length) return '';
+    return '<div class="w-keep"><button class="w-keep-h" data-act="keepToggle" aria-expanded="' + !!st.keepOpen + '">이번 화에 안 나오는 인물 · 배경 ' + st.keep.length + ' ' + (st.keepOpen ? '▴' : '▾') + '</button><span class="w-mut">그리지 않고 다음 화로 계속 넘어가요</span>' +
+      (st.keepOpen ? '<ul>' + st.keep.map(function (k) { return '<li><b>' + esc(k.n) + '</b> <small class="w-mut">' + (k.isBg ? '배경' : '인물') + '</small><span class="w-tag-inh">' + (st.series.no - 1) + '화</span><p class="w-mut">' + esc(k.d) + '</p></li>'; }).join('') + '</ul>' : '') + '</div>';
+  }
+  var P = function () { return st.proj; };
+  var planName = function () { return P().plan === 'free' ? '무료' : 'Producer15'; };
+  var used = function () { return P().list.length; };
+  function L1() {
+    var pj = P(), full = used() >= pj.max;
+    var cards = pj.list.map(function (c, i) {
+      var nx = c.made
+        ? '<button class="w-btn sm pri" data-act="nextEp" data-arg="' + i + '">다음 화 만들기</button>'
+        : '<button class="w-btn sm" disabled>다음 화 만들기</button>';
+      return '<li class="w-pcard"><span class="w-pth" style="background:' + styleBg(i % 3 + 1) + '">' + esc(c.ratio || '9:16') + '</span>' +
+        '<div class="w-pcb"><b>' + esc(c.t) + (c.no > 1 ? ' <span class="w-tag-inh">' + c.no + '화</span>' : '') + '</b>' +
+        '<span class="w-mut">' + (c.prev ? '← ' + esc(c.prev) + ' · ' : '') + esc(c.stage) + ' 단계 · ' + esc(c.date) + ' 고침</span>' +
+        (c.made ? '' : '<span class="w-why-l">그림을 만든 뒤에 다음 화를 만들 수 있어요</span>') + '</div>' +
+        '<div class="w-pca">' + nx + '<button class="w-btn sm" data-act="delProj" data-arg="' + i + '">지우기</button></div></li>';
+    }).join('');
+    return bar() + '<div class="w-entry wide w-plist"><div class="w-title"><h3>내 프로젝트</h3><span class="w-tbar-sp"></span>' +
+      '<span class="w-slot' + (full ? ' full' : '') + '">' + planName() + ' · 프로젝트 칸 ' + used() + ' / ' + pj.max + '</span>' + A('＋ 새 프로젝트', 'newProj', 'pri sm') + '</div>' +
+      '<ul class="w-plist-ul">' + cards + '</ul>' +
+      '<p class="w-note">다음 화는 앞 화 카드의 [다음 화 만들기]에서만 만들어요. 만들 때 인물 · 배경 · 그림 · 그림체 · 말투 · 줄거리를 한 번에 복사해서, 그 뒤 앞 화를 고치거나 지워도 다음 화는 그대로예요.</p>' +
+      '<div class="w-demo"><span class="w-mut">확인용</span>' +
+        A(full ? '칸 비우기' : '칸 꽉 채우기', 'demoFull', 'sm') + A(pj.plan === 'free' ? 'Producer15로' : '무료 요금제로', 'demoFree', 'sm') +
+        A(pj.fail ? '복사 실패 끄기' : '복사 실패로 해 보기', 'demoFail', 'sm') + '</div></div>';
+  }
+  function LS() {
+    var free = P().max < 2;
+    return L1() + modal('다음 화를 둘 칸이 없어요', free
+      ? '<p>지금 요금제는 프로젝트 칸이 1개예요. 다음 화는 칸이 2개 이상인 요금제(Producer10 이상)에서 만들 수 있어요.</p>'
+      : '<p>프로젝트 칸 ' + used() + ' / ' + P().max + '을 쓰고 있어요. 다음 화도 프로젝트 하나라 칸이 하나 필요해요. 옛 화를 지우거나 요금제를 올려 주세요.</p><p class="w-note">옛 화를 지워도 다음 화는 그대로예요. 만들 때 복사해 뒀어요.</p>',
+      B('닫기', 'L1') + B('요금제 보기', 'L1', 'pri'));
+  }
+  function N2() {
+    var c = P().list[P().pick], no = c.no + 1;
+    return L1() + modal('「' + c.t + '」 ' + no + '화를 만들까요?',
+      '<div class="w-inh"><span class="w-faces"><i>민호</i><i>팀장</i><i>경비</i><i>복도</i></span><span>인물 3 · 배경 1 · 그림체 · 말투 · 줄거리를 그대로 이어받아요</span></div>' +
+      (c.hasEnd ? '<label class="w-check"><input type="checkbox" data-bind="proj.cont"' + (P().cont ? ' checked' : '') + '> 앞 화 마지막 장면에서 이어 시작하기</label>' : '') +
+      '<p class="w-note">새 화는 프로젝트 칸 1개를 써요 (' + used() + ' / ' + P().max + ' → ' + (used() + 1) + ' / ' + P().max + ')</p>',
+      B('취소', 'L1') + A(no + '화 만들기', 'makeNext', 'pri'));
+  }
+  function N3() { return L1() + busy(P().list[P().pick].no + 1 + '화를 만들고 있어요', ['새 프로젝트 만들기', '인물 · 배경 · 그림 복사', '그림체 · 말투 · 줄거리 복사']); }
+  function N3e() {
+    return L1() + modal('다음 화를 만들지 못했어요', '<p>그림을 옮기다 문제가 생겼어요. 만든 것은 모두 되돌렸어요.</p><p class="w-note">칸은 쓰지 않았고, 앞 화도 그대로예요.</p>',
+      B('닫기', 'L1') + A('다시 시도', 'retryNext', 'pri'));
+  }
+  function LD() {
+    var c = P().list[P().del] || {}, kids = P().list.filter(function (x) { return x.prevId === c.id; });
+    return L1() + modal('「' + (c.t || '') + '」을(를) 지울까요?', '<p>이 화의 산문 · 그림 · 영상이 모두 지워지고, 프로젝트 칸이 하나 비어요.</p>' +
+      (kids.length ? '<p class="w-note">이 화를 이어받은 ' + esc(kids.map(function (k) { return k.t; }).join(', ')) + '은(는) 그대로 남아요. 만들 때 복사해 뒀어요.</p>' : ''),
+      B('취소', 'L1') + A('지우기', 'delDo', 'warn'));
+  }
+  // 다음 화 만들기: 한 번에 전부 복사 (프로토 데이터)
+  function makeNext() {
+    var pj = st.proj, c = pj.list[pj.pick], no = c.no + 1, plan = st.plan, prevProse = st.prose.slice(), prevStyle = st.style, prevRatio = st.ratio;
+    var n = initial(); n.plan = plan; n.proj = pj;
+    n.series = { no: no, prevTitle: c.t, prevProse: prevProse, style: prevStyle, cont: !!(c.hasEnd && pj.cont) };
+    n.title = c.t + ' ' + no; n.style = prevStyle; n.ratio = prevRatio;
+    n.idea = '캔 사태 다음 날. 수리 기사가 와서 자판기를 여는데, 안에서 민호가 넣었던 동전이 쏟아진다.';
+    n.prose = ['다음 날 아침, 자판기에는 "고장" 종이가 붙어 있다. 어제 일 이후 민호는 자판기 앞을 지날 때마다 눈을 피한다. 팀장이 지나가며 "어제 고마워" 하고 웃는다.',
+      '점심시간, 수리 기사가 자판기를 열자 안에서 민호가 넣었던 동전이 쏟아진다. 수리 기사는 동전을 세어 민호 손에 쥐여 준다. 민호는 그 동전을 들고 1층 로비 커피 머신 앞에 선다.'];
+    n.chars = [
+      { n: '민호', d: '20대 후반 직장인. 흰 셔츠, 느슨한 넥타이, 피곤한 눈.', states: ['흰 셔츠'], tone: 0, note: '', inh: 1, sid: 'c1' },
+      { n: '팀장', d: '40대. 회색 정장, 단정한 머리, 무표정.', states: ['회색 정장'], tone: 0, note: '', inh: 1, sid: 'c2' },
+      { n: '수리 기사', d: '30대. 파란 작업복, 공구 가방, 웃는 상.', states: ['작업복'], tone: 0, note: '' },
+    ];
+    n.bgs = [{ n: '회사 복도 자판기 앞', d: '낮, 형광등, 리놀륨 바닥, 빨간 자판기 한 대.', tone: 0, inh: 1, sid: 'b1' }, { n: '1층 로비', d: '유리문, 커피 머신, 대리석 바닥.', tone: 0 }];
+    n.keep = [{ n: '경비 아저씨', d: '50대. 남색 경비 제복, 무전기.', isBg: false }];
+    n.chat.Writer = [['Writer', (no - 1) + '화 줄거리를 읽고 이어지는 이야기를 썼어요. 민호 · 팀장은 ' + (no - 1) + '화와 같은 사람이에요.']];
+    n.chat.Artist = [['Artist', (no - 1) + '화에서 민호 · 팀장 · 회사 복도 자판기 앞을 이어받았어요. 새로 나온 수리 기사 · 1층 로비만 그리면 돼요.']];
+    pj.list.push({ t: n.title, stage: 'Producer', date: '11-03', made: false, no: no, prev: c.t, prevId: c.id, id: Date.now(), ratio: prevRatio });
+    st = n;
   }
 
   /* ── Producer 2안: 채팅으로 만들기 ── */
@@ -612,7 +709,7 @@
       ? (st.descEdit === i ? A('완료', 'descDone', 'sm pri') : A('설명 고치기', 'descEdit', 'sm', ' data-arg="' + i + '"'))
       : A(h ? '다시 만들기' : '만들기', 'openTone', 'sm', ' data-arg="' + i + '"');
     return '<li class="w-row' + (isNew ? ' is-new' : '') + '">' + (mode === 'img' ? thumb(o, h) : '') +
-      '<div class="w-row-b"><b>' + esc(o.n) + ' <small>' + (o.isBg ? '배경' : '인물') + (isNew ? ' · 새로' : '') + (o.aliases && o.aliases.length > 1 ? ' · 또는 ' + esc(o.aliases.filter(function (a) { return a !== o.n; }).join(' · ')) : '') + '</small></b>' + desc +
+      '<div class="w-row-b"><b>' + esc(o.n) + ' <small>' + (o.isBg ? '배경' : '인물') + (isNew ? ' · 새로' : '') + '</small>' + serTag(o) + '<small>' + (o.aliases && o.aliases.length > 1 ? ' · 또는 ' + esc(o.aliases.filter(function (a) { return a !== o.n; }).join(' · ')) : '') + '</small></b>' + desc +
       (o.isBg ? '' : '<div class="w-row-st">' + o.states.map(function (x) { return '<span>' + esc(x) + '</span>'; }).join('') + '</div>') +
       '<div class="w-row-ref"><i>레퍼런스</i>' + refStrip(String(i), o.refs) + '</div></div>' +
       '<div class="w-row-a">' + acts + '</div></li>';
@@ -648,7 +745,7 @@
           '<button class="w-gadd" data-act="openState" data-arg="' + i + ':-1">＋ 모습 추가</button></div></div>'
         : '<button class="w-gadd solo" data-act="openState" data-arg="' + i + ':-1">＋<span>모습</span></button>';
       return '<div class="w-agrp' + (o.isBg ? ' bg' : '') + (nv ? ' wide' : '') + (isNew ? ' is-new' : '') + '">' +
-        '<div class="w-agh"><b>' + esc(o.n) + '</b><span class="w-role">' + (o.isBg ? '배경' : '인물') + '</span>' + (isNew ? '<span class="w-tag-new">새로</span>' : '') +
+        '<div class="w-agh"><b>' + esc(o.n) + '</b><span class="w-role">' + (o.isBg ? '배경' : '인물') + '</span>' + (isNew ? '<span class="w-tag-new">새로</span>' : '') + serTag(o) +
         (o.aliases && o.aliases.length > 1 ? '<span class="w-mut" style="font-size:11px">또는 ' + esc(o.aliases.filter(function (a) { return a !== o.n; }).join(' · ')) + '</span>' : '') +
         '<span class="w-tbar-sp"></span>' + (o.refs.length ? '<span class="w-refcnt" title="레퍼런스 ' + o.refs.length + '장 · 상세에서 관리">🖼 ' + o.refs.length + '</span>' : '') + '</div>' +
         '<div class="w-agcells">' + gcell(o, i, 0) + vars + '</div></div>';
@@ -657,15 +754,16 @@
   function rows(mode) { return '<ul class="w-rows">' + objs().map(function (o, i) { return showObj(o) ? row(o, i, mode) : ''; }).join('') + '</ul>'; }
   function styleRow(bind, cur) {
     return '<div class="w-styles" role="radiogroup">' + STYLES.map(function (s, i) {
-      return '<button class="w-sty' + (i === cur ? ' on' : '') + '" role="radio" aria-checked="' + (i === cur) + '" data-bind="' + bind + '" data-val="' + i + '"><i style="background:' + styleBg(i) + '"></i>' + esc(s[0]) + (bind === 'regenStyle' && i === st.style ? '<small>지금</small>' : '') + '</button>';
+      return '<button class="w-sty' + (i === cur ? ' on' : '') + '" role="radio" aria-checked="' + (i === cur) + '" data-bind="' + bind + '" data-val="' + i + '"><i style="background:' + styleBg(i) + '"></i>' + esc(s[0]) + (bind === 'regenStyle' && i === st.style ? '<small>지금</small>' : '') + (bind === 'style' && st.series && i === st.series.style ? '<small>앞 화</small>' : '') + '</button>';
     }).join('') + '</div>';
   }
   function A1() {
     var unnamed = /사람들|누군가|행인/.test(st.prose.join(' '));
     var main = '<div class="w-title"><h3>Artist · 브레이크다운</h3><span class="w-mut">확정 산문에서 뽑은 인물 ' + st.chars.length + ' · 배경 ' + st.bgs.length + '</span></div>' +
-      '<div class="w-diag"><b>AI 진단</b>' + (st.newItems.length ? '새로 들어온 것: ' + esc(st.newItems.join(', ')) + '. ' : '산문의 인물과 장소를 모두 찾았어요. ') +
-      (unnamed ? '"지나가던 사람들"처럼 이름 없는 인물은 따로 뽑지 않았어요. 필요하면 산문에서 이름을 붙여 주세요.' : '') + '</div>' +
-      filterBar() + rows('text') + '<p class="w-note">상태(씬마다 다른 옷·나이)는 그림을 만든 뒤 카드 상세의 [＋ 상태]나 Storyboard에서 더할 수 있어요.</p>' +
+      (st.series ? '<div class="w-diag"><b>AI 진단</b>' + (st.series.no - 1) + '화에서 이어받은 ' + esc(names(inhObjs())) + '은(는) 그림이 이미 있어요. 새로 나온 ' + esc(names(freshObjs())) + '만 그리면 돼요.</div>' : '') +
+      (st.series ? '' : '<div class="w-diag"><b>AI 진단</b>' + (st.newItems.length ? '새로 들어온 것: ' + esc(st.newItems.join(', ')) + '. ' : '산문의 인물과 장소를 모두 찾았어요. ') +
+      (unnamed ? '"지나가던 사람들"처럼 이름 없는 인물은 따로 뽑지 않았어요. 필요하면 산문에서 이름을 붙여 주세요.' : '') + '</div>') +
+      filterBar() + rows('text') + keepFold() + '<p class="w-note">상태(씬마다 다른 옷·나이)는 그림을 만든 뒤 카드 상세의 [＋ 상태]나 Storyboard에서 더할 수 있어요.</p>' +
       '<div class="w-foot">' + B('인물·배경이 빠졌거나 겹쳤어요', 'A1c') + B('목록이 맞아요 · 그림 만들기 →', 'A2', 'pri') + '</div>';
     return studio('Artist', main, { noChat: true });
   }
@@ -687,10 +785,14 @@
   function A2() {
     var n = st.chars.reduce(function (x, c) { return x + c.states.length; }, 0);
     return A1() + modal('어떤 스타일로 만들까요?', '<p>이 작품의 스타일은 하나예요. 나중에 [재생성하기]로 다른 스타일을 다시 고를 수 있고, 이전 버전은 기록에 남아요.</p>' +
-      styleRow('style', st.style) + '<div class="w-q"><div class="w-q-t">스타일 레퍼런스 <small>선택 · 이 그림체를 참고해요</small></div>' + refStrip('style', st.styleRefs) + '</div>' + list([['만드는 것', '인물 시트 ' + st.chars.length + ' (상태 ' + n + ') · 배경 ' + st.bgs.length], ['스타일', esc(STYLES[st.style][0])], ['예상 크레딧', '표시 자리']]),
+      styleRow('style', st.style) + '<div class="w-q"><div class="w-q-t">스타일 레퍼런스 <small>선택 · 이 그림체를 참고해요</small></div>' + refStrip('style', st.styleRefs) + '</div>' + list((st.series
+        ? (st.style === st.series.style
+          ? [['그대로 쓰는 그림', esc(names(inhObjs())) + ' (' + (st.series.no - 1) + '화)'], ['새로 그리는 것', esc(names(freshObjs()))]]
+          : [[(st.series.no - 1) + '화 그림을 참고해 다시 그리는 것', esc(names(inhObjs()))], ['새로 그리는 것', esc(names(freshObjs()))]])
+        : [['만드는 것', '인물 시트 ' + st.chars.length + ' (상태 ' + n + ') · 배경 ' + st.bgs.length]]).concat([['스타일', esc(STYLES[st.style][0])], ['예상 크레딧', '표시 자리']])),
       B('취소', 'A1') + A(esc(STYLES[st.style][0]) + '로 만들기', 'generate', 'acc'), true);
   }
-  function A4() { return (st.versions.length ? A5() : A1()) + busy(st.busyNames ? '새로 넣은 것을 같은 스타일로 만들고 있어요' : '그림을 만들고 있어요', st.busyNames || objs().map(function (o) { return o.n; })); }
+  function A4() { return (st.versions.length ? A5() : A1()) + busy(st.busyNames ? '새로 넣은 것을 같은 스타일로 만들고 있어요' : '그림을 만들고 있어요', st.busyNames || (st.series && !st.versions.length && st.style === st.series.style ? freshObjs() : objs()).map(function (o) { return o.n; })); }
   function A5(o) {
     o = o || {};
     if (!st.versions.length) newVersion(st.style);
@@ -1161,12 +1263,14 @@
 
   var SCREENS = { A1c: A1c, WT: WT, WTm: WTm, EB1: EB1, EBX: EBX, EB2: EB2, EB3: EB3, EB4: EB4, EB5: EB5, EB6: EB6, EB7: EB7, E1: E1, E1e: E1e, EF: EF, EFe: EFe, E2: E2, E2e: E2e, E3: E3, E4: E4, E5: E5, W1: W1, W1r: W1r, WC1: WC1, WC2: WC2, WC3: WC3, W2: W2, W4: W4, W5: W5, W6: W6, WP: WP, WN: WN, W3: W3,
     A0: A0, A1: A1, R1: R1, A2: A2, A4: A4, A5: A5, A6: A6, A7: A7, A8: A8, R2: R2, A9: A9, AV: AV, AC1: AC1, AC2: AC2, AC3: AC3, AX: AX, AY: AY,
+    L1: L1, LS: LS, N2: N2, N3: N3, N3e: N3e, LD: LD,
     A7r: A7r, S3c: S3c, S0: S0, S1: S1, SG: SG, S2: S2, S3: S3, S4: S4, R3: R3, S5: S5, S6: S6, S7: S7, S8: S8, SM: SM, D1: D1 };
   // 갈림 노드는 그 갈림을 묻는 화면으로
-  var DECISION_SCREEN = { E1n: function () { return entryId(); }, EFq: 'EF', E2q: function () { return isB() ? 'EB3' : 'E3'; }, E5q: function () { return isB() ? 'EB7' : 'E4'; }, W1q: 'W1', WPq: 'WP', A5q: 'A5', S1q: 'S1' };
+ var DECISION_SCREEN = { L1a: 'L1', E1n: function () { return entryId(); }, EFq: 'EF', E2q: function () { return isB() ? 'EB3' : 'E3'; }, E5q: function () { return isB() ? 'EB7' : 'E4'; }, W1q: 'W1', WPq: 'WP', A5q: 'A5', S1q: 'S1' };
   // AI 작업이 끝나면 가는 곳
   var BUSY_NEXT = {
     E2: function () { if (st.file && st.file.noText) return 'E2e'; if (isB()) return st.file ? 'EB2' : nextQ(); return 'E3'; },
+    N3: function () { if (st.proj.fail) return 'N3e'; makeNext(); return 'E1'; },
     E5: 'W1', W2: 'W4', A0: 'A1', A4: 'A5', A8: 'A5', S0: 'S1', S3: function () { return st.cands ? 'S3c' : 'S1'; }, S6: function () { var f = st.stateFrom; st.stateFrom = ''; return f || 'S1'; },
   };
   var preserve = function () { return st.level === 0 && hasText(); };
@@ -1581,6 +1685,18 @@
       return 'S6';
     },
     skip: function () { return finishBusy(true); },
+    // 서버 판정 하나: 그림 있음(버튼이 켜진 것) → 칸 · 요금제 → 확인 창
+    nextEp: function (i) { var pj = st.proj; pj.pick = +i; pj.cont = !!pj.list[pj.pick].hasEnd; return pj.max < 2 || used() >= pj.max ? 'LS' : 'N2'; },
+    makeNext: function () { return 'N3'; },
+    retryNext: function () { st.proj.fail = false; return 'N3'; },
+    delProj: function (i) { st.proj.del = +i; return 'LD'; },
+    delDo: function () { st.proj.list.splice(st.proj.del, 1); st.proj.del = -1; return 'L1'; },
+    newProj: function () { var pj = st.proj; if (used() >= pj.max) { pj.pick = 0; return 'LS'; } var p = st.plan; st = initial(); st.plan = p; st.proj = pj; return p === 'B' ? 'EB1' : 'E1'; },
+    demoFull: function () { var pj = st.proj; if (used() >= pj.max) { while (used() > 2) pj.list.pop(); } else { while (used() < pj.max) pj.list.push({ t: '택배 상자', stage: 'Producer', date: '10-22', made: false, no: 1, id: Date.now() + used() }); } return 'L1'; },
+    demoFree: function () { var pj = st.proj; if (pj.plan === 'free') { pj.plan = 'p15'; pj.max = 3; } else { pj.plan = 'free'; pj.max = 1; } return 'L1'; },
+    demoFail: function () { st.proj.fail = !st.proj.fail; return 'L1'; },
+    serPop: function () { st.serPop = !st.serPop; },
+    keepToggle: function () { st.keepOpen = !st.keepOpen; },
     // 목업 보기용: 위쪽 단계 탭을 누르면 그 단계 첫 화면으로
     jumpStage: function (name) {
       return { Producer: entryId(), Writer: 'W1', Artist: st.versions.length ? 'A5' : 'A1', Storyboard: 'S1', Director: 'D1', Editor: 'D1' }[name];
@@ -1713,6 +1829,7 @@
     el.addEventListener('click', function (e) {
       var t = e.target;
       if (st.rw && !t.closest('.w-popwrap')) { st.rw = null; paint(); }
+      if (st.serPop && !t.closest('.w-serwrap')) { st.serPop = false; paint(); }
       var b = t.closest('[data-act]');
       if (b && !b.disabled) { e.preventDefault(); run(b.getAttribute('data-act'), b.getAttribute('data-arg')); return; }
       var g = t.closest('[data-go]');
@@ -1728,7 +1845,7 @@
     el.addEventListener('input', function (e) {
       var t = e.target, p = t.getAttribute && t.getAttribute('data-bind');
       if (!p || t.tagName === 'BUTTON') return;
-      setPath(st, p, (t.tagName === 'SELECT' && t.value !== '' && !isNaN(+t.value)) || t.type === 'range' ? +t.value : t.value);
+      setPath(st, p, t.type === 'checkbox' ? t.checked : (t.tagName === 'SELECT' && t.value !== '' && !isNaN(+t.value)) || t.type === 'range' ? +t.value : t.value);
       if (/\.prompt$/.test(p)) syncTraits();
       if (/^shotDraft\.(dirMv|act|note)$/.test(p) && st.shotTab === 'dir') {
         // v18처럼: 바꾸면 적용 버튼이 켜지고, 액션은 연출 표시에 바로 보인다

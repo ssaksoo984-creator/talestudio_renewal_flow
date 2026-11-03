@@ -115,3 +115,4 @@
 - **단계별 Lumi 적용(2026-11-03)**: Lumi 성장 흐름 아티팩트(https://claude.ai/artifact/LJEHRV9HcAzUsrJhbhVsrd)에서 몸 + 눈을 합쳐 8장 추출 → `mascot/personas/lumi-<단계>.png`(640×495 투명). Figma v3 페이지에 보드 "Lumi 페르소나 · 단계별", E3 · W1 · A5 · S1 · D1 · ED1의 Lumi 자리(채팅 머리 · 아바타 · D1 Lumi 버튼)를 그 단계 Lumi로 바꾸고 흑백 필터 제거. 주의: 아티팩트의 Director(청록) · Editor(초록) 색이 UI 단계 색(#3E9BE0 · #2DB39A)과 다름, 소품 없음
 - 채팅 보내기 버튼 화살표가 크림 바탕에 흰색이라 안 보이던 것 → #141312로
 - **로고 뜻 바로잡음(2026-11-03, 사용자 설명)**: "리본 · 책 두 권"이 아니라 **반쪽 T + 이야기 꼬리**. Tale = tail(소리가 같음) → 이야기의 꼬리를 잡아 시작한다. Lumi도 같은 꼬리를 가진 AI로 생성됨. T = 앞 세 단계, 꼬리 = 뒤 세 단계, 겹친 곳 = T가 꼬리로 이어지는 자리. brand/README.md · LANDING_BRIEF.md · LUMI_PERSONA_BRIEF.md · Figma 브랜드 가이드(157:680 · 199:722 단계 카드 · 색 설명) 모두 수정
+- **헤드라인 글자 그라데이션(2026-11-03)**: Home 예시 "Pre-visualization." 무지개(브랜드 6색) → 기본 그라데이션 `v3/Gradient/Text · 기본`(#FFFFFF → #9E9B92). LANDING_BRIEF에 `--text-gradient`로 반영

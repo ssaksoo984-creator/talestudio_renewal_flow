@@ -105,6 +105,21 @@
 ## 8. 움직임
 
 - 저장소에 **stageshow 스킬**이 설치돼 있어요(`.claude/skills/stageshow`). 3번 제품 화면을 "커서가 아이디어를 입력 → Lumi가 장르 추천 → 산문 → 컷 카드가 채워짐" 데모로 만들 때 쓰세요
+- 헤드라인 강조 글자(`--text-gradient`)에는 **빛이 한 번 지나가는 효과**를 넣어요. 6초마다 한 번, 천천히(1.6초). 무지개 · 반짝이는 쓰지 않아요
+
+```css
+.shine {
+  background: linear-gradient(100deg, #FFFFFF 0%, #9E9B92 40%, #FFFFFF 50%, #9E9B92 60%, #9E9B92 100%);
+  background-size: 250% 100%;
+  -webkit-background-clip: text; background-clip: text; color: transparent;
+  animation: shine 6s ease-in-out infinite;
+}
+@keyframes shine {
+  0%, 60% { background-position: 100% 0; }
+  87%, 100% { background-position: 0% 0; }
+}
+@media (prefers-reduced-motion: reduce) { .shine { animation: none; background-position: 100% 0; } }
+```
 - 스크롤에 따라 섹션이 살짝 올라오며 나타나는 정도. 과한 패럴랙스 · 회전 금지
 - `prefers-reduced-motion`이면 움직임 끄기
 

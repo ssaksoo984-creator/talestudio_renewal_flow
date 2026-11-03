@@ -30,7 +30,7 @@
   - Artist ⇄ Storyboard는 오가며 고쳐요.
 - **디자인 방향**: B안 크리에이티브 툴형이에요. 어두운 작업대 위에 결과물이 떠 있고, 강조는 레드 그라데이션이에요.
   - 작업대 `#0C0A0B` · 패널 `#151213` · 카드 `#1D191A` · 글자 `#F5EEEE` · 보조 글자 `#A0938F`
-  - 레드 `#F0303F` · 코랄(선택 표시) `#FF6B57` · 메인 버튼 그라데이션 `#FF7A5C → #F0303F → #B0123C`
+  - 레드 `#F0303F` · 코랄(선택 표시) `#FF6B57` · 메인 버튼 그라데이션 `#FF6A4D → #F0303F → #B0123C`
   - 메인(레드) 버튼은 한 화면에 하나만 써요. 다음 단계로 가는 버튼이에요.
   - 선택 표시는 모든 화면에서 같아요: 코랄 테두리 + 옅은 레드 바탕
   - 글자: 제목 Archivo ExtraBold, 본문 IBM Plex Sans KR, 산문은 16px · 행간 1.85
@@ -57,7 +57,58 @@
 7. 채팅 버튼이 가로 · 세로로 섞여 있어요.
 8. 수정안 비교(W4)에서 바뀐 부분이 안 보여요.
 
+## Figma 진행 (2026-10-26)
+- 파일: https://www.figma.com/design/X3F0vvX6w4ZLARa0DyLspr (팀 "싹수의 일상의 팀")
+- 페이지: Components · **Producer v2**(1안 E1~E5, 2안 EB1~EB7) · **Writer v2**(W1 · W1r · W2 · W4~W6 · W1 채팅 접힘, W3 다시 쓰기 옵션은 뺌 · WC2 · WC3 · WP · WN) · **Artist v2**(A0~A9 · WT · WTm · R1 · R2 · AC2 · AC3 · AX · AY · AR · AV) · **Storyboard v2**(S0~S8 · S3c · SG · SM · R3 · S7) · v2 시안(이전 참고용). W1 Writer · Producer 진입 페이지는 삭제(2026-10-27)
+- 정한 것
+  - 배치: 왼쪽 사이드바(홈 → 단계 진행 → 도구) → 작업 화면(대시보드) → 채팅(오른쪽)
+  - **패널 분리**: 바깥 bg/shell(#040303). 가운데 작업 화면은 따로 상자 없이 바탕 그대로. 왼쪽 사이드바는 bg/side 둥근 패널(여백 8 · 모서리 16). 오른쪽 채팅은 위 · 아래 · 오른쪽 여백 없이 화면 끝까지 꽉 차고, 작업 화면과는 왼쪽 8 틈 + 왼쪽 모서리만 16
+  - **포인트 변수 나눔**: 레드 = 메인 버튼 · 선택 / 사이드바 현재 단계 바탕 = bg/nav-active(흰색 5%) / Lumi 이름 · ✦ 판단 근거 = text/lumi(라벤더 #B9A3F0) / @인물 · 씬 번호 = text/ref(스카이 #8EC3F0) / 경고(🔒 · 바꿀 수 없어요)는 코랄 그대로
+  - 채팅 패널 머리 오른쪽에 접기 버튼(v2/Chat Toggle, » 접기 / « 펼치기). 접으면 56px 레일에 펼치기 버튼 + Lumi 아바타 + 새 메시지 점(예시: Writer v2 'W1 · 채팅 접힘')
+  - **채팅 층 구분**: 패널 bg/side #181415 → Lumi 말풍선 bg/bubble #211B1D → 채팅 안 칩 · 버튼 bg/chat-chip #342C2F / 내 말풍선 bg/mine #3A3134 / 입력창 bg/input #0F0C0D(패널보다 어둡게). Lumi 아바타는 바탕 빛 없이 이미지만
+  - Lumi 말풍선 앞에는 항상 Lumi 아바타(v2/Lumi Avatar 28px). v2/Chat · Lumi · Lumi Ask 컴포넌트에 포함
+  - **보라 포인트(로고 색)**: 상단 단계 배지(Producer · Writer …)는 Gradient/Stage(#8A3E86 → #5B4BB0) + 흰 글자. S1 · S2 · @인물 태그는 text/ref = 로고 보라(#9B7CE8). 나머지 포인트는 레드 그대로
+  - 사이드바 홈 자리는 T 이니셜(t + 별), 흰색 100% → 60% 세로 그라데이션(Gradient/Icon Current · White). 현재 단계 아이콘도 같은 그라데이션, 현재 단계 바탕 bg/nav-active = 흰색 5%. 지난 단계 완료 배지는 Gradient/Done(#FF5C66 → #E0303F)
+  - 연필 · 화면에서 고르기 · 채팅으로 만들기 아이콘은 채움 아이콘(icon-fill/pencil · list · chat). 직접 작성 · 직접 고치기는 icon-fill/draw(손글씨 펜), 버튼은 Secondary 바탕
+  - 아이콘은 선 없이 채움만. 공유 · 내보내기는 통통한 화살표 + 알약 받침으로 다시 그림(마스터 시트 버튼도 같은 아이콘)
+  - 사이드바 아이콘은 Tale 전용 채움(Filled) 아이콘. 지금 단계만 Lumi 그라데이션(코랄 → 라벤더), 지난 단계는 ✓ 완료 배지
+  - 일반 카드 · 칩에는 테두리를 쓰지 않아요. 구분선도 여백으로 대신해요
+  - **포인트(단계 배지 · 스텝퍼 현재 단계)는 더 진한 bg/point = red/800.** **모드 토글 켜진 쪽(화면에서 고르기 · 채팅으로 만들기)은 bg/toggle-on = 흰색 20%(white/a20), Light는 black/a08.** **대시보드 선택 · 강조는 다크 레드 바탕(bg/select → red/900 #4A1F27) + 레드 그라데이션 선(Stroke/Select: 코랄 #F2A08A 60% → 레드 #DC4B55 100%). 선택 안 된 칩 · 카드는 #2B2526 40%**. '추천' · '지금' 배지는 레드 그라데이션 바탕(Gradient/Primary) + 흰 글자. **테두리 선은 선택된 칩 · 선택 카드(W4 세 가지 안 포함)에만** 쓰고, 단계 알약 · 머리 배지 · 진행 표시줄 · Lumi 질문 카드 · 안내 띠 · 강조 줄은 바탕색만 써요. 사이드바 현재 단계는 카드 바탕(bg/raised)만
+  - 레드 그라데이션은 메인 버튼(한 화면에 하나) · 보내기 버튼 · 추천 배지에만 써요. 내 말풍선은 회색(ink/800)
+  - 레드 채도를 낮췄어요: 레드 #DC4B55 · 코랄 #EC8676 · 그라데이션 #EE9078 → #DC4B55 → #9E3348. 라벤더 #B9A3F0 추가
+  - 배경에 Lumi 색이 은은하게 번지는 분위기, 큰 입력 카드, 예시 카드
+  - Lumi는 빛 번짐 없는 밝은 버전을 써요. 채팅 아바타 28px
+- 남은 것
+  - 글꼴: 한글 · 영문 모두 Pretendard, 숫자는 Inter(Number/Tag · Number/Meta) — 모든 페이지에 적용됨
+  - 로고 미정(임시 컴포넌트), Lumi 상태 17종 컴포넌트화(키 포즈 PNG는 Lumi 상태 17종 아티팩트의 keyposes/)
+  - Director · Editor 단계
+  - Components 페이지는 섹션 8개(Logo · Icons 채움 · Icons 선 · Navigation · Controls · Chat · Content · 보관)로 정리, 이름은 그룹/이름(Control/Choice Chip, Chat/Lumi …). 안 쓰는 이전 컴포넌트 26개 삭제
+  - 개발 공유 가이드(Claude Docs): https://claude.ai/artifact/DZQeNYVBJdM8t98sPPq5B6
+
 ## 참고 링크 (owner만 열림)
 - 플로우 · 프로토타입: https://claude.ai/artifact/C5xmoMhBQq9Juh3AeTP4Z2
 - 디자인 시안(로고 · 캐릭터 · W1 시안 · 기준): https://claude.ai/artifact/SXpdWww154q9pB9HMStn8w
 - Lumi 원본 에셋: https://claude.ai/artifact/MpbM4C24A8nLUN1m9zt9ZN
+- **Lumi 상태 · 움직임(기준)**: https://claude.ai/artifact/LbhbVTNxmxQLcq8WyPzAc1
+
+## v3 시안 (2026-10-29, 진행 중)
+- 방향: 레드 포인트를 걷어내고 Claude처럼 톤다운된 따뜻한 무채색. 눈이 덜 피로하게
+- Figma 페이지 "v3 시안 (Claude 톤)": E3 · W1 · A5 · S1 복사본 + v3 Palette 보드. v2 페이지는 그대로
+- 변수: Color 컬렉션에 모드 "Dark v3" 추가(바탕 #262624 · 사이드 #1F1E1D · 카드 #30302E · 글자 #F5F4EE). 새 컬렉션 "Stage"(모드 Producer · Writer · Artist · Storyboard · Director · Editor)에 stage/accent · tint · tint-strong · on-accent
+- 메인 버튼 · 보내기는 크림 #EDEAE0(v3/Fill/Primary · Cream) + 진한 글자. 선택 = stage/tint 바탕 + stage/accent 테두리. 단계 배지 · 추천 배지 · 현재 단계 아이콘 = stage/accent
+- Lumi는 무채색(이미지 채도 -100). 단계마다 페르소나 색: Producer 앰버 #D4A35F · Writer 세이지 #93B48B · Artist 클레이 #D98E7E · Storyboard 페리윙클 #8EA5D8 · Director 라일락 #A898D8 · Editor 틸 #6DB2AB
+- 그림 자리는 무채색 그라데이션(#4D4B46 → #2E2D2A)으로 임시
+- **브랜드 색 = 완성된 Lumi의 진주빛(Pearl Vivid)**: #FFB547 → #FF6A4D → #A066FF → #4F86FF → #22C3B5 → #3DCB7A. 검정 위 로고 · 홈 헤드라인 · 앱 아이콘 · 완성 순간에만. 광택 버전은 위 45%에 흰색 45% → 0% 겹침(v3/Gradient/Pearl Vivid · 광택). 앱 안 기능 색은 크림 + 단계 페르소나 색(톤다운)
+- v3 페이지: v3 · Logo Study(워드마크 2종 · 앱 아이콘 2종), v3 · Home 예시(talestudio.art 히어로에 적용)
+- **로고 확정(v3)**: 심볼 `Logo/Tale Symbol`(리본 두 겹이 책 두 권처럼 쌓인 모양. 모든 모서리 완전히 둥글게. 위 책 = Producer · Writer · Artist #FFA600 → #FF3D5A → #7B2FFF, 아래 책 = Storyboard · Director · Editor #2F45FF → #0096FF → #00C9A7(둘 다 사선 흐름), 두 책이 겹치는 곳 = 빛 섞임(위 책 색 스크린 90%, 핑크 · 마젠타로 빛남) — 최종 확정 2026-11-03. 비교안은 v3 페이지 보드에) + 흰 글자 "tale studio" = `Logo/Tale Lockup`. 사이드바 홈 자리 · 홈 예시 로고 교체. SVG · 설명: brand/ (README.md에 도출 과정 · 색 이유). 밝은 바탕용 Theme=Light 추가, 다른 로고 시안은 모두 삭제(2026-11-02)
+- **단계 포인트 색(선명, Pearl 순서와 일치 · Figma · Google식 2026-11-01)**: Producer #F2A33A · Writer #E8606F · Artist #8B63E8 · Storyboard #5A6AE6 · Director #3E9BE0 · Editor #2DB39A (어두운 화면용으로 채도를 누른 UI 색, 2026-11-03. 로고는 딥 디지털 그대로). 단계별 그라데이션 스타일 v3/Stage/<단계>
+- **시스템 색(Claude · Figma처럼 담백)**: 무채색 바탕 · 크림 메인 버튼 + 상태 Info #0D99FF · Success #14AE5C · Warning #FFCD29 · Danger #F24822 (변수 system/*)
+- v3 페이지 "Brand Guide v3" 보드: 로고 변형 설명 · 브랜드 그라데이션 · 단계 색 · 시스템 색 · 쓰는 규칙
+- **Lumi 페르소나 브리프**: mascot/LUMI_PERSONA_BRIEF.md (Claude Docs: https://claude.ai/artifact/QZ7SKMMCXcxoizU2WngSD8). 화이트 펄 → 단계별 색 · 소품 → 완성 컬러 진주빛 Lumi, 채팅창 가이드 포함
+- **v3 페이지 정리(2026-11-02)**: 섹션 01 브랜드 가이드(로고 구조 카드 4장 · 로고 쓰는 법 · 브랜드 그라데이션 · 단계 색 · 시스템 색 · 규칙) / 02 화면 시안(홈 + E3 · W1 · A5 · S1) / 03 로고 · 색 작업 과정(비교안 아카이브)
+- **메인(랜딩) 시안 2종(2026-11-03)**: v3 페이지 섹션 04. A = 제품이 주인공(Ponder형: 왼쪽 정렬 큰 헤드라인 + 실제 앱 창 + 여섯 단계 + 마지막 CTA), B = 바로 만들기(Seedance형 입력창 히어로 + WowMade형 결과 카드 부채꼴 + 단계별 Lumi 타임라인). 레퍼런스: wowmade.ai · ponder.ai · seedance25ai.im
+- **포인트 색 최소화(2026-11-03)**: 단계 색은 ① 상단 단계 배지 · 지금 단계 스텝퍼(그라데이션 v3/Stage Badge/<단계>, 흰 글자) ② 사이드바 현재 단계 아이콘 ③ 선택 칩 · 카드 테두리에만. 완료 ✓ · 체크는 흰색(#F5F4EE), S1 · S2 씬 번호는 text/primary 흰색, @인물 태그(text/ref)는 밝은 파랑 #8EB2FF
+- **메인(랜딩) HTML 제작 가이드**: LANDING_BRIEF.md (새 채팅에서 코드로 제작할 때 읽기)
+- **Producer 그라데이션 정리(2026-11-03)**: 갈색으로 탁하던 어두운 끝을 맑은 주황으로. `v3/Stage/Producer` #E98B2A → #F2A33A → #FFC36B, `v3/Stage Badge/Producer` #EA8A2C → #FFB84F (대표 색 #F2A33A는 그대로)
+- **Director · Editor 대표 화면 추가(2026-11-03, v3 페이지 "02 화면 시안")**: `v3 · D1 · Director 노드 캔버스 (The Set)`(221:222) — 점 격자 캔버스에 인물 · 배경 · 샷 · 영상 노드, 입력 포트(프롬프트 · 이미지), 연결선(선택 노드만 Director 색), 줌 · 미니맵, 툴바(노드/스토리보드 · 스토리보드 생성 · 영상 생성 · 안 쓴 에셋 · 자동 정렬 · 프롬프트 노드). `v3 · ED1 · Editor 타임라인`(224:222) — 소스(영상 7 · 오디오 0) · 미리보기(영상 없는 컷은 설명 카드) · 타임라인(선택/자르기 · 타이틀 카드 · 재생 · 줌 · 전체 보기 · 샷 ZIP · 초안 렌더, 영상 · 오디오 트랙). 둘 다 S1을 복제해 사이드바 · 헤더 · Lumi 채팅 틀을 그대로 씀
+- **D1 Director 전체 화면으로 다듬음(2026-11-03)**: 채팅 패널을 접고(캔버스 오른쪽 위 "Lumi" 알약으로) 노드 캔버스를 화면 끝까지 넓힘. 툴바는 캔버스 위에 떠 있는 알약(왼쪽 노드/스토리보드 · The Set, 가운데 생성 버튼, 오른쪽 에셋 · 정렬 · 프롬프트 노드 · Lumi), "다음: Editor로"는 헤더 오른쪽. 노드 9개(인물 2 · 배경 1 · 샷 4 · 영상 2) 4열 배치, 줌은 왼쪽 아래 가로 알약, 미니맵은 실제 노드 위치 반영

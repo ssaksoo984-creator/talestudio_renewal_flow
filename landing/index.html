@@ -142,11 +142,10 @@
     </div>
   </div>
   <div class="product__stage reveal">
-    <div id="demo" class="product__demo"></div>
-    <button type="button" class="replay" id="replay">
-      <svg width="14" height="14" viewBox="0 0 16 16" fill="currentColor" aria-hidden="true"><path d="M8 2a6 6 0 1 1-5.66 8 1 1 0 1 1 1.88-.67A4 4 0 1 0 5.2 4.8H6.5a1 1 0 1 1 0 2H3a1 1 0 0 1-1-1V2.5a1 1 0 1 1 2 0v.95A5.98 5.98 0 0 1 8 2Z"/></svg>
-      다시 보기
-    </button>
+    <div class="shots" id="shots">
+      <div class="shots__frame"><img src="./assets/app/start.webp" alt="Tale Studio 시작 화면: 새 프로젝트 · 어떻게 시작할까요?" width="1440" height="900" class=on /><img src="./assets/app/producer-1.webp" alt="Tale Studio Producer 화면: Lumi와 채팅으로 이야기 정하기" width="1440" height="900" /><img src="./assets/app/producer.webp" alt="Tale Studio Producer 화면: 대화 → 요약 → 다음 단계" width="1440" height="900" /><img src="./assets/app/writer.webp" alt="Tale Studio Writer 화면: 문단만 골라 AI 수정안 받기" width="1440" height="900" /><img src="./assets/app/artist.webp" alt="Tale Studio Artist 화면: Lumi가 묻는 그림 스타일" width="1440" height="900" /><img src="./assets/app/director.webp" alt="Tale Studio Director 화면: 노드로 컷을 잇고 영상 만들기" width="1440" height="900" /></div>
+      <div class="shots__tabs" role="tablist" aria-label="화면 고르기"><button type="button" role="tab" aria-selected="true" class=on><b>시작</b><span>새 프로젝트 · 어떻게 시작할까요?</span><i></i></button><button type="button" role="tab" aria-selected="false"><b>Producer</b><span>Lumi와 채팅으로 이야기 정하기</span><i></i></button><button type="button" role="tab" aria-selected="false"><b>Producer</b><span>대화 → 요약 → 다음 단계</span><i></i></button><button type="button" role="tab" aria-selected="false"><b>Writer</b><span>문단만 골라 AI 수정안 받기</span><i></i></button><button type="button" role="tab" aria-selected="false"><b>Artist</b><span>Lumi가 묻는 그림 스타일</span><i></i></button><button type="button" role="tab" aria-selected="false"><b>Director</b><span>노드로 컷을 잇고 영상 만들기</span><i></i></button></div>
+    </div>
   </div>
 </section>
 
@@ -200,16 +199,8 @@
       <div class="six__card" style="--c:#F2A33A">
         <div class="six__glow"></div>
         <div class="six__win">
-          <div class="six__bar"><span class="dots"><i></i><i></i><i></i></span><span class="six__chip"><i></i><b id="sixName">Producer</b></span><span id="sixNum">01 / 06</span></div>
-          <div class="six__screens nodes" id="nodes">
-            <svg class="nd-lines" aria-hidden="true"></svg>
-            <div class="nd" data-p="producer" style="--c:#F2A33A"><p class="nd-h"><i></i>Producer<span class="nd-ok">✓</span></p><div class="nd-chips"><b class="on">로맨틱 코미디</b><b class="on">60초</b><b class="on">9:16</b></div></div>
-            <div class="nd" data-p="writer" style="--c:#E8606F"><p class="nd-h"><i></i>Writer<span class="nd-ok">✓</span></p><p class="nd-text">막차를 놓친 <span class="mention">@서윤</span>은 정류장 지붕 끝에 서서 비를 피했다…</p></div>
-            <div class="nd" data-p="artist" style="--c:#8B63E8"><p class="nd-h"><i></i>Artist<span class="nd-ok">✓</span></p><div class="nd-row"><figure class="nd-shot"><svg viewBox="128 76 40 53" preserveAspectRatio="xMidYMid slice"><use href="#world"/></svg></figure><figure class="nd-shot"><svg viewBox="150 72 40 53" preserveAspectRatio="xMidYMid slice"><use href="#world"/></svg></figure><figure class="nd-shot"><svg viewBox="40 30 240 135" preserveAspectRatio="xMidYMid slice"><use href="#world"/></svg></figure></div></div>
-            <div class="nd" data-p="storyboard" style="--c:#5A6AE6"><p class="nd-h"><i></i>Storyboard<span class="nd-ok">✓</span></p><div class="nd-row nd-row--4"><figure class="nd-shot"><svg viewBox="0 0 320 180" preserveAspectRatio="xMidYMid slice"><use href="#world"/></svg></figure><figure class="nd-shot"><svg viewBox="112 66 96 54" preserveAspectRatio="xMidYMid slice"><use href="#world"/></svg></figure><figure class="nd-shot"><svg viewBox="128 79 46 25.9" preserveAspectRatio="xMidYMid slice"><use href="#world"/></svg></figure><figure class="nd-shot nd-flip"><svg viewBox="118 58 120 67.5" preserveAspectRatio="xMidYMid slice"><use href="#world"/></svg></figure></div></div>
-            <div class="nd" data-p="director" style="--c:#3E9BE0"><p class="nd-h"><i></i>Director<span class="nd-ok">✓</span></p><div class="nd-row nd-row--dir"><figure class="nd-shot"><svg viewBox="112 66 96 54" preserveAspectRatio="xMidYMid slice"><use href="#world"/></svg></figure><div class="nd-chips nd-chips--v"><b class="on">로우앵글</b><b>천천히 다가가기</b></div></div></div>
-            <div class="nd" data-p="editor" style="--c:#2DB39A"><p class="nd-h"><i></i>Editor<span class="nd-ok">✓</span></p><div class="nd-tl"><i style="flex:3"></i><i style="flex:2"></i><i style="flex:1.4"></i><i style="flex:2.4"></i></div><p class="nd-cost">20 Takes · 생성하기</p></div>
-          </div>
+          <div class="six__bar six__bar--hide"><span class="dots"><i></i><i></i><i></i></span><span class="six__chip"><i></i><b id="sixName">Producer</b></span><span id="sixNum">01 / 06</span></div>
+          <div class="six__screens six__app"><img data-p="producer" src="./assets/app/producer.webp" alt="" width="1440" height="900" /><img data-p="writer" src="./assets/app/writer.webp" alt="" width="1440" height="900" /><img data-p="artist" src="./assets/app/artist.webp" alt="" width="1440" height="900" /><img data-p="storyboard" src="./assets/app/director.webp" alt="" width="1440" height="900" /><img data-p="director" src="./assets/app/director.webp" alt="" width="1440" height="900" /><img data-p="editor" src="./assets/app/director.webp" alt="" width="1440" height="900" /></div>
         </div>
       </div>
     </div>

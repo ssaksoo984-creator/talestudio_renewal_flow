@@ -798,3 +798,36 @@ h2 { font-size: clamp(32px, 4.6vw, 48px); line-height: 1.2; font-weight: 700; le
 .nd-tl { display: flex; gap: 3px; height: 22px; padding: 3px; border-radius: 7px; background: #3A3936; }
 .nd-tl i { border-radius: 4px; background: color-mix(in srgb, var(--c) 60%, #3A3936); }
 .nd-cost { justify-self: start; padding: 5px 10px; border-radius: 999px; background: #EDEAE0; color: #141312; font-size: 11.5px; font-weight: 800; }
+
+/* ===== v6: Figma 실제 앱 화면 ===== */
+.shots { max-width: 1180px; margin: 0 auto; padding: 0 var(--gut); }
+.shots__frame { position: relative; aspect-ratio: 16 / 10; border-radius: 18px; overflow: hidden; background: #141312; box-shadow: 0 0 0 1px rgba(255, 255, 255, 0.06), 0 40px 100px -30px rgba(0, 0, 0, 0.55); }
+.shots__frame img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; opacity: 0; transform: scale(1.015); transition: opacity 0.7s ease, transform 1.2s ease; }
+.shots__frame img.on { opacity: 1; transform: none; }
+.shots__tabs { display: grid; grid-template-columns: repeat(6, minmax(0, 1fr)); gap: 8px; margin-top: 16px; }
+.shots__tabs button { position: relative; display: grid; gap: 2px; padding: 12px 12px 14px; border: 0; border-radius: 14px; background: transparent; text-align: left; cursor: pointer; overflow: hidden; }
+.shots__tabs button:hover { background: var(--chip); }
+.shots__tabs b { font: 700 13.5px/1.3 var(--num); color: var(--text-3); }
+.shots__tabs span { font-size: 12.5px; line-height: 1.4; color: var(--text-3); }
+.shots__tabs .on b { color: var(--text); }
+.shots__tabs .on span { color: var(--text-2); }
+.shots__tabs i { position: absolute; left: 12px; right: 12px; bottom: 6px; height: 2px; border-radius: 2px; background: var(--line); overflow: hidden; }
+.shots__tabs i::after { content: ''; position: absolute; inset: 0; background: var(--text); transform: scaleX(0); transform-origin: left; }
+.shots__tabs .on i::after { animation: tabfill 4.5s linear forwards; }
+.paused .shots__tabs .on i::after { animation-play-state: paused; }
+@keyframes tabfill { to { transform: scaleX(1); } }
+
+.six__card { padding: 28px; }
+.six__win { grid-template-rows: 1fr; background: #141312; }
+.six__bar--hide { display: none; }
+.six__app { position: relative; overflow: hidden; }
+.six__app img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; object-position: left top; opacity: 0; transition: opacity 0.6s ease, transform 0.9s cubic-bezier(0.2, 0.7, 0.2, 1); }
+.six__app img.on { opacity: 1; }
+/* Storyboard · Director · Editor는 같은 노드 화면의 다른 곳을 비춰요 */
+.six__app img[data-p='storyboard'] { transform-origin: 6% 8%; transform: scale(1.7); }
+.six__app img[data-p='director'] { transform-origin: 50% 40%; transform: scale(1.35); }
+.six__app img[data-p='editor'] { transform-origin: 96% 30%; transform: scale(1.8); }
+.six__stage { height: auto; top: 18vh; }
+.six__card { height: auto; aspect-ratio: 16 / 11; }
+@media (max-width: 860px) { .shots__tabs { grid-template-columns: repeat(3, minmax(0, 1fr)); } .shots { padding: 0 16px; } }
+@media (max-width: 480px) { .shots__tabs span { display: none; } }

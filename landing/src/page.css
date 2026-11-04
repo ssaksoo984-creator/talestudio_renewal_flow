@@ -754,3 +754,47 @@ h2 { font-size: clamp(32px, 4.6vw, 48px); line-height: 1.2; font-weight: 700; le
 .ws-cost b { padding: 9px 14px; border-radius: 999px; background: var(--btn-bg); color: var(--btn-fg); font-size: 13px; }
 @media (max-width: 1000px) { .six__item h3 .six__m { opacity: 1; filter: none; animation: lumiBob 3.2s ease-in-out infinite; } }
 .defs { position: absolute; width: 0; height: 0; overflow: hidden; }
+
+/* ===== v5: 여섯 단계 = 노드 캔버스, 창은 채팅창 색으로 고정 ===== */
+.six__win { --nb: #1F1E1D; --nn: #2A2927; --nt: #F5F4EE; --nm: #A8A29C; --nl: rgba(255, 255, 255, 0.08);
+  background: var(--nb); color: var(--nt); box-shadow: 0 0 0 1px rgba(255, 255, 255, 0.06), 0 30px 70px -20px rgba(0, 0, 0, 0.45); }
+.six__bar { border-bottom-color: var(--nl); color: var(--nm); }
+.six__bar .dots i { background: #3A3936; }
+.six__chip { color: var(--nt); }
+.nodes { background-image: radial-gradient(rgba(255, 255, 255, 0.07) 1px, transparent 1.2px); background-size: 18px 18px; }
+.nd-lines { position: absolute; inset: 0; width: 100%; height: 100%; pointer-events: none; overflow: visible; }
+.nd-lines path { fill: none; stroke: rgba(255, 255, 255, 0.12); stroke-width: 2; stroke-dasharray: 4 6; transition: stroke 0.5s; }
+.nd-lines path.lit { stroke: var(--c); stroke-dasharray: none; opacity: 0.7; }
+.nd-lines path.flow { stroke-dasharray: 8 8; opacity: 1; animation: ndflow 0.9s linear infinite; }
+@keyframes ndflow { to { stroke-dashoffset: -32; } }
+.nd { position: absolute; width: 42%; padding: 10px 12px 12px; border-radius: 14px; background: var(--nn); box-shadow: 0 0 0 1px var(--nl); display: grid; gap: 8px;
+  opacity: 0.45; transform: scale(0.96); transition: opacity 0.5s, transform 0.5s cubic-bezier(0.2, 0.7, 0.2, 1), box-shadow 0.5s; }
+.nd.done { opacity: 0.8; transform: none; }
+.nd.on { opacity: 1; transform: scale(1.03); box-shadow: 0 0 0 1.5px var(--c), 0 14px 40px -10px color-mix(in srgb, var(--c) 55%, transparent); z-index: 2; }
+.nd[data-p='producer'] { left: 4%; top: 5%; }
+.nd[data-p='writer'] { left: 54%; top: 9%; }
+.nd[data-p='artist'] { left: 5%; top: 37%; }
+.nd[data-p='storyboard'] { left: 53%; top: 41%; }
+.nd[data-p='director'] { left: 4%; top: 69%; }
+.nd[data-p='editor'] { left: 54%; top: 73%; }
+.nd-h { display: flex; align-items: center; gap: 8px; font: 700 13px/1 var(--num); color: var(--nt); }
+.nd-h i { width: 8px; height: 8px; border-radius: 50%; background: var(--c); }
+.nd-ok { margin-left: auto; display: grid; place-items: center; width: 18px; height: 18px; border-radius: 50%; background: var(--c); color: #141312; font-size: 10px; font-weight: 900; opacity: 0; transform: scale(0.5); transition: opacity 0.4s, transform 0.4s; }
+.nd.done .nd-ok { opacity: 1; transform: none; }
+.nd-chips { display: flex; flex-wrap: wrap; gap: 4px; }
+.nd-chips b { padding: 4px 8px; border-radius: 999px; background: #3A3936; color: var(--nm); font-size: 11px; font-weight: 600; }
+.nd-chips b.on { background: var(--nt); color: #141312; }
+.nd-chips--v { flex-direction: column; align-items: flex-start; }
+.nd-text { font-size: 12px; line-height: 1.6; color: var(--nm); }
+.nd .mention { color: #8EB2FF; }
+.nd-row { display: grid; grid-template-columns: 0.75fr 0.75fr 1.5fr; gap: 5px; }
+.nd-row--4 { grid-template-columns: repeat(4, 1fr); }
+.nd-row--dir { grid-template-columns: 1.2fr 1fr; align-items: center; }
+.nd-shot { position: relative; overflow: hidden; border-radius: 6px; aspect-ratio: 16 / 10; background: #0b0f1c; }
+.nd-row:not(.nd-row--4):not(.nd-row--dir) .nd-shot:not(:last-child) { aspect-ratio: 3 / 4; }
+.nd-row:not(.nd-row--4):not(.nd-row--dir) .nd-shot:last-child { aspect-ratio: auto; }
+.nd-shot svg { display: block; width: 100%; height: 100%; }
+.nd-flip svg { transform: scaleX(-1); }
+.nd-tl { display: flex; gap: 3px; height: 22px; padding: 3px; border-radius: 7px; background: #3A3936; }
+.nd-tl i { border-radius: 4px; background: color-mix(in srgb, var(--c) 60%, #3A3936); }
+.nd-cost { justify-self: start; padding: 5px 10px; border-radius: 999px; background: #EDEAE0; color: #141312; font-size: 11.5px; font-weight: 800; }

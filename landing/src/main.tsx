@@ -59,10 +59,38 @@ const activate = (el: HTMLElement) => {
   current = p
   sixItems.forEach((x) => x.classList.toggle('on', x === el))
   card?.style.setProperty('--c', el.style.getPropertyValue('--c'))
-  document.querySelectorAll('.ws').forEach((w) => w.classList.toggle('on', (w as HTMLElement).dataset.p === p))
+  const order = sixItems.map((x) => x.dataset.p)
+  const at = order.indexOf(p)
+  document.querySelectorAll<HTMLElement>('.nd').forEach((n) => {
+    const i = order.indexOf(n.dataset.p!)
+    n.classList.toggle('on', i === at)
+    n.classList.toggle('done', i < at)
+  })
+  drawLines(at)
   if (nameEl) nameEl.textContent = el.querySelector('h3')!.textContent
   if (numEl) numEl.textContent = `${String(sixItems.indexOf(el) + 1).padStart(2, '0')} / 06`
 }
 const sio = new IntersectionObserver((es) => es.forEach((e) => e.isIntersecting && activate(e.target as HTMLElement)), { rootMargin: '-45% 0px -45% 0px' })
 sixItems.forEach((x) => sio.observe(x))
 if (sixItems[0]) activate(sixItems[0])
+
+// 노드 사이 선: 지난 단계까지는 밝게, 지금 들어오는 선은 흐르게
+function drawLines(at = 0) {
+  const box = document.getElementById('nodes')
+  const svg = box?.querySelector('svg')
+  if (!box || !svg) return
+  const b = box.getBoundingClientRect()
+  const ns = Array.from(box.querySelectorAll<HTMLElement>('.nd'))
+  svg.setAttribute('viewBox', `0 0 ${b.width} ${b.height}`)
+  svg.innerHTML = ns.slice(0, -1).map((n, i) => {
+    const r1 = n.getBoundingClientRect(), r2 = ns[i + 1].getBoundingClientRect()
+    const leftToRight = r2.left > r1.left
+    const x1 = (leftToRight ? r1.right : r1.left) - b.left, y1 = r1.top + r1.height / 2 - b.top
+    const x2 = (leftToRight ? r2.left : r2.right) - b.left, y2 = r2.top + r2.height / 2 - b.top
+    const dx = Math.abs(x2 - x1) * 0.6 + 30, s = leftToRight ? 1 : -1
+    const cls = i + 1 < at ? 'lit' : i + 1 === at ? 'lit flow' : ''
+    return `<path class="${cls}" d="M${x1} ${y1} C${x1 + dx * s} ${y1}, ${x2 - dx * s} ${y2}, ${x2} ${y2}" style="--c:${getComputedStyle(ns[i + 1]).getPropertyValue('--c')}"/>`
+  }).join('')
+}
+addEventListener('resize', () => drawLines(sixItems.findIndex((x) => x.classList.contains('on'))))
+requestAnimationFrame(() => drawLines(0))

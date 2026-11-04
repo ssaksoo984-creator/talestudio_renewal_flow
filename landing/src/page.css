@@ -605,3 +605,84 @@ h2 { font-size: clamp(32px, 4.6vw, 48px); line-height: 1.2; font-weight: 700; le
 .trust__cta { margin-top: 28px; }
 @media (prefers-reduced-motion: reduce) { .carousel__track, .steps li img, .grad { animation: none; } }
 @media (max-width: 560px) { .steps li { grid-template-columns: 84px minmax(0, 1fr); } .steps li img { width: 84px; height: 65px; } }
+
+/* ===== 2026-11 v3: 토글 한 페이지 · 여섯 단계 Lumi · 마지막 통합 ===== */
+
+/* 포인트 글씨: 밝게 = 컬러 그라데이션 / 어둡게 = 빛이 지나가는 효과 */
+.pt { -webkit-background-clip: text; background-clip: text; color: transparent; }
+:root[data-theme='light'] .pt {
+  background-image: linear-gradient(92deg, #F2A33A, #E8606F 22%, #B95BE0 45%, #6E6BF0 65%, #3E9BE0 82%, #2DB39A);
+  background-size: 200% 100%; animation: gradflow 6s ease-in-out infinite alternate;
+}
+:root[data-theme='dark'] .pt {
+  background-image: linear-gradient(105deg, #F5F4EE 0%, #F5F4EE 40%, #FFD9A0 45%, #FF9AAE 48%, #C9A8FF 51%, #9FC8FF 54%, #F5F4EE 60%, #F5F4EE 100%);
+  background-size: 300% 100%; animation: lightsweep 4.2s cubic-bezier(0.6, 0, 0.3, 1) infinite;
+  filter: drop-shadow(0 0 22px rgba(201, 168, 255, 0.25));
+}
+@keyframes lightsweep { 0% { background-position: 100% 0; } 55%, 100% { background-position: 0% 0; } }
+
+/* 밝게: 그냥 흰 바탕 / 어둡게: 섹션 띠 없이 배경 빛이 끊기지 않게 */
+:root[data-theme='light'] { --bg: #FFFFFF; }
+:root[data-theme='light'] .hero__glow { display: none; }
+:root[data-theme='dark'] { --bg: #0A0A0B; }
+:root[data-theme='dark'] main > section, :root[data-theme='dark'] .foot { background: transparent; }
+:root[data-theme='dark'] .foot { border-top: 1px solid var(--line); }
+:root[data-theme='dark'] .hero__glow { opacity: 0.8; }
+:root[data-theme='dark'] .nav--scrolled { background: rgba(10, 10, 11, 0.6); }
+
+/* 여섯 단계 (어두운 시안의 '왜 Tale' 구성) */
+.six { padding: 80px 0 120px; }
+.six__in { display: grid; grid-template-columns: minmax(0, 5fr) minmax(0, 6fr); gap: 64px; }
+.six__head { margin-bottom: 24px; }
+.six__item { position: relative; padding: 28px 0 28px 26px; min-height: 48vh; display: flex; flex-direction: column; justify-content: center; gap: 10px; border-left: 2px solid var(--line); }
+.six__item::before { content: ''; position: absolute; left: -2px; top: 0; bottom: 0; width: 2px; background: var(--c); transform: scaleY(0); transform-origin: top; transition: transform 0.6s ease; }
+.six__item.on::before { transform: none; }
+.six__n { font: 600 12.5px/1 var(--num); letter-spacing: 0.08em; color: var(--text-3); }
+.six__item h3 { display: flex; align-items: center; gap: 12px; font: 800 clamp(28px, 3.2vw, 42px)/1.15 var(--num); letter-spacing: -0.03em; color: var(--text-3); transition: color 0.5s; }
+.six__item h3 i { width: 12px; height: 12px; border-radius: 50%; background: var(--c); opacity: 0.4; transition: opacity 0.5s, box-shadow 0.5s; }
+.six__item.on h3 { color: var(--text); }
+.six__item.on h3 i { opacity: 1; box-shadow: 0 0 16px var(--c); }
+.six__d { max-width: 440px; color: var(--text-3); font-size: 17px; line-height: 1.75; transition: color 0.5s; }
+.six__item.on .six__d { color: var(--text-2); }
+.six__out { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 4px; }
+.six__out li { padding: 6px 12px; border-radius: 999px; background: var(--chip); color: var(--text-2); font-size: 13.5px; font-weight: 600; transition: background-color 0.5s, color 0.5s; }
+.six__item.on .six__out li { background: color-mix(in srgb, var(--c) 16%, transparent); color: var(--text); }
+.six__m { display: none; }
+.six__stage { position: sticky; top: 12vh; height: 76vh; align-self: start; }
+.six__card { position: relative; height: 100%; display: grid; place-items: center; border-radius: 32px; overflow: hidden; isolation: isolate; background: var(--bg-2); box-shadow: 0 0 0 1px var(--line); transition: --c 0.6s; }
+.six__glow { position: absolute; inset: 0; z-index: -1; background: radial-gradient(60% 55% at 50% 55%, color-mix(in srgb, var(--c) 32%, transparent), transparent 72%); transition: background 0.8s ease; }
+:root[data-theme='dark'] .six__card { background: rgba(255, 255, 255, 0.03); }
+.six__lumi { display: block; width: min(440px, 82%); }
+.six__cap { position: absolute; left: 28px; right: 28px; bottom: 24px; display: flex; justify-content: space-between; align-items: baseline; }
+.six__cap b { font: 800 22px/1 var(--num); letter-spacing: -0.02em; color: var(--c); transition: color 0.6s; }
+.six__cap span { font: 600 13px/1 var(--num); color: var(--text-3); }
+
+/* 마지막: 첫 장 + 당신의 것 */
+.finale { padding: 140px 0 140px; text-align: center; }
+.finale--sm { padding: 100px 0 120px; }
+.finale__in { display: flex; flex-direction: column; align-items: center; }
+.finale__symbol { width: 110px; height: auto; margin-bottom: 32px; animation: lumiBob 5s ease-in-out infinite; }
+.finale h2 { font-size: clamp(36px, 5.6vw, 68px); font-weight: 800; letter-spacing: -0.04em; line-height: 1.12; }
+.finale .sec-sub { max-width: 620px; }
+.finale__btns { display: flex; flex-wrap: wrap; justify-content: center; gap: 10px; margin-top: 36px; }
+.finale__trust { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 12px; width: 100%; max-width: 920px; margin-top: 64px; text-align: left; }
+.finale__trust li { padding: 18px 20px; border-radius: 18px; background: var(--chip); color: var(--text-2); font-size: 14.5px; line-height: 1.5; }
+.finale__trust b { display: block; color: var(--text); font-size: 16px; margin-bottom: 4px; }
+
+/* Tale 서비스 페이지 머리 */
+.svc-hero { padding: 96px 0 24px; text-align: center; }
+.svc-hero__in { display: flex; flex-direction: column; align-items: center; }
+.svc-hero__h { margin-top: 24px; font-size: clamp(40px, 6vw, 76px); line-height: 1.1; font-weight: 800; letter-spacing: -0.04em; }
+
+@media (max-width: 1000px) {
+  .six__in { grid-template-columns: 1fr; gap: 0; }
+  .six__stage { display: none; }
+  .six__item { min-height: 0; padding: 22px 0 22px 20px; }
+  .six__item::before { transform: none; }
+  .six__item h3 { color: var(--text); }
+  .six__item h3 i { opacity: 1; }
+  .six__d { color: var(--text-2); }
+  .six__m { display: block; width: 110px; height: auto; animation: lumiBob 3.6s ease-in-out infinite; filter: drop-shadow(0 8px 16px color-mix(in srgb, var(--c) 40%, transparent)); }
+}
+@media (max-width: 700px) { .finale__trust { grid-template-columns: 1fr; } }
+@media (prefers-reduced-motion: reduce) { .pt, .finale__symbol, .six__m { animation: none !important; } }

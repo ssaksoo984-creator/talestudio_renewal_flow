@@ -4,7 +4,9 @@ import { execSync } from 'node:child_process'
 import { readFileSync, writeFileSync, readdirSync } from 'node:fs'
 import { join } from 'node:path'
 
-const pages = { index: '../dist/TaleStudio_메인_밝은.html', dark: '../dist/TaleStudio_메인_어두운.html' }
+const pages = { index: '../dist/TaleStudio_메인.html', service: '../dist/TaleStudio_서비스.html' }
+const LINKS = { './index.html': './TaleStudio_메인.html', './service.html': './TaleStudio_서비스.html' }
+const LUMI = readFileSync('vendor/lumi-persona.js', 'utf8').replace(/<\/script/gi, '<\\/script')
 
 for (const [page, out] of Object.entries(pages)) {
   execSync('npx vite build', { stdio: 'inherit', env: { ...process.env, PAGE: page } })
@@ -22,6 +24,8 @@ for (const [page, out] of Object.entries(pages)) {
       html = html.replace(`./assets/${f}`, () => 'data:image/svg+xml;base64,' + Buffer.from(body).toString('base64'))
     }
   }
+  html = html.replace('<!--LUMI_PERSONA-->', () => `<script>${LUMI}</script>`)
+  for (const [a, b] of Object.entries(LINKS)) html = html.split(a).join(b)
   if (/\.\/assets\//.test(html)) throw new Error(`${page}: unresolved asset reference left in HTML`)
   writeFileSync(out, html)
   console.log(out, (Buffer.byteLength(html) / 1024).toFixed(0) + ' KB')

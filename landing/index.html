@@ -9,6 +9,7 @@
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable-dynamic-subset.css" />
 <link rel="preconnect" href="https://fonts.googleapis.com" />
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@500;600;700;800&display=swap" />
+<script>try{var s=localStorage.getItem("tale-theme");if(s)document.documentElement.dataset.theme=s}catch(e){}</script>
 </head>
 <body>
 <a class="skip" href="#main">본문으로 건너뛰기</a>
@@ -21,12 +22,16 @@
       <img class="only-light" src="./assets/tale-lockup-light.svg" alt="tale studio" width="138" height="35" />
     </a>
     <nav class="nav__links" aria-label="주요 메뉴">
-      <a href="#flow">서비스 흐름</a>
+      <a href="./service.html">Tale 서비스</a>
       <a href="#works">작품</a>
       <a href="https://talestudio.art/pricing">요금</a>
       <a href="#login">로그인</a>
     </nav>
     <div class="nav__end">
+      <button class="theme-toggle" type="button" aria-label="밝게 · 어둡게 바꾸기" title="밝게 · 어둡게">
+        <svg class="only-dark" width="18" height="18" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><circle cx="12" cy="12" r="5"/><path d="M12 1.5v3M12 19.5v3M1.5 12h3M19.5 12h3M4.6 4.6l2.1 2.1M17.3 17.3l2.1 2.1M4.6 19.4l2.1-2.1M17.3 6.7l2.1-2.1" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+        <svg class="only-light" width="18" height="18" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M21 14.5A8.5 8.5 0 0 1 9.5 3a.6.6 0 0 0-.76-.7A9.5 9.5 0 1 0 21.7 15.26a.6.6 0 0 0-.7-.76Z"/></svg>
+      </button>
       <a href="#start" class="btn btn--primary btn--sm">시작하기</a>
     </div>
   </div>
@@ -39,7 +44,7 @@
   <div class="hero__glow" aria-hidden="true"><i></i><i></i><i></i></div>
   <div class="wrap hero__in">
     <p class="pill reveal"><span class="pill__dot"></span>Lumi와 함께 만드는 프리비즈 스튜디오</p>
-    <h1 class="hero__h reveal">이야기를 적어 주세요.<br /><span class="grad grad--hero">영상까지는 Lumi가 이어 갈게요.</span></h1>
+    <h1 class="hero__h reveal">이야기를 적어 주세요.<br /><span class="pt">영상까지는 Lumi가 이어 갈게요.</span></h1>
     <p class="hero__sub reveal">아이디어 한 줄이면 충분해요. Lumi가 산문을 쓰고, 인물과 배경을 그리고,<br class="br-wide" /> 스토리보드로 먼저 보여 드려요. 마음에 들 때만 영상으로 옮겨요.</p>
     <ul class="hero__chips reveal" aria-label="Tale이 하는 일">
       <li>글을 써 줘요</li><li>아이디어를 넓혀 줘요</li><li>콘티로 먼저 확인</li><li>영상까지 한 번에</li>
@@ -72,7 +77,7 @@
   <div class="wrap">
     <div class="sec-head sec-head--center reveal">
       <p class="eyebrow">한 줄의 여정</p>
-      <h2>한 줄이 이렇게 <span class="grad">영상</span>이 돼요</h2>
+      <h2>한 줄이 이렇게 <span class="pt">영상</span>이 돼요</h2>
       <p class="sec-sub">아이디어를 적고 Lumi가 고른 방향 중 하나를 누르면, 산문이 써지고 인물이 그려지고 컷이 채워져요.</p>
     </div>
   </div>
@@ -85,159 +90,64 @@
   </div>
 </section>
 
-<!-- 4 · Tale이 잘하는 세 가지 -->
-<section class="why">
-  <div class="wrap">
-    <div class="sec-head reveal">
-      <p class="eyebrow">왜 Tale인가요</p>
-      <h2>영상 AI는 많아요.<br />이야기부터 같이 쓰는 곳은 드물어요.</h2>
-    </div>
-
-    <!-- 4-1 글을 써 줘요 -->
-    <div class="why__row reveal">
-      <div class="why__copy">
-        <span class="num">01</span>
-        <h3>글을 써 줘요</h3>
-        <p>한 줄 아이디어를 장면이 보이는 산문으로 바꿔요. 마음에 안 드는 문단만 골라 “더 설레게”, “대사를 줄여서”처럼 말하면 그 부분만 다시 써요.</p>
-        <ul class="ticks"><li>아이디어 · 대본 · 파일 어디서든 시작</li><li>문단 단위로 고치고 비교</li><li>@인물 태그로 인물 설정을 그대로 유지</li></ul>
+<!-- 3 · 여섯 단계 (스크롤하면 오른쪽 Lumi가 그 단계로 옷을 갈아입어요) -->
+<section class="six" id="six">
+  <div class="wrap six__in">
+    <div class="six__list">
+      <div class="six__head reveal">
+        <p class="eyebrow">여섯 단계</p>
+        <h2>Tale에서<br /><span class="pt">이야기</span>를 만들어요</h2>
+        <p class="sec-sub">단계마다 Lumi가 그 일에 맞는 소품을 챙겨 함께 가요.</p>
       </div>
-      <div class="ui ui--write" aria-hidden="true">
-        <div class="ui__bar"><span class="badge" data-step="writer"><i></i>Writer</span><span class="ui__title">1화 · 우산 하나</span></div>
-        <p class="ui__p">막차를 놓친 <span class="mention">@서윤</span>은 정류장 지붕 끝에 서서 비를 피했다.</p>
-        <p class="ui__p ui__p--sel"><del>옆자리 남자가 말없이 우산을 기울였다.</del> <ins>옆자리 남자가 말없이 우산을 기울였다. 우산 끝에서 떨어진 빗방울이 그의 어깨만 적셨다.</ins></p>
-        <p class="ui__p ui__p--dim">둘의 어깨가 한 뼘쯤 젖었을 때, <span class="mention">@서윤</span>은 그가 같은 회사 신입이라는 걸 알아챘다.</p>
-        <div class="ui__ask">
-          <img src="./assets/lumi-writer.webp" alt="" width="28" height="22" />
-          <span>“우산 장면을 조금 더 설레게”</span>
-          <span class="ui__chip">이 문단만 고치기</span>
-        </div>
-      </div>
-    </div>
-
-    <!-- 4-2 아이디어를 넓혀 줘요 -->
-    <div class="why__row why__row--flip reveal">
-      <div class="why__copy">
-        <span class="num">02</span>
-        <h3>아이디어를 넓혀 줘요</h3>
-        <p>막연한 한 줄도 괜찮아요. Lumi가 장르, 인물 관계, 결말 방향을 몇 갈래로 펼쳐 보여 주고, 고르는 대로 이야기가 단단해져요.</p>
-        <ul class="ticks"><li>장르 · 분위기 · 길이 · 화면 비율 추천</li><li>인물과 배경을 자동으로 정리</li><li>고른 갈래만 다음 단계로</li></ul>
-      </div>
-      <div class="ui ui--branch" aria-hidden="true">
-        <div class="seed">우산 하나를 같이 쓴 두 사람</div>
-        <svg class="branch__lines" viewBox="0 0 400 160" preserveAspectRatio="none"><path d="M200 0 C200 60 70 60 70 110"/><path d="M200 0 V110"/><path d="M200 0 C200 60 330 60 330 110"/></svg>
-        <div class="branch">
-          <div class="leaf leaf--on"><small>장르</small><b>로맨틱 코미디</b><span>상사와 신입, 비밀 연애의 시작</span></div>
-          <div class="leaf"><small>장르</small><b>잔잔한 드라마</b><span>매일 같은 버스, 말 없는 동행</span></div>
-          <div class="leaf"><small>장르</small><b>미스터리</b><span>우산 주인은 왜 나타나지 않을까</span></div>
-        </div>
-        <div class="branch__next">
-          <span class="opt opt--on">결말 · 해피엔딩</span><span class="opt">인물 2명 + 1</span><span class="opt">60초</span><span class="opt">9:16</span>
-        </div>
-      </div>
-    </div>
-
-    <!-- 4-3 스토리보드 먼저 -->
-    <div class="why__row reveal">
-      <div class="why__copy">
-        <span class="num">03</span>
-        <h3>스토리보드로 먼저 확인해요</h3>
-        <p>영상부터 뽑으면 마음에 들 때까지 계속 다시 만들어야 해요. Tale은 컷마다 구도 · 카메라 · 조명을 콘티로 먼저 보여 줘요. 확정한 컷만 영상으로 옮기니 결과가 원하는 모습에 가까워요.</p>
-        <ul class="ticks"><li>콘티 · 인물 시트 · 컨셉 이미지는 항상 무료</li><li>Take는 확정한 컷에만 써요</li><li>인물 얼굴이 컷마다 바뀌지 않아요</li></ul>
-      </div>
-      <div class="ui ui--compare" aria-hidden="true">
-        <div class="cmp cmp--bad">
-          <div class="cmp__h"><span>바로 영상 생성</span><em>다시 · 다시 · 다시</em></div>
-          <div class="cmp__row">
-            <span class="vid vid--x"></span><span class="vid vid--x"></span><span class="vid vid--x"></span><span class="vid vid--ok"></span>
-          </div>
-          <p class="cmp__f">4번 생성 · <b>20 Takes</b></p>
-        </div>
-        <div class="cmp cmp--good">
-          <div class="cmp__h"><span>Tale · 콘티 먼저</span><em>확인 → 확정 → 생성</em></div>
-          <div class="cmp__row">
-            <span class="sb sb--ok">1</span><span class="sb sb--ok">2</span><span class="sb sb--redo">3<i>다시 그리기 · 무료</i></span><span class="sb sb--ok">4</span>
-          </div>
-          <p class="cmp__f">콘티 확인 무료 · 확정 후 <b>5 Takes</b></p>
-        </div>
-        <p class="cmp__note">Seedance 2.0 720p 기준 예시. 실제 사용량은 컷 수와 모델에 따라 달라요.</p>
-      </div>
-    </div>
-  </div>
-</section>
-
-<!-- 5 · 여섯 단계, T와 꼬리 -->
-<section class="steps">
-  <div class="wrap">
-    <div class="sec-head sec-head--center reveal">
-      <p class="eyebrow">여섯 단계</p>
-      <h2>Tale에서 이야기를 만들어요</h2>
-      <p class="sec-sub">여섯 단계마다 Lumi가 그 일에 맞는 소품을 챙겨 들고 함께 가요.</p>
-    </div>
-    <div class="steps__grid">
-      <div class="steps__group reveal">
-        <p class="steps__label"><span class="bar bar--t"></span>이야기 만들기</p>
-        <ol>
-          <li data-step="producer"><img src="./assets/lumi-producer.webp" alt="" width="120" height="93" /><div><b><i></i>Producer</b><span>한 줄을 듣고 장르 · 길이 · 화면 비율을 정해요</span></div></li>
-          <li data-step="writer"><img src="./assets/lumi-writer.webp" alt="" width="120" height="93" /><div><b><i></i>Writer</b><span>장면이 보이는 산문을 쓰고 같이 고쳐요</span></div></li>
-          <li data-step="artist"><img src="./assets/lumi-artist.webp" alt="" width="120" height="93" /><div><b><i></i>Artist</b><span>인물 시트와 배경을 그려 얼굴을 고정해요</span></div></li>
-        </ol>
-      </div>
-      <div class="steps__group reveal">
-        <p class="steps__label"><span class="bar bar--tail"></span>영상으로 옮기기</p>
-        <ol>
-          <li data-step="storyboard"><img src="./assets/lumi-storyboard.webp" alt="" width="120" height="93" /><div><b><i></i>Storyboard</b><span>컷을 나누고 구도를 콘티로 먼저 보여 줘요</span></div></li>
-          <li data-step="director"><img src="./assets/lumi-director.webp" alt="" width="120" height="93" /><div><b><i></i>Director</b><span>컷마다 카메라 · 조명 · 움직임을 정해요</span></div></li>
-          <li data-step="editor"><img src="./assets/lumi-editor.webp" alt="" width="120" height="93" /><div><b><i></i>Editor</b><span>확정한 컷을 영상으로 만들고 한 편으로 이어요</span></div></li>
-        </ol>
-      </div>
-    </div>
-  </div>
-</section>
-
-<!-- 6 · 기능 벤토 -->
-<section class="bento-sec">
-  <div class="wrap">
-    <div class="sec-head reveal">
-      <p class="eyebrow">기능</p>
-      <h2>프리비즈에 필요한 건<br />한 화면에</h2>
-    </div>
-    <div class="bento">
-      <article class="tile tile--chat reveal">
-        <div class="tile__copy"><h3>채팅으로 기획</h3><p>“60초짜리로 줄여 줘”, “결말을 반전으로” 말하면 돼요.</p></div>
-        <div class="mini-chat" aria-hidden="true">
-          <span class="mc mc--me">결말을 반전으로 바꿔 줘</span>
-          <span class="mc mc--lumi"><img src="./assets/lumi@2x.webp" alt="" width="22" height="16" />도현이 사실 우산 주인을 찾고 있었다면 어떨까요?</span>
-        </div>
+      <article class="six__item" data-p="producer" style="--c:#F2A33A">
+        <img class="six__m" src="./assets/lumi-producer.webp" alt="" width="120" height="93" />
+        <p class="six__n">01 · 이야기 만들기</p>
+        <h3><i></i>Producer</h3>
+        <p class="six__d">한 줄을 듣고 이야기의 방향을 잡아요. 장르와 분위기, 길이와 화면 비율을 Lumi가 먼저 제안해요.</p>
+        <ul class="six__out"><li>장르 · 분위기</li><li>길이 · 비율</li><li>바꿈 정도</li></ul>
       </article>
-      <article class="tile tile--cast reveal">
-        <div class="tile__copy"><h3>인물 일관성</h3><p>인물 시트 하나로 모든 컷에서 같은 얼굴.</p></div>
-        <div class="sheet" aria-hidden="true">
-          <figure class="ph ph--sq" data-img="IMG-B1"><figcaption>정면</figcaption></figure>
-          <figure class="ph ph--sq" data-img="IMG-B2"><figcaption>측면</figcaption></figure>
-          <figure class="ph ph--sq" data-img="IMG-B3"><figcaption>표정</figcaption></figure>
-        </div>
+      <article class="six__item" data-p="writer" style="--c:#E8606F">
+        <img class="six__m" src="./assets/lumi-writer.webp" alt="" width="120" height="93" />
+        <p class="six__n">02 · 이야기 만들기</p>
+        <h3><i></i>Writer</h3>
+        <p class="six__d">장면이 보이는 산문을 써요. 마음에 안 드는 문단만 골라 말로 고치면 그 부분만 다시 써요.</p>
+        <ul class="six__out"><li>산문</li><li>문단 고치기</li><li>@인물 태그</li></ul>
       </article>
-      <article class="tile tile--cam reveal">
-        <div class="tile__copy"><h3>컷마다 카메라 · 조명</h3><p>6축 카메라 앵글과 조명을 컷 단위로.</p></div>
-        <div class="cam" aria-hidden="true">
-          <div class="cam__row"><span>앵글</span><span class="seg"><em>아이레벨</em><em class="on">로우</em><em>하이</em></span></div>
-          <div class="cam__row"><span>샷</span><span class="seg"><em>와이드</em><em>미디엄</em><em class="on">클로즈업</em></span></div>
-          <div class="cam__row"><span>조명</span><span class="slider"><i style="width:68%"></i></span></div>
-        </div>
+      <article class="six__item" data-p="artist" style="--c:#8B63E8">
+        <img class="six__m" src="./assets/lumi-artist.webp" alt="" width="120" height="93" />
+        <p class="six__n">03 · 이야기 만들기</p>
+        <h3><i></i>Artist</h3>
+        <p class="six__d">인물 시트와 배경을 그려요. 한 번 정한 얼굴은 모든 컷에서 같은 모습으로 이어져요.</p>
+        <ul class="six__out"><li>인물 시트</li><li>배경</li><li>모습 추가</li></ul>
       </article>
-      <article class="tile tile--sheet reveal">
-        <div class="tile__copy"><h3>마스터 시트 내보내기</h3><p>컷 · 대사 · 카메라를 한 장으로. 팀과 바로 공유해요.</p></div>
-        <div class="msheet" aria-hidden="true">
-          <div class="msheet__row msheet__row--h"><span>컷</span><span>샷</span><span>대사</span></div>
-          <div class="msheet__row"><span>1</span><span>와이드</span><span>—</span></div>
-          <div class="msheet__row"><span>2</span><span>미디엄</span><span>“이 버스 타세요?”</span></div>
-          <div class="msheet__row"><span>3</span><span>클로즈업</span><span>“…네.”</span></div>
-        </div>
+      <article class="six__item" data-p="storyboard" style="--c:#5A6AE6">
+        <img class="six__m" src="./assets/lumi-storyboard.webp" alt="" width="120" height="93" />
+        <p class="six__n">04 · 영상으로 옮기기</p>
+        <h3><i></i>Storyboard</h3>
+        <p class="six__d">컷을 나누고 구도를 콘티로 먼저 보여 줘요. 다시 그리기는 무료라 마음껏 맞춰 볼 수 있어요.</p>
+        <ul class="six__out"><li>컷 나누기</li><li>콘티 이미지</li><li>다시 그리기 무료</li></ul>
       </article>
-      <article class="tile tile--video reveal">
-        <div class="tile__copy"><h3>영상 생성 · T2V · I2V</h3><p>글에서 바로, 또는 확정한 콘티 이미지에서 영상으로.</p></div>
-        <figure class="ph ph--video" data-img="IMG-V1"><span class="play" aria-hidden="true"></span><figcaption>컷 3 · 5초 · 720p</figcaption></figure>
+      <article class="six__item" data-p="director" style="--c:#3E9BE0">
+        <img class="six__m" src="./assets/lumi-director.webp" alt="" width="120" height="93" />
+        <p class="six__n">05 · 영상으로 옮기기</p>
+        <h3><i></i>Director</h3>
+        <p class="six__d">컷마다 카메라 앵글과 조명, 움직임을 정해요. 6축 카메라로 원하는 시선을 만들어요.</p>
+        <ul class="six__out"><li>카메라 앵글</li><li>조명</li><li>움직임</li></ul>
       </article>
+      <article class="six__item" data-p="editor" style="--c:#2DB39A">
+        <img class="six__m" src="./assets/lumi-editor.webp" alt="" width="120" height="93" />
+        <p class="six__n">06 · 영상으로 옮기기</p>
+        <h3><i></i>Editor</h3>
+        <p class="six__d">확정한 컷만 영상으로 만들고 한 편으로 이어요. 생성 전에 Take를 먼저 보여 드려요.</p>
+        <ul class="six__out"><li>영상 생성</li><li>컷 잇기</li><li>내보내기</li></ul>
+      </article>
+    </div>
+    <div class="six__stage" aria-hidden="true">
+      <div class="six__card" style="--c:#F2A33A">
+        <div class="six__glow"></div>
+        <lumi-persona class="six__lumi" persona="producer" state="idle"></lumi-persona>
+        <p class="six__cap"><b id="sixName">Producer</b><span id="sixNum">01 / 06</span></p>
+      </div>
     </div>
   </div>
 </section>
@@ -262,47 +172,22 @@
   </div>
 </section>
 
-<!-- 8 · 믿을 수 있는 이유 -->
-<section class="trust">
-  <div class="wrap trust__in">
-    <div class="trust__lead reveal">
-      <p class="eyebrow">믿을 수 있는 이유</p>
-      <h2>당신의 이야기는<br />당신의 것이에요</h2>
-      <a href="https://talestudio.art/pricing" class="btn btn--primary trust__cta">요금 확인하기 <span aria-hidden="true">→</span></a>
+<!-- 5 · 마지막: 첫 장 + 당신의 것 -->
+<section class="finale">
+  <div class="wrap finale__in reveal">
+    <img class="finale__symbol only-dark" src="./assets/tale-symbol.svg" alt="" width="125" height="110" />
+    <img class="finale__symbol only-light" src="./assets/tale-symbol-light.svg" alt="" width="125" height="110" />
+    <h2>당신의 이야기,<br /><span class="pt">첫 장</span>을 써 볼까요?</h2>
+    <p class="sec-sub">당신의 이야기는 당신의 것이에요. 만든 프로젝트 · 프롬프트 · 생성물은 어떤 AI 학습에도 쓰지 않아요.</p>
+    <div class="finale__btns">
+      <a href="#start" class="btn btn--primary btn--lg">Lumi와 시작하기 <span aria-hidden="true">→</span></a>
+      <a href="https://talestudio.art/pricing" class="btn btn--ghost btn--lg">요금 확인하기</a>
     </div>
-    <div class="trust__items">
-      <div class="titem reveal"><h3>외부 AI 학습에 쓰지 않아요</h3><p>프로젝트 · 프롬프트 · 생성물은 어떤 AI 모델 학습에도 쓰지 않아요.</p></div>
-      <div class="titem reveal"><h3>분리된 작업 공간</h3><p>프로젝트마다 격리된 환경에서 작업해요. IP가 밖으로 새지 않아요.</p></div>
-      <div class="titem reveal"><h3>검증된 영상 모델</h3><p class="models"><span>Seedance</span><span>Kling</span><span>Hunyuan</span><span>Tale 자체 모델</span></p></div>
-    </div>
-  </div>
-</section>
-
-<!-- 10 · 자주 묻는 질문 -->
-<section class="faq">
-  <div class="wrap faq__in">
-    <div class="sec-head reveal"><p class="eyebrow">자주 묻는 질문</p><h2>궁금한 게 있나요?</h2></div>
-    <div class="faq__list reveal">
-      <details open><summary>영상 만들기를 몰라도 쓸 수 있나요?</summary><p>네. 한 줄만 적으면 Lumi가 장르와 길이를 묻고, 산문 · 인물 · 콘티 순서로 이어 가요. 각 단계에서 고르기만 하면 돼요.</p></details>
-      <details><summary>스토리보드를 먼저 보는 게 왜 좋아요?</summary><p>영상은 한 번 만들 때마다 Take가 들어요. 콘티는 무료라서, 구도와 인물을 먼저 맞추고 확정한 컷만 영상으로 옮기면 다시 만드는 횟수가 확 줄어요.</p></details>
-      <details><summary>이미지도 Take를 쓰나요?</summary><p>아니요. 스토리보드 · 컨셉 아트 · 인물 시트는 어떤 요금제에서도 Take를 쓰지 않아요.</p></details>
-      <details><summary>쓰지 않은 Take는 어떻게 되나요?</summary><p>요금제 Take는 결제 주기가 끝나면 사라지고, 충전한 팩 Take는 12개월 동안 쓸 수 있어요. 무료 Take → 요금제 Take → 팩 Take 순서로 써요.</p></details>
-      <details><summary>제 작업물이 AI 학습에 쓰이나요?</summary><p>아니요. Tale에서 만든 프로젝트 · 프롬프트 · 생성물은 AI 모델 학습에 쓰지 않아요.</p></details>
-      <details><summary>지금 결제할 수 있나요?</summary><p>결제는 준비 중이에요. 요금제와 Take 팩은 미리 둘러볼 수 있어요.</p></details>
-    </div>
-  </div>
-</section>
-
-<!-- 11 · 마지막 행동 유도 -->
-<section class="cta">
-  <div class="cta__glow" aria-hidden="true"></div>
-  <div class="wrap cta__in reveal">
-    <img class="cta__symbol only-dark" src="./assets/tale-symbol.svg" alt="" width="125" height="110" />
-    <img class="cta__symbol only-light" src="./assets/tale-symbol-light.svg" alt="" width="125" height="110" />
-    <h2>당신의 이야기,<br />첫 장을 써 볼까요?</h2>
-    <p class="sec-sub">Your Tale Deserves a Take.</p>
-    <a href="#start" class="btn btn--primary btn--lg">Lumi와 시작하기</a>
-    <div class="cta__lumi float" aria-hidden="true"><img src="./assets/lumi-hd.webp" alt="" width="200" height="148" /></div>
+    <ul class="finale__trust">
+      <li><b>학습에 쓰지 않아요</b>프로젝트 · 프롬프트 · 생성물 모두</li>
+      <li><b>분리된 작업 공간</b>프로젝트마다 격리된 환경</li>
+      <li><b>검증된 영상 모델</b>Seedance · Kling · Hunyuan · Tale 자체 모델</li>
+    </ul>
   </div>
 </section>
 
@@ -316,13 +201,14 @@
       <p>한 줄 이야기에서 프리비즈 영상까지. AI 제작팀과 함께하는 프리프로덕션 스튜디오.</p>
     </div>
     <nav class="foot__links" aria-label="푸터">
-      <a href="#flow">서비스 흐름</a><a href="https://talestudio.art/pricing">요금</a><a href="mailto:support@talestudio.art">문의</a>
+      <a href="./service.html">Tale 서비스</a><a href="https://talestudio.art/pricing">요금</a><a href="mailto:support@talestudio.art">문의</a>
       <a href="https://talestudio.art/terms">이용약관</a><a href="https://talestudio.art/refund">환불</a><a href="https://talestudio.art/privacy">개인정보</a><a href="https://talestudio.art/acceptable-use">이용 정책</a>
     </nav>
     <p class="foot__biz">Talestudio · 대표 Daewon Yoon · 사업자등록번호 333-27-02069 · 13606 경기도 성남시 분당구 돌마로 169 · support@talestudio.art<br />결제는 준비 중이에요 · © 2026 Tale Studio. All rights reserved.</p>
   </div>
 </footer>
 
+<!--LUMI_PERSONA-->
 <script type="module" src="./src/main.tsx"></script>
 </body>
 </html>

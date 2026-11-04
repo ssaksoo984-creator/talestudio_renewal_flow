@@ -10,7 +10,9 @@ const sleep = (ms) => new Promise((r) => setTimeout(r, ms))
 const amb = document.createElement('div')
 amb.className = 'ambient'
 amb.setAttribute('aria-hidden', 'true')
+const ORBS = ['#F2A33A', '#E8606F', '#8B63E8', '#5A6AE6', '#3E9BE0', '#2DB39A']
 amb.innerHTML = '<i></i><i></i><i></i><i></i>' +
+  ORBS.map((c, n) => `<b class="ambient__orb" style="--oc:${c};--s:${70 + ((n * 37) % 90)}px;left:${8 + n * 15}%;top:${12 + ((n * 29) % 70)}%;--d:${22 + n * 4}s;--dl:${-n * 5}s"></b>`).join('') +
   Array.from({ length: 18 }, () => `<span class="ambient__spark" style="left:${Math.random() * 100}%;top:${60 + Math.random() * 45}%;--d:${8 + Math.random() * 10}s;--dl:${-Math.random() * 18}s"></span>`).join('')
 document.body.prepend(amb)
 
@@ -31,7 +33,13 @@ fab.type = 'button'
 fab.className = 'lumi-fab'
 fab.setAttribute('aria-label', 'Lumi에게 물어보기')
 fab.setAttribute('aria-expanded', 'false')
-fab.innerHTML = `<span class="lumi-fab__float"><img class="lumi-fab__img lumi-fab__img--white" src="${whiteSrc}" alt="" /><img class="lumi-fab__img lumi-fab__img--color" src="${colorSrc}" alt="" /></span><span class="lumi-fab__ring"></span>`
+const HAS_PERSONA = !!customElements.get('lumi-persona') && !!document.createElement('canvas').getContext('webgl')
+fab.innerHTML = HAS_PERSONA
+  ? `<lumi-persona class="lumi-fab__persona" persona="pearl" state="idle"></lumi-persona><span class="lumi-fab__ring"></span>`
+  : `<span class="lumi-fab__float"><img class="lumi-fab__img lumi-fab__img--white" src="${whiteSrc}" alt="" /><img class="lumi-fab__img lumi-fab__img--color" src="${colorSrc}" alt="" /></span><span class="lumi-fab__ring"></span>`
+if (HAS_PERSONA) fab.classList.add('lumi-fab--persona')
+const persona = fab.querySelector('lumi-persona')
+const setLumi = (state, p) => { if (!persona) return; if (p) persona.setAttribute('persona', p); persona.setAttribute('state', state) }
 
 const hint = document.createElement('div')
 hint.className = 'lumi-hint'
@@ -65,15 +73,18 @@ const esc = (s) => s.replace(/[&<>]/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>':
 async function reply(text) {
   const t = text.toLowerCase()
   const hit = ANSWERS.find((x) => x.k.some((k) => t.includes(k)))
+  setLumi('thinking')
   const typing = add('<span class="lc-typing"><i></i><i></i><i></i></span>', 'lumi')
   typing.style.padding = '0'
   await sleep(reduce ? 100 : 700 + Math.random() * 500)
   typing.remove()
+  setLumi('complete')
   add(hit ? hit.a : `"${esc(text)}" 좋은 이야기 씨앗이네요! 시작하기를 누르면 이 한 줄로 바로 산문을 써 볼게요.`, 'lumi')
 }
 
 async function open() {
   root.classList.add('lumi-open', 'lumi-pop')
+  setLumi('idle', 'complete') // 화이트 진주 → 완성 Lumi로 옷 갈아입기
   fab.setAttribute('aria-expanded', 'true')
   setTimeout(() => root.classList.remove('lumi-pop'), 900)
   if (!greeted) {
@@ -87,6 +98,7 @@ async function open() {
 }
 function close() {
   root.classList.remove('lumi-open')
+  setLumi('idle', 'pearl')
   fab.setAttribute('aria-expanded', 'false')
   fab.focus({ preventScroll: true })
 }
@@ -94,6 +106,8 @@ fab.addEventListener('click', () => (root.classList.contains('lumi-open') ? clos
 chat.querySelector('.lc-close').addEventListener('click', close)
 addEventListener('keydown', (e) => e.key === 'Escape' && root.classList.contains('lumi-open') && close())
 chat.querySelectorAll('.lc-chip').forEach((c) => c.addEventListener('click', () => { add(esc(c.textContent), 'me'); reply(c.textContent) }))
+input.addEventListener('focus', () => setLumi('listening'))
+input.addEventListener('blur', () => persona?.getAttribute('state') === 'listening' && setLumi('idle'))
 chat.querySelector('.lc-form').addEventListener('submit', (e) => {
   e.preventDefault()
   const v = input.value.trim()

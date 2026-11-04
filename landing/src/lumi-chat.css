@@ -10,7 +10,12 @@
 @keyframes amb1 { to { transform: translate(18vw, 22vh) scale(1.15); } }
 @keyframes amb2 { to { transform: translate(-22vw, 30vh) scale(0.9); } }
 @keyframes amb3 { to { transform: translate(20vw, -26vh) scale(1.2); } }
-:root[data-theme='light'] .ambient { --amb-o: 0.13; }
+:root[data-theme='light'] .ambient i, :root[data-theme='light'] .ambient__spark { display: none; }
+.ambient__orb { position: absolute; width: var(--s); height: var(--s); border-radius: 50%; display: none;
+  background: radial-gradient(circle at 35% 30%, color-mix(in srgb, var(--oc) 55%, #fff), color-mix(in srgb, var(--oc) 70%, transparent) 60%, transparent 72%);
+  opacity: 0.22; filter: blur(2px); animation: orb var(--d) ease-in-out infinite alternate; animation-delay: var(--dl); }
+:root[data-theme='light'] .ambient__orb { display: block; }
+@keyframes orb { 0% { transform: translate(0, 0) scale(1); } 50% { transform: translate(6vw, -8vh) scale(1.1); } 100% { transform: translate(-5vw, 6vh) scale(0.92); } }
 .ambient__spark { position: absolute; width: 3px; height: 3px; border-radius: 50%; background: var(--amb-spark, rgba(255, 255, 255, 0.7)); box-shadow: 0 0 8px currentColor; animation: spark var(--d, 9s) linear infinite; animation-delay: var(--dl, 0s); opacity: 0; }
 :root[data-theme='light'] .ambient__spark { --amb-spark: rgba(139, 99, 232, 0.55); }
 @keyframes spark { 0% { opacity: 0; transform: translateY(0); } 15% { opacity: 1; } 85% { opacity: 0.8; } 100% { opacity: 0; transform: translateY(-40vh); } }
@@ -37,16 +42,22 @@ main, .foot { position: relative; }
   box-shadow: 0 0 0 2px #F2A33A, 0 0 0 5px #E8606F, 0 0 0 8px #8B63E8, 0 0 0 11px #3E9BE0; }
 .lumi-pop .lumi-fab__ring { animation: ring 0.9s ease-out; }
 @keyframes ring { 0% { opacity: 0.9; transform: scale(1); } 100% { opacity: 0; transform: scale(14); } }
-.lumi-hint { position: fixed; right: calc(max(20px, env(safe-area-inset-right, 0px)) + 88px); bottom: calc(max(20px, env(safe-area-inset-bottom, 0px)) + 38px); z-index: 80;
+.lumi-hint { position: fixed; right: calc(max(20px, env(safe-area-inset-right, 0px)) + 124px); bottom: calc(max(20px, env(safe-area-inset-bottom, 0px)) + 38px); z-index: 80;
   padding: 10px 14px; border-radius: 16px 16px 4px 16px; background: var(--lc-panel); color: var(--lc-fg); font: 600 14px/1.4 var(--font, system-ui); white-space: nowrap;
   box-shadow: 0 12px 30px rgba(0, 0, 0, 0.25), 0 0 0 1px var(--lc-line); opacity: 0; transform: translateY(8px) scale(0.96); transition: opacity 0.4s, transform 0.4s; pointer-events: none; }
 .lumi-hint.on { opacity: 1; transform: none; }
 .lumi-open .lumi-hint { opacity: 0; }
 
+/* 진짜 Lumi 컴포넌트를 쓸 때 (3:2) */
+.lumi-fab--persona { width: 132px; height: 88px; }
+.lumi-fab--persona::before { display: none; }
+.lumi-fab__persona { display: block; width: 132px; }
+.lumi-fab--persona + .lumi-hint, .lumi-hint { }
+
 /* ---------- 챗봇 창 ---------- */
 :root { --lc-panel: #18171C; --lc-panel-2: #232129; --lc-fg: #F5F4EE; --lc-fg-2: #B9B6AD; --lc-line: rgba(255, 255, 255, 0.09); --lc-me: #2C2A33; --lc-btn: #EDEAE0; --lc-btn-fg: #141312; }
 :root[data-theme='light'] { --lc-panel: #FFFFFF; --lc-panel-2: #F3F2EE; --lc-fg: #141312; --lc-fg-2: #5C5A55; --lc-line: rgba(20, 19, 18, 0.1); --lc-me: #141312; --lc-btn: #141312; --lc-btn-fg: #FFFFFF; }
-.lumi-chat { position: fixed; right: max(20px, env(safe-area-inset-right, 0px)); bottom: calc(max(20px, env(safe-area-inset-bottom, 0px)) + 88px); z-index: 79;
+.lumi-chat { position: fixed; right: max(20px, env(safe-area-inset-right, 0px)); bottom: calc(max(20px, env(safe-area-inset-bottom, 0px)) + 100px); z-index: 79;
   display: grid; grid-template-rows: auto minmax(0, 1fr) auto auto; width: min(380px, calc(100vw - 32px)); height: min(540px, calc(100vh - 140px));
   border-radius: 24px; background: var(--lc-panel); color: var(--lc-fg); font-family: var(--font, system-ui); overflow: hidden;
   box-shadow: 0 30px 80px -10px rgba(0, 0, 0, 0.45), 0 0 0 1px var(--lc-line);
@@ -85,6 +96,8 @@ main, .foot { position: relative; }
 }
 @media (max-width: 560px) {
   .lumi-fab { width: 76px; height: 62px; }
+  .lumi-fab--persona { width: 102px; height: 68px; }
+  .lumi-fab__persona { width: 102px; }
   .lumi-hint { display: none; }
   .lumi-chat { bottom: calc(max(16px, env(safe-area-inset-bottom, 0px)) + 72px); right: 16px; height: min(520px, calc(100vh - 120px)); }
 }

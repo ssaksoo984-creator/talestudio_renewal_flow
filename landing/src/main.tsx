@@ -3,6 +3,7 @@ import { useEffect, useState } from 'react'
 import TaleDemo from './TaleDemo'
 import './page.css'
 import './lumi-chat.js'
+import './common.js'
 
 const root = document.documentElement
 const themeOf = () => (root.dataset.theme === 'light' ? 'light' : 'dark') as 'light' | 'dark'
@@ -27,12 +28,6 @@ function DemoHost() {
 const host = document.getElementById('demo')
 if (host) createRoot(host).render(<DemoHost />)
 
-// Theme toggle (each file opens in its own theme; the toggle is for comparing)
-document.querySelector('.theme-toggle')?.addEventListener('click', () => {
-  root.dataset.theme = themeOf() === 'dark' ? 'light' : 'dark'
-  window.dispatchEvent(new Event('tale-theme'))
-})
-
 // Hero tabs
 const tabs = Array.from(document.querySelectorAll<HTMLButtonElement>('.prompt__tabs button'))
 const holders: Record<string, string> = {
@@ -49,31 +44,26 @@ tabs.forEach((t) =>
 )
 document.querySelectorAll('.prompt__opts .opt').forEach((o) => o.addEventListener('click', () => o.classList.toggle('opt--on')))
 
-// Sections rise in once as they enter
-const reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches
-const items = document.querySelectorAll('.reveal')
-if (reduce || !('IntersectionObserver' in window)) {
-  items.forEach((e) => e.classList.add('in'))
-} else {
-  const io = new IntersectionObserver(
-    (entries) =>
-      entries.forEach((e) => {
-        if (e.isIntersecting) {
-          e.target.classList.add('in')
-          io.unobserve(e.target)
-        }
-      }),
-    { rootMargin: '0px 0px -8% 0px', threshold: 0.08 },
-  )
-  items.forEach((e) => io.observe(e))
-}
-
-// Nav gets a surface once the page scrolls
-const nav = document.querySelector('.nav')
-const onScroll = () => nav?.classList.toggle('nav--scrolled', window.scrollY > 8)
-window.addEventListener('scroll', onScroll, { passive: true })
-onScroll()
-
 // 작품 슬라이드: 끊김 없이 흐르도록 한 벌 더
 const track = document.querySelector('.carousel__track')
 if (track) Array.from(track.children).forEach((c) => { const d = c.cloneNode(true) as HTMLElement; d.setAttribute('aria-hidden', 'true'); track.append(d) })
+
+// 여섯 단계: 보고 있는 단계로 오른쪽 Lumi가 옷을 갈아입어요
+const sixItems = Array.from(document.querySelectorAll<HTMLElement>('.six__item'))
+const card = document.querySelector<HTMLElement>('.six__card')
+const lumi = document.querySelector('.six__lumi')
+const nameEl = document.getElementById('sixName'), numEl = document.getElementById('sixNum')
+let current = ''
+const activate = (el: HTMLElement) => {
+  const p = el.dataset.p!
+  if (p === current) return
+  current = p
+  sixItems.forEach((x) => x.classList.toggle('on', x === el))
+  card?.style.setProperty('--c', el.style.getPropertyValue('--c'))
+  lumi?.setAttribute('persona', p)
+  if (nameEl) nameEl.textContent = el.querySelector('h3')!.textContent
+  if (numEl) numEl.textContent = `${String(sixItems.indexOf(el) + 1).padStart(2, '0')} / 06`
+}
+const sio = new IntersectionObserver((es) => es.forEach((e) => e.isIntersecting && activate(e.target as HTMLElement)), { rootMargin: '-45% 0px -45% 0px' })
+sixItems.forEach((x) => sio.observe(x))
+if (sixItems[0]) activate(sixItems[0])

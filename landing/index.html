@@ -13,6 +13,65 @@
 </head>
 <body>
 <a class="skip" href="#main">본문으로 건너뛰기</a>
+<svg class="defs" aria-hidden="true" focusable="false">
+  <defs>
+    <linearGradient id="sky" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#070b16"/><stop offset=".55" stop-color="#121a30"/><stop offset="1" stop-color="#1a1d2c"/></linearGradient>
+    <linearGradient id="road" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#151925"/><stop offset="1" stop-color="#05060a"/></linearGradient>
+    <radialGradient id="cone" cx=".5" cy="0" r="1"><stop offset="0" stop-color="#ffcf86" stop-opacity=".55"/><stop offset=".6" stop-color="#f2a33a" stop-opacity=".12"/><stop offset="1" stop-color="#f2a33a" stop-opacity="0"/></radialGradient>
+    <radialGradient id="pool" cx=".5" cy=".5" r=".5"><stop offset="0" stop-color="#ffcf86" stop-opacity=".45"/><stop offset="1" stop-color="#ffcf86" stop-opacity="0"/></radialGradient>
+    <radialGradient id="tail" cx=".5" cy=".5" r=".5"><stop offset="0" stop-color="#ff4a5a" stop-opacity=".9"/><stop offset="1" stop-color="#ff4a5a" stop-opacity="0"/></radialGradient>
+    <radialGradient id="faceW" cx=".62" cy=".4" r=".7"><stop offset="0" stop-color="#e7b48c"/><stop offset=".7" stop-color="#8a5f45"/><stop offset="1" stop-color="#3a2a22"/></radialGradient>
+    <radialGradient id="faceM" cx=".35" cy=".4" r=".7"><stop offset="0" stop-color="#c79a7a"/><stop offset=".7" stop-color="#6e4c3a"/><stop offset="1" stop-color="#2a2020"/></radialGradient>
+    <g id="world">
+      <rect width="320" height="180" fill="url(#sky)"/>
+      <!-- 먼 건물 -->
+      <g fill="#0b1020">
+        <rect x="0" y="52" width="38" height="70"/><rect x="36" y="38" width="30" height="84"/><rect x="64" y="60" width="26" height="62"/>
+        <rect x="196" y="46" width="22" height="76"/><rect x="250" y="30" width="40" height="92"/><rect x="288" y="56" width="32" height="66"/>
+      </g>
+      <g fill="#f6c27a">
+        <rect x="8" y="62" width="3" height="3" opacity=".7"/><rect x="20" y="74" width="3" height="3" opacity=".4"/><rect x="44" y="50" width="3" height="3" opacity=".8"/>
+        <rect x="52" y="66" width="3" height="3" opacity=".35"/><rect x="72" y="70" width="3" height="3" opacity=".6"/><rect x="258" y="42" width="3" height="3" opacity=".5"/>
+        <rect x="272" y="58" width="3" height="3" opacity=".8"/><rect x="262" y="78" width="3" height="3" opacity=".35"/><rect x="298" y="66" width="3" height="3" opacity=".6"/><rect x="204" y="60" width="3" height="3" opacity=".45"/>
+      </g>
+      <!-- 길 -->
+      <rect y="122" width="320" height="58" fill="url(#road)"/>
+      <rect y="122" width="320" height="1" fill="#2a3044"/>
+      <!-- 떠난 막차 -->
+      <ellipse cx="22" cy="132" rx="9" ry="5" fill="url(#tail)"/><ellipse cx="38" cy="132" rx="9" ry="5" fill="url(#tail)"/>
+      <rect x="20" y="148" width="20" height="14" fill="#ff4a5a" opacity=".08"/>
+      <!-- 가로등 -->
+      <polygon points="226,34 178,138 276,138" fill="url(#cone)"/>
+      <line x1="232" y1="30" x2="232" y2="136" stroke="#1a2030" stroke-width="2.2"/>
+      <path d="M232 31 Q232 27 226 28" stroke="#1a2030" stroke-width="2" fill="none"/>
+      <ellipse cx="224" cy="31" rx="5" ry="2.2" fill="#ffe1a8"/>
+      <ellipse cx="226" cy="150" rx="40" ry="14" fill="url(#pool)"/>
+      <rect x="222" y="138" width="6" height="40" fill="#ffcf86" opacity=".14"/>
+      <!-- 정류장 -->
+      <rect x="84" y="76" width="104" height="50" fill="#9db4e8" opacity=".06"/>
+      <rect x="80" y="70" width="114" height="5" rx="2" fill="#a9c0f0" opacity=".22"/>
+      <rect x="86" y="75" width="2" height="51" fill="#2a3246"/><rect x="186" y="75" width="2" height="51" fill="#2a3246"/>
+      <rect x="96" y="82" width="22" height="30" rx="1.5" fill="#ffe9c2" opacity=".18"/>
+      <!-- 서윤 (왼쪽, 트렌치코트) -->
+      <path d="M140 132 L141 108 Q141 101 148 101 Q155 101 155 108 L157 132 Z" fill="#4a3d2f"/>
+      <path d="M147 102 L148 132" stroke="#2c241c" stroke-width=".8"/>
+      <circle cx="148" cy="96" r="5.2" fill="url(#faceW)"/>
+      <path d="M142.6 96 Q142.4 89.6 148 89.6 Q153.8 89.6 153.6 96 L153.4 99 Q152 93 148 92.8 Q144 93 143 99 Z" fill="#0d0b0c"/>
+      <!-- 도현 (오른쪽, 검정 코트) -->
+      <path d="M159 132 L160 105 Q160 98 167 98 Q174 98 174 105 L176 132 Z" fill="#141826"/>
+      <path d="M163 99 Q167 102 171 99 L171 104 Q167 106 163 104 Z" fill="#26324f"/>
+      <circle cx="167" cy="93" r="5" fill="url(#faceM)"/>
+      <path d="M162 92 Q162 87 167 87 Q172.4 87 172 92 Q169 89.6 165 90.6 Z" fill="#0a0a0d"/>
+      <!-- 투명 비닐 우산 -->
+      <line x1="171" y1="84" x2="173" y2="112" stroke="#d8e2f0" stroke-width=".8" opacity=".8"/>
+      <path d="M144 86 Q160 62 186 80 Q178 80 172 84 Q166 80 158 82 Q150 82 144 86 Z" fill="#dfeaff" opacity=".2" stroke="#eef4ff" stroke-opacity=".55" stroke-width=".6"/>
+      <!-- 얼굴에 닿는 빛 -->
+      <circle cx="150" cy="95" r="2.4" fill="#ffd8a8" opacity=".35"/>
+      <!-- 젖은 길 위 반사 -->
+      <rect x="140" y="134" width="36" height="20" fill="#9db4e8" opacity=".05"/>
+    </g>
+  </defs>
+</svg>
 
 <!-- 0 · 내비게이션 -->
 <header class="nav" id="top">
@@ -101,44 +160,38 @@
         <p class="sec-sub">단계마다 Lumi가 그 일에 맞는 소품을 챙겨 함께 가요.</p>
       </div>
       <article class="six__item" data-p="producer" style="--c:#F2A33A">
-        <img class="six__m" src="./assets/lumi-producer.webp" alt="" width="120" height="93" />
         <p class="six__n">01 · 이야기 만들기</p>
-        <h3><i></i>Producer</h3>
+        <h3><img class="six__m" src="./assets/lumi-producer.webp" alt="" width="64" height="50" />Producer</h3>
         <p class="six__d">한 줄을 듣고 이야기의 방향을 잡아요. 장르와 분위기, 길이와 화면 비율을 Lumi가 먼저 제안해요.</p>
         <ul class="six__out"><li>장르 · 분위기</li><li>길이 · 비율</li><li>바꿈 정도</li></ul>
       </article>
       <article class="six__item" data-p="writer" style="--c:#E8606F">
-        <img class="six__m" src="./assets/lumi-writer.webp" alt="" width="120" height="93" />
         <p class="six__n">02 · 이야기 만들기</p>
-        <h3><i></i>Writer</h3>
+        <h3><img class="six__m" src="./assets/lumi-writer.webp" alt="" width="64" height="50" />Writer</h3>
         <p class="six__d">장면이 보이는 산문을 써요. 마음에 안 드는 문단만 골라 말로 고치면 그 부분만 다시 써요.</p>
         <ul class="six__out"><li>산문</li><li>문단 고치기</li><li>@인물 태그</li></ul>
       </article>
       <article class="six__item" data-p="artist" style="--c:#8B63E8">
-        <img class="six__m" src="./assets/lumi-artist.webp" alt="" width="120" height="93" />
         <p class="six__n">03 · 이야기 만들기</p>
-        <h3><i></i>Artist</h3>
+        <h3><img class="six__m" src="./assets/lumi-artist.webp" alt="" width="64" height="50" />Artist</h3>
         <p class="six__d">인물 시트와 배경을 그려요. 한 번 정한 얼굴은 모든 컷에서 같은 모습으로 이어져요.</p>
         <ul class="six__out"><li>인물 시트</li><li>배경</li><li>모습 추가</li></ul>
       </article>
       <article class="six__item" data-p="storyboard" style="--c:#5A6AE6">
-        <img class="six__m" src="./assets/lumi-storyboard.webp" alt="" width="120" height="93" />
         <p class="six__n">04 · 영상으로 옮기기</p>
-        <h3><i></i>Storyboard</h3>
+        <h3><img class="six__m" src="./assets/lumi-storyboard.webp" alt="" width="64" height="50" />Storyboard</h3>
         <p class="six__d">컷을 나누고 구도를 콘티로 먼저 보여 줘요. 다시 그리기는 무료라 마음껏 맞춰 볼 수 있어요.</p>
         <ul class="six__out"><li>컷 나누기</li><li>콘티 이미지</li><li>다시 그리기 무료</li></ul>
       </article>
       <article class="six__item" data-p="director" style="--c:#3E9BE0">
-        <img class="six__m" src="./assets/lumi-director.webp" alt="" width="120" height="93" />
         <p class="six__n">05 · 영상으로 옮기기</p>
-        <h3><i></i>Director</h3>
+        <h3><img class="six__m" src="./assets/lumi-director.webp" alt="" width="64" height="50" />Director</h3>
         <p class="six__d">컷마다 카메라 앵글과 조명, 움직임을 정해요. 6축 카메라로 원하는 시선을 만들어요.</p>
         <ul class="six__out"><li>카메라 앵글</li><li>조명</li><li>움직임</li></ul>
       </article>
       <article class="six__item" data-p="editor" style="--c:#2DB39A">
-        <img class="six__m" src="./assets/lumi-editor.webp" alt="" width="120" height="93" />
         <p class="six__n">06 · 영상으로 옮기기</p>
-        <h3><i></i>Editor</h3>
+        <h3><img class="six__m" src="./assets/lumi-editor.webp" alt="" width="64" height="50" />Editor</h3>
         <p class="six__d">확정한 컷만 영상으로 만들고 한 편으로 이어요. 생성 전에 Take를 먼저 보여 드려요.</p>
         <ul class="six__out"><li>영상 생성</li><li>컷 잇기</li><li>내보내기</li></ul>
       </article>
@@ -146,8 +199,58 @@
     <div class="six__stage" aria-hidden="true">
       <div class="six__card" style="--c:#F2A33A">
         <div class="six__glow"></div>
-        <lumi-persona class="six__lumi" persona="producer" state="idle"></lumi-persona>
-        <p class="six__cap"><b id="sixName">Producer</b><span id="sixNum">01 / 06</span></p>
+        <div class="six__win">
+          <div class="six__bar"><span class="dots"><i></i><i></i><i></i></span><span class="six__chip"><i></i><b id="sixName">Producer</b></span><span id="sixNum">01 / 06</span></div>
+          <div class="six__screens">
+        <div class="ws" data-p="producer">
+          <p class="ws-t">이야기 설정</p>
+          <p class="ws-idea">우산 하나를 같이 쓴 두 사람</p>
+          <div class="ws-row"><span>장르</span><div class="ws-chips"><b class="on">로맨틱 코미디</b><b>드라마</b><b>미스터리</b></div></div>
+          <div class="ws-row"><span>길이</span><div class="ws-chips"><b>15초</b><b class="on">60초</b><b>3분</b></div></div>
+          <div class="ws-row"><span>비율</span><div class="ws-chips"><b class="on">9:16</b><b>16:9</b><b>1:1</b></div></div>
+          <div class="ws-row"><span>바꿈 정도</span><div class="ws-bar"><i style="width:40%"></i></div></div>
+          <p class="ws-btn">산문 쓰기 →</p>
+        </div>
+        <div class="ws" data-p="writer">
+          <p class="ws-t">산문 · 1화 우산 하나</p>
+          <p class="ws-p">막차를 놓친 <span class="mention">@서윤</span>은 정류장 지붕 끝에 서서 비를 피했다.</p>
+          <p class="ws-p ws-p--sel"><s>옆자리 남자가 말없이 우산을 기울였다.</s> 옆자리 남자가 말없이 우산을 기울였다. 우산 끝 빗방울이 그의 어깨만 적셨다.</p>
+          <p class="ws-p ws-p--dim">둘의 어깨가 한 뼘쯤 젖었을 때, <span class="mention">@서윤</span>은 그가 같은 회사 신입이라는 걸 알아챘다.</p>
+          <p class="ws-ask">“우산 장면을 조금 더 설레게” <b>이 문단만 고치기</b></p>
+        </div>
+        <div class="ws" data-p="artist">
+          <p class="ws-t">인물 · 배경</p>
+          <div class="ws-cast">
+            <div><figure class="ws-shot "><svg viewBox="128 76 40 53" preserveAspectRatio="xMidYMid slice"><use href="#world"/></svg></figure><p><b>서윤</b>29 · 팀장</p></div>
+            <div><figure class="ws-shot "><svg viewBox="150 72 40 53" preserveAspectRatio="xMidYMid slice"><use href="#world"/></svg></figure><p><b>도현</b>26 · 신입</p></div>
+            <div class="ws-add">+ 모습 추가</div>
+          </div>
+          <div class="ws-bg"><figure class="ws-shot "><svg viewBox="40 30 240 100" preserveAspectRatio="xMidYMid slice"><use href="#world"/></svg></figure><p><b>버스 정류장</b>밤 · 비</p></div>
+        </div>
+        <div class="ws" data-p="storyboard">
+          <p class="ws-t">스토리보드 · 컷 4</p>
+          <div class="ws-grid">
+            <div><figure class="ws-shot "><svg viewBox="0 0 320 180" preserveAspectRatio="xMidYMid slice"><use href="#world"/></svg></figure><p><b>1</b>와이드 · 아이레벨</p></div>
+            <div><figure class="ws-shot "><svg viewBox="112 66 96 54" preserveAspectRatio="xMidYMid slice"><use href="#world"/></svg></figure><p><b>2</b>미디엄 · 옆에서</p></div>
+            <div class="redo"><figure class="ws-shot "><svg viewBox="128 79 46 25.9" preserveAspectRatio="xMidYMid slice"><use href="#world"/></svg></figure><p><b>3</b>다시 그리기 · 무료</p></div>
+            <div><figure class="ws-shot ws-flip "><svg viewBox="118 58 120 67.5" preserveAspectRatio="xMidYMid slice"><use href="#world"/></svg></figure><p><b>4</b>투샷 · 뒤에서</p></div>
+          </div>
+        </div>
+        <div class="ws" data-p="director">
+          <p class="ws-t">컷 2 · 연출</p>
+          <div class="ws-big"><figure class="ws-shot "><svg viewBox="112 66 96 54" preserveAspectRatio="xMidYMid slice"><use href="#world"/></svg></figure></div>
+          <div class="ws-row"><span>앵글</span><div class="ws-chips"><b>아이레벨</b><b class="on">로우</b><b>하이</b></div></div>
+          <div class="ws-row"><span>카메라</span><div class="ws-chips"><b class="on">천천히 다가가기</b><b>고정</b></div></div>
+          <div class="ws-row"><span>조명</span><div class="ws-bar"><i style="width:70%"></i></div></div>
+        </div>
+        <div class="ws" data-p="editor">
+          <p class="ws-t">영상 · 한 편으로</p>
+          <div class="ws-big ws-play"><figure class="ws-shot ws-flip "><svg viewBox="118 58 120 67.5" preserveAspectRatio="xMidYMid slice"><use href="#world"/></svg></figure><span class="ws-tri"></span></div>
+          <div class="ws-tl"><i style="flex:3"></i><i style="flex:2"></i><i style="flex:1.4"></i><i style="flex:2.4"></i></div>
+          <p class="ws-cost"><span>컷 4 · Seedance 2.0 720p</span><b>20 Takes · 생성하기</b></p>
+        </div>
+          </div>
+        </div>
       </div>
     </div>
   </div>

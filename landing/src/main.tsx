@@ -51,7 +51,6 @@ if (track) Array.from(track.children).forEach((c) => { const d = c.cloneNode(tru
 // 여섯 단계: 보고 있는 단계로 오른쪽 Lumi가 옷을 갈아입어요
 const sixItems = Array.from(document.querySelectorAll<HTMLElement>('.six__item'))
 const card = document.querySelector<HTMLElement>('.six__card')
-const lumi = document.querySelector('.six__lumi')
 const nameEl = document.getElementById('sixName'), numEl = document.getElementById('sixNum')
 let current = ''
 const activate = (el: HTMLElement) => {
@@ -60,7 +59,7 @@ const activate = (el: HTMLElement) => {
   current = p
   sixItems.forEach((x) => x.classList.toggle('on', x === el))
   card?.style.setProperty('--c', el.style.getPropertyValue('--c'))
-  lumi?.setAttribute('persona', p)
+  document.querySelectorAll('.ws').forEach((w) => w.classList.toggle('on', (w as HTMLElement).dataset.p === p))
   if (nameEl) nameEl.textContent = el.querySelector('h3')!.textContent
   if (numEl) numEl.textContent = `${String(sixItems.indexOf(el) + 1).padStart(2, '0')} / 06`
 }

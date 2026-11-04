@@ -12,7 +12,7 @@ amb.className = 'ambient'
 amb.setAttribute('aria-hidden', 'true')
 const STAR = ['#F2A33A', '#E8606F', '#8B63E8', '#5A6AE6', '#3E9BE0', '#2DB39A']
 amb.innerHTML = '<i></i><i></i><i></i><i></i>' +
-  Array.from({ length: 34 }, () => `<span class="ambient__spark" style="left:${Math.random() * 100}%;top:${20 + Math.random() * 85}%;--sc:${STAR[Math.floor(Math.random() * 6)]};--sz:${2 + Math.random() * 3}px;--d:${9 + Math.random() * 12}s;--dl:${-Math.random() * 20}s"></span>`).join('')
+  Array.from({ length: 30 }, () => `<span class="ambient__spark" style="left:${Math.random() * 100}%;top:${20 + Math.random() * 85}%;--sc:${STAR[Math.floor(Math.random() * 6)]};--sz:${2 + Math.random() * 3}px;--d:${9 + Math.random() * 12}s;--dl:${-Math.random() * 20}s"></span>`).join('')
 document.body.prepend(amb)
 
 // ---------- 챗봇 ----------

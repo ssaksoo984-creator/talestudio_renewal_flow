@@ -14,7 +14,8 @@
 .ambient__spark { position: absolute; width: var(--sz, 3px); height: var(--sz, 3px); border-radius: 50%; background: var(--sc); box-shadow: 0 0 10px var(--sc); color: var(--sc); animation: spark var(--d, 9s) linear infinite; animation-delay: var(--dl, 0s); opacity: 0; }
 
 @keyframes spark { 0% { opacity: 0; transform: translate(0, 0); } 15% { opacity: var(--so, 0.55); } 50% { transform: translate(2vw, -20vh); } 85% { opacity: var(--so, 0.55); } 100% { opacity: 0; transform: translate(-1vw, -40vh); } }
-:root[data-theme='light'] .ambient__spark { --so: 0.45; }
+:root[data-theme='light'] .ambient__spark { --so: 0.5; box-shadow: 0 0 16px 5px color-mix(in srgb, var(--sc) 55%, transparent); animation-name: bloom; }
+@keyframes bloom { 0% { opacity: 0; transform: translate(0, 0) scale(0.3); } 30% { opacity: var(--so); transform: translate(1vw, -6vh) scale(1.7); } 60% { opacity: calc(var(--so) * 0.8); transform: translate(2vw, -12vh) scale(1); } 100% { opacity: 0; transform: translate(1vw, -18vh) scale(0); } }
 /* 섹션 바탕이 배경 빛을 덮지 않게 */
 body { background-color: var(--bg); }
 main, .foot { position: relative; }
@@ -35,23 +36,23 @@ main, .foot { position: relative; }
 .lumi-open .lumi-fab__img--color { opacity: 1; transform: none; }
 .lumi-open .lumi-fab::before { background: radial-gradient(closest-side, rgba(232, 96, 111, 0.6), rgba(139, 99, 232, 0.35) 60%, transparent); }
 
-.lumi-hint { position: fixed; right: calc(max(20px, env(safe-area-inset-right, 0px)) + 124px); bottom: calc(max(20px, env(safe-area-inset-bottom, 0px)) + 38px); z-index: 80;
+.lumi-hint { position: fixed; right: calc(max(20px, env(safe-area-inset-right, 0px)) + 96px); bottom: calc(max(20px, env(safe-area-inset-bottom, 0px)) + 38px); z-index: 80;
   padding: 10px 14px; border-radius: 16px 16px 4px 16px; background: var(--lc-panel); color: var(--lc-fg); font: 600 14px/1.4 var(--font, system-ui); white-space: nowrap;
   box-shadow: 0 12px 30px rgba(0, 0, 0, 0.25), 0 0 0 1px var(--lc-line); opacity: 0; transform: translateY(8px) scale(0.96); transition: opacity 0.4s, transform 0.4s; pointer-events: none; }
 .lumi-hint.on { opacity: 1; transform: none; }
 .lumi-open .lumi-hint { opacity: 0; }
 
 /* 진짜 Lumi 컴포넌트를 쓸 때 (3:2) */
-.lumi-fab--persona { width: 132px; height: 88px; }
+.lumi-fab--persona { width: 100px; height: 67px; }
 .lumi-fab--persona::before { display: none; }
-.lumi-fab__persona { display: block; width: 132px; }
+.lumi-fab__persona { display: block; width: 100px; }
 .lumi-fab--persona + .lumi-hint, .lumi-hint { }
 
 /* ---------- 챗봇 창 ---------- */
 :root { --lc-panel: #18171C; --lc-panel-2: #232129; --lc-fg: #F5F4EE; --lc-fg-2: #B9B6AD; --lc-line: rgba(255, 255, 255, 0.09); --lc-me: #2C2A33; --lc-btn: #EDEAE0; --lc-btn-fg: #141312; }
 :root[data-theme='light'] { --lc-panel: #FFFFFF; --lc-panel-2: #F3F2EE; --lc-fg: #141312; --lc-fg-2: #5C5A55; --lc-line: rgba(20, 19, 18, 0.1); --lc-me: #141312; --lc-btn: #141312; --lc-btn-fg: #FFFFFF; }
-.lumi-chat { position: fixed; right: max(20px, env(safe-area-inset-right, 0px)); bottom: calc(max(20px, env(safe-area-inset-bottom, 0px)) + 100px); z-index: 79;
-  display: grid; grid-template-rows: auto minmax(0, 1fr) auto auto; width: min(380px, calc(100vw - 32px)); height: min(540px, calc(100vh - 140px));
+.lumi-chat { position: fixed; right: max(20px, env(safe-area-inset-right, 0px)); bottom: calc(max(20px, env(safe-area-inset-bottom, 0px)) + 80px); z-index: 79;
+  display: grid; grid-template-rows: auto minmax(0, 1fr) auto auto; width: min(340px, calc(100vw - 32px)); height: min(470px, calc(100vh - 130px));
   border-radius: 24px; background: var(--lc-panel); color: var(--lc-fg); font-family: var(--font, system-ui); overflow: hidden;
   box-shadow: 0 30px 80px -10px rgba(0, 0, 0, 0.45), 0 0 0 1px var(--lc-line);
   transform-origin: calc(100% - 46px) calc(100% + 50px); transform: scale(0.2); opacity: 0; pointer-events: none;
@@ -89,8 +90,9 @@ main, .foot { position: relative; }
 }
 @media (max-width: 560px) {
   .lumi-fab { width: 76px; height: 62px; }
-  .lumi-fab--persona { width: 102px; height: 68px; }
-  .lumi-fab__persona { width: 102px; }
+  .lumi-fab--persona { width: 84px; height: 56px; }
+  .lumi-fab__persona { width: 84px; }
   .lumi-hint { display: none; }
   .lumi-chat { bottom: calc(max(16px, env(safe-area-inset-bottom, 0px)) + 72px); right: 16px; height: min(520px, calc(100vh - 120px)); }
 }
+:root[data-theme='light'] .ambient__spark:nth-of-type(n+15) { display: none; }

@@ -688,3 +688,69 @@ h2 { font-size: clamp(32px, 4.6vw, 48px); line-height: 1.2; font-weight: 700; le
 @media (prefers-reduced-motion: reduce) { .pt, .finale__symbol, .six__m { animation: none !important; } }
 .nav__links a.on { color: var(--text); }
 [data-view][hidden] { display: none !important; }
+
+/* ===== v4: 어둡게 포인트 = 하얀 빛 · 여섯 단계 작업 화면 ===== */
+:root[data-theme='dark'] .pt {
+  background-image: linear-gradient(105deg, #E9E6DD 0%, #E9E6DD 40%, #FFFFFF 47%, #FFFFFF 53%, #E9E6DD 60%, #E9E6DD 100%);
+  background-size: 300% 100%; animation: lightsweep 5s ease-in-out infinite;
+  filter: drop-shadow(0 0 14px rgba(255, 252, 240, 0.35)) drop-shadow(0 0 34px rgba(255, 248, 230, 0.15));
+}
+
+/* 왼쪽: 단계 이름 옆 작은 Lumi */
+.six__item h3 .six__m { display: block; width: 64px; height: auto; margin-left: -6px; opacity: 0.45; filter: grayscale(0.4); transition: opacity 0.5s, filter 0.5s, transform 0.5s; }
+.six__item.on h3 .six__m { opacity: 1; filter: drop-shadow(0 6px 14px color-mix(in srgb, var(--c) 45%, transparent)); animation: lumiBob 3.2s ease-in-out infinite; }
+.six__item h3 i { display: none; }
+
+/* 오른쪽: 단계별 작업 화면 */
+.six__card { padding: 36px; }
+.six__win { position: relative; width: 100%; height: 100%; display: grid; grid-template-rows: auto 1fr; border-radius: 18px; overflow: hidden; background: var(--bg); box-shadow: 0 0 0 1px var(--line), 0 30px 70px -20px rgba(0, 0, 0, 0.35); }
+.six__bar { display: flex; align-items: center; gap: 12px; height: 44px; padding: 0 16px; border-bottom: 1px solid var(--line); font: 600 12.5px/1 var(--num); color: var(--text-3); }
+.six__bar .dots { display: flex; gap: 6px; }
+.six__bar .dots i { width: 10px; height: 10px; border-radius: 50%; background: var(--surface-2); }
+.six__chip { display: inline-flex; align-items: center; gap: 7px; padding: 6px 11px; border-radius: 999px; background: color-mix(in srgb, var(--c) 16%, transparent); color: var(--text); transition: background-color 0.5s; }
+.six__chip i { width: 7px; height: 7px; border-radius: 50%; background: var(--c); }
+.six__bar > span:last-child { margin-left: auto; }
+.six__screens { position: relative; }
+.ws { position: absolute; inset: 0; display: flex; flex-direction: column; gap: 12px; padding: 22px; overflow: hidden; opacity: 0; transform: translateY(14px); transition: opacity 0.5s ease, transform 0.6s cubic-bezier(0.2, 0.7, 0.2, 1); pointer-events: none; }
+.ws.on { opacity: 1; transform: none; }
+.ws-t { font-weight: 800; font-size: 15px; }
+.ws-idea { padding: 12px 16px; border-radius: 14px; background: var(--chip); font-weight: 600; }
+.ws-row { display: grid; grid-template-columns: 72px minmax(0, 1fr); align-items: center; gap: 10px; font-size: 13px; color: var(--text-3); font-weight: 600; }
+.ws-chips { display: flex; flex-wrap: wrap; gap: 6px; }
+.ws-chips b { padding: 6px 11px; border-radius: 999px; background: var(--chip); color: var(--text-2); font-weight: 600; font-size: 12.5px; }
+.ws-chips b.on { background: var(--text); color: var(--bg); }
+.ws-bar { position: relative; height: 6px; border-radius: 999px; background: var(--chip); }
+.ws-bar i { position: absolute; inset: 0 auto 0 0; border-radius: inherit; background: var(--c); }
+.ws-btn { align-self: flex-end; margin-top: auto; padding: 10px 18px; border-radius: 999px; background: var(--btn-bg); color: var(--btn-fg); font-weight: 700; font-size: 14px; }
+.ws-p { padding: 8px 12px; border-radius: 12px; color: var(--text-2); font-size: 14.5px; line-height: 1.8; }
+.ws-p--sel { background: var(--chip); color: var(--text); }
+.ws-p--sel s { display: block; color: var(--text-3); text-decoration-color: var(--writer); }
+.ws-p--dim { color: var(--text-3); }
+.ws-ask { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; margin-top: auto; padding: 10px 10px 10px 14px; border-radius: 16px; box-shadow: 0 0 0 1px var(--line); font-size: 13.5px; color: var(--text-2); }
+.ws-ask b { margin-left: auto; padding: 7px 12px; border-radius: 999px; background: var(--btn-bg); color: var(--btn-fg); font-size: 12.5px; }
+.ws-shot { position: relative; overflow: hidden; border-radius: 10px; background: #0b0f1c; }
+.ws-shot svg { display: block; width: 100%; height: 100%; }
+.ws-flip svg { transform: scaleX(-1); }
+.ws-cast { display: grid; grid-template-columns: 1fr 1fr 0.7fr; gap: 10px; }
+.ws-cast .ws-shot { aspect-ratio: 3 / 4; }
+.ws-cast p, .ws-bg p, .ws-grid p { margin-top: 6px; font-size: 12.5px; color: var(--text-3); }
+.ws-cast b, .ws-bg b { display: block; color: var(--text); font-size: 13.5px; }
+.ws-add { display: grid; place-items: center; border-radius: 10px; border: 1.5px dashed var(--line); color: var(--text-3); font-size: 12.5px; font-weight: 600; text-align: center; aspect-ratio: 3 / 4.6; }
+.ws-bg .ws-shot { aspect-ratio: 12 / 5; }
+.ws-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+.ws-grid .ws-shot { aspect-ratio: 16 / 9; }
+.ws-grid p { display: flex; align-items: center; gap: 6px; }
+.ws-grid p b { display: grid; place-items: center; width: 18px; height: 18px; border-radius: 50%; background: var(--text); color: var(--bg); font: 800 10.5px/1 var(--num); }
+.ws-grid .redo .ws-shot { box-shadow: 0 0 0 2px var(--c); }
+.ws-grid .redo p { color: var(--text); font-weight: 700; }
+.ws-big { position: relative; }
+.ws-big .ws-shot { aspect-ratio: 16 / 8; }
+.ws-tri { position: absolute; left: 50%; top: 50%; width: 52px; height: 52px; margin: -26px; border-radius: 50%; background: rgba(255, 255, 255, 0.92); }
+.ws-tri::after { content: ''; position: absolute; left: 21px; top: 16px; border-left: 15px solid #141312; border-top: 10px solid transparent; border-bottom: 10px solid transparent; }
+.ws-tl { display: flex; gap: 4px; height: 34px; padding: 4px; border-radius: 10px; background: var(--chip); }
+.ws-tl i { border-radius: 6px; background: color-mix(in srgb, var(--c) 45%, var(--surface-2)); }
+.ws-tl i:nth-child(2) { background: color-mix(in srgb, var(--c) 70%, var(--surface-2)); }
+.ws-cost { display: flex; justify-content: space-between; align-items: center; gap: 10px; margin-top: auto; font-size: 13px; color: var(--text-3); }
+.ws-cost b { padding: 9px 14px; border-radius: 999px; background: var(--btn-bg); color: var(--btn-fg); font-size: 13px; }
+@media (max-width: 1000px) { .six__item h3 .six__m { opacity: 1; filter: none; animation: lumiBob 3.2s ease-in-out infinite; } }
+.defs { position: absolute; width: 0; height: 0; overflow: hidden; }

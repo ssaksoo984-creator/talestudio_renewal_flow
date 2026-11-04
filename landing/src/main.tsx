@@ -1,6 +1,7 @@
 import './page.css'
 import './lumi-chat.js'
 import './common.js'
+import { createSim, STEPS } from './appsim.js'
 
 
 // Hero tabs
@@ -28,6 +29,8 @@ const sixItems = Array.from(document.querySelectorAll<HTMLElement>('.six__item')
 const card = document.querySelector<HTMLElement>('.six__card')
 const nameEl = document.getElementById('sixName'), numEl = document.getElementById('sixNum')
 let current = ''
+const sim2 = createSim(document.getElementById('sim2')!)
+let sim2Visible = false
 const activate = (el: HTMLElement) => {
   const p = el.dataset.p!
   if (p === current) return
@@ -36,8 +39,8 @@ const activate = (el: HTMLElement) => {
   card?.style.setProperty('--c', el.style.getPropertyValue('--c'))
   const order = sixItems.map((x) => x.dataset.p)
   const at = order.indexOf(p)
-  document.querySelectorAll<HTMLElement>('.six__app img').forEach((n) => n.classList.toggle('on', n.dataset.p === p))
   void at
+  if (sim2Visible) sim2.play(p, true); else sim2.still(p)
   if (nameEl) nameEl.textContent = el.querySelector('h3')!.textContent
   if (numEl) numEl.textContent = `${String(sixItems.indexOf(el) + 1).padStart(2, '0')} / 06`
 }
@@ -46,19 +49,21 @@ sixItems.forEach((x) => sio.observe(x))
 if (sixItems[0]) activate(sixItems[0])
 
 
-// 한 줄의 여정: 실제 앱 화면이 차례로 넘어가요 (탭을 눌러 고를 수 있어요)
-const frame = document.querySelectorAll<HTMLImageElement>('.shots__frame img')
+
+// 한 줄의 여정: 앱 시뮬레이션이 Producer부터 Editor까지 이어서 재생돼요
 const stabs = Array.from(document.querySelectorAll<HTMLButtonElement>('.shots__tabs button'))
-let si = 0, timer = 0
-const showShot = (n: number) => {
-  si = (n + frame.length) % frame.length
-  frame.forEach((f, i) => f.classList.toggle('on', i === si))
-  stabs.forEach((b, i) => { b.classList.toggle('on', i === si); b.setAttribute('aria-selected', String(i === si)) })
-}
-const reduceMotion = matchMedia('(prefers-reduced-motion: reduce)').matches
-const play = () => { clearInterval(timer); if (!reduceMotion) timer = window.setInterval(() => showShot(si + 1), 4500) }
-stabs.forEach((b, i) => b.addEventListener('click', () => { showShot(i); play() }))
-const shots = document.getElementById('shots')
-shots?.addEventListener('mouseenter', () => { clearInterval(timer); shots.classList.add('paused') })
-shots?.addEventListener('mouseleave', () => { shots.classList.remove('paused'); play() })
-play()
+const sim = createSim(document.getElementById('sim')!, {
+  loop: true,
+  onStep: (s: string) => stabs.forEach((b) => { const on = b.dataset.s === s; b.classList.toggle('on', on); b.setAttribute('aria-selected', String(on)) }),
+})
+let simStarted = false
+stabs.forEach((b) => b.addEventListener('click', () => sim.play(b.dataset.s!)))
+new IntersectionObserver((es) => es.forEach((e) => {
+  if (e.isIntersecting && !simStarted) { simStarted = true; sim.play('producer') }
+  else if (!e.isIntersecting && simStarted) { simStarted = false; sim.stop(); sim.still('producer') }
+}), { threshold: 0.3 }).observe(document.getElementById('sim')!)
+sim.still('producer')
+new IntersectionObserver((es) => es.forEach((e) => {
+  sim2Visible = e.isIntersecting
+  if (current) { if (sim2Visible) sim2.play(current, true); else sim2.stop() }
+}), { threshold: 0.3 }).observe(document.getElementById('sim2')!)

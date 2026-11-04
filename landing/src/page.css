@@ -831,3 +831,8 @@ h2 { font-size: clamp(32px, 4.6vw, 48px); line-height: 1.2; font-weight: 700; le
 .six__card { height: auto; aspect-ratio: 16 / 11; }
 @media (max-width: 860px) { .shots__tabs { grid-template-columns: repeat(3, minmax(0, 1fr)); } .shots { padding: 0 16px; } }
 @media (max-width: 480px) { .shots__tabs span { display: none; } }
+
+/* ===== v7: 앱 시뮬레이션 자리 ===== */
+.six__win { background: transparent; box-shadow: none; }
+.six__screens { display: grid; align-items: center; }
+.six__card { aspect-ratio: auto; padding: 24px; }

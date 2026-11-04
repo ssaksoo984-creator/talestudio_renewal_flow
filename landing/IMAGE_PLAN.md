@@ -2,7 +2,9 @@
 
 이 문서는 메인 페이지 두 시안에 있는 **이미지 자리**에 무엇을 채울지, Claude에게 **어떻게 시키면 되는지** 정리한 거예요.
 - 밝은 버전 `dist/TaleStudio_메인_밝은.html` (원본 `landing/index.html`) — Runway 결
-- 어두운 버전 `dist/TaleStudio_메인_어두운.html` (원본 `landing/dark.html`) — Artlist · OpenArt 결, 구성이 달라요
+- 어두운 버전 `dist/TaleStudio_메인_어두운.html` (원본 `landing/dark.html` · `src/dark.css` · `src/dark.js`) — Artlist · OpenArt 결, 구성이 달라요. stageshow · React 없이 손으로 만든 페이지예요
+  - 어두운 버전은 이미지 대신 직접 그린 SVG 장면(비 오는 정류장, `dark.html` 맨 위 `#world`)을 히어로 · 데모 컷 · 콘티에 써요. 실제 이미지가 생기면 `<svg>…</svg>` 자리를 `<img src="./assets/img/IMG-C1.webp">`로 바꾸면 돼요
+  - 작품은 글자 포스터로 대신했어요. IMG-S1~S6이 생기면 포스터 배경으로 넣어요
 
 두 페이지는 같은 ID를 같이 써요. 한 번 만들면 양쪽에 다 들어가요.
 페이지 안의 회색 자리마다 오른쪽 위에 `IMG-xx` 표시가 붙어 있어요. 아래 표의 ID와 같아요.
@@ -81,7 +83,7 @@ cinematic previs still, 35mm film look, cool navy night with warm sodium streetl
 
 > 실제 Tale로 만든 결과물이 생기면 그걸로 바꾸는 게 가장 좋아요. 쇼케이스는 "만든 것"이어야 믿어져요.
 
-### F. 어두운 버전에만 있는 자리
+### F. (이전 어두운 시안용 · 지금 버전에서는 안 씀)
 
 | ID | 어디 | 비율 · 크기 | 프롬프트 |
 |---|---|---|---|

@@ -1,5 +1,5 @@
 <!doctype html>
-<html lang="ko" data-theme="dark">
+<html lang="ko">
 <head>
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
@@ -8,231 +8,262 @@
 <link rel="icon" type="image/svg+xml" href="./assets/tale-symbol.svg" />
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable-dynamic-subset.css" />
 <link rel="preconnect" href="https://fonts.googleapis.com" />
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@300;500;600;700;800&display=swap" />
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@300;500;600;700;800&family=Noto+Serif+KR:wght@400;600&display=swap" />
+<link rel="stylesheet" href="./src/dark.css" />
 </head>
-<body class="dk">
+<body>
 <a class="skip" href="#main">본문으로 건너뛰기</a>
 
-<!-- 내비게이션 -->
+<!-- 장면 원본: 비 오는 정류장. 히어로 · 데모 컷 · 콘티가 viewBox만 바꿔 같은 세계를 비춰요 -->
+<svg class="defs" aria-hidden="true" focusable="false">
+  <defs>
+    <linearGradient id="sky" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#070b16"/><stop offset=".55" stop-color="#121a30"/><stop offset="1" stop-color="#1a1d2c"/></linearGradient>
+    <linearGradient id="road" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#151925"/><stop offset="1" stop-color="#05060a"/></linearGradient>
+    <radialGradient id="cone" cx=".5" cy="0" r="1"><stop offset="0" stop-color="#ffcf86" stop-opacity=".55"/><stop offset=".6" stop-color="#f2a33a" stop-opacity=".12"/><stop offset="1" stop-color="#f2a33a" stop-opacity="0"/></radialGradient>
+    <radialGradient id="pool" cx=".5" cy=".5" r=".5"><stop offset="0" stop-color="#ffcf86" stop-opacity=".45"/><stop offset="1" stop-color="#ffcf86" stop-opacity="0"/></radialGradient>
+    <radialGradient id="tail" cx=".5" cy=".5" r=".5"><stop offset="0" stop-color="#ff4a5a" stop-opacity=".9"/><stop offset="1" stop-color="#ff4a5a" stop-opacity="0"/></radialGradient>
+    <radialGradient id="faceW" cx=".62" cy=".4" r=".7"><stop offset="0" stop-color="#e7b48c"/><stop offset=".7" stop-color="#8a5f45"/><stop offset="1" stop-color="#3a2a22"/></radialGradient>
+    <radialGradient id="faceM" cx=".35" cy=".4" r=".7"><stop offset="0" stop-color="#c79a7a"/><stop offset=".7" stop-color="#6e4c3a"/><stop offset="1" stop-color="#2a2020"/></radialGradient>
+    <g id="world">
+      <rect width="320" height="180" fill="url(#sky)"/>
+      <!-- 먼 건물 -->
+      <g fill="#0b1020">
+        <rect x="0" y="52" width="38" height="70"/><rect x="36" y="38" width="30" height="84"/><rect x="64" y="60" width="26" height="62"/>
+        <rect x="196" y="46" width="22" height="76"/><rect x="250" y="30" width="40" height="92"/><rect x="288" y="56" width="32" height="66"/>
+      </g>
+      <g fill="#f6c27a">
+        <rect x="8" y="62" width="3" height="3" opacity=".7"/><rect x="20" y="74" width="3" height="3" opacity=".4"/><rect x="44" y="50" width="3" height="3" opacity=".8"/>
+        <rect x="52" y="66" width="3" height="3" opacity=".35"/><rect x="72" y="70" width="3" height="3" opacity=".6"/><rect x="258" y="42" width="3" height="3" opacity=".5"/>
+        <rect x="272" y="58" width="3" height="3" opacity=".8"/><rect x="262" y="78" width="3" height="3" opacity=".35"/><rect x="298" y="66" width="3" height="3" opacity=".6"/><rect x="204" y="60" width="3" height="3" opacity=".45"/>
+      </g>
+      <!-- 길 -->
+      <rect y="122" width="320" height="58" fill="url(#road)"/>
+      <rect y="122" width="320" height="1" fill="#2a3044"/>
+      <!-- 떠난 막차 -->
+      <ellipse cx="22" cy="132" rx="9" ry="5" fill="url(#tail)"/><ellipse cx="38" cy="132" rx="9" ry="5" fill="url(#tail)"/>
+      <rect x="20" y="148" width="20" height="14" fill="#ff4a5a" opacity=".08"/>
+      <!-- 가로등 -->
+      <polygon points="226,34 178,138 276,138" fill="url(#cone)"/>
+      <line x1="232" y1="30" x2="232" y2="136" stroke="#1a2030" stroke-width="2.2"/>
+      <path d="M232 31 Q232 27 226 28" stroke="#1a2030" stroke-width="2" fill="none"/>
+      <ellipse cx="224" cy="31" rx="5" ry="2.2" fill="#ffe1a8"/>
+      <ellipse cx="226" cy="150" rx="40" ry="14" fill="url(#pool)"/>
+      <rect x="222" y="138" width="6" height="40" fill="#ffcf86" opacity=".14"/>
+      <!-- 정류장 -->
+      <rect x="84" y="76" width="104" height="50" fill="#9db4e8" opacity=".06"/>
+      <rect x="80" y="70" width="114" height="5" rx="2" fill="#a9c0f0" opacity=".22"/>
+      <rect x="86" y="75" width="2" height="51" fill="#2a3246"/><rect x="186" y="75" width="2" height="51" fill="#2a3246"/>
+      <rect x="96" y="82" width="22" height="30" rx="1.5" fill="#ffe9c2" opacity=".18"/>
+      <!-- 서윤 (왼쪽, 트렌치코트) -->
+      <path d="M140 132 L141 108 Q141 101 148 101 Q155 101 155 108 L157 132 Z" fill="#4a3d2f"/>
+      <path d="M147 102 L148 132" stroke="#2c241c" stroke-width=".8"/>
+      <circle cx="148" cy="96" r="5.2" fill="url(#faceW)"/>
+      <path d="M142.6 96 Q142.4 89.6 148 89.6 Q153.8 89.6 153.6 96 L153.4 99 Q152 93 148 92.8 Q144 93 143 99 Z" fill="#0d0b0c"/>
+      <!-- 도현 (오른쪽, 검정 코트) -->
+      <path d="M159 132 L160 105 Q160 98 167 98 Q174 98 174 105 L176 132 Z" fill="#141826"/>
+      <path d="M163 99 Q167 102 171 99 L171 104 Q167 106 163 104 Z" fill="#26324f"/>
+      <circle cx="167" cy="93" r="5" fill="url(#faceM)"/>
+      <path d="M162 92 Q162 87 167 87 Q172.4 87 172 92 Q169 89.6 165 90.6 Z" fill="#0a0a0d"/>
+      <!-- 투명 비닐 우산 -->
+      <line x1="171" y1="84" x2="173" y2="112" stroke="#d8e2f0" stroke-width=".8" opacity=".8"/>
+      <path d="M144 86 Q160 62 186 80 Q178 80 172 84 Q166 80 158 82 Q150 82 144 86 Z" fill="#dfeaff" opacity=".2" stroke="#eef4ff" stroke-opacity=".55" stroke-width=".6"/>
+      <!-- 얼굴에 닿는 빛 -->
+      <circle cx="150" cy="95" r="2.4" fill="#ffd8a8" opacity=".35"/>
+      <!-- 젖은 길 위 반사 -->
+      <rect x="140" y="134" width="36" height="20" fill="#9db4e8" opacity=".05"/>
+    </g>
+  </defs>
+</svg>
+
 <header class="nav" id="top">
-  <div class="wrap-x nav__in">
+  <div class="wrap nav__in">
     <a href="#top" class="nav__logo" aria-label="Tale Studio 처음으로"><img src="./assets/tale-lockup.svg" alt="tale studio" width="138" height="35" /></a>
-    <nav class="nav__links dk-navlinks" aria-label="주요 메뉴">
-      <a href="#studio">스튜디오</a>
-      <a href="#tools">기능</a>
-      <a href="#works">작품</a>
-      <a href="#pricing">요금</a>
+    <nav class="nav__links" aria-label="주요 메뉴">
+      <a href="#studio">스튜디오</a><a href="#why">왜 Tale</a><a href="#works">작품</a><a href="#pricing">요금</a>
     </nav>
     <div class="nav__end">
-      <a href="#login" class="dk-login">로그인</a>
-      <a href="#studio" class="btn btn--primary btn--sm">무료로 시작하기</a>
+      <a href="#login" class="nav__login">로그인</a>
+      <a href="#studio" class="btn btn--cream btn--sm">무료로 시작하기</a>
     </div>
   </div>
 </header>
 
 <main id="main">
 
-<!-- 1 · 히어로 (Artlist 결: 가운데, 가는 글씨 + 굵은 강조) -->
-<section class="dk-hero">
-  <div class="dk-hero__light" aria-hidden="true"></div>
-  <div class="wrap-x dk-hero__in">
-    <p class="dk-kicker reveal">Your Tale Deserves a Take</p>
-    <h1 class="dk-hero__h reveal">이야기를 쓰면,<br /><b class="shine">영상이 됩니다</b></h1>
-    <ul class="dk-models reveal" aria-label="함께 쓰는 AI">
-      <li><img src="./assets/lumi@2x.webp" alt="" width="20" height="15" />Lumi</li>
-      <li>Seedance</li><li>Kling</li><li>Hunyuan</li><li>Tale 자체 모델</li>
-    </ul>
-    <a href="#studio" class="btn btn--primary btn--lg reveal">한 줄 적고 시작하기</a>
-    <p class="dk-hero__note reveal">기획 · 글 · 그림 · 콘티 · 연출 · 편집. 여섯 명의 AI 제작팀이 한 화면에.</p>
+<!-- 1 · 히어로: 장면 위에 타이틀 카드 -->
+<section class="hero">
+  <div class="hero__scene" aria-hidden="true">
+    <svg viewBox="0 0 320 180" preserveAspectRatio="xMidYMid slice"><use href="#world"/></svg>
+    <div class="rain"></div><div class="rain rain--far"></div>
   </div>
-</section>
+  <div class="hero__shade" aria-hidden="true"></div>
+  <div class="wrap hero__in">
+    <p class="kicker rise">Your Tale Deserves a Take</p>
+    <h1 class="hero__h rise">이야기를 쓰면,<br /><em>영상</em>이 됩니다</h1>
+    <p class="hero__sub rise">한 줄을 적으면 Lumi가 산문을 쓰고, 인물을 그리고, 콘티로 먼저 보여 줘요.<br class="br-wide" />마음에 들 때만 영상으로 옮겨요.</p>
 
-<!-- 2 · 스튜디오 위젯 (OpenArt 결: 왼쪽 설정 패널 + 오른쪽 큰 미리보기) -->
-<section class="dk-studio" id="studio">
-  <div class="wrap-x dk-studio__in">
-    <form class="dk-panel reveal" onsubmit="return false" aria-label="Tale 스튜디오 시작하기">
-      <div class="dk-panel__model">
-        <img src="./assets/lumi-white-pearl.webp" alt="" width="40" height="31" />
-        <div><small>함께할 AI</small><b>Lumi · Producer</b></div>
-      </div>
-      <div class="dk-seg" role="tablist" aria-label="시작 방법">
-        <button type="button" role="tab" aria-selected="true">아이디어</button>
-        <button type="button" role="tab" aria-selected="false">대본</button>
-        <button type="button" role="tab" aria-selected="false">파일</button>
-      </div>
-      <label class="sr" for="dk-idea">이야기 한 줄</label>
-      <textarea id="dk-idea" rows="5" placeholder="예) 비 오는 정류장, 우산 하나를 같이 쓰게 된 두 사람. 알고 보니 같은 회사 신입과 팀장이었다."></textarea>
-      <div class="dk-rows">
-        <div class="dk-row"><span>장르</span><b>Lumi가 추천</b></div>
-        <div class="dk-row"><span>길이</span><b>60초</b></div>
-        <div class="dk-row"><span>화면 비율</span><b>9:16</b></div>
-      </div>
-      <button type="submit" class="btn btn--primary dk-go">콘티 먼저 보기</button>
-      <p class="dk-cost"><span>예상 사용량</span><b>0 Take</b></p>
-      <p class="dk-cost__sub">콘티 · 인물 시트는 무료예요. 영상은 확정한 컷에만 Take를 써요.</p>
+    <form class="ask rise" onsubmit="return false" aria-label="이야기 시작하기">
+      <img class="ask__lumi" src="./assets/lumi@2x.webp" alt="" width="36" height="27" />
+      <label class="sr" for="ask">이야기 한 줄</label>
+      <input id="ask" type="text" autocomplete="off" placeholder="비 오는 정류장, 우산 하나를 같이 쓴 두 사람" />
+      <button type="submit" class="btn btn--cream">시작하기 <span aria-hidden="true">→</span></button>
     </form>
-    <div class="dk-preview reveal">
-      <div id="demo" class="dk-demo"></div>
-      <button type="button" class="dk-replay" id="replay" aria-label="데모 다시 보기">
-        <svg width="14" height="14" viewBox="0 0 16 16" fill="currentColor" aria-hidden="true"><path d="M8 2a6 6 0 1 1-5.66 8 1 1 0 1 1 1.88-.67A4 4 0 1 0 5.2 4.8H6.5a1 1 0 1 1 0 2H3a1 1 0 0 1-1-1V2.5a1 1 0 1 1 2 0v.95A5.98 5.98 0 0 1 8 2Z"/></svg>
-      </button>
-    </div>
+    <ul class="hero__models rise" aria-label="함께 쓰는 AI"><li>Lumi</li><li>Seedance</li><li>Kling</li><li>Hunyuan</li><li>Tale 자체 모델</li></ul>
   </div>
+  <p class="hero__slate" aria-hidden="true"><span>SCENE 01</span><span>버스 정류장 · 밤 · 비</span><span>CUT 1 / WIDE</span></p>
 </section>
 
-<!-- 3 · 도구 벤토 (Artlist 결: 이미지 타일 + 아이콘 라벨) -->
-<section class="dk-tools" id="tools">
-  <div class="wrap-x">
-    <div class="dk-head reveal">
-      <h2>영상 AI는 많아요.<br /><span class="dk-thin">이야기부터 같이 쓰는 곳은 드물어요.</span></h2>
-    </div>
-    <div class="dk-bento">
-      <a class="dk-tile dk-tile--big reveal" href="#flow">
-        <figure class="ph" data-img="IMG-T1"></figure>
-        <div class="dk-tile__ui dk-ui-write" aria-hidden="true">
-          <p><span class="mention">@서윤</span>은 정류장 지붕 끝에 서서 비를 피했다.</p>
-          <p class="sel">옆자리 남자가 말없이 우산을 기울였다. 우산 끝 빗방울이 그의 어깨만 적셨다.</p>
-          <span class="dk-mini-chip">이 문단만 더 설레게</span>
-        </div>
-        <div class="dk-tile__label"><span class="dk-ico" data-step="writer"><i></i></span><div><b>글을 써 줘요</b><span>한 줄을 장면이 보이는 산문으로. 고칠 문단만 골라 말로 고쳐요.</span></div></div>
-      </a>
-      <a class="dk-tile dk-tile--tall reveal" href="#flow">
-        <figure class="ph" data-img="IMG-T2"></figure>
-        <div class="dk-tile__ui dk-ui-branch" aria-hidden="true">
-          <span class="seed">우산 하나를 같이 쓴 두 사람</span>
-          <span class="leaf on">로맨틱 코미디</span><span class="leaf">잔잔한 드라마</span><span class="leaf">미스터리</span>
-        </div>
-        <div class="dk-tile__label"><span class="dk-ico" data-step="producer"><i></i></span><div><b>아이디어를 넓혀 줘요</b><span>장르 · 인물 관계 · 결말을 몇 갈래로 펼쳐 보여 줘요.</span></div></div>
-      </a>
-      <a class="dk-tile reveal" href="#storyboard">
-        <figure class="ph" data-img="IMG-C2"></figure>
-        <div class="dk-tile__label"><span class="dk-ico" data-step="storyboard"><i></i></span><div><b>콘티로 먼저 확인</b><span>영상 전에 구도부터.</span></div></div>
-      </a>
-      <a class="dk-tile reveal" href="#flow">
-        <figure class="ph" data-img="IMG-B1"></figure>
-        <div class="dk-tile__label"><span class="dk-ico" data-step="artist"><i></i></span><div><b>인물 일관성</b><span>인물 시트 하나로 같은 얼굴.</span></div></div>
-      </a>
-      <a class="dk-tile reveal" href="#flow">
-        <figure class="ph" data-img="IMG-T3"></figure>
-        <div class="dk-tile__label"><span class="dk-ico" data-step="director"><i></i></span><div><b>컷마다 카메라 · 조명</b><span>6축 앵글과 빛을 컷 단위로.</span></div></div>
-      </a>
-      <a class="dk-tile reveal" href="#flow">
-        <figure class="ph" data-img="IMG-V1"><span class="play" aria-hidden="true"></span></figure>
-        <div class="dk-tile__label"><span class="dk-ico" data-step="editor"><i></i></span><div><b>영상 생성 · T2V · I2V</b><span>확정한 콘티에서 영상으로.</span></div></div>
-      </a>
-      <a class="dk-tile dk-tile--wide reveal" href="#flow">
-        <div class="dk-sheet" aria-hidden="true">
-          <div class="r h"><span>컷</span><span>샷</span><span>카메라</span><span>대사</span></div>
-          <div class="r"><span>1</span><span>와이드</span><span>아이레벨</span><span>—</span></div>
-          <div class="r"><span>2</span><span>미디엄</span><span>옆에서</span><span>“팀장님도 이 버스 타세요?”</span></div>
-          <div class="r"><span>3</span><span>클로즈업</span><span>로우앵글</span><span>“…네.”</span></div>
-        </div>
-        <div class="dk-tile__label"><span class="dk-ico dk-ico--mono"><i></i></span><div><b>마스터 시트 내보내기</b><span>컷 · 대사 · 카메라를 한 장으로. 팀과 바로 공유해요.</span></div></div>
-      </a>
+<!-- 2 · 스튜디오: 손으로 만든 제품 데모 -->
+<section class="studio" id="studio">
+  <div class="wrap">
+    <div class="head rise">
+      <p class="kicker">Studio</p>
+      <h2>한 줄을 적었을 뿐인데,<br /><em>콘티</em>까지 와 있어요</h2>
     </div>
   </div>
-</section>
-
-<!-- 4 · 여섯 단계 카드 줄 (Artlist 모델 카드 줄 결) -->
-<section class="dk-steps" id="flow">
-  <div class="wrap-x">
-    <div class="dk-head dk-head--row reveal">
-      <h2>여섯 단계,<br /><span class="dk-thin">T에서 쓰고 꼬리에서 찍어요</span></h2>
-      <div class="dk-arrows"><button type="button" class="dk-arrow" data-dir="-1" aria-label="이전">←</button><button type="button" class="dk-arrow" data-dir="1" aria-label="다음">→</button></div>
-    </div>
-  </div>
-  <div class="dk-rail reveal" id="rail">
-    <article class="dk-step" data-step="producer"><img src="./assets/lumi-producer.webp" alt="" width="96" height="74" /><p class="dk-step__n">01 · T</p><h3><i></i>Producer</h3><p>한 줄을 듣고 장르 · 길이 · 화면 비율을 정해요.</p></article>
-    <article class="dk-step" data-step="writer"><img src="./assets/lumi-writer.webp" alt="" width="96" height="74" /><p class="dk-step__n">02 · T</p><h3><i></i>Writer</h3><p>장면이 보이는 산문을 쓰고 같이 고쳐요.</p></article>
-    <article class="dk-step" data-step="artist"><img src="./assets/lumi-artist.webp" alt="" width="96" height="74" /><p class="dk-step__n">03 · T</p><h3><i></i>Artist</h3><p>인물 시트와 배경을 그려 얼굴을 고정해요.</p></article>
-    <article class="dk-step" data-step="storyboard"><img src="./assets/lumi-storyboard.webp" alt="" width="96" height="74" /><p class="dk-step__n">04 · 꼬리</p><h3><i></i>Storyboard</h3><p>컷을 나누고 구도를 콘티로 먼저 보여 줘요.</p></article>
-    <article class="dk-step" data-step="director"><img src="./assets/lumi-director.webp" alt="" width="96" height="74" /><p class="dk-step__n">05 · 꼬리</p><h3><i></i>Director</h3><p>컷마다 카메라 · 조명 · 움직임을 정해요.</p></article>
-    <article class="dk-step" data-step="editor"><img src="./assets/lumi-editor.webp" alt="" width="96" height="74" /><p class="dk-step__n">06 · 꼬리</p><h3><i></i>Editor</h3><p>확정한 컷을 영상으로 만들고 한 편으로 이어요.</p></article>
-  </div>
-</section>
-
-<!-- 5 · 콘티 먼저 (Artlist Studio 결: 빛나는 제목 + 큰 시네마틱 이미지) -->
-<section class="dk-sb" id="storyboard">
-  <div class="wrap-x">
-    <div class="dk-sb__head reveal">
-      <p class="dk-kicker">Storyboard First</p>
-      <h2 class="dk-glow">콘티 먼저,<br />영상은 그다음</h2>
-      <p class="dk-sub">영상부터 뽑으면 마음에 들 때까지 계속 다시 만들어야 해요. Tale은 컷마다 구도 · 카메라 · 조명을 콘티로 먼저 보여 주고, 확정한 컷만 영상으로 옮겨요.</p>
-    </div>
-    <div class="dk-sb__frame reveal">
-      <figure class="ph dk-sb__img" data-img="IMG-H1"><figcaption><b>컷 3 · 클로즈업 · 로우앵글</b>“팀장님도 이 버스 타세요?”</figcaption></figure>
-      <div class="dk-strip" aria-label="컷 확인 상태">
-        <figure class="ph dk-cut" data-img="IMG-C1"><span class="cutno">1</span><em class="ok">확정</em></figure>
-        <figure class="ph dk-cut" data-img="IMG-C2"><span class="cutno">2</span><em class="ok">확정</em></figure>
-        <figure class="ph dk-cut dk-cut--on" data-img="IMG-C3"><span class="cutno">3</span><em>다시 그리기 · 무료</em></figure>
-        <figure class="ph dk-cut" data-img="IMG-C4"><span class="cutno">4</span><em class="ok">확정</em></figure>
+  <div class="wrap wrap--wide">
+    <div class="app rise" id="app" aria-label="Tale Studio 작업 화면 예시 (자동 재생)">
+      <div class="app__bar">
+        <span class="app__dots"><i></i><i></i><i></i></span>
+        <span class="app__title">비 오는 정류장</span>
+        <ol class="app__steps" aria-hidden="true">
+          <li data-s="producer">Producer</li><li data-s="writer">Writer</li><li data-s="artist">Artist</li><li data-s="storyboard">Storyboard</li><li data-s="director">Director</li><li data-s="editor">Editor</li>
+        </ol>
       </div>
-      <div class="dk-meter" aria-label="Take 비교">
-        <div><span>바로 영상으로 4번 다시</span><b class="x">20 Takes</b></div>
-        <div><span>콘티 확인 후 1번에</span><b>5 Takes</b></div>
+      <div class="app__body">
+        <div class="app__canvas">
+          <article class="prose" id="prose">
+            <p class="prose__label"><i></i>산문 · 1화 우산 하나</p>
+            <p class="prose__text" id="proseText"></p>
+          </article>
+          <div class="cuts" id="cuts">
+            <figure class="cut" data-vb="0 0 320 180"><svg preserveAspectRatio="xMidYMid slice"><use href="#world"/></svg><div class="rain rain--sm"></div><figcaption><b>1</b>와이드 · 아이레벨</figcaption></figure>
+            <figure class="cut" data-vb="112 66 96 54"><svg preserveAspectRatio="xMidYMid slice"><use href="#world"/></svg><div class="rain rain--sm"></div><figcaption><b>2</b>미디엄 · 옆에서</figcaption></figure>
+            <figure class="cut" data-vb="128 79 46 25.9"><svg preserveAspectRatio="xMidYMid slice"><use href="#world"/></svg><figcaption><b>3</b>클로즈업 · 로우앵글</figcaption></figure>
+            <figure class="cut cut--flip" data-vb="118 58 120 67.5"><svg preserveAspectRatio="xMidYMid slice"><use href="#world"/></svg><div class="rain rain--sm"></div><figcaption><b>4</b>투샷 · 뒤에서</figcaption></figure>
+          </div>
+        </div>
+        <aside class="chat">
+          <div class="chat__head"><img src="./assets/lumi@2x.webp" alt="" width="28" height="21" /><b>Lumi</b><span id="lumiState">듣고 있어요</span></div>
+          <div class="chat__log" id="log" aria-live="off"></div>
+          <div class="chat__input"><span id="typed"></span><i class="caret"></i><span class="chat__send">↑</span></div>
+        </aside>
+      </div>
+    </div>
+    <div class="studio__foot">
+      <p class="studio__cost"><span>지금까지 쓴 Take</span><b>0</b><small>콘티 · 인물 시트는 무료</small></p>
+      <button type="button" class="ghost" id="replay">↻ 처음부터 다시</button>
+    </div>
+  </div>
+</section>
+
+<!-- 3 · 왜 Tale: 스크롤하면 오른쪽 그림이 바뀌어요 -->
+<section class="why" id="why">
+  <div class="wrap why__in">
+    <div class="why__list">
+      <p class="kicker rise">왜 Tale인가요</p>
+      <h2 class="rise">영상 AI는 많아요.<br /><em>이야기부터</em> 같이 쓰는 곳은 드물어요.</h2>
+      <article class="why__item" data-k="0"><span class="num">01</span><h3>글을 써 줘요</h3><p>한 줄을 장면이 보이는 산문으로. 마음에 안 드는 문단만 골라 “더 설레게”처럼 말하면 그 부분만 다시 써요.</p></article>
+      <article class="why__item" data-k="1"><span class="num">02</span><h3>아이디어를 넓혀 줘요</h3><p>막연한 한 줄도 괜찮아요. 장르 · 인물 관계 · 결말을 몇 갈래로 펼쳐 보여 주고, 고르는 대로 이야기가 단단해져요.</p></article>
+      <article class="why__item" data-k="2"><span class="num">03</span><h3>콘티로 먼저 확인해요</h3><p>영상부터 뽑으면 계속 다시 만들어야 해요. 컷마다 구도 · 카메라 · 조명을 콘티로 먼저 보고, 확정한 컷만 영상으로 옮겨요.</p></article>
+    </div>
+    <div class="why__stage" aria-hidden="true">
+      <div class="why__card" data-k="0">
+        <p class="w-line">막차를 놓친 <span class="mention">@서윤</span>은 정류장 지붕 끝에 서서 비를 피했다.</p>
+        <p class="w-line w-line--edit"><s>옆자리 남자가 말없이 우산을 기울였다.</s><span>옆자리 남자가 말없이 우산을 기울였다. 우산 끝에서 떨어진 빗방울이 그의 어깨만 적셨다.</span></p>
+        <p class="w-ask"><img src="./assets/lumi-writer.webp" alt="" width="34" height="26" />“우산 장면을 조금 더 설레게” <b>이 문단만</b></p>
+      </div>
+      <div class="why__card why__card--tree" data-k="1">
+        <p class="t-seed">우산 하나를 같이 쓴 두 사람</p>
+        <div class="t-branches">
+          <p class="t-leaf t-leaf--on" style="--c:#E8606F"><small>로맨틱 코미디</small>상사와 신입, 비밀 연애의 시작</p>
+          <p class="t-leaf" style="--c:#3E9BE0"><small>잔잔한 드라마</small>매일 같은 버스, 말 없는 동행</p>
+          <p class="t-leaf" style="--c:#8B63E8"><small>미스터리</small>우산 주인은 왜 나타나지 않을까</p>
+        </div>
+      </div>
+      <div class="why__card why__card--sb" data-k="2">
+        <div class="filmstrip">
+          <figure class="fs ok" data-vb="0 0 320 180"><svg preserveAspectRatio="xMidYMid slice"><use href="#world"/></svg></figure>
+          <figure class="fs ok" data-vb="112 66 96 54"><svg preserveAspectRatio="xMidYMid slice"><use href="#world"/></svg></figure>
+          <figure class="fs redo" data-vb="128 79 46 25.9"><svg preserveAspectRatio="xMidYMid slice"><use href="#world"/></svg></figure>
+          <figure class="fs ok cut--flip" data-vb="118 58 120 67.5"><svg preserveAspectRatio="xMidYMid slice"><use href="#world"/></svg></figure>
+        </div>
+        <p class="sb-note"><span>3번 컷 다시 그리기</span><b>무료</b></p>
+        <div class="sb-vs"><p><small>영상부터 4번 다시</small><s>20 Takes</s></p><p><small>콘티 확인 후 한 번에</small><b>5 Takes</b></p></div>
       </div>
     </div>
   </div>
 </section>
 
-<!-- 6 · 작품 (OpenArt 커뮤니티 갤러리 결) -->
-<section class="dk-works" id="works">
-  <div class="wrap-x">
-    <div class="dk-head dk-head--row reveal">
-      <h2>Tale로 만든 이야기들</h2>
-      <div class="dk-filter" role="tablist" aria-label="장르">
-        <button type="button" class="on">전체</button><button type="button">로맨스</button><button type="button">드라마</button><button type="button">미스터리</button><button type="button">애니메이션</button><button type="button">숏폼</button>
-      </div>
+<!-- 4 · 여섯 단계: 로고의 T와 꼬리 -->
+<section class="tail">
+  <div class="wrap">
+    <div class="head head--center rise">
+      <p class="kicker">Six steps</p>
+      <h2>T에서 <em>쓰고</em>,<br />꼬리에서 <em>찍어요</em></h2>
     </div>
-    <div class="dk-masonry">
-      <figure class="ph m-tall reveal" data-img="IMG-S1"><figcaption><b>우산 하나</b>로맨틱 코미디 · 60초</figcaption></figure>
-      <figure class="ph m-wide reveal" data-img="IMG-S6"><figcaption><b>첫 무대</b>뮤직비디오 · 60초</figcaption></figure>
-      <figure class="ph reveal" data-img="IMG-S3"><figcaption><b>404호의 소리</b>미스터리 · 45초</figcaption></figure>
-      <figure class="ph m-tall reveal" data-img="IMG-S2"><figcaption><b>마지막 배달</b>드라마 · 90초</figcaption></figure>
-      <figure class="ph reveal" data-img="IMG-S4"><figcaption><b>작은 우주선</b>애니메이션 · 30초</figcaption></figure>
-      <figure class="ph reveal" data-img="IMG-S5"><figcaption><b>새벽 편의점</b>숏폼 · 15초</figcaption></figure>
+    <div class="tail__map rise">
+      <ol class="tail__col tail__col--t">
+        <li style="--c:#F2A33A"><img src="./assets/lumi-producer.webp" alt="" width="80" height="62" /><div><b>Producer</b><span>한 줄을 듣고 장르 · 길이 · 비율을 정해요</span></div></li>
+        <li style="--c:#E8606F"><img src="./assets/lumi-writer.webp" alt="" width="80" height="62" /><div><b>Writer</b><span>장면이 보이는 산문을 같이 써요</span></div></li>
+        <li style="--c:#8B63E8"><img src="./assets/lumi-artist.webp" alt="" width="80" height="62" /><div><b>Artist</b><span>인물 시트로 얼굴을 고정해요</span></div></li>
+      </ol>
+      <div class="tail__logo"><img src="./assets/tale-symbol.svg" alt="Tale 심볼: 위는 T, 아래는 꼬리" width="250" height="220" /><p><span>T · 이야기 만들기</span><span>꼬리 · 영상으로 옮기기</span></p></div>
+      <ol class="tail__col tail__col--tail">
+        <li style="--c:#5A6AE6"><img src="./assets/lumi-storyboard.webp" alt="" width="80" height="62" /><div><b>Storyboard</b><span>컷을 나누고 콘티로 먼저 보여 줘요</span></div></li>
+        <li style="--c:#3E9BE0"><img src="./assets/lumi-director.webp" alt="" width="80" height="62" /><div><b>Director</b><span>컷마다 카메라 · 조명 · 움직임</span></div></li>
+        <li style="--c:#2DB39A"><img src="./assets/lumi-editor.webp" alt="" width="80" height="62" /><div><b>Editor</b><span>확정한 컷을 영상으로 잇고 다듬어요</span></div></li>
+      </ol>
     </div>
   </div>
 </section>
 
-<!-- 7 · 사용법 3단계 (OpenArt How to use 결) -->
-<section class="dk-how">
-  <div class="wrap-x">
-    <div class="dk-head reveal"><h2>세 번이면 한 편이에요</h2></div>
-    <ol class="dk-how__list">
-      <li class="reveal"><span class="dk-num">1</span><h3>한 줄 적기</h3><p>아이디어 · 대본 · 파일 중 편한 걸로. Lumi가 장르와 길이를 물어요.</p></li>
-      <li class="reveal"><span class="dk-num">2</span><h3>콘티 확인하기</h3><p>산문과 인물 시트, 컷별 콘티가 나와요. 마음에 안 드는 컷만 다시 그려요. 무료예요.</p></li>
-      <li class="reveal"><span class="dk-num">3</span><h3>영상으로 옮기기</h3><p>확정한 컷만 영상으로. 생성 전에 Take를 먼저 보여 드려요.</p></li>
-    </ol>
+<!-- 5 · 작품: 포스터가 흘러가요 -->
+<section class="works" id="works">
+  <div class="wrap head head--row rise">
+    <div><p class="kicker">Made with Tale</p><h2>Tale로 만든 <em>이야기들</em></h2></div>
+    <a class="link" href="#works">전체 보기 →</a>
   </div>
+  <div class="marquee" aria-label="작품 목록">
+    <div class="marquee__track">
+      <article class="poster poster--scene"><svg viewBox="96 40 150 200" preserveAspectRatio="xMidYMid slice" aria-hidden="true"><use href="#world"/></svg><div class="rain rain--sm"></div><p class="poster__g">로맨틱 코미디 · 60초</p><h3>우산<br />하나</h3></article>
+      <article class="poster" style="--a:#3b1d0e;--b:#f2a33a"><p class="poster__g">드라마 · 90초</p><h3>마지막<br />배달</h3></article>
+      <article class="poster" style="--a:#0c1030;--b:#5a6ae6"><p class="poster__g">미스터리 · 45초</p><h3>404호의<br />소리</h3></article>
+      <article class="poster" style="--a:#06231e;--b:#2db39a"><p class="poster__g">숏폼 · 15초</p><h3>새벽<br />편의점</h3></article>
+      <article class="poster" style="--a:#22103a;--b:#8b63e8"><p class="poster__g">뮤직비디오 · 60초</p><h3>첫<br />무대</h3></article>
+      <article class="poster" style="--a:#2a0d16;--b:#e8606f"><p class="poster__g">애니메이션 · 30초</p><h3>작은<br />우주선</h3></article>
+    </div>
+  </div>
+  <p class="wrap works__note">포스터는 예시예요. 실제 작품 스틸로 바꿔요 (IMAGE_PLAN.md · IMG-S1~S6).</p>
 </section>
 
-<!-- 8 · 신뢰 (Artlist 큰 숫자 + 체크 결) -->
-<section class="dk-trust">
-  <div class="wrap-x dk-trust__in reveal">
-    <p class="dk-big"><span>0</span><small>외부 AI 학습에 쓰인 작업물</small></p>
-    <ul class="dk-checks">
-      <li>프로젝트 · 프롬프트 · 생성물은 어떤 AI 학습에도 쓰지 않아요</li>
-      <li>프로젝트마다 분리된 작업 공간</li>
-      <li>Seedance · Kling · Hunyuan · Tale 자체 모델</li>
+<!-- 6 · 신뢰 -->
+<section class="trust">
+  <div class="wrap trust__in rise">
+    <p class="trust__big">0<small>외부 AI 학습에<br />쓰인 작업물</small></p>
+    <ul class="trust__list">
+      <li><b>학습에 쓰지 않아요</b>프로젝트 · 프롬프트 · 생성물 모두</li>
+      <li><b>분리된 작업 공간</b>프로젝트마다 격리된 환경</li>
+      <li><b>검증된 영상 모델</b>Seedance · Kling · Hunyuan · Tale 자체 모델</li>
     </ul>
   </div>
 </section>
 
-<!-- 9 · 요금 (Take 계산기 + 요금제 줄) -->
-<section class="dk-pricing" id="pricing">
-  <div class="wrap-x">
-    <div class="dk-head dk-head--center reveal">
-      <h2>기획한 분량과<br /><span class="dk-thin">쓴 Take만큼</span></h2>
-      <p class="dk-sub">이미지는 언제나 무료예요. 결제는 준비 중이고, 요금제와 Take 팩은 미리 둘러볼 수 있어요.</p>
+<!-- 7 · 요금 -->
+<section class="pricing" id="pricing">
+  <div class="wrap">
+    <div class="head head--center rise">
+      <p class="kicker">Pricing</p>
+      <h2>기획한 분량과<br /><em>쓴 Take</em>만큼</h2>
+      <p class="sub">이미지는 언제나 무료예요. 결제는 준비 중이고, 요금제와 Take 팩은 미리 둘러볼 수 있어요.</p>
     </div>
 
-    <div class="dk-calc reveal" aria-label="Take 계산기">
-      <div class="dk-calc__in">
+    <div class="calc rise">
+      <div class="calc__in">
         <h3>내 이야기엔 Take가 얼마나 들까요?</h3>
-        <label class="dk-field"><span>컷 수 <b id="cutsOut">8</b>컷</span><input id="cuts" type="range" min="2" max="40" value="8" /></label>
-        <label class="dk-field"><span>영상 모델</span>
-          <select id="model">
+        <label><span>컷 수 <b id="cutsOut">8</b>컷</span><input id="cutsIn" type="range" min="2" max="40" value="8" /></label>
+        <label><span>영상 모델</span>
+          <select id="modelIn">
             <option value="1">Seedance Pro 720p · 1 Take</option>
             <option value="4">Seedance Pro 1080p · 4 Takes</option>
             <option value="4">Seedance 2.0 Fast 720p · 4 Takes</option>
@@ -240,55 +271,33 @@
             <option value="10">Seedance 2.0 1080p · 10 Takes</option>
           </select>
         </label>
-        <label class="dk-field"><span>컷마다 다시 만드는 횟수 (바로 생성할 때) <b id="redoOut">3</b>번</span><input id="redo" type="range" min="1" max="6" value="3" /></label>
+        <label><span>영상부터 뽑으면 컷마다 다시 만드는 횟수 <b id="redoOut">3</b>번</span><input id="redoIn" type="range" min="1" max="6" value="3" /></label>
       </div>
-      <div class="dk-calc__out">
-        <div class="dk-res dk-res--bad"><span>영상부터 바로</span><b id="resBad">160</b><small>Takes</small></div>
-        <div class="dk-res"><span>Tale · 콘티 먼저</span><b id="resGood">40</b><small>Takes</small><em>콘티 · 인물 시트 0 Take</em></div>
+      <div class="calc__out">
+        <p class="res res--bad"><small>영상부터 바로</small><b id="resBad">160</b><span>Takes</span></p>
+        <p class="res"><small>Tale · 콘티 먼저</small><b id="resGood">40</b><span>Takes</span><em>콘티 · 인물 시트 0 Take</em></p>
       </div>
     </div>
 
-    <div class="dk-plans">
-      <article class="dk-plan reveal">
-        <div class="dk-plan__name"><small>월 구독</small><h3>Starter</h3><span>혼자 만드는 크리에이터</span></div>
-        <p class="dk-plan__desc">한 번에 프로젝트 하나. 필요한 영상 분량을 골라요. 720p 첫 생성 포함.</p>
-        <p class="dk-plan__price"><b>$15</b><small>부터 / 월</small></p>
-        <a href="#studio" class="btn btn--ghost">옵션 고르기</a>
-      </article>
-      <article class="dk-plan dk-plan--pick reveal">
-        <div class="dk-plan__name"><small>월 구독 · 팀 추천</small><h3>Producer</h3><span>제작팀</span></div>
-        <p class="dk-plan__desc">더 많은 프로젝트와 계정, 프리비즈 데이터 · AX 에이전트 설정 내보내기.</p>
-        <p class="dk-plan__price"><b>$199</b><small>부터 / 월</small></p>
-        <a href="#studio" class="btn btn--primary">옵션 고르기</a>
-      </article>
-      <article class="dk-plan reveal">
-        <div class="dk-plan__name"><small>1회 충전</small><h3>Take</h3><span>다음 생성을 위해</span></div>
-        <p class="dk-plan__desc">다시 만들기 · 1080p · 프리미엄 모델용 Take. 팩 Take는 12개월 유효.</p>
-        <p class="dk-plan__price"><b>$29</b><small>부터 · 1회</small></p>
-        <a href="#studio" class="btn btn--ghost">옵션 고르기</a>
-      </article>
-      <article class="dk-plan dk-plan--studio reveal">
-        <div class="dk-plan__name"><small>연간 계약</small><h3>Studio</h3><span>계정 10개 · 연 30,000 Take부터</span></div>
-        <p class="dk-plan__desc">연결 프로젝트 4개 · 계정 8개가 넘는 팀. Take 공유 · 세금계산서 · 전담 지원.</p>
-        <p class="dk-plan__price"><b>문의</b></p>
-        <a href="mailto:support@talestudio.art" class="btn btn--ghost">문의하기</a>
-      </article>
+    <div class="plans">
+      <article class="plan rise"><p class="plan__k">월 구독</p><h3>Starter</h3><p class="plan__for">혼자 만드는 크리에이터</p><p class="plan__p"><b>$15</b><small>부터 / 월</small></p><p class="plan__d">한 번에 프로젝트 하나. 필요한 영상 분량을 골라요. 720p 첫 생성 포함.</p><a class="btn btn--line" href="#studio">옵션 고르기</a></article>
+      <article class="plan plan--pick rise"><p class="plan__k">월 구독 · 팀 추천</p><h3>Producer</h3><p class="plan__for">제작팀</p><p class="plan__p"><b>$199</b><small>부터 / 월</small></p><p class="plan__d">더 많은 프로젝트와 계정. 프리비즈 데이터 · AX 에이전트 설정 내보내기.</p><a class="btn btn--cream" href="#studio">옵션 고르기</a></article>
+      <article class="plan rise"><p class="plan__k">1회 충전</p><h3>Take</h3><p class="plan__for">다음 생성을 위해</p><p class="plan__p"><b>$29</b><small>부터 · 1회</small></p><p class="plan__d">다시 만들기 · 1080p · 프리미엄 모델용. 팩 Take는 12개월 유효.</p><a class="btn btn--line" href="#studio">옵션 고르기</a></article>
     </div>
-
-    <ul class="dk-rules reveal">
-      <li><b>요금제는 네 가지로 재요</b>프로젝트당 분량 · 연결 프로젝트 · 월 Take · 내보내기. 높은 요금제는 기능이 아니라 여유를 더 줘요.</li>
-      <li><b>Take 1개 = 720p 영상 1번</b>1080p · 프리미엄 모델은 더 들어요. 생성 전에 항상 먼저 보여 드려요.</li>
-      <li><b>무료 → 요금제 → 팩 순서로</b>요금제 Take는 결제 주기마다 새로, 팩 Take는 12개월.</li>
+    <div class="studio-plan rise"><p><b>Studio</b> 연결 프로젝트 4개 · 계정 8개가 넘는 팀을 위한 연간 계약. Take 공유 · 세금계산서 · 전담 지원. 계정 10개 · 연 30,000 Take부터.</p><a class="link" href="mailto:support@talestudio.art">문의하기 →</a></div>
+    <ul class="rules rise">
+      <li><b>네 가지로 재요</b>프로젝트당 분량 · 연결 프로젝트 · 월 Take · 내보내기. 높은 요금제는 여유를 더 줘요.</li>
+      <li><b>Take 1 = 720p 영상 1번</b>1080p · 프리미엄 모델은 더 들어요. 생성 전에 항상 먼저 보여 드려요.</li>
+      <li><b>무료 → 요금제 → 팩 순서</b>요금제 Take는 결제 주기마다 새로, 팩 Take는 12개월.</li>
     </ul>
   </div>
 </section>
 
-<!-- 10 · FAQ (Artlist 결: 가로선 목록) -->
-<section class="dk-faq">
-  <div class="wrap-x dk-faq__in">
-    <h2 class="reveal">자주 묻는 질문</h2>
-    <div class="dk-faq__list reveal">
-      <details><summary>Tale Studio는 어떤 서비스예요?</summary><p>한 줄 이야기를 산문 · 인물 · 스토리보드 · 영상으로 이어 주는 프리비즈 스튜디오예요. Lumi와 여섯 단계의 AI 제작팀이 함께해요.</p></details>
+<!-- 8 · FAQ -->
+<section class="faq">
+  <div class="wrap faq__in">
+    <h2 class="rise">자주 묻는 <em>질문</em></h2>
+    <div class="faq__list rise">
       <details><summary>영상 만들기를 몰라도 쓸 수 있나요?</summary><p>네. 한 줄만 적으면 Lumi가 장르와 길이를 묻고, 단계마다 고르기만 하면 돼요.</p></details>
       <details><summary>스토리보드를 먼저 보는 게 왜 좋아요?</summary><p>영상은 만들 때마다 Take가 들지만 콘티는 무료예요. 구도와 인물을 먼저 맞추면 다시 만드는 횟수가 확 줄어요.</p></details>
       <details><summary>이미지도 Take를 쓰나요?</summary><p>아니요. 스토리보드 · 컨셉 아트 · 인물 시트는 어떤 요금제에서도 Take를 쓰지 않아요.</p></details>
@@ -299,33 +308,30 @@
   </div>
 </section>
 
-<!-- 11 · CTA (OpenArt 그라데이션 상자 + Artlist "Start Free Now →") -->
-<section class="dk-cta">
-  <div class="wrap-x">
-    <a href="#studio" class="dk-cta__box reveal">
-      <span class="dk-cta__light" aria-hidden="true"></span>
-      <span class="dk-cta__lumi float" aria-hidden="true"><img src="./assets/lumi-hd.webp" alt="" width="180" height="133" /></span>
-      <span class="dk-cta__t">당신의 이야기,<br />첫 장을 써 볼까요?</span>
-      <span class="dk-cta__go">시작하기 <span aria-hidden="true">→</span></span>
-    </a>
+<!-- 9 · 마지막 장면 -->
+<section class="end">
+  <div class="end__scene" aria-hidden="true"><svg viewBox="100 50 140 78.75" preserveAspectRatio="xMidYMid slice"><use href="#world"/></svg><div class="rain"></div></div>
+  <div class="end__shade" aria-hidden="true"></div>
+  <div class="wrap end__in rise">
+    <img class="end__lumi" src="./assets/lumi-hd.webp" alt="" width="190" height="141" />
+    <h2>당신의 이야기,<br /><em>첫 장</em>을 써 볼까요?</h2>
+    <a href="#top" class="btn btn--cream btn--lg">Lumi와 시작하기 <span aria-hidden="true">→</span></a>
   </div>
 </section>
 
 </main>
 
-<footer class="dk-foot">
-  <div class="wrap-x">
-    <div class="dk-foot__grid">
-      <div class="dk-foot__brand"><p class="dk-foot__say">이야기의 꼬리를<br />잡아 보세요.</p></div>
-      <nav aria-label="서비스"><b>서비스</b><a href="#studio">스튜디오</a><a href="#tools">기능</a><a href="#works">작품</a><a href="#pricing">요금</a></nav>
-      <nav aria-label="단계"><b>여섯 단계</b><a href="#flow">Producer</a><a href="#flow">Writer</a><a href="#flow">Artist</a><a href="#flow">Storyboard</a><a href="#flow">Director · Editor</a></nav>
-      <nav aria-label="정책"><b>정책</b><a href="https://talestudio.art/terms">이용약관</a><a href="https://talestudio.art/refund">환불</a><a href="https://talestudio.art/privacy">개인정보</a><a href="https://talestudio.art/acceptable-use">이용 정책</a><a href="mailto:support@talestudio.art">문의</a></nav>
-    </div>
-    <p class="dk-foot__biz">Talestudio · 대표 Daewon Yoon · 사업자등록번호 333-27-02069 · 13606 경기도 성남시 분당구 돌마로 169 · support@talestudio.art · 결제는 준비 중이에요 · © 2026 Tale Studio</p>
+<footer class="foot">
+  <div class="wrap foot__grid">
+    <p class="foot__say">이야기의 꼬리를<br />잡아 보세요.</p>
+    <nav aria-label="서비스"><b>서비스</b><a href="#studio">스튜디오</a><a href="#why">왜 Tale</a><a href="#works">작품</a><a href="#pricing">요금</a></nav>
+    <nav aria-label="정책"><b>정책</b><a href="https://talestudio.art/terms">이용약관</a><a href="https://talestudio.art/refund">환불</a><a href="https://talestudio.art/privacy">개인정보</a><a href="https://talestudio.art/acceptable-use">이용 정책</a></nav>
+    <nav aria-label="문의"><b>문의</b><a href="mailto:support@talestudio.art">support@talestudio.art</a></nav>
   </div>
-  <div class="dk-foot__mark" aria-hidden="true"><img src="./assets/tale-lockup.svg" alt="" width="433" height="110" /></div>
+  <p class="wrap foot__biz">Talestudio · 대표 Daewon Yoon · 사업자등록번호 333-27-02069 · 13606 경기도 성남시 분당구 돌마로 169 · 결제는 준비 중이에요 · © 2026 Tale Studio</p>
+  <div class="foot__mark" aria-hidden="true"><img src="./assets/tale-lockup.svg" alt="" width="433" height="110" /></div>
 </footer>
 
-<script type="module" src="./src/dark.tsx"></script>
+<script type="module" src="./src/dark.js"></script>
 </body>
 </html>

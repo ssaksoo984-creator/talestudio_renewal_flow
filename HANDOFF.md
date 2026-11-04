@@ -116,3 +116,6 @@
 - 채팅 보내기 버튼 화살표가 크림 바탕에 흰색이라 안 보이던 것 → #141312로
 - **로고 뜻 바로잡음(2026-11-03, 사용자 설명)**: "리본 · 책 두 권"이 아니라 **반쪽 T + 이야기 꼬리**. Tale = tail(소리가 같음) → 이야기의 꼬리를 잡아 시작한다. Lumi도 같은 꼬리를 가진 AI로 생성됨. T = 앞 세 단계, 꼬리 = 뒤 세 단계, 겹친 곳 = T가 꼬리로 이어지는 자리. brand/README.md · LANDING_BRIEF.md · LUMI_PERSONA_BRIEF.md · Figma 브랜드 가이드(157:680 · 199:722 단계 카드 · 색 설명) 모두 수정
 - **헤드라인 글자 그라데이션(2026-11-03)**: Home 예시 "Pre-visualization." 무지개(브랜드 6색) → 기본 그라데이션 `v3/Gradient/Text · 기본`(#FFFFFF → #9E9B92). LANDING_BRIEF에 `--text-gradient`로 반영
+- **로고 변형 시안(2026-11-04)**: Components 페이지 위쪽 보드 2개 — "T + 꼬리 하나로"(A ⊏ · B ㅁ · C 둥근 네모 · D 원형), "책 (사용자 스케치 정리)"(E 정사각 · 끝 반원 · 왼쪽 아래 물방울 / F 바깥 모서리 덜 둥글게 / G 모든 모서리 작게). 확정 로고는 그대로. 사용자 스케치 원본은 Components 페이지 "현재 확정"(285:256)
+- **1104 리뷰 반영 (리뷰 PDF 1–7쪽)** — v3 페이지 섹션 "04 1104 리뷰 반영": R1 로그인 · R2 프로젝트 목록 · R3 새 프로젝트(화이트 Lumi가 묻는 팝업 → "처음부터 만들기"면 바로 P1) · R4 이어 만들 화 고르기 · R5 불러오는 중 · R6 확인 · P1 Producer 첫 화면(채팅 가운데, Producer Lumi) · P2 대화 → 요약 → 공통 버튼 · WL Writer 고치는 중(Lumi 로딩 카드) · WS Writer AI 수정안(포인트 색 Writer 하나, 되돌리기/적용 버튼 통일) · AS Artist 스타일 팝업(Artist Lumi가 묻는 형식) · AR 다시 그리는 중(카드 상태 + Lumi 알림)
+- **공통 컴포넌트(Components 페이지 "Stage Actions · AI 아이콘")**: `Control/Stage Confirm`(Stage=Producer…Editor, "좋아요, ○○로" + "아니요, 더 고칠래요"), `icon-fill/ai`(Lumi 실루엣, ✦ 대신), `icon-fill/ai-rewrite`(Lumi + 다시 하기 화살표)

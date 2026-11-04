@@ -1,2 +1,4 @@
 _test.html
 _t_*.html
+landing/node_modules
+landing/build

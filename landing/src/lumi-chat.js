@@ -10,10 +10,9 @@ const sleep = (ms) => new Promise((r) => setTimeout(r, ms))
 const amb = document.createElement('div')
 amb.className = 'ambient'
 amb.setAttribute('aria-hidden', 'true')
-const ORBS = ['#F2A33A', '#E8606F', '#8B63E8', '#5A6AE6', '#3E9BE0', '#2DB39A']
+const STAR = ['#F2A33A', '#E8606F', '#8B63E8', '#5A6AE6', '#3E9BE0', '#2DB39A']
 amb.innerHTML = '<i></i><i></i><i></i><i></i>' +
-  ORBS.map((c, n) => `<b class="ambient__orb" style="--oc:${c};--s:${70 + ((n * 37) % 90)}px;left:${8 + n * 15}%;top:${12 + ((n * 29) % 70)}%;--d:${22 + n * 4}s;--dl:${-n * 5}s"></b>`).join('') +
-  Array.from({ length: 18 }, () => `<span class="ambient__spark" style="left:${Math.random() * 100}%;top:${60 + Math.random() * 45}%;--d:${8 + Math.random() * 10}s;--dl:${-Math.random() * 18}s"></span>`).join('')
+  Array.from({ length: 34 }, () => `<span class="ambient__spark" style="left:${Math.random() * 100}%;top:${20 + Math.random() * 85}%;--sc:${STAR[Math.floor(Math.random() * 6)]};--sz:${2 + Math.random() * 3}px;--d:${9 + Math.random() * 12}s;--dl:${-Math.random() * 20}s"></span>`).join('')
 document.body.prepend(amb)
 
 // ---------- 챗봇 ----------
@@ -35,8 +34,8 @@ fab.setAttribute('aria-label', 'Lumi에게 물어보기')
 fab.setAttribute('aria-expanded', 'false')
 const HAS_PERSONA = !!customElements.get('lumi-persona') && !!document.createElement('canvas').getContext('webgl')
 fab.innerHTML = HAS_PERSONA
-  ? `<lumi-persona class="lumi-fab__persona" persona="pearl" state="idle"></lumi-persona><span class="lumi-fab__ring"></span>`
-  : `<span class="lumi-fab__float"><img class="lumi-fab__img lumi-fab__img--white" src="${whiteSrc}" alt="" /><img class="lumi-fab__img lumi-fab__img--color" src="${colorSrc}" alt="" /></span><span class="lumi-fab__ring"></span>`
+  ? `<lumi-persona class="lumi-fab__persona" persona="pearl" state="idle"></lumi-persona>`
+  : `<span class="lumi-fab__float"><img class="lumi-fab__img lumi-fab__img--white" src="${whiteSrc}" alt="" /><img class="lumi-fab__img lumi-fab__img--color" src="${colorSrc}" alt="" /></span>`
 if (HAS_PERSONA) fab.classList.add('lumi-fab--persona')
 const persona = fab.querySelector('lumi-persona')
 const setLumi = (state, p) => { if (!persona) return; if (p) persona.setAttribute('persona', p); persona.setAttribute('state', state) }
@@ -83,10 +82,9 @@ async function reply(text) {
 }
 
 async function open() {
-  root.classList.add('lumi-open', 'lumi-pop')
+  root.classList.add('lumi-open')
   setLumi('idle', 'complete') // 화이트 진주 → 완성 Lumi로 옷 갈아입기
   fab.setAttribute('aria-expanded', 'true')
-  setTimeout(() => root.classList.remove('lumi-pop'), 900)
   if (!greeted) {
     greeted = true
     await sleep(reduce ? 0 : 450)

@@ -4,8 +4,8 @@ import { execSync } from 'node:child_process'
 import { readFileSync, writeFileSync, readdirSync } from 'node:fs'
 import { join } from 'node:path'
 
-const pages = { index: '../dist/TaleStudio_메인.html', service: '../dist/TaleStudio_서비스.html' }
-const LINKS = { './index.html': './TaleStudio_메인.html', './service.html': './TaleStudio_서비스.html' }
+const pages = { index: '../dist/TaleStudio_메인.html' }
+const LINKS = {}
 const LUMI = readFileSync('vendor/lumi-persona.js', 'utf8').replace(/<\/script/gi, '<\\/script')
 
 for (const [page, out] of Object.entries(pages)) {

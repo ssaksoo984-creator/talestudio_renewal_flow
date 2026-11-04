@@ -20,3 +20,20 @@ const nav = document.querySelector('.nav')
 const onScroll = () => nav?.classList.toggle('nav--scrolled', scrollY > 8)
 addEventListener('scroll', onScroll, { passive: true })
 onScroll()
+
+// 한 파일 안의 화면: #home · #service · #pricing (다른 #은 그 요소가 있는 화면을 열고 그 자리로)
+const views = Array.from(document.querySelectorAll('[data-view]'))
+function route() {
+  const id = decodeURIComponent(location.hash.slice(1)) || 'home'
+  let target = document.getElementById(id)
+  const view = target?.closest('[data-view]') || views[0]
+  const changed = view.hidden
+  views.forEach((v) => (v.hidden = v !== view))
+  document.querySelectorAll('.nav__links a').forEach((a) => a.classList.toggle('on', a.getAttribute('href') === '#' + view.id))
+  if (view.id === 'home' && !view.contains(target)) target = null
+  if (target === view || !target) scrollTo({ top: 0, behavior: changed ? 'instant' : 'smooth' })
+  else requestAnimationFrame(() => target.scrollIntoView({ behavior: changed ? 'instant' : 'smooth' }))
+  if (changed) view.querySelectorAll('.reveal').forEach((e) => e.getBoundingClientRect().top < innerHeight && e.classList.add('in'))
+}
+addEventListener('hashchange', route)
+route()

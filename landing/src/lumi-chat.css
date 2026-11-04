@@ -10,15 +10,11 @@
 @keyframes amb1 { to { transform: translate(18vw, 22vh) scale(1.15); } }
 @keyframes amb2 { to { transform: translate(-22vw, 30vh) scale(0.9); } }
 @keyframes amb3 { to { transform: translate(20vw, -26vh) scale(1.2); } }
-:root[data-theme='light'] .ambient i, :root[data-theme='light'] .ambient__spark { display: none; }
-.ambient__orb { position: absolute; width: var(--s); height: var(--s); border-radius: 50%; display: none;
-  background: radial-gradient(circle at 35% 30%, color-mix(in srgb, var(--oc) 55%, #fff), color-mix(in srgb, var(--oc) 70%, transparent) 60%, transparent 72%);
-  opacity: 0.22; filter: blur(2px); animation: orb var(--d) ease-in-out infinite alternate; animation-delay: var(--dl); }
-:root[data-theme='light'] .ambient__orb { display: block; }
-@keyframes orb { 0% { transform: translate(0, 0) scale(1); } 50% { transform: translate(6vw, -8vh) scale(1.1); } 100% { transform: translate(-5vw, 6vh) scale(0.92); } }
-.ambient__spark { position: absolute; width: 3px; height: 3px; border-radius: 50%; background: var(--amb-spark, rgba(255, 255, 255, 0.7)); box-shadow: 0 0 8px currentColor; animation: spark var(--d, 9s) linear infinite; animation-delay: var(--dl, 0s); opacity: 0; }
-:root[data-theme='light'] .ambient__spark { --amb-spark: rgba(139, 99, 232, 0.55); }
-@keyframes spark { 0% { opacity: 0; transform: translateY(0); } 15% { opacity: 1; } 85% { opacity: 0.8; } 100% { opacity: 0; transform: translateY(-40vh); } }
+:root[data-theme='light'] .ambient i { display: none; }
+.ambient__spark { position: absolute; width: var(--sz, 3px); height: var(--sz, 3px); border-radius: 50%; background: var(--sc); box-shadow: 0 0 10px var(--sc); color: var(--sc); animation: spark var(--d, 9s) linear infinite; animation-delay: var(--dl, 0s); opacity: 0; }
+
+@keyframes spark { 0% { opacity: 0; transform: translate(0, 0); } 15% { opacity: var(--so, 0.55); } 50% { transform: translate(2vw, -20vh); } 85% { opacity: var(--so, 0.55); } 100% { opacity: 0; transform: translate(-1vw, -40vh); } }
+:root[data-theme='light'] .ambient__spark { --so: 0.45; }
 /* 섹션 바탕이 배경 빛을 덮지 않게 */
 body { background-color: var(--bg); }
 main, .foot { position: relative; }
@@ -38,10 +34,7 @@ main, .foot { position: relative; }
 .lumi-open .lumi-fab__img--white { opacity: 0; transform: scale(1.4) rotate(40deg); filter: hue-rotate(160deg) blur(2px); }
 .lumi-open .lumi-fab__img--color { opacity: 1; transform: none; }
 .lumi-open .lumi-fab::before { background: radial-gradient(closest-side, rgba(232, 96, 111, 0.6), rgba(139, 99, 232, 0.35) 60%, transparent); }
-.lumi-fab__ring { position: absolute; left: 50%; top: 50%; width: 10px; height: 10px; margin: -5px; border-radius: 50%; pointer-events: none; opacity: 0;
-  box-shadow: 0 0 0 2px #F2A33A, 0 0 0 5px #E8606F, 0 0 0 8px #8B63E8, 0 0 0 11px #3E9BE0; }
-.lumi-pop .lumi-fab__ring { animation: ring 0.9s ease-out; }
-@keyframes ring { 0% { opacity: 0.9; transform: scale(1); } 100% { opacity: 0; transform: scale(14); } }
+
 .lumi-hint { position: fixed; right: calc(max(20px, env(safe-area-inset-right, 0px)) + 124px); bottom: calc(max(20px, env(safe-area-inset-bottom, 0px)) + 38px); z-index: 80;
   padding: 10px 14px; border-radius: 16px 16px 4px 16px; background: var(--lc-panel); color: var(--lc-fg); font: 600 14px/1.4 var(--font, system-ui); white-space: nowrap;
   box-shadow: 0 12px 30px rgba(0, 0, 0, 0.25), 0 0 0 1px var(--lc-line); opacity: 0; transform: translateY(8px) scale(0.96); transition: opacity 0.4s, transform 0.4s; pointer-events: none; }

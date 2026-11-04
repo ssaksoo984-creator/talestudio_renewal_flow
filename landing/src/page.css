@@ -686,3 +686,5 @@ h2 { font-size: clamp(32px, 4.6vw, 48px); line-height: 1.2; font-weight: 700; le
 }
 @media (max-width: 700px) { .finale__trust { grid-template-columns: 1fr; } }
 @media (prefers-reduced-motion: reduce) { .pt, .finale__symbol, .six__m { animation: none !important; } }
+.nav__links a.on { color: var(--text); }
+[data-view][hidden] { display: none !important; }

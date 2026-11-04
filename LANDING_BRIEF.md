@@ -99,7 +99,7 @@
 
 - 원본: `mascot/assets/lumi-hd.webp`(큰 화면), `lumi@2x.webp`(작은 자리). 사용법 `mascot/README.md`
 - 이야기: 처음은 **화이트 펄 Lumi**(하얀 진주빛 + 연한 하늘), 단계마다 그 단계 색과 소품을 입고, 완성되면 지금의 컬러 진주빛 Lumi
-- 페르소나 이미지는 아직 없어요(`mascot/LUMI_PERSONA_BRIEF.md`로 제작 중). 그 전까지는 흑백 Lumi(CSS `filter: grayscale(1)`) + 단계 색 점으로 대신
+- 단계별 Lumi 이미지: `mascot/personas/lumi-<white-pearl|producer|writer|artist|storyboard|director|editor|complete>.png` (투명 PNG). "여섯 단계" 섹션과 히어로 Lumi에 사용. 움직임 참고: https://claude.ai/artifact/LJEHRV9HcAzUsrJhbhVsrd
 - 마지막 CTA · 히어로 오른쪽 아래에는 원본 컬러 Lumi를 둥실거리게(lumi-image.css의 애니메이션)
 
 ## 8. 움직임

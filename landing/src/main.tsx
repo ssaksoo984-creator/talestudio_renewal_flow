@@ -2,6 +2,7 @@ import { createRoot } from 'react-dom/client'
 import { useEffect, useState } from 'react'
 import TaleDemo from './TaleDemo'
 import './page.css'
+import './lumi-chat.js'
 
 const root = document.documentElement
 const themeOf = () => (root.dataset.theme === 'light' ? 'light' : 'dark') as 'light' | 'dark'
@@ -72,3 +73,7 @@ const nav = document.querySelector('.nav')
 const onScroll = () => nav?.classList.toggle('nav--scrolled', window.scrollY > 8)
 window.addEventListener('scroll', onScroll, { passive: true })
 onScroll()
+
+// 작품 슬라이드: 끊김 없이 흐르도록 한 벌 더
+const track = document.querySelector('.carousel__track')
+if (track) Array.from(track.children).forEach((c) => { const d = c.cloneNode(true) as HTMLElement; d.setAttribute('aria-hidden', 'true'); track.append(d) })

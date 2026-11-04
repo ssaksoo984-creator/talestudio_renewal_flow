@@ -1,0 +1,119 @@
+// 두 페이지 공통: 움직이는 배경 + 화이트 진주 Lumi 챗봇 (누르면 컬러 Lumi로 바뀌며 창이 열려요)
+import './lumi-chat.css'
+import whiteSrc from '../assets/lumi-white-pearl.webp'
+import colorSrc from '../assets/lumi@2x.webp'
+
+const reduce = matchMedia('(prefers-reduced-motion: reduce)').matches
+const sleep = (ms) => new Promise((r) => setTimeout(r, ms))
+
+// ---------- 배경 ----------
+const amb = document.createElement('div')
+amb.className = 'ambient'
+amb.setAttribute('aria-hidden', 'true')
+amb.innerHTML = '<i></i><i></i><i></i><i></i>' +
+  Array.from({ length: 18 }, () => `<span class="ambient__spark" style="left:${Math.random() * 100}%;top:${60 + Math.random() * 45}%;--d:${8 + Math.random() * 10}s;--dl:${-Math.random() * 18}s"></span>`).join('')
+document.body.prepend(amb)
+
+// ---------- 챗봇 ----------
+const PRICING = 'https://talestudio.art/pricing'
+const ANSWERS = [
+  { k: ['뭐', '무엇', '소개', 'tale', '테일', '서비스'], a: 'Tale은 한 줄 이야기를 산문 · 인물 · 콘티 · 영상으로 이어 주는 프리비즈 스튜디오예요. 저는 그 여섯 단계를 같이 걷는 Lumi고요.' },
+  { k: ['요금', '가격', '얼마', '비용', 'take', '테이크', '크레딧'], a: `Starter는 월 $15부터, 팀용 Producer는 월 $199부터예요. 이미지와 콘티는 항상 무료고, 영상에만 Take를 써요. <a href="${PRICING}">요금 자세히 보기 →</a>` },
+  { k: ['콘티', '스토리보드', '먼저'], a: '영상은 만들 때마다 Take가 들지만 콘티는 무료예요. 구도와 인물을 콘티로 먼저 맞추고, 확정한 컷만 영상으로 옮기면 다시 만드는 횟수가 확 줄어요.' },
+  { k: ['시작', '어떻게', '처음', '사용'], a: '이야기 한 줄만 적어 주세요. 제가 장르와 길이를 여쭤보고, 산문 → 인물 → 콘티 순서로 이어 갈게요. 고르기만 하면 돼요.' },
+  { k: ['학습', '보안', '저작권', '내 것', '데이터'], a: '만드신 프로젝트 · 프롬프트 · 생성물은 어떤 AI 학습에도 쓰지 않아요. 프로젝트마다 분리된 공간에서 작업해요.' },
+  { k: ['모델', 'seedance', 'kling', 'hunyuan'], a: 'Seedance · Kling · Hunyuan, 그리고 Tale 자체 모델을 써요. 생성 전에 모델과 Take를 먼저 보여 드려요.' },
+]
+const CHIPS = ['Tale은 뭐예요?', '요금이 궁금해요', '콘티 먼저가 뭐예요?', '어떻게 시작해요?']
+
+const fab = document.createElement('button')
+fab.type = 'button'
+fab.className = 'lumi-fab'
+fab.setAttribute('aria-label', 'Lumi에게 물어보기')
+fab.setAttribute('aria-expanded', 'false')
+fab.innerHTML = `<span class="lumi-fab__float"><img class="lumi-fab__img lumi-fab__img--white" src="${whiteSrc}" alt="" /><img class="lumi-fab__img lumi-fab__img--color" src="${colorSrc}" alt="" /></span><span class="lumi-fab__ring"></span>`
+
+const hint = document.createElement('div')
+hint.className = 'lumi-hint'
+hint.textContent = '궁금한 건 저한테 물어보세요!'
+
+const chat = document.createElement('section')
+chat.className = 'lumi-chat'
+chat.setAttribute('aria-label', 'Lumi 챗봇')
+chat.innerHTML = `
+  <header class="lc-head"><img src="${colorSrc}" alt="" /><div><b>Lumi</b><small>Tale의 AI 제작 친구</small></div><button type="button" class="lc-close" aria-label="닫기">✕</button></header>
+  <div class="lc-log" aria-live="polite"></div>
+  <div class="lc-chips">${CHIPS.map((c) => `<button type="button" class="lc-chip">${c}</button>`).join('')}</div>
+  <form class="lc-form"><label class="sr" for="lc-input">Lumi에게 보낼 말</label><input id="lc-input" autocomplete="off" placeholder="무엇이든 물어보세요" /><button type="submit" aria-label="보내기">↑</button></form>`
+document.body.append(chat, hint, fab)
+
+const root = document.documentElement
+const log = chat.querySelector('.lc-log')
+const input = chat.querySelector('#lc-input')
+let greeted = false
+
+const add = (html, who) => {
+  const m = document.createElement('div')
+  m.className = `lc-msg lc-msg--${who}`
+  m.innerHTML = html
+  log.append(m)
+  log.scrollTop = log.scrollHeight
+  return m
+}
+const esc = (s) => s.replace(/[&<>]/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;' })[c])
+
+async function reply(text) {
+  const t = text.toLowerCase()
+  const hit = ANSWERS.find((x) => x.k.some((k) => t.includes(k)))
+  const typing = add('<span class="lc-typing"><i></i><i></i><i></i></span>', 'lumi')
+  typing.style.padding = '0'
+  await sleep(reduce ? 100 : 700 + Math.random() * 500)
+  typing.remove()
+  add(hit ? hit.a : `"${esc(text)}" 좋은 이야기 씨앗이네요! 시작하기를 누르면 이 한 줄로 바로 산문을 써 볼게요.`, 'lumi')
+}
+
+async function open() {
+  root.classList.add('lumi-open', 'lumi-pop')
+  fab.setAttribute('aria-expanded', 'true')
+  setTimeout(() => root.classList.remove('lumi-pop'), 900)
+  if (!greeted) {
+    greeted = true
+    await sleep(reduce ? 0 : 450)
+    add('안녕하세요, 저는 Lumi예요. 하얀 진주였는데 이야기를 만나면 이렇게 색이 생겨요.', 'lumi')
+    await sleep(reduce ? 0 : 500)
+    add('Tale에 대해 궁금한 걸 물어보세요. 아래 버튼을 눌러도 돼요.', 'lumi')
+  }
+  setTimeout(() => input.focus({ preventScroll: true }), 300)
+}
+function close() {
+  root.classList.remove('lumi-open')
+  fab.setAttribute('aria-expanded', 'false')
+  fab.focus({ preventScroll: true })
+}
+fab.addEventListener('click', () => (root.classList.contains('lumi-open') ? close() : open()))
+chat.querySelector('.lc-close').addEventListener('click', close)
+addEventListener('keydown', (e) => e.key === 'Escape' && root.classList.contains('lumi-open') && close())
+chat.querySelectorAll('.lc-chip').forEach((c) => c.addEventListener('click', () => { add(esc(c.textContent), 'me'); reply(c.textContent) }))
+chat.querySelector('.lc-form').addEventListener('submit', (e) => {
+  e.preventDefault()
+  const v = input.value.trim()
+  if (!v) return
+  input.value = ''
+  add(esc(v), 'me')
+  reply(v)
+})
+
+// 처음 몇 초 뒤 말풍선으로 살짝 알려요
+setTimeout(() => { if (!root.classList.contains('lumi-open')) { hint.classList.add('on'); setTimeout(() => hint.classList.remove('on'), 5000) } }, 2500)
+
+// 히어로의 "시작하기" 버튼도 Lumi 창을 열어요
+document.querySelectorAll('form.prompt, form.ask').forEach((f) =>
+  f.addEventListener('submit', (e) => {
+    e.preventDefault()
+    const field = f.querySelector('textarea, input')
+    const v = field?.value.trim()
+    open().then(async () => {
+      if (v) { field.value = ''; add(esc(v), 'me'); reply(v) }
+    })
+  }),
+)

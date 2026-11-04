@@ -1,3 +1,4 @@
+import './lumi-chat.js'
 // Tale Studio · 어두운 버전 스크립트 (라이브러리 없음)
 const reduce = matchMedia('(prefers-reduced-motion: reduce)').matches
 const $ = (s, r = document) => r.querySelector(s)

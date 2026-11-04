@@ -1,6 +1,10 @@
 # Tale Studio 메인 페이지 · 이미지 / 영상 제작 계획
 
-이 문서는 메인 페이지 두 시안(`dist/TaleStudio_메인_어두운.html`, `dist/TaleStudio_메인_밝은.html`)에 있는 **이미지 자리**에 무엇을 채울지, Claude에게 **어떻게 시키면 되는지** 정리한 거예요.
+이 문서는 메인 페이지 두 시안에 있는 **이미지 자리**에 무엇을 채울지, Claude에게 **어떻게 시키면 되는지** 정리한 거예요.
+- 밝은 버전 `dist/TaleStudio_메인_밝은.html` (원본 `landing/index.html`) — Runway 결
+- 어두운 버전 `dist/TaleStudio_메인_어두운.html` (원본 `landing/dark.html`) — Artlist · OpenArt 결, 구성이 달라요
+
+두 페이지는 같은 ID를 같이 써요. 한 번 만들면 양쪽에 다 들어가요.
 페이지 안의 회색 자리마다 오른쪽 위에 `IMG-xx` 표시가 붙어 있어요. 아래 표의 ID와 같아요.
 
 > 이번에는 이미지 · 영상을 만들지 않았어요. 자리와 프롬프트만 준비했어요.
@@ -77,6 +81,17 @@ cinematic previs still, 35mm film look, cool navy night with warm sodium streetl
 
 > 실제 Tale로 만든 결과물이 생기면 그걸로 바꾸는 게 가장 좋아요. 쇼케이스는 "만든 것"이어야 믿어져요.
 
+### F. 어두운 버전에만 있는 자리
+
+| ID | 어디 | 비율 · 크기 | 프롬프트 |
+|---|---|---|---|
+| IMG-T1 | 도구 벤토 큰 칸 "글을 써 줘요" (위에 산문 UI가 떠 있음) | 1:1 · 1400×1400 | `top-down view of a writer's desk at night, open notebook with handwritten Korean lines, a phone showing a bus stop photo, rain on the window, warm desk lamp` + 화풍 문장. 위쪽 절반은 어둡고 단순하게(UI가 올라감) |
+| IMG-T2 | 도구 벤토 세로 칸 "아이디어를 넓혀 줘요" | 1:2 · 800×1600 | `a single clear umbrella standing open on wet asphalt at night, three diverging puddle reflections in different colors (warm pink, soft blue, cold violet)` + 스타일 꼬리. 위쪽에 칩이 올라가니 위는 어둡게 |
+| IMG-T3 | 도구 벤토 "컷마다 카메라 · 조명" | 4:3 · 1000×750 | `behind-the-scenes previs: a small film camera on a slider pointed at the bus stop set, one soft key light, rain machine mist` + 스타일 꼬리 |
+| IMG-H1 | "콘티 먼저" 섹션의 큰 와이드 스틸 | 21:9 · 2100×900 | IMG-C3 장면을 21:9로 다시 뽑기. 아래 1/4은 컷 카드가 덮으니 중요한 건 위 3/4에 |
+
+> 어두운 버전 히어로는 일부러 이미지 없이 글자 + 빛만 썼어요(Artlist 첫 화면 결). 나중에 바꾸고 싶으면 `IMG-C4`를 아주 어둡게 깔고 그 위에 헤드라인을 올리는 걸 추천해요.
+
 ---
 
 ## 2. 서비스 화면 캡처 (있으면 좋은 화면)
@@ -104,7 +119,7 @@ cinematic previs still, 35mm film look, cool navy night with warm sodium streetl
 landing/IMAGE_PLAN.md를 읽고 이미지를 만들어 줘.
 1) 먼저 IMG-F1, F2, F3만 만들어서 보여 줘. 내가 고르면 그걸 기준 이미지로 써.
 2) 고른 F1·F2·F3을 참고 이미지로 넣고 IMG-C1~C4를 만들어 줘. 얼굴·옷이 같아야 해.
-3) 그다음 B1~B3, S1~S6.
+3) 그다음 B1~B3, S1~S6, T1~T3, H1.
 - 모든 프롬프트 끝에 문서의 '스타일 꼬리'를 붙여 줘.
 - 만들기 전에 모델과 크레딧 비용을 먼저 알려 줘.
 - 결과는 landing/assets/img/<ID>.webp 로 저장(긴 변 1600px 이하, 품질 82).
@@ -117,10 +132,10 @@ landing/IMAGE_PLAN.md를 읽고 이미지를 만들어 줘.
 - 마음에 안 드는 것만 "IMG-C3만 다시, 표정을 덜 놀라게"처럼 ID로 짚어 고치면 빨라요.
 
 ### 이미지 넣는 방법 (빌드 구조)
-- 페이지 원본: `landing/index.html`, 스타일 `landing/src/page.css`, 데모 `landing/src/TaleDemo.tsx` · `demo.css`
+- 페이지 원본: 밝은 `landing/index.html` + `src/page.css` / 어두운 `landing/dark.html` + `src/dark.css`, 데모 `landing/src/TaleDemo.tsx` · `demo.css`
 - 자리에 넣기: `<figure class="ph" data-img="IMG-S1">` 안에 `<img src="./assets/img/IMG-S1.webp" alt="우산 하나 대표 장면">` 한 줄 추가 → `IMG-xx` 표시는 자동으로 사라져요
 - 데모 컷 썸네일: `demo.css`의 `.td-cut[data-on] .td-cut__img--a ~ --d` 배경을 `background-image: url(../assets/img/IMG-C1.webp)` 처럼 바꾸고 `.td-cut__rain` 줄은 지우기
-- 빌드: `cd landing && node build.mjs` → `dist/`에 두 HTML이 다시 생겨요 (이미지는 HTML 안에 들어가요. 총 용량은 10MB 안쪽으로)
+- 빌드: `cd landing && node build.mjs` → `dist/`에 두 HTML이 다시 생겨요. 이미지를 넣을 때는 index.html과 dark.html 양쪽 같은 ID 자리에 넣어 주세요 (이미지는 HTML 안에 들어가요. 총 용량은 10MB 안쪽으로)
 
 ---
 

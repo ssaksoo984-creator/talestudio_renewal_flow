@@ -1,7 +1,8 @@
 import './page.css'
 import './lumi-chat.js'
 import './common.js'
-import { createSim, STEPS } from './appsim.js'
+import { createSim } from './appsim.js'
+import { createVignettes } from './vignette.js'
 
 
 // Hero tabs
@@ -29,7 +30,7 @@ const sixItems = Array.from(document.querySelectorAll<HTMLElement>('.six__item')
 const card = document.querySelector<HTMLElement>('.six__card')
 const nameEl = document.getElementById('sixName'), numEl = document.getElementById('sixNum')
 let current = ''
-const sim2 = createSim(document.getElementById('sim2')!)
+const sim2 = createVignettes(document.getElementById('sim2')!)
 let sim2Visible = false
 const activate = (el: HTMLElement) => {
   const p = el.dataset.p!
@@ -67,3 +68,22 @@ new IntersectionObserver((es) => es.forEach((e) => {
   sim2Visible = e.isIntersecting
   if (current) { if (sim2Visible) sim2.play(current, true); else sim2.stop() }
 }), { threshold: 0.3 }).observe(document.getElementById('sim2')!)
+
+// 마지막 구간: 작은 별들이 그라데이션 빛으로 터지며 바탕이 돼요
+const burst = document.getElementById('burst')
+const STAR = ['#F2A33A', '#E8606F', '#8B63E8', '#5A6AE6', '#3E9BE0', '#2DB39A']
+let bursting = 0
+const pop = (keep: boolean) => {
+  if (!burst) return
+  const s = document.createElement('span')
+  s.style.cssText = `left:${5 + Math.random() * 90}%;top:${8 + Math.random() * 84}%;--c:${STAR[Math.floor(Math.random() * 6)]};--z:${18 + Math.random() * 26};--d:${(2.2 + Math.random() * 1.6).toFixed(2)}s`
+  s.className = keep ? 'keep' : ''
+  burst.append(s)
+  if (!keep) setTimeout(() => s.remove(), 4200)
+}
+if (burst) new IntersectionObserver((es) => es.forEach((e) => {
+  if (e.isIntersecting && !bursting) {
+    if (!burst.childElementCount) for (let i = 0; i < 14; i++) setTimeout(() => pop(true), i * 160)
+    bursting = window.setInterval(() => pop(false), 700)
+  } else if (!e.isIntersecting && bursting) { clearInterval(bursting); bursting = 0 }
+}), { threshold: 0.2 }).observe(burst.parentElement!)

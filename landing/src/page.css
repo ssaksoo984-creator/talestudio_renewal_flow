@@ -836,3 +836,16 @@ h2 { font-size: clamp(32px, 4.6vw, 48px); line-height: 1.2; font-weight: 700; le
 .six__win { background: transparent; box-shadow: none; }
 .six__screens { display: grid; align-items: center; }
 .six__card { aspect-ratio: auto; padding: 24px; }
+
+/* ===== v8: 마지막 구간 별 → 빛 터짐 ===== */
+.finale { position: relative; overflow: hidden; isolation: isolate; }
+.burst { position: absolute; inset: 0; z-index: -1; pointer-events: none; }
+.burst span { position: absolute; width: 10px; height: 10px; margin: -5px; border-radius: 50%;
+  background: radial-gradient(circle, color-mix(in srgb, var(--c) 90%, #fff) 0%, var(--c) 30%, transparent 70%);
+  box-shadow: 0 0 10px var(--c); animation: starburst var(--d) cubic-bezier(.2, .7, .2, 1) forwards; }
+.burst span.keep { animation-name: starstay; }
+@keyframes starburst { 0% { opacity: 0; transform: scale(.3); } 18% { opacity: 1; transform: scale(1); } 30% { opacity: 1; transform: scale(1.6); } 100% { opacity: 0; transform: scale(var(--z)); box-shadow: none; } }
+@keyframes starstay { 0% { opacity: 0; transform: scale(.3); } 18% { opacity: 1; transform: scale(1); } 32% { transform: scale(1.6); } 100% { opacity: var(--keep-o, .32); transform: scale(calc(var(--z) * 1.4)); box-shadow: none; } }
+:root[data-theme='light'] .burst { --keep-o: .2; }
+:root[data-theme='light'] .burst span { box-shadow: 0 0 14px 3px color-mix(in srgb, var(--c) 50%, transparent); }
+@media (prefers-reduced-motion: reduce) { .burst span { animation-duration: .01s; } }

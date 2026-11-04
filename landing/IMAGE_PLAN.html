@@ -1,0 +1,340 @@
+<title>Tale 이미지 플랜</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Gothic+A1:wght@400;600;800;900&family=JetBrains+Mono:wght@500&display=swap">
+<style>
+/* Layout: 촬영 콜시트처럼 — 위에서 아래로 한 이야기, ID 카드는 컷 번호가 붙은 슬레이트 */
+:root {
+  color-scheme: dark;
+  --bg: #0A0A0C; --panel: #141318; --panel-2: #1D1B22; --line: rgba(255,255,255,.09);
+  --fg: #F4F2EC; --fg-2: #BDB9AF; --fg-3: #85817A; --cream: #EDEAE0;
+  --warm: #F2A33A; --rose: #E8606F; --violet: #8B63E8; --indigo: #5A6AE6; --azure: #3E9BE0; --mint: #2DB39A;
+  --grad: linear-gradient(92deg, #F2A33A, #E8606F 25%, #B95BE0 50%, #6E6BF0 70%, #3E9BE0 85%, #2DB39A);
+  --sans: 'Gothic A1', 'Pretendard', -apple-system, 'Apple SD Gothic Neo', system-ui, sans-serif;
+  --mono: 'JetBrains Mono', ui-monospace, Menlo, monospace;
+}
+* { box-sizing: border-box; }
+body { background: var(--bg); color: var(--fg); font: 16px/1.65 var(--sans); word-break: keep-all; padding-left: max(16px, env(safe-area-inset-left, 0px)); padding-right: max(16px, env(safe-area-inset-right, 0px)); }
+.page { max-width: 1080px; margin: 0 auto; padding-block: 56px 96px; }
+h1, h2, h3, p { margin: 0; }
+h2, h1 { text-wrap: balance; }
+code { font: 500 .86em/1.4 var(--mono); background: var(--panel-2); padding: 2px 6px; border-radius: 6px; color: var(--fg); }
+.defs { position: absolute; width: 0; height: 0; }
+
+/* 머리 */
+.top { display: grid; gap: 18px; padding-bottom: 40px; border-bottom: 1px solid var(--line); }
+.slug { font: 500 12px/1 var(--mono); letter-spacing: .14em; color: var(--fg-3); text-transform: uppercase; }
+.top h1 { font-size: clamp(36px, 6vw, 68px); line-height: 1.05; font-weight: 900; letter-spacing: -.04em; }
+.top h1 b { background: var(--grad); -webkit-background-clip: text; background-clip: text; color: transparent; }
+.top p { color: var(--fg-2); max-width: 64ch; }
+.files { display: flex; flex-wrap: wrap; gap: 8px; }
+.files span { padding: 6px 12px; border-radius: 999px; background: var(--panel); font-size: 13.5px; color: var(--fg-2); }
+.files b { color: var(--fg); }
+.toc { display: flex; flex-wrap: wrap; gap: 6px 18px; font-size: 14px; }
+.toc a { color: var(--fg-3); text-decoration: none; }
+.toc a:hover { color: var(--fg); }
+
+section { padding-top: 64px; }
+.sh { display: flex; align-items: baseline; gap: 14px; margin-bottom: 22px; }
+.sh .n { font: 500 13px/1 var(--mono); color: var(--fg-3); }
+.sh h2 { font-size: clamp(24px, 3.2vw, 34px); font-weight: 800; letter-spacing: -.03em; }
+.lead { color: var(--fg-2); max-width: 66ch; margin-bottom: 22px; }
+
+/* 이야기 바이블 */
+.bible { display: grid; grid-template-columns: minmax(0, 1.15fr) minmax(0, 1fr); gap: 14px; }
+.scene { position: relative; border-radius: 18px; overflow: hidden; aspect-ratio: 16 / 9; max-width: 100%; }
+.scene svg { width: 100%; height: 100%; display: block; }
+.scene figcaption { position: absolute; left: 12px; bottom: 10px; font: 500 11px/1 var(--mono); letter-spacing: .12em; color: rgba(255,255,255,.75); }
+.facts { display: grid; gap: 10px; align-content: start; }
+.fact { padding: 14px 16px; border-radius: 14px; background: var(--panel); }
+.fact small { display: block; font: 500 11px/1.4 var(--mono); letter-spacing: .1em; color: var(--fg-3); margin-bottom: 4px; }
+.fact p { font-size: 15px; }
+.fact .who { display: grid; gap: 4px; }
+.prose-line { margin-top: 14px; padding: 18px 20px; border-radius: 16px; background: var(--panel); font-size: 17px; line-height: 1.9; }
+.tail-box { margin-top: 14px; display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 12px; align-items: center; padding: 16px 16px 16px 20px; border-radius: 16px; background: var(--panel-2); position: relative; }
+.tail-box::before { content: ''; position: absolute; left: 0; top: 14px; bottom: 14px; width: 3px; border-radius: 3px; background: var(--grad); }
+.tail-box small { display: block; font: 500 11px/1.4 var(--mono); letter-spacing: .1em; color: var(--fg-3); margin-bottom: 4px; }
+.tail-box code { background: none; padding: 0; font-size: 13px; color: var(--fg-2); }
+
+/* ID 카드 */
+.group { margin-top: 34px; }
+.group h3 { display: flex; align-items: center; gap: 10px; font-size: 17px; font-weight: 800; margin-bottom: 4px; }
+.group h3 i { width: 9px; height: 9px; border-radius: 50%; background: var(--c); }
+.group > p { color: var(--fg-3); font-size: 14px; margin-bottom: 14px; }
+.cards { display: grid; grid-template-columns: repeat(auto-fill, minmax(min(100%, 300px), 1fr)); gap: 12px; }
+.card { display: grid; grid-template-rows: auto auto 1fr auto; gap: 10px; padding: 14px; border-radius: 16px; background: var(--panel); min-width: 0; }
+.thumb { position: relative; border-radius: 10px; overflow: hidden; background: var(--panel-2); max-width: 100%; }
+.thumb svg { width: 100%; height: 100%; display: block; }
+.thumb.flip svg { transform: scaleX(-1); }
+.thumb .ar { position: absolute; right: 8px; top: 8px; padding: 2px 8px; border-radius: 999px; background: rgba(0,0,0,.6); font: 500 11px/1.5 var(--mono); color: #fff; }
+.thumb .blank { position: absolute; inset: 0; display: grid; place-items: center; padding: 16px; text-align: center; font-size: 13px; color: var(--fg-3);
+  background: radial-gradient(60% 60% at 50% 60%, color-mix(in srgb, var(--c) 30%, transparent), transparent 75%), var(--panel-2); }
+.idrow { display: flex; align-items: baseline; justify-content: space-between; gap: 10px; }
+.id { font: 500 13px/1 var(--mono); color: var(--fg); padding: 5px 9px; border-radius: 8px; background: color-mix(in srgb, var(--c) 22%, var(--panel-2)); }
+.size { font: 500 12px/1 var(--mono); color: var(--fg-3); }
+.what { font-size: 15.5px; font-weight: 700; }
+.prompt { font: 500 12.5px/1.6 var(--mono); color: var(--fg-2); background: var(--bg); border-radius: 10px; padding: 10px 12px; overflow-wrap: anywhere; }
+.prompt em { font-style: normal; color: var(--fg-3); }
+.copy { justify-self: start; height: 32px; padding: 0 12px; border: 0; border-radius: 999px; background: var(--panel-2); color: var(--fg-2); font: 600 13px var(--sans); cursor: pointer; }
+.copy:hover { color: var(--fg); }
+.copy:focus-visible, a:focus-visible { outline: 2px solid var(--azure); outline-offset: 2px; }
+.copy.done { background: var(--cream); color: #141312; }
+.note { margin-top: 14px; padding: 12px 16px; border-radius: 12px; background: var(--panel); color: var(--fg-2); font-size: 14px; }
+
+/* 표 */
+.tbl { overflow-x: auto; border-radius: 16px; background: var(--panel); }
+table { width: 100%; border-collapse: collapse; font-size: 14.5px; min-width: 620px; }
+th { text-align: left; font: 500 11.5px/1.4 var(--mono); letter-spacing: .08em; color: var(--fg-3); padding: 14px 16px; }
+td { padding: 12px 16px; border-top: 1px solid var(--line); color: var(--fg-2); vertical-align: top; }
+td b { color: var(--fg); }
+.pri { font: 500 13px var(--mono); color: var(--fg); }
+
+/* 지시문 */
+.brief { display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 12px; align-items: start; padding: 18px; border-radius: 16px; background: var(--panel); }
+.brief pre { margin: 0; white-space: pre-wrap; font: 500 13px/1.75 var(--mono); color: var(--fg-2); overflow-wrap: anywhere; }
+.tips { margin-top: 14px; display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 240px), 1fr)); gap: 10px; }
+.tips p { padding: 14px 16px; border-radius: 14px; background: var(--panel); font-size: 14.5px; color: var(--fg-2); }
+.tips b { display: block; color: var(--fg); margin-bottom: 2px; }
+.steps { display: grid; gap: 8px; counter-reset: s; margin: 0; padding: 0; list-style: none; }
+.steps li { counter-increment: s; display: grid; grid-template-columns: 34px minmax(0, 1fr); gap: 10px; padding: 12px 16px; border-radius: 12px; background: var(--panel); font-size: 14.5px; color: var(--fg-2); }
+.steps li::before { content: counter(s); display: grid; place-items: center; width: 26px; height: 26px; border-radius: 50%; background: var(--cream); color: #141312; font: 800 13px/1 var(--sans); }
+
+@media (max-width: 760px) {
+  .bible { grid-template-columns: 1fr; }
+  .brief, .tail-box { grid-template-columns: 1fr; }
+}
+@media (prefers-reduced-motion: reduce) { * { transition: none !important; } }
+</style>
+
+<svg class="defs" aria-hidden="true" focusable="false"><defs>
+    <linearGradient id="sky" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#070b16"/><stop offset=".55" stop-color="#121a30"/><stop offset="1" stop-color="#1a1d2c"/></linearGradient>
+    <linearGradient id="road" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#151925"/><stop offset="1" stop-color="#05060a"/></linearGradient>
+    <radialGradient id="cone" cx=".5" cy="0" r="1"><stop offset="0" stop-color="#ffcf86" stop-opacity=".55"/><stop offset=".6" stop-color="#f2a33a" stop-opacity=".12"/><stop offset="1" stop-color="#f2a33a" stop-opacity="0"/></radialGradient>
+    <radialGradient id="pool" cx=".5" cy=".5" r=".5"><stop offset="0" stop-color="#ffcf86" stop-opacity=".45"/><stop offset="1" stop-color="#ffcf86" stop-opacity="0"/></radialGradient>
+    <radialGradient id="tail" cx=".5" cy=".5" r=".5"><stop offset="0" stop-color="#ff4a5a" stop-opacity=".9"/><stop offset="1" stop-color="#ff4a5a" stop-opacity="0"/></radialGradient>
+    <radialGradient id="faceW" cx=".62" cy=".4" r=".7"><stop offset="0" stop-color="#e7b48c"/><stop offset=".7" stop-color="#8a5f45"/><stop offset="1" stop-color="#3a2a22"/></radialGradient>
+    <radialGradient id="faceM" cx=".35" cy=".4" r=".7"><stop offset="0" stop-color="#c79a7a"/><stop offset=".7" stop-color="#6e4c3a"/><stop offset="1" stop-color="#2a2020"/></radialGradient>
+    <g id="world">
+      <rect width="320" height="180" fill="url(#sky)"/>
+      <!-- 먼 건물 -->
+      <g fill="#0b1020">
+        <rect x="0" y="52" width="38" height="70"/><rect x="36" y="38" width="30" height="84"/><rect x="64" y="60" width="26" height="62"/>
+        <rect x="196" y="46" width="22" height="76"/><rect x="250" y="30" width="40" height="92"/><rect x="288" y="56" width="32" height="66"/>
+      </g>
+      <g fill="#f6c27a">
+        <rect x="8" y="62" width="3" height="3" opacity=".7"/><rect x="20" y="74" width="3" height="3" opacity=".4"/><rect x="44" y="50" width="3" height="3" opacity=".8"/>
+        <rect x="52" y="66" width="3" height="3" opacity=".35"/><rect x="72" y="70" width="3" height="3" opacity=".6"/><rect x="258" y="42" width="3" height="3" opacity=".5"/>
+        <rect x="272" y="58" width="3" height="3" opacity=".8"/><rect x="262" y="78" width="3" height="3" opacity=".35"/><rect x="298" y="66" width="3" height="3" opacity=".6"/><rect x="204" y="60" width="3" height="3" opacity=".45"/>
+      </g>
+      <!-- 길 -->
+      <rect y="122" width="320" height="58" fill="url(#road)"/>
+      <rect y="122" width="320" height="1" fill="#2a3044"/>
+      <!-- 떠난 막차 -->
+      <ellipse cx="22" cy="132" rx="9" ry="5" fill="url(#tail)"/><ellipse cx="38" cy="132" rx="9" ry="5" fill="url(#tail)"/>
+      <rect x="20" y="148" width="20" height="14" fill="#ff4a5a" opacity=".08"/>
+      <!-- 가로등 -->
+      <polygon points="226,34 178,138 276,138" fill="url(#cone)"/>
+      <line x1="232" y1="30" x2="232" y2="136" stroke="#1a2030" stroke-width="2.2"/>
+      <path d="M232 31 Q232 27 226 28" stroke="#1a2030" stroke-width="2" fill="none"/>
+      <ellipse cx="224" cy="31" rx="5" ry="2.2" fill="#ffe1a8"/>
+      <ellipse cx="226" cy="150" rx="40" ry="14" fill="url(#pool)"/>
+      <rect x="222" y="138" width="6" height="40" fill="#ffcf86" opacity=".14"/>
+      <!-- 정류장 -->
+      <rect x="84" y="76" width="104" height="50" fill="#9db4e8" opacity=".06"/>
+      <rect x="80" y="70" width="114" height="5" rx="2" fill="#a9c0f0" opacity=".22"/>
+      <rect x="86" y="75" width="2" height="51" fill="#2a3246"/><rect x="186" y="75" width="2" height="51" fill="#2a3246"/>
+      <rect x="96" y="82" width="22" height="30" rx="1.5" fill="#ffe9c2" opacity=".18"/>
+      <!-- 서윤 (왼쪽, 트렌치코트) -->
+      <path d="M140 132 L141 108 Q141 101 148 101 Q155 101 155 108 L157 132 Z" fill="#4a3d2f"/>
+      <path d="M147 102 L148 132" stroke="#2c241c" stroke-width=".8"/>
+      <circle cx="148" cy="96" r="5.2" fill="url(#faceW)"/>
+      <path d="M142.6 96 Q142.4 89.6 148 89.6 Q153.8 89.6 153.6 96 L153.4 99 Q152 93 148 92.8 Q144 93 143 99 Z" fill="#0d0b0c"/>
+      <!-- 도현 (오른쪽, 검정 코트) -->
+      <path d="M159 132 L160 105 Q160 98 167 98 Q174 98 174 105 L176 132 Z" fill="#141826"/>
+      <path d="M163 99 Q167 102 171 99 L171 104 Q167 106 163 104 Z" fill="#26324f"/>
+      <circle cx="167" cy="93" r="5" fill="url(#faceM)"/>
+      <path d="M162 92 Q162 87 167 87 Q172.4 87 172 92 Q169 89.6 165 90.6 Z" fill="#0a0a0d"/>
+      <!-- 투명 비닐 우산 -->
+      <line x1="171" y1="84" x2="173" y2="112" stroke="#d8e2f0" stroke-width=".8" opacity=".8"/>
+      <path d="M144 86 Q160 62 186 80 Q178 80 172 84 Q166 80 158 82 Q150 82 144 86 Z" fill="#dfeaff" opacity=".2" stroke="#eef4ff" stroke-opacity=".55" stroke-width=".6"/>
+      <!-- 얼굴에 닿는 빛 -->
+      <circle cx="150" cy="95" r="2.4" fill="#ffd8a8" opacity=".35"/>
+      <!-- 젖은 길 위 반사 -->
+      <rect x="140" y="134" width="36" height="20" fill="#9db4e8" opacity=".05"/>
+    </g>
+  </defs></svg>
+
+<main class="page">
+  <header class="top">
+    <p class="slug">Tale Studio · 메인 페이지 · 이미지 콜시트</p>
+    <h1>한 장면으로 찍는<br><b>이미지 플랜</b></h1>
+    <p>메인 페이지 두 시안의 이미지 자리에 무엇을 채울지, Claude에게 어떻게 시키면 되는지 정리했어요. 모든 이미지는 이야기 하나, "우산 하나"로 맞춰요. 아직 이미지와 영상은 만들지 않았어요. 아래 구도 그림은 어두운 시안에 직접 그린 장면이에요.</p>
+    <div class="files"><span><b>밝은 시안</b> landing/index.html</span><span><b>어두운 시안</b> landing/dark.html</span><span><b>원문</b> landing/IMAGE_PLAN.md</span></div>
+    <nav class="toc" aria-label="목차"><a href="#bible">이야기 하나로</a><a href="#list">이미지 목록</a><a href="#dark">어두운 시안 자리</a><a href="#capture">서비스 화면 캡처</a><a href="#ask">Claude에게 시키기</a><a href="#video">영상은 나중에</a></nav>
+  </header>
+
+  <section id="bible">
+    <div class="sh"><span class="n">00</span><h2>이야기 하나로 통일해요</h2></div>
+    <p class="lead">페이지 전체가 같은 이야기를 보여 줘야 "한 줄 → 산문 → 인물 → 콘티 → 영상" 흐름이 믿어져요.</p>
+    <div class="bible">
+      <figure class="scene"><svg viewBox="0 0 320 180" preserveAspectRatio="xMidYMid slice" role="img" aria-label="비 오는 버스 정류장 밤 장면 구도"><use href="#world"/></svg><figcaption>SCENE 01 · 버스 정류장 · 밤 · 비</figcaption></figure>
+      <div class="facts">
+        <div class="fact"><small>한 줄</small><p>우산 하나를 같이 쓴 두 사람</p></div>
+        <div class="fact"><small>인물</small><div class="who"><p><b>서윤</b> 29 · 팀장. 어깨 길이 흑발 단발, 베이지 트렌치코트, 사원증 끈, 지친 듯 단단한 눈매</p><p><b>도현</b> 26 · 신입. 짧은 흑발, 네이비 니트 + 검정 코트, 투명 비닐 우산, 수줍은 미소</p></div></div>
+        <div class="fact"><small>배경</small><p>서울 외곽 버스 정류장, 밤, 비. 노란 가로등, 젖은 아스팔트에 번지는 불빛, 반투명 지붕</p></div>
+      </div>
+    </div>
+    <p class="prose-line">막차를 놓친 서윤은 정류장 지붕 끝에 서서 비를 피했다. 옆자리 남자가 말없이 우산을 기울였다. 둘의 어깨가 한 뼘쯤 젖었을 때, 서윤은 그가 같은 회사 신입이라는 걸 알아챘다.</p>
+    <div class="tail-box">
+      <div><small>스타일 꼬리 · 모든 프롬프트 끝에 붙여요</small><code id="tail">cinematic previs still, 35mm film look, cool navy night with warm sodium streetlight, light rain, wet asphalt reflections, shallow depth of field, subtle film grain, muted color grade, no text, no logo, no watermark</code></div>
+      <button class="copy" type="button" data-copy-el="tail">복사</button>
+    </div>
+  </section>
+
+  <section id="list">
+    <div class="sh"><span class="n">01</span><h2>이미지 목록</h2></div>
+    <p class="lead">카드의 ID는 페이지 안 이미지 자리의 <code>data-img</code> 값과 같아요. 복사 버튼은 스타일 꼬리까지 붙여서 복사해요.</p>
+    <div id="groups"></div>
+  </section>
+
+  <section id="dark">
+    <div class="sh"><span class="n">02</span><h2>어두운 시안에서 바뀔 자리</h2></div>
+    <p class="lead">어두운 시안은 지금 직접 그린 SVG 장면으로 채워져 있어요. 이미지가 생기면 이 자리를 바꿔요.</p>
+    <div class="tbl"><table>
+      <thead><tr><th scope="col">자리</th><th scope="col">지금</th><th scope="col">바꿀 이미지</th></tr></thead>
+      <tbody>
+        <tr><td><b>히어로 배경</b></td><td>SVG 장면 · 와이드</td><td>IMG-F3 또는 IMG-C1, 아주 어둡게 깔려요</td></tr>
+        <tr><td><b>스튜디오 데모 컷 4장</b></td><td>SVG 장면 네 구도</td><td>IMG-C1 ~ C4</td></tr>
+        <tr><td><b>"왜 Tale" 콘티 필름</b></td><td>SVG 장면 네 구도</td><td>IMG-C1 ~ C4</td></tr>
+        <tr><td><b>작품 포스터 6장</b></td><td>글자 포스터</td><td>IMG-S1 ~ S6, 제목 글자는 그대로 위에</td></tr>
+        <tr><td><b>마지막 장면</b></td><td>SVG 장면 · 미디엄</td><td>IMG-C2</td></tr>
+      </tbody>
+    </table></div>
+  </section>
+
+  <section id="capture">
+    <div class="sh"><span class="n">03</span><h2>서비스 화면 캡처</h2></div>
+    <p class="lead">지금 제품 화면은 간략하게 그린 예시예요. 실제 앱이 준비되면 1440×900, 2배율(2880×1800)로 캡처해 두세요. 더미 데이터는 "우산 하나" 이야기로 맞추고, 개인 정보는 지우고, 주소창 없이 앱 창만 찍어요.</p>
+    <div class="tbl"><table>
+      <thead><tr><th scope="col">우선</th><th scope="col">화면</th><th scope="col">어디에</th><th scope="col">보여야 할 것</th></tr></thead>
+      <tbody>
+        <tr><td class="pri">1</td><td><b>Writer · 산문 + 채팅</b></td><td>"글을 써 줘요"</td><td>산문 가운데, 오른쪽 Lumi 채팅, 고치는 문단 선택, @인물 태그</td></tr>
+        <tr><td class="pri">2</td><td><b>Producer · 추천 카드</b></td><td>"아이디어를 넓혀 줘요"</td><td>한 줄 입력 후 Lumi가 세 갈래 제안, 하나 선택된 상태</td></tr>
+        <tr><td class="pri">3</td><td><b>Storyboard · 컷 그리드 + 상세</b></td><td>"콘티 먼저", 스튜디오</td><td>컷 6~8장, 카메라 · 조명 패널 열림, "다시 그리기 · 무료"</td></tr>
+        <tr><td class="pri">4</td><td><b>Artist · 인물 카드</b></td><td>인물 일관성</td><td>첫 모습 크게, 다른 모습 작게, "+ 모습 추가"</td></tr>
+        <tr><td class="pri">5</td><td><b>생성 전 비용 확인</b></td><td>요금 옆</td><td>"이 컷 생성 · 5 Take" 확인 창</td></tr>
+        <tr><td class="pri">6</td><td><b>마스터 시트 미리보기</b></td><td>기능 소개</td><td>컷 · 샷 · 대사 표 한 장</td></tr>
+      </tbody>
+    </table></div>
+  </section>
+
+  <section id="ask">
+    <div class="sh"><span class="n">04</span><h2>Claude에게 이미지 만들라고 할 때</h2></div>
+    <p class="lead">다음 대화에서 아래 지시문을 그대로 붙여 넣으면 돼요.</p>
+    <div class="brief"><pre id="brief1">landing/IMAGE_PLAN.md를 읽고 이미지를 만들어 줘.
+1) 먼저 IMG-F1, F2, F3만 만들어서 보여 줘. 내가 고르면 그걸 기준 이미지로 써.
+2) 고른 F1·F2·F3을 참고 이미지로 넣고 IMG-C1~C4를 만들어 줘. 얼굴·옷이 같아야 해.
+3) 그다음 B1~B3, S1~S6.
+- 모든 프롬프트 끝에 문서의 '스타일 꼬리'를 붙여 줘.
+- 만들기 전에 모델과 크레딧 비용을 먼저 알려 줘.
+- 결과는 landing/assets/img/&lt;ID&gt;.webp 로 저장(긴 변 1600px 이하, 품질 82).
+- 저장하면 index.html과 dark.html의 같은 자리에 넣고 node build.mjs로 다시 빌드해 줘.</pre><button class="copy" type="button" data-copy-el="brief1">복사</button></div>
+    <div class="tips">
+      <p><b>F 세트부터</b>인물 얼굴이 먼저 정해져야 나머지 컷이 흔들리지 않아요.</p>
+      <p><b>참고 이미지 지원 모델</b>얼굴이 이어지려면 이미지 레퍼런스를 받는 모델을 쓰라고 말하세요.</p>
+      <p><b>ID로 짚어 고치기</b>"IMG-C3만 다시, 표정을 덜 놀라게"처럼 말하면 빨라요.</p>
+    </div>
+  </section>
+
+  <section id="video">
+    <div class="sh"><span class="n">05</span><h2>영상은 나중에 · 확정한 콘티에서 출발</h2></div>
+    <p class="lead">영상은 확정한 콘티 이미지에서 출발(I2V)해요. "콘티 먼저, 확정 컷만 영상"을 페이지가 직접 보여 주는 셈이에요.</p>
+    <div class="tbl"><table>
+      <thead><tr><th scope="col">ID</th><th scope="col">출발 이미지</th><th scope="col">길이</th><th scope="col">움직임 프롬프트</th></tr></thead>
+      <tbody>
+        <tr><td class="pri">VID-C2</td><td>IMG-C2</td><td>5초</td><td><code>slow push-in, the umbrella tilts toward her, rain keeps falling, subtle breathing, no cuts</code></td></tr>
+        <tr><td class="pri">VID-C3</td><td>IMG-C3</td><td>5초</td><td><code>static camera, her eyes widen slightly then soften into a small smile, rain drips from the umbrella edge</code></td></tr>
+        <tr><td class="pri">VID-C4</td><td>IMG-C4</td><td>5초</td><td><code>slow dolly back, the two stand still under one umbrella, a bus headlight passes and lights them</code></td></tr>
+        <tr><td class="pri">VID-S1</td><td>IMG-S1</td><td>6초 · 반복</td><td>끝 프레임이 첫 프레임과 비슷하게 (<code>seamless loop</code>)</td></tr>
+        <tr><td class="pri">VID-HERO</td><td>C1 → C4</td><td>15~20초</td><td>선택. 스튜디오 아래 "완성 영상" 자리</td></tr>
+      </tbody>
+    </table></div>
+    <div class="brief" style="margin-top:14px"><pre id="brief2">IMAGE_PLAN.md 4번 표대로 영상을 만들어 줘.
+- I2V로, 출발 이미지는 landing/assets/img/&lt;ID&gt;.webp
+- 720p로 먼저 1개(VID-C3)만 만들어 보여 줘. 괜찮으면 나머지.
+- 생성 전에 모델과 비용을 먼저 알려 줘.
+- 결과는 mp4(H.264, 무음) + 첫 프레임 webp로 저장하고,
+  페이지에는 &lt;video autoplay muted loop playsinline poster="..."&gt; 로 넣어 줘.
+- 영상은 HTML에 넣지 말고 같은 폴더 옆 파일로 둬.</pre><button class="copy" type="button" data-copy-el="brief2">복사</button></div>
+    <ol class="steps" style="margin-top:14px">
+      <li>영상 안에 글자나 로고가 생기면 다시 뽑아요.</li>
+      <li>쇼케이스 영상은 5~8초, 2MB 이하로 줄여요 (<code>ffmpeg -crf 28 -an</code>).</li>
+      <li>움직임 줄이기 설정이면 첫 프레임만 보여 줘요. 페이지에 이미 규칙이 있어요.</li>
+    </ol>
+  </section>
+</main>
+
+<script>
+const TAIL = document.getElementById('tail').textContent.trim();
+const GROUPS = [
+  { t: '인물 · 배경', c: '#8B63E8', d: '밝은 시안 "한 줄이 이렇게 돼요" 카드. 이 세 장이 모든 컷의 기준 이미지가 돼요.', items: [
+    { id: 'IMG-F1', what: '서윤 인물 카드', size: '3:4 · 900×1200', vb: '128 76 40 53', ar: '3 / 4', p: "character portrait of Seoyun, 29-year-old Korean woman team leader, shoulder-length black bob, beige trench coat, lanyard, tired but firm eyes, standing under a bus stop roof at night, waist-up, looking slightly off camera" },
+    { id: 'IMG-F2', what: '도현 인물 카드', size: '3:4 · 900×1200', vb: '150 72 40 53', ar: '3 / 4', p: "character portrait of Dohyun, 26-year-old Korean man, new employee, short black hair, navy knit sweater under black coat, holding a clear vinyl umbrella, shy smile, waist-up, night rain" },
+    { id: 'IMG-F3', what: '배경 · 버스 정류장', size: '16:9 · 1600×900', vb: '40 30 240 135', ar: '16 / 9', p: "empty suburban Seoul bus stop at night in the rain, translucent roof, yellow streetlight, bus timetable panel glowing, wet asphalt reflections, no people, establishing shot" },
+  ]},
+  { t: '콘티 컷', c: '#5A6AE6', d: 'F1 · F2 · F3을 참고 이미지로 넣고 만들어요. 두 시안의 데모와 콘티에 같이 써요.', items: [
+    { id: 'IMG-C1', what: '컷 1 · 와이드 · 아이레벨', size: '16:9 · 1280×720', vb: '0 0 320 180', ar: '16 / 9', p: "wide shot, eye level: Seoyun alone at the edge of a bus stop roof, rain pouring, the last bus tail lights leaving in the distance" },
+    { id: 'IMG-C2', what: '컷 2 · 미디엄 · 옆에서', size: '16:9 · 1280×720', vb: '112 66 96 54', ar: '16 / 9', p: "medium side shot: Dohyun silently tilts his clear umbrella over Seoyun, both facing the street, streetlight behind them" },
+    { id: 'IMG-C3', what: '컷 3 · 클로즈업 · 로우앵글', size: '16:9 · 1280×720', vb: '128 79 46 25.9', ar: '16 / 9', p: "close-up from a low angle: Seoyun's face, surprised recognition, rain drops on the umbrella edge in the foreground, warm light on her cheek" },
+    { id: 'IMG-C4', what: '컷 4 · 투샷 · 뒤에서', size: '16:9 · 1280×720', vb: '118 58 120 67.5', ar: '16 / 9', flip: true, p: "two-shot from behind: the two share one umbrella, shoulders wet, looking at the empty road, streetlights stretching away" },
+  ]},
+  { t: '인물 일관성', c: '#E8606F', d: '밝은 시안 기능 소개의 인물 시트. 밤 · 비 표현은 빼고 스튜디오 배경으로 만들어요.', noTail: true, items: [
+    { id: 'IMG-B1', what: '서윤 정면', size: '1:1 · 800×800', ar: '1 / 1', blank: '정면 · 무표정', p: "character sheet tile, front view of Seoyun, neutral expression, plain warm gray studio background, soft key light" },
+    { id: 'IMG-B2', what: '서윤 측면', size: '1:1 · 800×800', ar: '1 / 1', blank: '측면 프로필', p: "character sheet tile, side profile view of Seoyun, neutral expression, plain warm gray studio background, soft key light" },
+    { id: 'IMG-B3', what: '서윤 표정 셋', size: '1:1 · 800×800', ar: '1 / 1', blank: '놀람 · 미소 · 짜증', p: "three expressions of Seoyun side by side: surprised, smiling, annoyed, same outfit, plain warm gray studio background" },
+  ]},
+  { t: '작품 쇼케이스', c: '#F2A33A', d: '작품마다 대표 스틸 한 장. 실제 Tale 결과물이 생기면 그걸로 바꾸는 게 가장 좋아요.', items: [
+    { id: 'IMG-S1', what: '우산 하나 · 로맨틱 코미디', size: '1:1 · 1400×1400', vb: '120 50 110 110', ar: '1 / 1', flip: true, p: "two-shot from behind: the two share one umbrella, shoulders wet, looking at the empty road, streetlights stretching away, square composition" },
+    { id: 'IMG-S2', what: '마지막 배달 · 드라마', size: '3:4 · 900×1200', ar: '3 / 4', blank: '새벽 골목 · 케이크 상자', c: '#F2A33A', p: "delivery rider on a scooter stopped at a hillside alley in Seoul at dawn, holding a small cake box, blue hour" },
+    { id: 'IMG-S3', what: '404호의 소리 · 미스터리', size: '4:3 · 1000×750', ar: '4 / 3', blank: '열린 404호 문', c: '#5A6AE6', p: "dim apartment corridor, door 404 slightly open, cold fluorescent light flickering, a single slipper on the floor" },
+    { id: 'IMG-S4', what: '작은 우주선 · 애니메이션', size: '4:3 · 1000×750', ar: '4 / 3', blank: '마당의 종이 로켓', c: '#E8606F', noTail: true, p: "stylized 3D animation still, a kid's cardboard rocket in a backyard at night, real stars above, warm window light" },
+    { id: 'IMG-S5', what: '새벽 편의점 · 숏폼', size: '4:3 · 1000×750', ar: '4 / 3', blank: '새벽 4시 계산대', c: '#2DB39A', p: "convenience store at 4am, a part-timer and a regular customer laughing at the counter, vertical-friendly composition" },
+    { id: 'IMG-S6', what: '첫 무대 · 뮤직비디오', size: '2:1 · 1600×800', ar: '2 / 1', blank: '스포트라이트 하나', c: '#8B63E8', p: "small indie stage seen from the back of the crowd, singer in a single spotlight, haze, colored backlights" },
+  ]},
+];
+
+const esc = (s) => s.replace(/&/g, '&amp;').replace(/</g, '&lt;');
+document.getElementById('groups').innerHTML = GROUPS.map((g) => `
+  <div class="group" style="--c:${g.c}">
+    <h3><i></i>${g.t}</h3><p>${g.d}</p>
+    <div class="cards">${g.items.map((it) => {
+      const tail = !(g.noTail || it.noTail);
+      const thumb = it.vb
+        ? `<svg viewBox="${it.vb}" preserveAspectRatio="xMidYMid slice" aria-hidden="true"><use href="#world"/></svg>`
+        : `<div class="blank" style="--c:${it.c || g.c}">${it.blank}</div>`;
+      return `<article class="card" style="--c:${it.c || g.c}">
+        <div class="thumb${it.flip ? ' flip' : ''}" style="aspect-ratio:${it.ar}">${thumb}<span class="ar">${it.ar.replace(/ /g, '')}</span></div>
+        <div class="idrow"><span class="id">${it.id}</span><span class="size">${it.size}</span></div>
+        <div><p class="what">${it.what}</p><p class="prompt" style="margin-top:8px">${esc(it.p)}${tail ? ' <em>+ 스타일 꼬리</em>' : ''}</p></div>
+        <button class="copy" type="button" data-prompt="${encodeURIComponent(it.p + (tail ? ', ' + TAIL : ''))}">프롬프트 복사</button>
+      </article>`;
+    }).join('')}</div>
+  </div>`).join('');
+
+document.addEventListener('click', async (e) => {
+  const b = e.target.closest('.copy');
+  if (!b) return;
+  const text = b.dataset.prompt ? decodeURIComponent(b.dataset.prompt) : document.getElementById(b.dataset.copyEl).textContent.trim();
+  const label = b.textContent;
+  try {
+    await navigator.clipboard.writeText(text);
+    b.textContent = '복사했어요'; b.classList.add('done');
+  } catch {
+    const el = b.dataset.copyEl ? document.getElementById(b.dataset.copyEl) : b.previousElementSibling.querySelector('.prompt');
+    const r = document.createRange(); r.selectNodeContents(el);
+    const s = getSelection(); s.removeAllRanges(); s.addRange(r);
+    b.textContent = '선택했어요 · ⌘C';
+  }
+  setTimeout(() => { b.textContent = label; b.classList.remove('done'); }, 1800);
+});
+</script>

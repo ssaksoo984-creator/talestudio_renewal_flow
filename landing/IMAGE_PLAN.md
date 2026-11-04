@@ -83,22 +83,23 @@ cinematic previs still, 35mm film look, cool navy night with warm sodium streetl
 
 > 실제 Tale로 만든 결과물이 생기면 그걸로 바꾸는 게 가장 좋아요. 쇼케이스는 "만든 것"이어야 믿어져요.
 
-### F. (이전 어두운 시안용 · 지금 버전에서는 안 씀)
+### F. 어두운 버전에서 이미지가 들어갈 곳
 
-| ID | 어디 | 비율 · 크기 | 프롬프트 |
-|---|---|---|---|
-| IMG-T1 | 도구 벤토 큰 칸 "글을 써 줘요" (위에 산문 UI가 떠 있음) | 1:1 · 1400×1400 | `top-down view of a writer's desk at night, open notebook with handwritten Korean lines, a phone showing a bus stop photo, rain on the window, warm desk lamp` + 화풍 문장. 위쪽 절반은 어둡고 단순하게(UI가 올라감) |
-| IMG-T2 | 도구 벤토 세로 칸 "아이디어를 넓혀 줘요" | 1:2 · 800×1600 | `a single clear umbrella standing open on wet asphalt at night, three diverging puddle reflections in different colors (warm pink, soft blue, cold violet)` + 스타일 꼬리. 위쪽에 칩이 올라가니 위는 어둡게 |
-| IMG-T3 | 도구 벤토 "컷마다 카메라 · 조명" | 4:3 · 1000×750 | `behind-the-scenes previs: a small film camera on a slider pointed at the bus stop set, one soft key light, rain machine mist` + 스타일 꼬리 |
-| IMG-H1 | "콘티 먼저" 섹션의 큰 와이드 스틸 | 21:9 · 2100×900 | IMG-C3 장면을 21:9로 다시 뽑기. 아래 1/4은 컷 카드가 덮으니 중요한 건 위 3/4에 |
+어두운 버전은 지금 직접 그린 SVG 장면으로 채워져 있어요. 이미지가 생기면 아래 자리를 바꿔요.
 
-> 어두운 버전 히어로는 일부러 이미지 없이 글자 + 빛만 썼어요(Artlist 첫 화면 결). 나중에 바꾸고 싶으면 `IMG-C4`를 아주 어둡게 깔고 그 위에 헤드라인을 올리는 걸 추천해요.
+| 자리 | 지금 | 바꿀 이미지 |
+|---|---|---|
+| 히어로 배경 | SVG 장면 · 와이드 | IMG-F3(배경) 또는 IMG-C1. 아주 어둡게 깔려요 |
+| 스튜디오 데모 컷 4장 | SVG 장면 4구도 | IMG-C1~C4 |
+| "왜 Tale" 콘티 필름 | SVG 장면 4구도 | IMG-C1~C4 |
+| 작품 포스터 6장 | 글자 포스터 | IMG-S1~S6 (포스터 배경, 제목 글자는 그대로 위에) |
+| 마지막 장면 | SVG 장면 · 미디엄 | IMG-C2 |
 
 ---
 
 ## 2. 서비스 화면 캡처 (있으면 좋은 화면)
 
-지금 페이지의 제품 화면은 stageshow로 그린 **간략화 버전**이에요. 실제 앱 화면이 준비되면 아래 화면을 1440×900, 2배율(2880×1800)로 캡처해 두세요. 섹션 4 "왜 Tale인가요"의 세 그림이나 섹션 3 데모 옆 보조 이미지로 쓸 수 있어요.
+지금 페이지의 제품 화면은 간략하게 그린 **예시 화면**이에요. 실제 앱 화면이 준비되면 아래 화면을 1440×900, 2배율(2880×1800)로 캡처해 두세요. 섹션 4 "왜 Tale인가요"의 세 그림이나 섹션 3 데모 옆 보조 이미지로 쓸 수 있어요.
 
 | 우선 | 화면 | 어디에 쓰나 | 보여야 할 것 |
 |---|---|---|---|
@@ -121,7 +122,7 @@ cinematic previs still, 35mm film look, cool navy night with warm sodium streetl
 landing/IMAGE_PLAN.md를 읽고 이미지를 만들어 줘.
 1) 먼저 IMG-F1, F2, F3만 만들어서 보여 줘. 내가 고르면 그걸 기준 이미지로 써.
 2) 고른 F1·F2·F3을 참고 이미지로 넣고 IMG-C1~C4를 만들어 줘. 얼굴·옷이 같아야 해.
-3) 그다음 B1~B3, S1~S6, T1~T3, H1.
+3) 그다음 B1~B3, S1~S6.
 - 모든 프롬프트 끝에 문서의 '스타일 꼬리'를 붙여 줘.
 - 만들기 전에 모델과 크레딧 비용을 먼저 알려 줘.
 - 결과는 landing/assets/img/<ID>.webp 로 저장(긴 변 1600px 이하, 품질 82).

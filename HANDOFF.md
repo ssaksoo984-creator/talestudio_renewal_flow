@@ -136,3 +136,4 @@
 - Lumi 이미지를 Lumi 아티팩트(https://claude.ai/code/artifact/9c4576f3-b386-46cd-bdd9-5ae43cb2b7e6)에서 투명 배경으로 다시 뽑음 → `mascot/artifact/` (단계별 8종 + 상태 6종).
 - A-15 Lumi 상태: 아티팩트 기준 기본(반복 6.5초) · 듣는 중/생각 중(반복 3초) · 완료(1회 1.2초→기본) · 오류(1회 1초→유지) · 로딩(단계 전환).
 - 움직임: `mascot/Lumi_상태.mp4/.gif`, `mascot/Lumi_성장흐름.mp4/.gif` (아티팩트 녹화).
+- (수정) 굿즈 목업 다시: 배지는 단계 색 동그라미 + 눈만(`brand/mockups/badge-ref.png` 참고), 스티커 Lumi 작게, 노트는 무지(미색·네이비) + 작은 심볼. 간판·벽 사인 심볼 더 작게. 포스터·빌보드 Lumi 크기 축소.

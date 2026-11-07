@@ -129,3 +129,10 @@
 - **단계 색 · 로딩 카드 컴포넌트화(2026-11-04)**: 사이드바 컴포넌트 6종에 각 단계 Stage 모드 지정(컴포넌트 페이지에서도 단계 색으로 보임), D1 · DG는 `Nav/Sidebar · Director`, ED1은 `Nav/Sidebar · Editor`로 교체. 새 컴포넌트 `Feedback/Loading Card`(Stage = 기본 · Producer … Editor, Lumi · 진행 막대 · 지금 단계 점이 단계 색, 글은 Title · Description · Step 1~3 속성) — WL(Writer) · R5(기본) · AR(Artist)을 이 인스턴스로 교체
 - **Content/Loading Card v3화(2026-11-04)**: 너비 372 · 여백 50/30 · 간격 15 · 모서리 20 · 바탕 #1F1E1D · 제목 16 Bold · 상태 12.5 #8E8B82 행간 155% · 진행 막대 4px, 색은 stage/accent(화면 단계 색) · Lumi 100. 단계 목록이 있는 건 Feedback/Loading Card
 - **P1 · P2 채팅 층 구분**: 바탕 #262624 / Lumi 말풍선 #34332F / 내 말풍선 · 빠른 답 칩 #45443F / 말풍선 안 요약 카드 #1F1E1D(한 단계 어둡게) / "더 고칠래요" 버튼 #45443F
+
+## 2026-11-07 · BI 가이드라인 v3 (심볼만 목업 · 아티팩트 Lumi)
+- 목업 사진 전부 재생성 (OpenArt Nano Banana 2): 워드마크 빼고 심볼만 작게. 사인/간판 그림자 아주 옅게.
+- 굿즈 목업 2장 추가 (민트: 노트·모자·텀블러·스티커 / 라벤더: 에코백·머그·배지) → `brand/mockups/goods1.jpg`, `goods2.jpg`.
+- Lumi 이미지를 Lumi 아티팩트(https://claude.ai/code/artifact/9c4576f3-b386-46cd-bdd9-5ae43cb2b7e6)에서 투명 배경으로 다시 뽑음 → `mascot/artifact/` (단계별 8종 + 상태 6종).
+- A-15 Lumi 상태: 아티팩트 기준 기본(반복 6.5초) · 듣는 중/생각 중(반복 3초) · 완료(1회 1.2초→기본) · 오류(1회 1초→유지) · 로딩(단계 전환).
+- 움직임: `mascot/Lumi_상태.mp4/.gif`, `mascot/Lumi_성장흐름.mp4/.gif` (아티팩트 녹화).

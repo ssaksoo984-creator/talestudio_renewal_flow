@@ -52,9 +52,10 @@ if (sixItems[0]) activate(sixItems[0])
 
 
 // 한 줄의 여정: 앱 시뮬레이션이 Producer부터 Editor까지 이어서 재생돼요
-const stabs = Array.from(document.querySelectorAll<HTMLButtonElement>('.shots__tabs button'))
+const stabs = Array.from(document.querySelectorAll<HTMLButtonElement>('.glass-tabs button'))
 const sim = createSim(document.getElementById('sim')!, {
   loop: true,
+  last: 'director',
   onStep: (s: string) => stabs.forEach((b) => { const on = b.dataset.s === s; b.classList.toggle('on', on); b.setAttribute('aria-selected', String(on)) }),
 })
 let simStarted = false

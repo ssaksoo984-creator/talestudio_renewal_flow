@@ -105,3 +105,33 @@
 .vg-cursor { position: absolute; left: 0; top: 0; z-index: 5; width: 22px; height: 22px; transition: transform 0.7s cubic-bezier(0.45, 0, 0.2, 1); filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.5)); pointer-events: none; }
 .vg-cursor.press { scale: 0.85; }
 @media (prefers-reduced-motion: reduce) { .vg * { animation: none !important; transition: none !important; } }
+
+/* 왜 Tale: 갈래 펼치기 · 콘티 먼저 */
+.vg-seed { width: auto !important; padding: 12px 20px; border-radius: 999px; background: var(--cream); color: var(--onc); font-weight: 700; font-size: 15px; }
+.vg-branches { position: relative; display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; padding-top: 34px; }
+.vg-blines { position: absolute; left: 16%; right: 16%; top: 0; width: 68% !important; height: 34px; }
+.vg-blines path { fill: none; stroke: rgba(255, 255, 255, .18); stroke-width: 1.5; vector-effect: non-scaling-stroke; stroke-dasharray: 80; stroke-dashoffset: 80; transition: stroke-dashoffset .8s ease; }
+.open .vg-blines path { stroke-dashoffset: 0; }
+.vg-leaf { position: relative; padding: 12px 12px 12px 15px; border-radius: 12px; background: var(--side); color: var(--t2); font-size: 12.5px; line-height: 1.45; overflow: hidden; opacity: 0; transform: translateY(8px); transition: opacity .4s, transform .4s, box-shadow .3s, background-color .3s; }
+.vg-leaf::before { content: ''; position: absolute; left: 0; top: 0; bottom: 0; width: 3px; background: var(--lc); }
+.vg-leaf small { display: block; color: var(--t1); font-size: 13.5px; font-weight: 700; margin-bottom: 2px; }
+.vg-leaf.on { opacity: 1; transform: none; }
+.vg-leaf.pick { background: color-mix(in srgb, var(--lc) 16%, var(--side)); box-shadow: 0 0 0 1.5px var(--lc); }
+.done .vg-leaf:not(.pick) { opacity: .4; }
+.vg-chips--c { justify-content: center; padding-left: 0; }
+.vg-pop { opacity: 0; transform: scale(.9); transition: opacity .3s, transform .3s; }
+.vg-pop.on { opacity: 1; transform: none; }
+.vg-cmp { padding: 12px 14px; border-radius: 14px; background: var(--side); }
+.vg-cmp__h { display: flex; justify-content: space-between; font-size: 13.5px; font-weight: 700; margin-bottom: 10px; }
+.vg-cmp__h span { color: var(--t3); font-weight: 500; font-size: 12px; }
+.vg-vids { display: grid; grid-template-columns: repeat(4, 1fr); gap: 6px; }
+.vg-vids i { position: relative; overflow: hidden; aspect-ratio: 16 / 10; border-radius: 7px; background: var(--bubble); opacity: .25; transition: opacity .3s; }
+.vg-vids i.on { opacity: 1; }
+.vg-vids i svg { position: absolute; inset: 0; width: 100%; height: 100%; }
+.vg-cmp--bad .vg-vids i.on::after { content: '다시'; position: absolute; left: 5px; bottom: 5px; padding: 1px 6px; border-radius: 999px; background: rgba(0, 0, 0, .6); font-size: 10.5px; font-weight: 600; }
+.vg-vids em { position: absolute; left: 5px; bottom: 5px; padding: 2px 7px; border-radius: 999px; background: rgba(0, 0, 0, .6); font-size: 10.5px; font-weight: 700; font-style: normal; }
+.vg-vids i.redo em { background: var(--cream); color: var(--onc); }
+.vg-vids i.redo.on { box-shadow: 0 0 0 2px var(--c); }
+.vg-take { margin-top: 10px; font-size: 13px; color: var(--t2); }
+.vg-take b { font: 800 22px Inter, sans-serif; color: var(--t1); margin-right: 2px; }
+.x .vg-take b { color: var(--t3); text-decoration: line-through; text-decoration-color: #E8606F; text-decoration-thickness: 3px; }

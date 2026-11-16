@@ -96,7 +96,8 @@ function template() {
 </div>`
 }
 
-export function createSim(host, { loop = false, onStep } = {}) {
+export function createSim(host, { loop = false, onStep, last = 'editor' } = {}) {
+  const END = STEPS.indexOf(last) + 1
   host.classList.add('sim')
   host.innerHTML = template()
   const $ = (s) => host.querySelector(s)
@@ -259,7 +260,7 @@ export function createSim(host, { loop = false, onStep } = {}) {
       if (!alive()) return
       if (only) { await sleep(2400); if (!alive()) return; reset(); if (i > 0) prefill(i); continue }
       i++
-      if (i >= STEPS.length) { if (!loop) return; i = 0; reset() }
+      if (i >= END) { if (!loop) return; i = 0; reset() }
     }
   }
   function prefill(i) {

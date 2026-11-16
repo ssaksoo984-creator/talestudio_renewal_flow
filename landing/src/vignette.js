@@ -44,9 +44,29 @@ const VIEWS = {
     <div class="vg-foot"><span class="vg-btn vg-btn--cream" data-t>내보내기</span><span class="vg-toast">mp4 · 1080p로 내보냈어요</span></div>`,
 }
 
+
+VIEWS.write = VIEWS.writer
+VIEWS.expand = `
+  <div class="vg-seed" data-seed>우산 하나를 같이 쓴 두 사람</div>
+  <div class="vg-branches">
+    <svg class="vg-blines" viewBox="0 0 300 40" preserveAspectRatio="none"><path d="M150 0 C150 22 50 18 50 40"/><path d="M150 0 V40"/><path d="M150 0 C150 22 250 18 250 40"/></svg>
+    <div class="vg-leaf" data-t style="--lc:#E8606F"><small>로맨틱 코미디</small>상사와 신입, 비밀 연애의 시작</div>
+    <div class="vg-leaf" style="--lc:#3E9BE0"><small>잔잔한 드라마</small>매일 같은 버스, 말 없는 동행</div>
+    <div class="vg-leaf" style="--lc:#8B63E8"><small>미스터리</small>우산 주인은 왜 나타나지 않을까</div>
+  </div>
+  <div class="vg-chips vg-chips--c"><span class="vg-chip vg-pop">인물 · 서윤 · 도현</span><span class="vg-chip vg-pop">결말 · 해피엔딩</span><span class="vg-chip vg-pop">15초 · 9:16</span></div>
+  <span class="vg-btn vg-btn--cream" data-go>갈래 펼치기</span>`
+VIEWS.board = `
+  <div class="vg-cmp vg-cmp--bad"><p class="vg-cmp__h">영상부터 바로<span>다시 · 다시 · 다시</span></p>
+    <div class="vg-vids">${['0 0 320 180', '112 66 96 54', '128 79 46 25.9', '118 58 120 67.5'].map((vb) => `<i>${shot(vb)}</i>`).join('')}</div>
+    <p class="vg-take"><b data-bad>0</b> Takes</p></div>
+  <div class="vg-cmp"><p class="vg-cmp__h">Tale · 콘티 먼저<span>확인 → 확정 → 생성</span></p>
+    <div class="vg-vids vg-vids--sb">${['0 0 320 180', '112 66 96 54', '128 79 46 25.9', '118 58 120 67.5'].map((vb, i) => `<i${i === 2 ? ' class="redo"' : ''}>${shot(vb)}<em>${i === 2 ? '다시 그리기 · 무료' : '✓ 확정'}</em></i>`).join('')}</div>
+    <p class="vg-take">콘티 <b>0</b> · 영상 <b data-good>0</b> Takes</p></div>`
+
 export function createVignettes(host) {
   host.classList.add('vg')
-  const C = { producer: '#F2A33A', writer: '#E8606F', artist: '#8B63E8', storyboard: '#5A6AE6', director: '#3E9BE0', editor: '#2DB39A' }
+  const C = { write: '#E8606F', expand: '#F2A33A', board: '#5A6AE6', producer: '#F2A33A', writer: '#E8606F', artist: '#8B63E8', storyboard: '#5A6AE6', director: '#3E9BE0', editor: '#2DB39A' }
   host.innerHTML = Object.entries(VIEWS).map(([k, v]) => `<div class="vg-view" data-v="${k}" style="--c:${C[k]}">${v}</div>`).join('') +
     `<svg class="vg-cursor" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 2l16 9.5-7 1.6L9.5 20z" fill="#fff" stroke="#141312" stroke-width="1.4" stroke-linejoin="round"/></svg>`
   const cursor = host.querySelector('.vg-cursor')
@@ -98,8 +118,31 @@ export function createVignettes(host) {
     },
   }
 
+
+  ANIM.write = ANIM.writer
+  ANIM.expand = async (v, alive) => {
+    await sleep(500); await click(v.querySelector('[data-go]')); if (!alive()) return
+    v.classList.add('open')
+    for (const l of v.querySelectorAll('.vg-leaf')) { await sleep(320); if (!alive()) return; l.classList.add('on') }
+    await sleep(600); const pick = v.querySelector('.vg-leaf[data-t]'); await click(pick); if (!alive()) return
+    pick.classList.add('pick'); v.querySelector('.vg-branches').classList.add('done')
+    for (const c of v.querySelectorAll('.vg-pop')) { await sleep(300); if (!alive()) return; c.classList.add('on') }
+  }
+  ANIM.board = async (v, alive) => {
+    const bad = v.querySelector('[data-bad]'), good = v.querySelector('[data-good]')
+    const vids = v.querySelectorAll('.vg-cmp--bad i')
+    for (let r = 0; r < 4 && alive(); r++) { vids[r].classList.add('on'); for (let k = 0; k < 5; k++) { bad.textContent = String(r * 5 + k + 1); await sleep(40) } await sleep(260) }
+    if (!alive()) return
+    v.querySelector('.vg-cmp--bad').classList.add('x')
+    const cuts = v.querySelectorAll('.vg-vids--sb i')
+    for (const c of cuts) { await sleep(380); if (!alive()) return; c.classList.add('on') }
+    await sleep(400); for (let k = 1; k <= 5 && alive(); k++) { good.textContent = String(k); await sleep(70) }
+  }
+
   function reset(v) {
-    v.classList.remove('busy', 'go', 'fin')
+    v.classList.remove('busy', 'go', 'fin', 'open')
+    v.querySelectorAll('.x').forEach((e) => e.classList.remove('x'))
+    v.querySelectorAll('[data-bad],[data-good]').forEach((e) => (e.textContent = '0'))
     v.querySelectorAll('.pick, .on, .hot, .done').forEach((e) => e.classList.remove('pick', 'on', 'hot', 'done'))
     const t = v.querySelector('[data-text]'); if (t) t.textContent = ''
     const bar = v.querySelector('.vg-prog i'); if (bar) bar.style.width = '0'

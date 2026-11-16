@@ -91,6 +91,8 @@
 | Artist | 브레이크다운 목록(이름 + 'Person/Background' 칩 + 설명 + 'Reference +' 칸 + 'Edit description'). 스타일 고르기 모달: 4열 썸네일 격자, 아래 '이미지는 Take를 쓰지 않아요', 버튼 'Draw it in Live Action'. 결과: 'Characters · backgrounds' 제목, 탭 'All 3 · Characters 2 · Backgrounds 1', 인물 카드는 캐릭터 시트(얼굴 · 전신 앞옆뒤 · 디테일) + 'v1' 배지, 선택 카드 단계색 테두리. 버튼 크림 'Complete · to Storyboard →'. |
 | Storyboard | 제목 'Storyboard' + 'Scenes 2 · Shots 4 · 15s'. 탭 'Rough storyboard · Dialogue', '+ Add scene', '+ Add shot'. 노란 '연출 점검: 검토할 4가지' 띠. 씬 머리 'Scene 1 · Outskirts bus stop · Night'. 샷 카드(약 316px 폭): 'Scene 1 · Shot 1 · 4s', 연필 러프(마네킹 스케치), 설명 13.5px, 대사 한 줄, 칩 'WS · Eye-level · Static · 5500K'. 그리는 중 카드: Lumi + 'Drawing the rough'. |
 | Director | 위 '스토리보드 · 노드' 토글, 'Rough · Real' 토글, 'The Set', 'N videos · about N min · N Takes' 알약, 크림 '▶ Make videos · N'. 'Every shot here already has an image.' |
+| Director 노드 | 캔버스 `--canvas-bg`, 노드 `--background` + `--border`. 이미지 노드 이미지 왼쪽 위 'Live-action' 표, 아래 상태줄(Image needed · Image ready · Making video · Video done). 영상 만드는 중인 노드는 보라 테두리(`--state-video #8f7ae0`), 영상 노드는 Lumi + 'Making the video · Shot 1 · 4s · Up next: Shot 4 · ■ Stop making'. 끝나면 초록 테두리(`--success`)와 '✓ Complete' 파란 배지, 재생 시간 '▶ 0:04'. 고른 노드의 연결선은 파란 점선(`--stage-director`). |
+| Editor | 'Edit · Export' 탭, 'Sequence 01 · 00:00:15:00 · 1280×720 · 30fps'. 왼쪽 위 Source/Effect controls, 오른쪽 위 Program 모니터(재생 바 · 타임코드), 아래 Project 목록(Director shots · 4), 도구(선택 · 자르기 · 글자), V1–V3 · A 트랙 타임라인(클립에 WS · MS · CU · 2S 표). 내보내기는 'Video file · Draft Render'와 'Shot ZIP'. |
 
 ## 8. 문구 (앱 영어 UI 그대로 → 랜딩 한국어)
 

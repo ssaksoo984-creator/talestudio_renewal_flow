@@ -7,7 +7,7 @@ const sleep = (ms) => new Promise((r) => setTimeout(r, reduce ? 0 : ms))
 const shot = (vb, flip) => `<svg viewBox="${vb}" preserveAspectRatio="xMidYMid slice" aria-hidden="true"${flip ? ' class="flip"' : ''}><use href="#world"/></svg>`
 const PROSE = '서윤은 정류장 지붕 끝에 서서 막차의 빨간 미등이 빗속으로 사라지는 걸 바라본다. 도현이 조용히 다가와 투명 비닐우산을 서윤의 머리 위로 기울인다.'
 // 앱 Storyboard에서 정리한 4컷 (16:9 · 15초)
-const CUTS = [['0 0 320 180', 'WS', '씬 1 · 샷 1', 4, '막차가 떠나고'], ['112 66 96 54', 'MS', '씬 1 · 샷 2', 4, '우산을 기울여'], ['128 79 46 25.9', 'CU', '씬 2 · 샷 3', 3, '알아채는 순간'], ['118 58 120 67.5', 'OS', '씬 2 · 샷 4', 4, '뒤에서 나란히', true]]
+const CUTS = [['0 0 320 180', 'WS', '씬 1 · 샷 1', 4, '막차가 떠나고'], ['112 66 96 54', 'MS', '씬 1 · 샷 2', 4, '우산을 기울여'], ['128 79 46 25.9', 'CU', '씬 2 · 샷 3', 3, '알아채는 순간'], ['118 58 120 67.5', '2S', '씬 2 · 샷 4', 4, '뒤에서 나란히', true]]
 const lumi = (text) => `<div class="vg-msg"><img src="${lumiSrc}" alt="" /><p class="vg-bub">${text}</p></div>`
 
 const VIEWS = {

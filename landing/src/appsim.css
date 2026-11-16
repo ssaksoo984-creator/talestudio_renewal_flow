@@ -224,7 +224,10 @@
 .sim-board svg.lines path.on:nth-child(n+5) { stroke: #3e9be0; stroke-width: 2; }
 .sim-node { position: absolute; width: 200px; padding: 10px; border-radius: 12px; background: var(--shell); box-shadow: 0 0 0 1px var(--line2); opacity: 0; transform: scale(.94); transition: opacity .5s, transform .5s, box-shadow .4s; }
 .sim-node.on { opacity: 1; transform: none; }
-.sim-node.hot { box-shadow: 0 0 0 1.5px #3e9be0, 0 12px 30px -10px rgba(62, 155, 224, .6); }
+.sim-node.hot { box-shadow: 0 0 0 1.5px #8f7ae0, 0 12px 30px -10px rgba(143, 122, 224, .55); }
+.sim-live { position: absolute; left: 6px; top: 6px; padding: 2px 7px; border-radius: 6px; background: rgba(0, 0, 0, .55); font: 600 10px Pretendard, sans-serif; color: #fff; }
+.sim-node__ok--vid { color: #8f7ae0 !important; }
+.sim-stop { margin-top: 2px; padding: 4px 10px; border-radius: 999px; background: var(--card); font: 600 10.5px Pretendard, sans-serif; color: var(--t1); }
 .sim-node small { display: block; font: 500 10.5px Pretendard, sans-serif; color: var(--t3); margin-bottom: 4px; }
 .sim-node small::before { content: '● '; font-size: 7px; vertical-align: 2px; }
 .sim-node b { display: flex; gap: 6px; align-items: center; font: 700 13px Pretendard, sans-serif; margin-bottom: 8px; }
@@ -248,7 +251,7 @@
 .sim-player .tri::after { content: ''; position: absolute; left: 23px; top: 18px; border-left: 16px solid #141312; border-top: 11px solid transparent; border-bottom: 11px solid transparent; }
 .sim-player.is-playing .tri { opacity: 0; }
 .sim-tl { position: relative; align-self: stretch; display: flex; gap: 4px; height: 64px; padding: 6px; border-radius: 12px; background: var(--side); }
-.sim-tl i { position: relative; overflow: hidden; border-radius: 7px; background: color-mix(in srgb, #2db39a 30%, #30302e); }
+.sim-tl i { position: relative; overflow: hidden; border-radius: 7px; background: color-mix(in srgb, #2db39a 30%, #30302e); box-shadow: inset 0 0 0 1.5px #2db39a; }
 .sim-tl i svg { position: absolute; inset: 0; width: 100%; height: 100%; opacity: .55; }
 .sim-head { position: absolute; top: 2px; bottom: 2px; left: 6px; width: 2px; background: var(--cream); border-radius: 2px; box-shadow: 0 0 10px rgba(255, 255, 255, .6); transition: left .1s linear; }
 

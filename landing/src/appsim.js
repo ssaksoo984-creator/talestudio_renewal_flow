@@ -30,7 +30,7 @@ const CUTS = [
   ['0 0 320 180', 'WS', '씬 1 · 샷 1', 4, '막차가 떠나고, 서윤 혼자 지붕 끝에'],
   ['112 66 96 54', 'MS', '씬 1 · 샷 2', 4, '도현이 말없이 우산을 기울여 줘요'],
   ['128 79 46 25.9', 'CU', '씬 2 · 샷 3', 3, '같은 회사 신입이라는 걸 알아채요'],
-  ['118 58 120 67.5', 'OS', '씬 2 · 샷 4', 4, '우산 하나 아래 나란히, 뒤에서', true],
+  ['118 58 120 67.5', '2S', '씬 2 · 샷 4', 4, '우산 하나 아래 나란히, 뒤에서', true],
 ]
 
 const msg = (html, center) => `<div class="sim-msg${center ? ' sim-msg--c' : ''}"><span class="sim-msg__av"><img src="${lumiSrc}" alt="" /></span><div class="sim-bub"><p class="sim-msg__name">Lumi</p>${html}</div></div>`
@@ -94,16 +94,16 @@ function template() {
       <div class="sim-node" style="left:30px;top:40px"><small>이미지</small><b>서윤<em>인물</em></b><div class="sim-node__img">${shot('128 76 40 53')}</div></div>
       <div class="sim-node" style="left:30px;top:250px"><small>이미지</small><b>도현<em>인물</em></b><div class="sim-node__img">${shot('150 72 40 53')}</div></div>
       <div class="sim-node" style="left:30px;top:470px"><small>이미지</small><b>외곽 버스 정류장<em>배경</em></b><div class="sim-node__img">${shot('40 30 240 135')}</div></div>
-      <div class="sim-node" style="left:360px;top:60px"><small>이미지</small><b>샷 2<em>MS</em></b><div class="sim-node__img">${shot('112 66 96 54')}</div><p class="sim-node__ok">● 완료</p></div>
-      <div class="sim-node" style="left:360px;top:360px"><small>이미지</small><b>샷 3<em>CU</em></b><div class="sim-node__img">${shot('128 79 46 25.9')}</div><p class="sim-node__ok">● 완료</p></div>
+      <div class="sim-node" style="left:360px;top:60px"><small>이미지</small><b>샷 2<em>MS</em></b><div class="sim-node__img">${shot('112 66 96 54')}<span class="sim-live">실사</span></div><p class="sim-node__ok">● 이미지 준비됨</p></div>
+      <div class="sim-node" style="left:360px;top:360px"><small>이미지</small><b>샷 3<em>CU</em></b><div class="sim-node__img">${shot('128 79 46 25.9')}<span class="sim-live">실사</span></div><p class="sim-node__ok sim-node__ok--vid">○ 영상 만드는 중</p></div>
       <div class="sim-node" style="left:700px;top:60px"><small>영상</small><b>샷 2 · 영상<em>4초</em></b><div class="sim-node__img">${shot('112 66 96 54')}</div><p class="sim-node__ok">● 완료</p></div>
-      <div class="sim-node" style="left:700px;top:380px"><small>영상</small><b>샷 3 · 영상<em>3초</em></b><div class="sim-load"><img src="${ld}" alt="" /><p>영상을 만들고 있어요</p><span class="pct">로우앵글 · 천천히 다가가기</span><div class="sim-prog"><i></i></div></div></div>
-      <div class="sim-node" style="left:1040px;top:170px;width:220px"><small>영상</small><b>샷 4 · 영상<em>4초</em></b><div class="sim-node__img">${shot('118 58 120 67.5', true)}</div><p class="sim-node__ok" style="color:var(--t3)">○ 순서 기다리는 중</p></div>
+      <div class="sim-node" style="left:700px;top:380px"><small>영상</small><b>샷 3 · 영상<em>3초</em></b><div class="sim-load"><img src="${ld}" alt="" /><p>영상을 만들고 있어요</p><span class="pct">샷 3 · 3초 · 다음: 샷 4</span><div class="sim-prog"><i></i></div><span class="sim-stop">■ 멈추기</span></div></div>
+      <div class="sim-node" style="left:1040px;top:170px;width:220px"><small>영상</small><b>샷 4 · 영상<em>4초</em></b><div class="sim-node__img">${shot('118 58 120 67.5', true)}</div><p class="sim-node__ok" style="color:var(--t3)">○ 차례 기다리는 중 · #1</p></div>
     </div>
   </section>
 
   <section class="sim-scene" data-scene="editor">
-    <div class="sim-tool"><span class="sim-seg"><span class="on">타임라인</span><span>노드</span></span><b>${TITLE}</b><small>샷 4 · 15초 · 16:9</small><span class="sim-pill">20 Takes 사용</span></div>
+    <div class="sim-tool"><span class="sim-seg"><span class="on">편집</span><span>내보내기</span></span><b>Sequence 01</b><small>00:00:15:00 · 1280×720 · 30fps</small><span class="sim-pill">영상 4 · 20 Takes 사용</span></div>
     <div class="sim-ed">
       <div class="sim-player">${shot('0 0 320 180')}<span class="tri"></span></div>
       <div class="sim-tl">${CUTS.map(([vb, , , sec, , fl]) => `<i style="flex:${sec}">${shot(vb, fl)}</i>`).join('')}<span class="sim-head"></span></div>

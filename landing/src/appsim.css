@@ -283,3 +283,11 @@
 .sim-attach { flex-basis: 100%; display: flex; align-items: center; gap: 8px; padding: 8px 10px; border-radius: 10px; background: var(--chip); color: var(--t2); font: 400 12px/1.4 Pretendard, sans-serif; white-space: nowrap; overflow: hidden; animation: simIn .35s both; }
 .sim-attach b { color: var(--stage); font: 600 11.5px Inter, sans-serif; }
 .sim-attach i { margin-left: auto; font-style: normal; color: var(--t3); }
+
+/* 사이드바: Figma 실제 아이콘 (마스크로 색을 입혀요) */
+.sim-nav i, .sim-side__end i { border-radius: 0; background: var(--t3); -webkit-mask: var(--ico) center / contain no-repeat; mask: var(--ico) center / contain no-repeat; }
+.sim-nav i { width: 22px; height: 22px; }
+.sim-side__end i { width: 22px; height: 22px; }
+.sim-nav.on i { background: var(--c); box-shadow: none; filter: drop-shadow(0 0 6px color-mix(in srgb, var(--c) 60%, transparent)); }
+.sim-nav.done i { background: var(--t2); }
+.sim-nav { font-weight: 600; }

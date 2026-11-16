@@ -8,6 +8,19 @@ import la from '../assets/lumi-artist.webp'
 import ls from '../assets/lumi-storyboard.webp'
 import ld from '../assets/lumi-director.webp'
 import le from '../assets/lumi-editor.webp'
+import icProducer from '../assets/icons/producer.svg'
+import icWriter from '../assets/icons/writer.svg'
+import icArtist from '../assets/icons/artist.svg'
+import icStoryboard from '../assets/icons/storyboard.svg'
+import icDirector from '../assets/icons/director.svg'
+import icEditor from '../assets/icons/editor.svg'
+import icTake from '../assets/icons/take.svg'
+import icShare from '../assets/icons/share.svg'
+import icExport from '../assets/icons/export.svg'
+import icHelp from '../assets/icons/help.svg'
+import lwLoad from '../assets/lumi-writer-loading.webp'
+const ICON = { producer: icProducer, writer: icWriter, artist: icArtist, storyboard: icStoryboard, director: icDirector, editor: icEditor }
+const ico = (src) => `<i style="--ico:url(&quot;${src.replace(/"/g, '%22')}&quot;)"></i>`
 
 export const STEPS = ['producer', 'writer', 'artist', 'storyboard', 'director', 'editor']
 const NAMES = { producer: 'Producer', writer: 'Writer', artist: 'Artist', storyboard: 'Storyboard', director: 'Director', editor: 'Editor' }
@@ -38,10 +51,10 @@ const input = (ph, plus) => `<div class="sim-input">${plus ? '<span class="sim-i
 const pick = (cards) => `<div class="sim-pick">${cards.map(([t, d, rec]) => `<span class="sim-pick__c${rec ? ' rec' : ''}"><b>${t}</b><small>${d}</small>${rec ? '<em>추천</em>' : ''}</span>`).join('')}</div>`
 
 function template() {
-  const nav = STEPS.map((s) => `<div class="sim-nav" data-n="${s}" style="--c:${COLORS[s]}"><i></i>${NAMES[s]}</div>`).join('')
+  const nav = STEPS.map((s) => `<div class="sim-nav" data-n="${s}" style="--c:${COLORS[s]}">${ico(ICON[s])}${NAMES[s]}</div>`).join('')
   return `<div class="sim__canvas">
   <aside class="sim-side"><img class="sim-side__logo" src="${symbolSrc}" alt="" />${nav}
-    <div class="sim-side__end"><span><i></i>Takes</span><span><i></i>공유</span><span><i></i>내보내기</span><span><i></i>도움말</span><span class="sim-av">A</span></div></aside>
+    <div class="sim-side__end"><span>${ico(icTake)}Takes</span><span>${ico(icShare)}공유</span><span>${ico(icExport)}내보내기</span><span>${ico(icHelp)}도움말</span><span class="sim-av">A</span></div></aside>
   <div class="sim-top"><span class="sim-badge">Producer</span><span class="sim-title">${TITLE}</span><span class="sim-pen"></span></div>
   <div class="sim-btns" data-for="writer"></div>
 
@@ -111,7 +124,7 @@ function template() {
   </section>
 
   <aside class="sim-chat"><div class="sim-chat__head"><img src="${lumiSrc}" alt="" /><b class="sim-chat__title">Lumi와 산문 쓰기</b><span>»</span></div><div class="sim-chat__log"></div>${input('예) 다시 써 줘, 결말을 더 웃기게')}<div class="sim-chat__foot"><span class="sim-chat__stage"></span></div></aside>
-  <div class="sim-busy"><div class="sim-busy__card"><img src="${lw}" alt="" /><p class="sim-busy__h">산문 초안을 쓰고 있어요</p><p class="sim-busy__s">AI가 작업하는 동안 화면과 채팅이 잠겨요. 끝나면 고칠 수 있어요.</p><ul><li>재료 정리하기</li><li>이야기 뼈대</li><li>장면별 이야기 쓰기</li></ul></div></div>
+  <div class="sim-busy"><div class="sim-busy__card"><img src="${lwLoad}" alt="" /><p class="sim-busy__h">산문 초안을 쓰고 있어요</p><p class="sim-busy__s">AI가 작업하는 동안 화면과 채팅이 잠겨요. 끝나면 고칠 수 있어요.</p><ul><li>재료 정리하기</li><li>이야기 뼈대</li><li>장면별 이야기 쓰기</li></ul></div></div>
   <svg class="sim-cursor" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 2l16 9.5-7 1.6L9.5 20z" fill="#fff" stroke="#141312" stroke-width="1.4" stroke-linejoin="round"/></svg>
 </div>`
 }

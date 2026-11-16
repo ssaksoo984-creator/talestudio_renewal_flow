@@ -10,6 +10,7 @@ import d1 from '../assets/gen/dir-01.webp'
 import d2 from '../assets/gen/dir-02.webp'
 import d3 from '../assets/gen/dir-03.webp'
 import d4 from '../assets/gen/dir-04.webp'
+import bg from '../assets/gen/bg-01.webp' // 배경 · 외곽 버스 정류장 (사람 없음)
 
 const W = 512, H = 288
 const CUT = { '0 0 320 180': 0, '112 66 96 54': 1, '128 79 46 25.9': 2, '118 58 120 67.5': 3 }
@@ -36,6 +37,6 @@ export function shot(vb, flip, kind = 'real') {
   }
   const i = CUT[vb]
   if (i !== undefined) return svg((kind === 'rough' ? ROUGH : REAL)[i])
-  // 배경(정류장 넓은 화면) 같은 나머지는 와이드 실사 컷
-  return svg(kind === 'rough' ? s1 : d1)
+  // 배경(정류장 넓은 화면): 보내 준 배경 이미지
+  return svg(kind === 'rough' ? s1 : bg, '0 0 512 286')
 }

@@ -55,7 +55,6 @@ if (sixItems[0]) activate(sixItems[0])
 const stabs = Array.from(document.querySelectorAll<HTMLButtonElement>('.glass-tabs button'))
 const sim = createSim(document.getElementById('sim')!, {
   loop: true,
-  last: 'director',
   onStep: (s: string) => stabs.forEach((b) => { const on = b.dataset.s === s; b.classList.toggle('on', on); b.setAttribute('aria-selected', String(on)) }),
 })
 let simStarted = false

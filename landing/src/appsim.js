@@ -8,6 +8,19 @@ import la from '../assets/lumi-artist.webp'
 import ls from '../assets/lumi-storyboard.webp'
 import ld from '../assets/lumi-director.webp'
 import le from '../assets/lumi-editor.webp'
+import st1 from '../assets/styles/style-1.webp'
+import st2 from '../assets/styles/style-2.webp'
+import st3 from '../assets/styles/style-3.webp'
+import st4 from '../assets/styles/style-4.webp'
+import st5 from '../assets/styles/style-5.webp'
+import st6 from '../assets/styles/style-6.webp'
+import st7 from '../assets/styles/style-7.webp'
+import st8 from '../assets/styles/style-8.webp'
+import st9 from '../assets/styles/style-9.webp'
+import st10 from '../assets/styles/style-10.webp'
+import st11 from '../assets/styles/style-11.webp'
+import st12 from '../assets/styles/style-12.webp'
+import laSrc from '../assets/lumi-artist.webp'
 import icProducer from '../assets/icons/producer.svg'
 import icWriter from '../assets/icons/writer.svg'
 import icArtist from '../assets/icons/artist.svg'
@@ -82,9 +95,10 @@ function template() {
       <div class="sim-card sim-card--sheet"><p>도현<span class="sim-kind">인물</span></p><div class="sim-card__img"><i>${shot('150 72 40 53')}</i><i>${shot('142 56 56 110')}</i><i>${shot('142 56 56 110', true)}</i></div><small>26세 신입, 투명 비닐우산</small></div>
       <div class="sim-card sim-card--wide"><p>외곽 버스 정류장<span class="sim-kind">배경</span><span class="sim-kind">밤</span></p><div class="sim-card__img">${shot('40 30 240 114')}</div><small>비 오는 서울 외곽, 노란 가로등 하나</small></div>
     </div>
-    <div class="sim-modal" data-modal="style"><p class="sim-modal__h">어떤 스타일로 그릴까요?</p>
-      <div class="sim-styles">${[['실사', '128 76 40 53'], ['3D 애니메이션', '150 72 40 53'], ['2D 애니메', '40 30 240 160'], ['카툰', '118 58 120 67.5']].map(([n, vb], i) => `<span class="sim-styles__c${i === 0 ? ' first' : ''}"><i>${shot(vb)}</i>${n}</span>`).join('')}</div>
-      <div class="sim-modal__f"><small>인물 시트 2 · 배경 1<br />이미지는 Take를 쓰지 않아요</small><span class="sim-btn sim-btn--cream" data-draw>실사로 그리기</span></div></div>
+    <div class="sim-modal sim-modal--style" data-modal="style"><span class="sim-modal__x">✕</span><img class="sim-modal__lumi" src="${laSrc}" alt="" /><p class="sim-modal__h">어떤 스타일로 그릴까요?</p>
+      <p class="sim-modal__s">작품의 스타일은 하나예요. 인물 · 배경 이미지가 모두 고른 스타일로 그려져요. 나중에 다시 만들기로 바꿀 수 있고, 이전 버전은 기록에 남아요.</p>
+      <div class="sim-styles">${[[st1, '실사'], [st2, '3D 애니메이션'], [st3, '2D 일본 애니'], [st4, '미국 카툰'], [st5, '스톱모션'], [st6, '수채화'], [st7, '일본 멜로'], [st8, '심리 호러'], [st9, 'SF'], [st10, '사막 서사'], [st11, '히어로 액션'], [st12, '시대극']].map(([src, n], i) => `<span class="sim-styles__c${i === 0 ? ' first' : ''}"><i><img src="${src}" alt="" /></i>${n}</span>`).join('')}</div>
+      <div class="sim-modal__f"><small>인물 시트 2 · 배경 1<br />이미지는 Take를 쓰지 않아요</small><span class="sim-modal__btns"><span class="sim-btn">취소</span><span class="sim-btn sim-btn--cream" data-draw>실사로 그리기</span></span></div></div>
   </section>
 
   <section class="sim-scene" data-scene="storyboard">
@@ -98,20 +112,30 @@ function template() {
   </section>
 
   <section class="sim-scene" data-scene="director">
-    <div class="sim-tool"><span class="sim-seg"><span>스토리보드</span><span class="on">노드</span></span><span class="sim-seg"><span>러프</span><span class="on">실사</span></span><b>The Set</b>
-      <small>노드 7 · 샷 4</small><span class="sim-pill">영상 4 · 약 15초 · 샷당 5 Takes</span></div>
-    <div class="sim-bar"><span class="sim-check-box"></span><b>모든 샷 4</b><span class="sim-bar__live"><img src="${ld}" alt="" />영상 만드는 중 · <span data-k="vid">0</span>/4</span>
-      <span class="sim-bar__end"><span class="sim-btn sim-btn--ghost">이미지 만들기 · 0</span><span class="sim-btn sim-btn--cream">▶ 영상 만들기 · 4</span></span></div>
-    <div class="sim-board">
-      <svg class="lines" viewBox="0 0 1316 760" preserveAspectRatio="none"><path d="M234 120 C300 120 300 150 360 150"/><path d="M234 330 C300 330 300 170 360 170"/><path d="M234 330 C300 330 300 440 360 440"/><path d="M234 560 C300 560 300 460 360 460"/><path d="M564 160 C640 160 640 150 700 150"/><path d="M564 450 C640 450 640 470 700 470"/><path d="M904 160 C960 160 960 260 1040 260"/></svg>
-      <div class="sim-node" style="left:30px;top:40px"><small>이미지</small><b>서윤<em>인물</em></b><div class="sim-node__img">${shot('128 76 40 53')}</div></div>
-      <div class="sim-node" style="left:30px;top:250px"><small>이미지</small><b>도현<em>인물</em></b><div class="sim-node__img">${shot('150 72 40 53')}</div></div>
-      <div class="sim-node" style="left:30px;top:470px"><small>이미지</small><b>외곽 버스 정류장<em>배경</em></b><div class="sim-node__img">${shot('40 30 240 135')}</div></div>
-      <div class="sim-node" style="left:360px;top:60px"><small>이미지</small><b>샷 2<em>MS</em></b><div class="sim-node__img">${shot('112 66 96 54')}<span class="sim-live">실사</span></div><p class="sim-node__ok">● 이미지 준비됨</p></div>
-      <div class="sim-node" style="left:360px;top:360px"><small>이미지</small><b>샷 3<em>CU</em></b><div class="sim-node__img">${shot('128 79 46 25.9')}<span class="sim-live">실사</span></div><p class="sim-node__ok sim-node__ok--vid">○ 영상 만드는 중</p></div>
-      <div class="sim-node" style="left:700px;top:60px"><small>영상</small><b>샷 2 · 영상<em>4초</em></b><div class="sim-node__img">${shot('112 66 96 54')}</div><p class="sim-node__ok">● 완료</p></div>
-      <div class="sim-node" style="left:700px;top:380px"><small>영상</small><b>샷 3 · 영상<em>3초</em></b><div class="sim-load"><img src="${ld}" alt="" /><p>영상을 만들고 있어요</p><span class="pct">샷 3 · 3초 · 다음: 샷 4</span><div class="sim-prog"><i></i></div><span class="sim-stop">■ 멈추기</span></div></div>
-      <div class="sim-node" style="left:1040px;top:170px;width:220px"><small>영상</small><b>샷 4 · 영상<em>4초</em></b><div class="sim-node__img">${shot('118 58 120 67.5', true)}</div><p class="sim-node__ok" style="color:var(--t3)">○ 차례 기다리는 중 · #1</p></div>
+    <div class="dn-tool"><span class="sim-seg"><span>스토리보드</span><span class="on">노드</span></span><b>The Set</b><small>ⓘ 노드 11 · 샷 4</small>
+      <span class="dn-tool__end"><span class="dn-pill">안 쓴 에셋</span><span class="dn-pill">자동 정렬</span><span class="dn-pill">+ 프롬프트 노드</span><span class="dn-pill">전체 4 ▾</span><span class="dn-lumi"><img src="${ld}" alt="" /></span></span></div>
+    <div class="dn-bar"><span class="dn-check" data-all></span><b>모든 샷 4</b>
+      <span class="dn-bar__end"><span class="dn-toggle"><i></i>영상도 만들기</span><span class="dn-pill dn-pill--off">이미지 만들기 · 0</span><span class="dn-pill dn-pill--go" data-make>▶ 영상 만들기 · <span data-k="vids">4</span></span></span>
+      <small class="dn-hint">모든 샷에 이미지가 있어요 · <span data-k="hint">영상을 만들 수 있어요</span></small></div>
+    <div class="dn-board">
+      <svg class="dn-lines" viewBox="0 0 1316 640" preserveAspectRatio="none">
+        <path d="M200 70 C245 70 245 60 290 60"/><path d="M200 300 C245 300 245 90 290 90"/><path d="M200 520 C245 520 250 120 290 120"/>
+        <path d="M200 70 C245 70 245 370 290 370"/><path d="M200 300 C245 300 245 400 290 400"/><path d="M200 520 C245 520 245 430 290 430"/>
+        <path d="M520 60 C540 60 540 60 560 60"/><path d="M520 370 C540 370 540 370 560 370"/>
+        <path d="M760 60 C790 60 790 60 820 60"/><path d="M760 370 C790 370 790 370 820 370"/>
+        <path d="M1050 60 C1070 60 1070 60 1090 60"/><path d="M1050 370 C1070 370 1070 370 1090 370"/>
+      </svg>
+      ${[['서윤', '인물', '128 76 40 53', 0], ['도현', '인물', '150 72 40 53', 230], ['외곽 버스 정류장', '배경', '40 30 240 135', 460]].map(([n, k, vb, y]) => `<div class="dn-node dn-node--asset" style="left:10px;top:${y}px"><p class="dn-node__h"><i></i>이미지<span>⤢ 자세히 ···</span></p><b>${n}<em>${k}</em></b><div class="dn-img">${shot(vb)}</div><small>GPT Image 2</small></div>`).join('')}
+      ${[[1, 'MS', '어두운 외곽 버스 정류장, 막차가 떠나고 서윤 혼자 지붕 끝에…', '0 0 320 180', 290, 560, 0, '0:04'], [3, 'CU', '같은 회사 신입이라는 걸 알아채는 서윤의 얼굴, 노란 가로등…', '128 79 46 25.9', 820, 1090, 0, '0:03'],
+         [2, 'MS', '도현이 말없이 투명 비닐우산을 서윤 쪽으로 기울여 준다…', '112 66 96 54', 290, 560, 310, '0:04'], [4, '2S', '뒤에서 본 투샷, 우산 하나 아래 나란히 선 두 사람…', '118 58 120 67.5', 820, 1090, 310, '0:04']]
+        .map(([n, t, d, vb, xi, xv, y, len]) => `<div class="dn-node dn-node--img" data-shot="${n}" style="left:${xi}px;top:${y}px"><p class="dn-node__h"><i></i>이미지<span>⤢ 자세히 ···</span></p><b>샷 ${n}<em>${t}</em></b><p class="dn-desc">${d}</p><div class="dn-img">${shot(vb)}<span class="dn-live">실사</span></div><p class="dn-state"><i></i><span>이미지 완료</span></p></div>
+        <div class="dn-node dn-node--vid" data-vid="${n}" style="left:${xv}px;top:${y}px"><p class="dn-node__h"><i></i>영상<span>☆ ···</span></p><b>샷 ${n}</b>
+          <div class="dn-vbox"><div class="dn-empty">샷 ${n} 영상 · 아직 없어요<small>"영상 만들기"를 누르면 여기에 생겨요</small></div>
+            <div class="dn-load"><img src="${ld}" alt="" /><p>영상을 만들고 있어요</p><div class="sim-prog"><i></i></div></div>
+            <div class="dn-done">${shot(vb)}<span class="dn-len">▶ ${len}</span></div></div>
+          <span class="dn-ok">✓ 완료</span></div>`).join('')}
+      <div class="dn-zoom">−&nbsp;&nbsp;75%&nbsp;&nbsp;+&nbsp;&nbsp;⤢</div>
+      <div class="dn-mini"><small>미니맵</small><div><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i></div></div>
     </div>
   </section>
 
@@ -160,7 +184,7 @@ export function createSim(host, { loop = false, onStep, last = 'editor' } = {}) 
     const at = STEPS.indexOf(s)
     $$('.sim-nav').forEach((n, i) => { n.classList.toggle('on', i === at); n.classList.toggle('done', i < at) })
     $$('.sim-scene').forEach((n) => n.classList.toggle('on', n.dataset.scene === s))
-    host.classList.toggle('sim--chat', s !== 'producer' && s !== 'editor')
+    host.classList.toggle('sim--chat', s !== 'producer' && s !== 'editor' && s !== 'director')
     $('.sim-chat__title').textContent = { writer: 'Lumi와 산문 쓰기', artist: 'Lumi와 그림 그리기', storyboard: 'Lumi와 연출하기', director: 'Lumi와 연출하기' }[s] || 'Lumi'
     $('.sim-chat__stage').textContent = NAMES[s]
     const btns = {
@@ -187,10 +211,10 @@ export function createSim(host, { loop = false, onStep, last = 'editor' } = {}) 
     $$('.sim-styles__c').forEach((c) => c.classList.remove('pick'))
     $$('.sim-modal').forEach((m) => m.classList.remove('on'))
     $$('.sim-attach').forEach((a) => a.remove()); $$('.has-attach').forEach((a) => a.classList.remove('has-attach')); $('.sim-busy').classList.remove('on')
-    $$('.sim-node').forEach((n) => n.classList.remove('on', 'done', 'hot'))
-    $$('.sim-board path').forEach((p) => p.classList.remove('on'))
-    $('.sim-prog i').style.width = '0'
-    $('[data-k="vid"]').textContent = '1'
+    $$('.dn-node--vid').forEach((n) => { n.classList.remove('loading', 'done'); n.querySelector('.sim-prog i').style.width = '0' })
+    $$('.dn-node--img').forEach((n) => n.classList.remove('vdone'))
+    $('[data-all]').classList.remove('on'); $('[data-make]').classList.remove('off')
+    $('[data-k="vids"]').textContent = '4'; $('[data-k="hint"]').textContent = '영상을 만들 수 있어요'
     $('.sim-head').style.left = '6px'
     $('.sim-player').classList.remove('is-playing')
   }
@@ -282,22 +306,20 @@ export function createSim(host, { loop = false, onStep, last = 'editor' } = {}) 
       await click($('[data-go]'))
     },
     async director(alive) {
-      const log = $('.sim-chat__log')
-      const nodes = $$('.sim-node'), paths = $$('.sim-board path')
-      for (const n of nodes.slice(0, 3)) { if (!alive()) return; n.classList.add('on'); await sleep(260) }
-      for (const n of nodes.slice(3, 5)) { if (!alive()) return; n.classList.add('on', 'done'); await sleep(260) }
-      paths.slice(0, 4).forEach((p) => p.classList.add('on'))
-      add(log, msg('샷마다 카메라 · 조명을 정했어요. 영상 4개에 Take가 얼마나 드는지 먼저 보여 드릴게요.'))
       await sleep(700); if (!alive()) return
-      nodes[5].classList.add('on', 'done'); paths[4].classList.add('on'); await sleep(400)
-      nodes[6].classList.add('on', 'hot'); nodes[7].classList.add('on'); paths[5].classList.add('on'); paths[6].classList.add('on')
-      $('[data-k="vid"]').textContent = '2'
-      const bar = $('.sim-prog i')
-      for (let p = 0; p <= 100 && alive(); p += 4) { bar.style.width = p + '%'; await sleep(70) }
-      if (!alive()) return
-      nodes[6].classList.remove('hot')
-      add(log, msg('샷 3 영상이 나왔어요. 만들기 전에 보여 드린 Take만 썼어요.'))
-      await sleep(1000); if (!alive()) return
+      await click($('[data-all]')); $('[data-all]').classList.add('on')
+      await sleep(300); await click($('[data-make]')); if (!alive()) return
+      let left = 4
+      for (const n of [1, 2, 3, 4]) {
+        const v = $(`[data-vid="${n}"]`); v.classList.add('loading')
+        const bar = v.querySelector('.sim-prog i')
+        for (let p = 0; p <= 100 && alive(); p += 5) { bar.style.width = p + '%'; await sleep(90) }
+        if (!alive()) return
+        v.classList.remove('loading'); v.classList.add('done'); $(`[data-shot="${n}"]`).classList.add('vdone')
+        left--; $('[data-k="vids"]').textContent = String(left)
+      }
+      $('[data-make]').classList.add('off'); $('[data-k="hint"]').textContent = '모든 샷에 영상이 있어요'
+      await sleep(1100); if (!alive()) return
       await click($('[data-go]'))
     },
     async editor(alive) {
@@ -341,7 +363,7 @@ export function createSim(host, { loop = false, onStep, last = 'editor' } = {}) 
     run++
     reset(); setStep(s); prefill(STEPS.indexOf(s) + 1)
     if (s === 'storyboard') $$('[data-scene="storyboard"] .sim-card').forEach((c) => c.classList.add('on'))
-    if (s === 'director') { $$('.sim-node').forEach((n) => n.classList.add('on')); $$('.sim-board path').forEach((p) => p.classList.add('on')) }
+    if (s === 'director') { $$('.dn-node--vid').forEach((n) => n.classList.add('done')); $$('.dn-node--img').forEach((n) => n.classList.add('vdone')) }
   }
   return { play, still, stop: () => run++, setStep }
 }

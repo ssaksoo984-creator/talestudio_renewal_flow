@@ -911,3 +911,7 @@ h2 { font-size: clamp(32px, 4.6vw, 48px); line-height: 1.2; font-weight: 700; le
 @media (prefers-reduced-motion: no-preference) { .hero--v3 .hero__glow i { animation: heroDrift 14s ease-in-out infinite alternate; } .hero--v3 .hero__glow i:nth-child(even) { animation-duration: 18s; animation-direction: alternate-reverse; } }
 @keyframes heroDrift { to { transform: translate(3vw, -2vw) scale(1.08); } }
 @media (max-width: 560px) { .btn--hero { padding: 15px 24px; font-size: 16px; } .hero--v3 { min-height: 0; padding: 72px 0 90px; } }
+
+/* 유리 버튼: 양쪽 여백 같게 */
+.glass { padding: 0 28px 0 22px; }
+@media (max-width: 760px) { .glass { padding: 0 18px 0 14px; } }

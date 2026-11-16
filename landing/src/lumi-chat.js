@@ -129,3 +129,6 @@ document.querySelectorAll('form.prompt, form.ask').forEach((f) =>
     })
   }),
 )
+
+// 히어로의 'Lumi와 시작하기' 버튼도 챗봇을 열어요
+document.querySelectorAll('[data-open-lumi]').forEach((b) => b.addEventListener('click', () => open()))

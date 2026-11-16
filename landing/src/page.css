@@ -887,3 +887,27 @@ h2 { font-size: clamp(32px, 4.6vw, 48px); line-height: 1.2; font-weight: 700; le
 :root[data-theme='light'] .glass.on { background: color-mix(in srgb, var(--c) 16%, #fff); }
 .glass.on b { color: var(--text); }
 @media (max-width: 760px) { .glass { padding: 0 24px 0 12px; } .glass img { width: 22px; } }
+
+/* ===== v10: 히어로를 Figma 'v3 · Home 예시' 형식으로 ===== */
+.hero--v3 { min-height: calc(100vh - 72px); display: flex; align-items: center; padding: 96px 0 120px; }
+.hero--v3 .hero__in { align-items: center !important; text-align: center !important; }
+.hero--v3 .pill { padding: 9px 18px; gap: 10px; font-size: 15px; color: var(--text); }
+.hero--v3 .pill__dot { width: 8px; height: 8px; }
+.hero--v3 .hero__h { margin-top: 14px; font-size: clamp(40px, 5.3vw, 76px) !important; line-height: 1.08 !important; letter-spacing: -0.03em !important; font-weight: 800; }
+.hero--v3 .hero__sub { margin-top: 24px; max-width: 760px; font-size: clamp(16px, 1.55vw, 22px); line-height: 1.6; color: var(--text-2); }
+.hero__btns { display: flex; flex-wrap: wrap; justify-content: center; gap: 16px; margin-top: 40px; }
+.btn--hero { height: auto; padding: 18px 34px; font-size: 19px; font-weight: 600; }
+.btn--hero.btn--ghost { background: rgba(255, 255, 255, .06); border: 0; cursor: pointer; }
+:root[data-theme='light'] .btn--hero.btn--ghost { background: rgba(20, 19, 18, .06); }
+/* Figma 히어로의 흐린 색 빛 다섯 개 */
+.hero--v3 .hero__glow { display: block !important; opacity: 1; }
+.hero--v3 .hero__glow i { position: absolute; border-radius: 50%; width: 32vw; height: 30vw; max-width: 460px; max-height: 400px; opacity: .55; filter: blur(70px); }
+.hero--v3 .hero__glow i:nth-child(1) { left: 26%; top: 34%; background: #8a2f3a; }
+.hero--v3 .hero__glow i:nth-child(2) { left: 44%; top: 26%; background: #4b2f7a; }
+.hero--v3 .hero__glow i:nth-child(3) { left: 60%; top: 38%; background: #24467e; }
+.hero--v3 .hero__glow i:nth-child(4) { left: 39%; top: 50%; background: #6a2a4a; width: 25vw; height: 18vw; }
+.hero--v3 .hero__glow i:nth-child(5) { left: 55%; top: 54%; background: #1f5a5a; width: 22vw; height: 17vw; }
+:root[data-theme='light'] .hero--v3 .hero__glow i { opacity: .16; }
+@media (prefers-reduced-motion: no-preference) { .hero--v3 .hero__glow i { animation: heroDrift 14s ease-in-out infinite alternate; } .hero--v3 .hero__glow i:nth-child(even) { animation-duration: 18s; animation-direction: alternate-reverse; } }
+@keyframes heroDrift { to { transform: translate(3vw, -2vw) scale(1.08); } }
+@media (max-width: 560px) { .btn--hero { padding: 15px 24px; font-size: 16px; } .hero--v3 { min-height: 0; padding: 72px 0 90px; } }

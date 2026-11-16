@@ -84,7 +84,6 @@
       <a href="#service">Tale 서비스</a>
       <a href="#works">작품</a>
       <a href="#pricing">요금</a>
-      <a href="#login">로그인</a>
     </nav>
     <div class="nav__end">
       <button class="theme-toggle" type="button" aria-label="밝게 · 어둡게 바꾸기" title="밝게 · 어둡게">
@@ -100,35 +99,16 @@
 <div class="view" id="home" data-view>
 
 <!-- 1 · 히어로 -->
-<section class="hero" id="start">
-  <div class="hero__glow" aria-hidden="true"><i></i><i></i><i></i></div>
+<section class="hero hero--v3" id="start">
+  <div class="hero__glow" aria-hidden="true"><i></i><i></i><i></i><i></i><i></i></div>
   <div class="wrap hero__in">
     <p class="pill reveal"><span class="pill__dot"></span>Lumi와 함께 만드는 프리비즈 스튜디오</p>
     <h1 class="hero__h reveal">이야기를 적어 주세요.<br /><span class="pt">영상까지는 Lumi가 이어 갈게요.</span></h1>
     <p class="hero__sub reveal">아이디어 한 줄이면 충분해요. Lumi가 산문을 쓰고, 인물과 배경을 그리고,<br class="br-wide" /> 스토리보드로 먼저 보여 드려요. 마음에 들 때만 영상으로 옮겨요.</p>
-    <ul class="hero__chips reveal" aria-label="Tale이 하는 일">
-      <li>글을 써 줘요</li><li>아이디어를 넓혀 줘요</li><li>콘티로 먼저 확인</li><li>영상까지 한 번에</li>
-    </ul>
-
-    <form class="prompt reveal" onsubmit="return false" aria-label="이야기 시작하기">
-      <div class="prompt__tabs" role="tablist">
-        <button type="button" role="tab" aria-selected="true">아이디어로</button>
-        <button type="button" role="tab" aria-selected="false">대본으로</button>
-        <button type="button" role="tab" aria-selected="false">파일로</button>
-      </div>
-      <label class="sr" for="idea">이야기 한 줄</label>
-      <textarea id="idea" rows="3" placeholder="예) 비 오는 정류장, 우산 하나를 같이 쓰게 된 두 사람. 알고 보니 같은 회사 신입과 팀장이었다."></textarea>
-      <div class="prompt__foot">
-        <div class="prompt__opts">
-          <span class="opt">15초 · 숏폼</span>
-          <span class="opt">9:16</span>
-          <span class="opt">코미디</span>
-        </div>
-        <button type="submit" class="btn btn--primary">Lumi와 시작하기
-          <svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor" aria-hidden="true"><path d="M9.3 3.3a1 1 0 0 1 1.4 0l4 4a1 1 0 0 1 0 1.4l-4 4a1 1 0 0 1-1.4-1.4L11.58 9H2a1 1 0 1 1 0-2h9.59L9.3 4.7a1 1 0 0 1 0-1.4Z"/></svg>
-        </button>
-      </div>
-    </form>
+    <div class="hero__btns reveal">
+      <a href="#works" class="btn btn--primary btn--hero">작품 보기 <span aria-hidden="true">→</span></a>
+      <button type="button" class="btn btn--ghost btn--hero" data-open-lumi><span aria-hidden="true">✦</span> Lumi와 시작하기</button>
+    </div>
   </div>
 </section>
 

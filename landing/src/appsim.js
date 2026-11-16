@@ -16,7 +16,7 @@ const COLORS = { producer: '#f2a33a', writer: '#e8606f', artist: '#8b63e8', stor
 const LUMI = { producer: lp, writer: lw, artist: la, storyboard: ls, director: ld, editor: le }
 const reduce = matchMedia('(prefers-reduced-motion: reduce)').matches
 const sleep = (ms) => new Promise((r) => setTimeout(r, reduce ? 0 : ms))
-const shot = (vb, flip) => `<svg viewBox="${vb}" preserveAspectRatio="xMidYMid slice" aria-hidden="true"${flip ? ' class="flip"' : ''}><use href="#world"/></svg>`
+import { shot } from './shots.js'
 
 // 실제로 만든 작품 '우산 하나 아래' (16:9 · 15초 · 4컷)
 const TITLE = '우산 하나 아래'
@@ -80,7 +80,7 @@ function template() {
     <div class="sim-check">⚠ 연출 점검: 영상 전에 볼 것 2가지</div>
     ${[['씬 1', '서윤 혼자 남은 정류장에 도현이 말없이 우산을 내밀어요', 0], ['씬 2', '서윤이 같은 회사 신입을 알아보고, 우산 하나 아래 나란히 서요', 2]].map(([sc, sum, from]) => `<p class="sim-scn"><b>${sc}</b>외곽 버스 정류장 · 밤<span>${sum} · 2컷</span></p>
     <div class="sim-cards sim-cards--sb">
-      ${CUTS.slice(from, from + 2).map(([vb, t, h, sec, d, f], j) => `<div class="sim-card${from + j === 2 ? ' sb-redo' : ''}"><p class="sim-card__h">${h} · ${sec}초</p><div class="sim-card__img">${shot(vb, f)}<span class="sim-tag">다시 그리기 · 무료</span><span class="sim-redraw"><img src="${ls}" alt="" />러프를 그리고 있어요</span></div><p class="sim-card__d">${d}</p><p class="sim-chips"><em>${t}</em><em>Eye-level</em><em>Static</em></p></div>`).join('')}
+      ${CUTS.slice(from, from + 2).map(([vb, t, h, sec, d, f], j) => `<div class="sim-card${from + j === 2 ? ' sb-redo' : ''}"><p class="sim-card__h">${h} · ${sec}초</p><div class="sim-card__img">${shot(vb, f, 'rough')}<span class="sim-tag">다시 그리기 · 무료</span><span class="sim-redraw"><img src="${ls}" alt="" />러프를 그리고 있어요</span></div><p class="sim-card__d">${d}</p><p class="sim-chips"><em>${t}</em><em>Eye-level</em><em>Static</em></p></div>`).join('')}
     </div>`).join('')}
   </section>
 

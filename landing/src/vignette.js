@@ -4,7 +4,7 @@ import lumiSrc from '../assets/lumi@2x.webp'
 
 const reduce = matchMedia('(prefers-reduced-motion: reduce)').matches
 const sleep = (ms) => new Promise((r) => setTimeout(r, reduce ? 0 : ms))
-const shot = (vb, flip) => `<svg viewBox="${vb}" preserveAspectRatio="xMidYMid slice" aria-hidden="true"${flip ? ' class="flip"' : ''}><use href="#world"/></svg>`
+import { shot } from './shots.js'
 const PROSE = '서윤은 정류장 지붕 끝에 서서 막차의 빨간 미등이 빗속으로 사라지는 걸 바라본다. 도현이 조용히 다가와 투명 비닐우산을 서윤의 머리 위로 기울인다.'
 // 앱 Storyboard에서 정리한 4컷 (16:9 · 15초)
 const CUTS = [['0 0 320 180', 'WS', '씬 1 · 샷 1', 4, '막차가 떠나고'], ['112 66 96 54', 'MS', '씬 1 · 샷 2', 4, '우산을 기울여'], ['128 79 46 25.9', 'CU', '씬 2 · 샷 3', 3, '알아채는 순간'], ['118 58 120 67.5', '2S', '씬 2 · 샷 4', 4, '뒤에서 나란히', true]]
@@ -28,7 +28,7 @@ const VIEWS = {
     </div>`,
   storyboard: `
     <div class="vg-cuts">
-      ${CUTS.map(([vb, t, h, sec, d, f], i) => `<div class="vg-cut${i === 2 ? ' vg-cut--redo' : ''}"><small>${h} · ${sec}초</small><div class="vg-cut__img">${shot(vb, f)}<span class="vg-tag">다시 그리기 · 무료</span></div><p><em>${t}</em>${d}</p></div>`).join('')}
+      ${CUTS.map(([vb, t, h, sec, d, f], i) => `<div class="vg-cut${i === 2 ? ' vg-cut--redo' : ''}"><small>${h} · ${sec}초</small><div class="vg-cut__img">${shot(vb, f, 'rough')}<span class="vg-tag">다시 그리기 · 무료</span></div><p><em>${t}</em>${d}</p></div>`).join('')}
     </div>
     <span class="vg-btn vg-btn--cream" data-t>러프 그리기</span>`,
   director: `
@@ -63,7 +63,7 @@ VIEWS.board = `
     <div class="vg-vids">${['0 0 320 180', '112 66 96 54', '128 79 46 25.9', '118 58 120 67.5'].map((vb) => `<i>${shot(vb)}</i>`).join('')}</div>
     <p class="vg-take"><b data-bad>0</b> Takes</p></div>
   <div class="vg-cmp"><p class="vg-cmp__h">Tale · 콘티 먼저<span>확인 → 확정 → 생성</span></p>
-    <div class="vg-vids vg-vids--sb">${['0 0 320 180', '112 66 96 54', '128 79 46 25.9', '118 58 120 67.5'].map((vb, i) => `<i${i === 2 ? ' class="redo"' : ''}>${shot(vb)}<em>${i === 2 ? '다시 그리기 · 무료' : '✓ 확정'}</em></i>`).join('')}</div>
+    <div class="vg-vids vg-vids--sb">${['0 0 320 180', '112 66 96 54', '128 79 46 25.9', '118 58 120 67.5'].map((vb, i) => `<i${i === 2 ? ' class="redo"' : ''}>${shot(vb, false, 'rough')}<em>${i === 2 ? '다시 그리기 · 무료' : '✓ 확정'}</em></i>`).join('')}</div>
     <p class="vg-take">러프 · 이미지 <b>0</b> · 영상 <b data-good>0</b> Takes</p></div>`
 
 export function createVignettes(host) {

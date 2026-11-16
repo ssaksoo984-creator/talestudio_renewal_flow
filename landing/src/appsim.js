@@ -1,4 +1,4 @@
-// Tale Studio 앱 시뮬레이션: Figma 화면의 색 · 컴포넌트 · 배치 + 프로토타입의 흐름 · 문구
+// Tale Studio 앱 시뮬레이션: 실제 앱(talestudio.art, 2026-11 캡처 · reference-app/)의 색 · 컴포넌트 · 배치 · 흐름
 import './appsim.css'
 import lumiSrc from '../assets/lumi@2x.webp'
 import symbolSrc from '../assets/tale-symbol.svg'
@@ -11,87 +11,106 @@ import le from '../assets/lumi-editor.webp'
 
 export const STEPS = ['producer', 'writer', 'artist', 'storyboard', 'director', 'editor']
 const NAMES = { producer: 'Producer', writer: 'Writer', artist: 'Artist', storyboard: 'Storyboard', director: 'Director', editor: 'Editor' }
-const COLORS = { producer: '#F2A33A', writer: '#E8606F', artist: '#8B63E8', storyboard: '#5A6AE6', director: '#3E9BE0', editor: '#2DB39A' }
+// 앱 --stage-* 값
+const COLORS = { producer: '#f2a33a', writer: '#e8606f', artist: '#8b63e8', storyboard: '#5a6ae6', director: '#3e9be0', editor: '#2db39a' }
 const LUMI = { producer: lp, writer: lw, artist: la, storyboard: ls, director: ld, editor: le }
 const reduce = matchMedia('(prefers-reduced-motion: reduce)').matches
 const sleep = (ms) => new Promise((r) => setTimeout(r, reduce ? 0 : ms))
 const shot = (vb, flip) => `<svg viewBox="${vb}" preserveAspectRatio="xMidYMid slice" aria-hidden="true"${flip ? ' class="flip"' : ''}><use href="#world"/></svg>`
-const PROSE = [
-  '막차를 놓친 서윤은 정류장 지붕 끝에 서서 비를 피했다.',
-  '옆자리 남자가 말없이 우산을 기울였다.',
-  '둘의 어깨가 한 뼘쯤 젖었을 때, 서윤은 그가 같은 회사 신입이라는 걸 알아챘다.',
-]
-const FIX = '옆자리 남자가 말없이 우산을 기울였다. 우산 끝에서 떨어진 빗방울이 그의 어깨만 적셨다.'
 
-const msg = (html, name) => `<div class="sim-msg"><span class="sim-msg__av"><img src="${lumiSrc}" alt="" /></span><div><p class="sim-msg__name">Lumi<span>${name}</span></p><div class="sim-bub">${html}</div></div></div>`
-const input = (ph) => `<div class="sim-input"><span class="sim-input__plus"></span><span class="ph">${ph}</span><b></b><span class="sim-input__send">↑</span></div>`
+// 실제로 만든 작품 '우산 하나 아래' (16:9 · 15초 · 4컷)
+const TITLE = '우산 하나 아래'
+const PROSE = [
+  '서윤은 정류장 지붕 끝에 서서, 비 오는 서울 외곽으로 사라지는 막차의 빨간 미등을 바라본다. 도현이 조용히 다가와 투명 비닐우산을 서윤의 머리 위로 기울인다.',
+  '서윤이 고개를 돌려 노란 가로등 아래 도현과 눈이 마주친다. 같은 회사 신입이라는 걸 알아챈다.',
+]
+const FIX = '서윤이 천천히 고개를 돌리자 노란 가로등 아래 도현의 눈과 마주친다. 작게 숨을 삼키며 그를 알아본다. 도현이 수줍게 웃고, 빗소리가 두 사람만의 벽이 된다.'
+// 앱 Storyboard에서 정리한 4컷
+const CUTS = [
+  ['0 0 320 180', 'WS', '씬 1 · 샷 1', 4, '막차가 떠나고, 서윤 혼자 지붕 끝에'],
+  ['112 66 96 54', 'MS', '씬 1 · 샷 2', 4, '도현이 말없이 우산을 기울여 줘요'],
+  ['128 79 46 25.9', 'CU', '씬 2 · 샷 3', 3, '같은 회사 신입이라는 걸 알아채요'],
+  ['118 58 120 67.5', 'OS', '씬 2 · 샷 4', 4, '우산 하나 아래 나란히, 뒤에서', true],
+]
+
+const msg = (html, center) => `<div class="sim-msg${center ? ' sim-msg--c' : ''}"><span class="sim-msg__av"><img src="${lumiSrc}" alt="" /></span><div class="sim-bub"><p class="sim-msg__name">Lumi</p>${html}</div></div>`
+const input = (ph, plus) => `<div class="sim-input">${plus ? '<span class="sim-input__plus">+</span>' : ''}<span class="ph">${ph}</span><b></b><span class="sim-input__send">↑</span></div>`
+const pick = (cards) => `<div class="sim-pick">${cards.map(([t, d, rec]) => `<span class="sim-pick__c${rec ? ' rec' : ''}"><b>${t}</b><small>${d}</small>${rec ? '<em>추천</em>' : ''}</span>`).join('')}</div>`
 
 function template() {
   const nav = STEPS.map((s) => `<div class="sim-nav" data-n="${s}" style="--c:${COLORS[s]}"><i></i>${NAMES[s]}</div>`).join('')
   return `<div class="sim__canvas">
   <aside class="sim-side"><img class="sim-side__logo" src="${symbolSrc}" alt="" />${nav}
-    <div class="sim-side__end"><span><i></i>Take</span><span><i></i>공유</span><span><i></i>Help</span><span class="sim-av">A</span></div></aside>
-  <div class="sim-top"><span class="sim-badge">Producer</span><span class="sim-title">비 오는 날 만난 두 사람</span><span class="sim-pen"></span></div>
+    <div class="sim-side__end"><span><i></i>Takes</span><span><i></i>공유</span><span><i></i>내보내기</span><span><i></i>도움말</span><span class="sim-av">A</span></div></aside>
+  <div class="sim-top"><span class="sim-badge">Producer</span><span class="sim-title">${TITLE}</span><span class="sim-pen"></span></div>
   <div class="sim-btns" data-for="writer"></div>
 
   <section class="sim-scene" data-scene="producer">
     <div class="sim-pro">
-      <div class="sim-set"><span>화면 비율 <b data-k="ratio">—</b></span><span>길이 <b data-k="len">—</b></span><span>장르 <b data-k="genre">—</b></span></div>
+      <div class="sim-set"><em>지금까지 정한 것</em><span data-q="genre">장르와 분위기 <b data-k="genre">아직</b></span><span data-q="len">길이 <b data-k="len">아직</b></span><span data-q="lvl">바꿀 정도 <b data-k="lvl">아직</b></span><span data-q="ratio">🔒 화면 비율 <b data-k="ratio">아직</b></span></div>
       <div class="sim-pro__log"></div>
-      ${input('Lumi에게 이야기해 보세요')}
+      ${input('예) 비 오는 날 만난 두 사람 이야기', true)}
     </div>
   </section>
 
   <section class="sim-scene" data-scene="writer">
-    <div class="sim-h"><b>산문</b><span>1화 · 15초</span></div>
-    <div class="sim-meta"><span>장르<b>로맨틱 코미디</b></span><span>길이<b>15초 · 숏폼</b></span><span>비율<b>9:16 🔒</b></span></div>
-    <div class="sim-prose">${PROSE.map((p, i) => `<div class="sim-para" data-i="${i}"><em>0${i + 1}</em><div class="sim-para__t">${p.split(' ').map((w) => `<span class="w">${w} </span>`).join('')}</div></div>`).join('')}</div>
+    <div class="sim-h"><b>산문</b><span>장면 2</span></div>
+    <div class="sim-meta"><em>지금 산문 조건</em><span>길이<b>15초 이하</b></span><span>장르<b>로맨스</b></span><span>원본 아이디어<b>유지</b></span></div>
+    <div class="sim-prose">${PROSE.map((p, i) => `<div class="sim-para" data-i="${i}"><em>S${i + 1}</em><div class="sim-para__t">${p.split(' ').map((w) => `<span class="w">${w} </span>`).join('')}</div></div>`).join('')}</div>
+    <p class="sim-hint">문단을 누르면 그 문단만 채팅에서 고칠 수 있어요.</p>
   </section>
 
   <section class="sim-scene" data-scene="artist">
-    <div class="sim-h"><b>인물 · 배경</b><span>확정 산문에서 뽑았어요</span></div>
+    <div class="sim-h"><b>인물 · 배경</b><span>인물 2 · 배경 1</span></div>
+    <div class="sim-style"><i>${shot('128 76 40 53')}</i><div><b>실사</b><small>작품 스타일 · v1</small></div><span class="sim-btn">다시 만들기</span></div>
     <div class="sim-tabs"><span class="on">모두 3</span><span>인물 2</span><span>배경 1</span></div>
     <div class="sim-cards sim-cards--art">
-      <div class="sim-card"><div class="sim-card__img">${shot('128 76 40 53')}</div><p>서윤<span>29 · 팀장</span></p></div>
-      <div class="sim-card"><div class="sim-card__img">${shot('150 72 40 53')}</div><p>도현<span>26 · 신입</span></p></div>
-      <div class="sim-card sim-card--wide"><div class="sim-card__img">${shot('40 30 240 114')}</div><p>버스 정류장<span>밤 · 비</span></p></div>
+      <div class="sim-card sim-card--sheet"><p>서윤<span class="sim-kind">인물</span></p><div class="sim-card__img"><i>${shot('128 76 40 53')}</i><i>${shot('120 60 56 110')}</i><i>${shot('120 60 56 110', true)}</i></div><small>29세 팀장, 베이지 트렌치코트</small></div>
+      <div class="sim-card sim-card--sheet"><p>도현<span class="sim-kind">인물</span></p><div class="sim-card__img"><i>${shot('150 72 40 53')}</i><i>${shot('142 56 56 110')}</i><i>${shot('142 56 56 110', true)}</i></div><small>26세 신입, 투명 비닐우산</small></div>
+      <div class="sim-card sim-card--wide"><p>외곽 버스 정류장<span class="sim-kind">배경</span><span class="sim-kind">밤</span></p><div class="sim-card__img">${shot('40 30 240 114')}</div><small>비 오는 서울 외곽, 노란 가로등 하나</small></div>
     </div>
+    <div class="sim-modal" data-modal="style"><p class="sim-modal__h">어떤 스타일로 그릴까요?</p>
+      <div class="sim-styles">${[['실사', '128 76 40 53'], ['3D 애니메이션', '150 72 40 53'], ['2D 애니메', '40 30 240 160'], ['카툰', '118 58 120 67.5']].map(([n, vb], i) => `<span class="sim-styles__c${i === 0 ? ' first' : ''}"><i>${shot(vb)}</i>${n}</span>`).join('')}</div>
+      <div class="sim-modal__f"><small>인물 시트 2 · 배경 1<br />이미지는 Take를 쓰지 않아요</small><span class="sim-btn sim-btn--cream" data-draw>실사로 그리기</span></div></div>
   </section>
 
   <section class="sim-scene" data-scene="storyboard">
-    <div class="sim-h"><b>Storyboard</b><span>씬 1 · 샷 6 · 15초</span></div>
-    <div class="sim-tabs"><span class="on">러프</span><span>시트</span></div>
+    <div class="sim-h"><b>Storyboard</b><span>씬 2 · 샷 4 · 15초</span></div>
+    <div class="sim-tabs sim-tabs--sb"><span class="on">러프 스토리보드</span><span>대사</span><span class="ghost">+ 씬 추가</span><span class="ghost">+ 샷 추가</span></div>
+    <div class="sim-check">⚠ 연출 점검: 영상 전에 볼 것 2가지</div>
+    ${[['씬 1', '서윤 혼자 남은 정류장에 도현이 말없이 우산을 내밀어요', 0], ['씬 2', '서윤이 같은 회사 신입을 알아보고, 우산 하나 아래 나란히 서요', 2]].map(([sc, sum, from]) => `<p class="sim-scn"><b>${sc}</b>외곽 버스 정류장 · 밤<span>${sum} · 2컷</span></p>
     <div class="sim-cards sim-cards--sb">
-      ${[['0 0 320 180', 'WS', '정류장 전경'], ['112 66 96 54', 'MS', '우산을 기울임'], ['128 79 46 25.9', 'CU', '서윤의 눈빛'], ['118 58 120 67.5', 'OS', '뒤에서 둘', true], ['150 72 40 30', 'CU', '도현의 미소'], ['60 40 200 112', 'LS', '버스가 지나감']]
-        .map(([vb, t, d, f], i) => `<div class="sim-card${i === 2 ? ' sb-redo' : ''}"><div class="sim-card__img">${shot(vb, f)}<span class="sim-tag">다시 그리기 · 무료</span></div><p><em>${t}</em>${d}</p></div>`).join('')}
-    </div>
+      ${CUTS.slice(from, from + 2).map(([vb, t, h, sec, d, f], j) => `<div class="sim-card${from + j === 2 ? ' sb-redo' : ''}"><p class="sim-card__h">${h} · ${sec}초</p><div class="sim-card__img">${shot(vb, f)}<span class="sim-tag">다시 그리기 · 무료</span><span class="sim-redraw"><img src="${ls}" alt="" />러프를 그리고 있어요</span></div><p class="sim-card__d">${d}</p><p class="sim-chips"><em>${t}</em><em>Eye-level</em><em>Static</em></p></div>`).join('')}
+    </div>`).join('')}
   </section>
 
   <section class="sim-scene" data-scene="director">
-    <div class="sim-tool"><span class="sim-seg"><span class="on">노드</span><span>스토리보드</span></span><b>The Set</b><small>노드 6 · 샷 3</small>
-      <span class="sim-pill">스토리보드 생성 6/6</span><span class="sim-pill sim-pill--live">영상 만드는 중 · <span data-k="vid">0</span>/3</span></div>
+    <div class="sim-tool"><span class="sim-seg"><span>스토리보드</span><span class="on">노드</span></span><span class="sim-seg"><span>러프</span><span class="on">실사</span></span><b>The Set</b>
+      <small>노드 7 · 샷 4</small><span class="sim-pill">영상 4 · 약 15초 · 샷당 5 Takes</span></div>
+    <div class="sim-bar"><span class="sim-check-box"></span><b>모든 샷 4</b><span class="sim-bar__live"><img src="${ld}" alt="" />영상 만드는 중 · <span data-k="vid">0</span>/4</span>
+      <span class="sim-bar__end"><span class="sim-btn sim-btn--ghost">이미지 만들기 · 0</span><span class="sim-btn sim-btn--cream">▶ 영상 만들기 · 4</span></span></div>
     <div class="sim-board">
       <svg class="lines" viewBox="0 0 1316 760" preserveAspectRatio="none"><path d="M234 120 C300 120 300 150 360 150"/><path d="M234 330 C300 330 300 170 360 170"/><path d="M234 330 C300 330 300 440 360 440"/><path d="M234 560 C300 560 300 460 360 460"/><path d="M564 160 C640 160 640 150 700 150"/><path d="M564 450 C640 450 640 470 700 470"/><path d="M904 160 C960 160 960 260 1040 260"/></svg>
       <div class="sim-node" style="left:30px;top:40px"><small>이미지</small><b>서윤<em>인물</em></b><div class="sim-node__img">${shot('128 76 40 53')}</div></div>
       <div class="sim-node" style="left:30px;top:250px"><small>이미지</small><b>도현<em>인물</em></b><div class="sim-node__img">${shot('150 72 40 53')}</div></div>
-      <div class="sim-node" style="left:30px;top:470px"><small>이미지</small><b>버스 정류장<em>배경</em></b><div class="sim-node__img">${shot('40 30 240 135')}</div></div>
-      <div class="sim-node" style="left:360px;top:60px"><small>이미지</small><b>샷 1<em>MS</em></b><div class="sim-node__img">${shot('112 66 96 54')}</div><p class="sim-node__ok">● 완료</p></div>
-      <div class="sim-node" style="left:360px;top:360px"><small>이미지</small><b>샷 2<em>CU</em></b><div class="sim-node__img">${shot('128 79 46 25.9')}</div><p class="sim-node__ok">● 완료</p></div>
-      <div class="sim-node" style="left:700px;top:60px"><small>영상</small><b>샷 1 · 영상<em>5초</em></b><div class="sim-node__img">${shot('112 66 96 54')}</div><p class="sim-node__ok">● 완료 · Kling</p></div>
-      <div class="sim-node" style="left:700px;top:380px"><small>영상</small><b>샷 2 · 영상<em>4초</em></b><div class="sim-load"><img src="${ld}" alt="" /><p>영상을 만들고 있어요</p><span class="pct">샷 2 · 약 1분 남음</span><div class="sim-prog"><i></i></div></div></div>
-      <div class="sim-node" style="left:1040px;top:170px;width:220px"><small>영상</small><b>샷 3 · 영상<em>6초</em></b><div class="sim-node__img">${shot('118 58 120 67.5', true)}</div><p class="sim-node__ok" style="color:var(--t3)">○ 순서 기다리는 중</p></div>
+      <div class="sim-node" style="left:30px;top:470px"><small>이미지</small><b>외곽 버스 정류장<em>배경</em></b><div class="sim-node__img">${shot('40 30 240 135')}</div></div>
+      <div class="sim-node" style="left:360px;top:60px"><small>이미지</small><b>샷 2<em>MS</em></b><div class="sim-node__img">${shot('112 66 96 54')}</div><p class="sim-node__ok">● 완료</p></div>
+      <div class="sim-node" style="left:360px;top:360px"><small>이미지</small><b>샷 3<em>CU</em></b><div class="sim-node__img">${shot('128 79 46 25.9')}</div><p class="sim-node__ok">● 완료</p></div>
+      <div class="sim-node" style="left:700px;top:60px"><small>영상</small><b>샷 2 · 영상<em>4초</em></b><div class="sim-node__img">${shot('112 66 96 54')}</div><p class="sim-node__ok">● 완료</p></div>
+      <div class="sim-node" style="left:700px;top:380px"><small>영상</small><b>샷 3 · 영상<em>3초</em></b><div class="sim-load"><img src="${ld}" alt="" /><p>영상을 만들고 있어요</p><span class="pct">로우앵글 · 천천히 다가가기</span><div class="sim-prog"><i></i></div></div></div>
+      <div class="sim-node" style="left:1040px;top:170px;width:220px"><small>영상</small><b>샷 4 · 영상<em>4초</em></b><div class="sim-node__img">${shot('118 58 120 67.5', true)}</div><p class="sim-node__ok" style="color:var(--t3)">○ 순서 기다리는 중</p></div>
     </div>
   </section>
 
   <section class="sim-scene" data-scene="editor">
-    <div class="sim-tool"><span class="sim-seg"><span class="on">타임라인</span><span>노드</span></span><b>1화 · 우산 하나</b><small>샷 6 · 15초</small><span class="sim-pill">20 Takes 사용</span></div>
+    <div class="sim-tool"><span class="sim-seg"><span class="on">타임라인</span><span>노드</span></span><b>${TITLE}</b><small>샷 4 · 15초 · 16:9</small><span class="sim-pill">20 Takes 사용</span></div>
     <div class="sim-ed">
-      <div class="sim-player">${shot('104 44 72 128')}<span class="tri"></span></div>
-      <div class="sim-tl">${[['0 0 320 180', 2.5], ['112 66 96 54', 2.5], ['128 79 46 25.9', 2], ['118 58 120 67.5', 3, true], ['150 72 40 30', 2], ['60 40 200 112', 3]].map(([vb, f, fl]) => `<i style="flex:${f}">${shot(vb, fl)}</i>`).join('')}<span class="sim-head"></span></div>
+      <div class="sim-player">${shot('0 0 320 180')}<span class="tri"></span></div>
+      <div class="sim-tl">${CUTS.map(([vb, , , sec, , fl]) => `<i style="flex:${sec}">${shot(vb, fl)}</i>`).join('')}<span class="sim-head"></span></div>
     </div>
   </section>
 
-  <aside class="sim-chat"><div class="sim-chat__head"><img src="${lumiSrc}" alt="" /><b class="sim-chat__title">Lumi와 산문 이야기</b><span></span></div><div class="sim-chat__log"></div>${input('질문을 입력하세요')}</aside>
+  <aside class="sim-chat"><div class="sim-chat__head"><img src="${lumiSrc}" alt="" /><b class="sim-chat__title">Lumi와 산문 쓰기</b><span>»</span></div><div class="sim-chat__log"></div>${input('예) 다시 써 줘, 결말을 더 웃기게')}<div class="sim-chat__foot"><span class="sim-chat__stage"></span></div></aside>
   <svg class="sim-cursor" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 2l16 9.5-7 1.6L9.5 20z" fill="#fff" stroke="#141312" stroke-width="1.4" stroke-linejoin="round"/></svg>
 </div>`
 }
@@ -118,7 +137,8 @@ export function createSim(host, { loop = false, onStep, last = 'editor' } = {}) 
   const type = async (inp, text, alive) => { const b = inp.querySelector('b'); inp.querySelector('.ph').hidden = true; inp.classList.add('ready'); for (let i = 1; i <= text.length && alive(); i++) { b.textContent = text.slice(0, i); await sleep(55) } }
   const clearInput = (inp) => { inp.querySelector('b').textContent = ''; inp.querySelector('.ph').hidden = false; inp.classList.remove('ready') }
   const add = (log, html) => { log.insertAdjacentHTML('beforeend', html); return log.lastElementChild }
-  const think = async (log, ms = 900) => { const d = add(log, `<div class="sim-msg"><span class="sim-msg__av"><img src="${lumiSrc}" alt="" /></span><div><span class="sim-dots"><i></i><i></i><i></i></span></div></div>`); await sleep(ms); d.remove() }
+  const think = async (log, ms = 900, center) => { const d = add(log, `<div class="sim-msg${center ? ' sim-msg--c' : ''}"><span class="sim-msg__av"><img src="${lumiSrc}" alt="" /></span><div><span class="sim-dots"><i></i><i></i><i></i></span></div></div>`); await sleep(ms); d.remove() }
+  const ask = (k) => $$('.sim-set span').forEach((s) => s.classList.toggle('ask', s.dataset.q === k))
 
   function setStep(s) {
     host.dataset.s = s
@@ -127,21 +147,31 @@ export function createSim(host, { loop = false, onStep, last = 'editor' } = {}) 
     $$('.sim-nav').forEach((n, i) => { n.classList.toggle('on', i === at); n.classList.toggle('done', i < at) })
     $$('.sim-scene').forEach((n) => n.classList.toggle('on', n.dataset.scene === s))
     host.classList.toggle('sim--chat', s !== 'producer' && s !== 'editor')
-    $('.sim-chat__title').textContent = { writer: 'Lumi와 산문 이야기', artist: 'Lumi와 그림 이야기', storyboard: 'Lumi와 콘티 이야기', director: 'Lumi와 연출 이야기' }[s] || 'Lumi'
-    const btns = { writer: '<span class="sim-btn">작업 계획</span><span class="sim-btn">AI 다시 쓰기</span><span class="sim-btn sim-btn--cream" data-go>브레이크다운하기 →</span>', artist: '<span class="sim-btn">스타일 · 실사</span><span class="sim-btn sim-btn--cream" data-go>콘티로 넘어가기 →</span>', storyboard: '<span class="sim-btn">시트로 보기</span><span class="sim-btn sim-btn--cream" data-go>Director로 →</span>', director: '<span class="sim-btn sim-btn--cream" data-go>다음: Editor →</span>', editor: '<span class="sim-btn">마스터 시트</span><span class="sim-btn sim-btn--cream" data-go>내보내기</span>' }
-    $('.sim-btns').innerHTML = btns[s] || '<span class="sim-btn">원본에서 고르기</span><span class="sim-btn">채팅으로 만들기</span>'
+    $('.sim-chat__title').textContent = { writer: 'Lumi와 산문 쓰기', artist: 'Lumi와 그림 그리기', storyboard: 'Lumi와 연출하기', director: 'Lumi와 연출하기' }[s] || 'Lumi'
+    $('.sim-chat__stage').textContent = NAMES[s]
+    const btns = {
+      writer: '<span class="sim-btn">직접 쓰기</span><span class="sim-btn">AI 다시 쓰기</span><span class="sim-btn sim-btn--cream" data-go>브레이크다운 →</span>',
+      artist: '<span class="sim-btn sim-btn--cream" data-go>완료 · Storyboard로 →</span>',
+      storyboard: '<span class="sim-btn sim-btn--cream" data-go>다음: Director →</span>',
+      director: '<span class="sim-btn sim-btn--cream" data-go>다음: Editor →</span>',
+      editor: '<span class="sim-btn">마스터 시트</span><span class="sim-btn sim-btn--cream" data-go>내보내기</span>',
+    }
+    $('.sim-btns').innerHTML = btns[s] || '<span class="sim-seg sim-seg--top"><span>화면에서 고르기</span><span class="on">채팅으로 만들기</span></span>'
     onStep?.(s)
   }
 
   function reset() {
     $('.sim-pro__log').innerHTML = ''
     $('.sim-chat__log').innerHTML = ''
-    $$('.sim-set b').forEach((b) => (b.textContent = '—'))
+    $$('.sim-set b').forEach((b) => (b.textContent = '아직'))
+    $$('.sim-set span').forEach((s) => s.classList.remove('ask', 'set'))
     $$('.sim-input').forEach(clearInput)
     $$('.sim-para .w').forEach((w) => w.classList.remove('on'))
-    $$('.sim-para').forEach((p) => { p.classList.remove('sel'); p.querySelector('.sim-fix')?.remove() })
+    $$('.sim-para').forEach((p) => { p.classList.remove('sel', 'old'); p.querySelector('.sim-fix')?.remove() })
     $('.sim-para[data-i="1"] .sim-para__t').innerHTML = PROSE[1].split(' ').map((w) => `<span class="w">${w} </span>`).join('')
-    $$('.sim-card').forEach((c) => c.classList.remove('on', 'redo'))
+    $$('.sim-card').forEach((c) => c.classList.remove('on', 'redo', 'drawing'))
+    $$('.sim-styles__c').forEach((c) => c.classList.remove('pick'))
+    $$('.sim-modal').forEach((m) => m.classList.remove('on'))
     $$('.sim-node').forEach((n) => n.classList.remove('on', 'done', 'hot'))
     $$('.sim-board path').forEach((p) => p.classList.remove('on'))
     $('.sim-prog i').style.width = '0'
@@ -153,62 +183,80 @@ export function createSim(host, { loop = false, onStep, last = 'editor' } = {}) 
   const SCENES = {
     async producer(alive) {
       const log = $('.sim-pro__log'), inp = $('.sim-pro .sim-input')
-      add(log, msg('안녕하세요! 어떤 이야기를 만들어 볼까요?<br>한 줄이면 충분해요. 장르 · 길이 · 화면 비율은 같이 정해요.<div class="sim-qs"><span class="sim-chipq">아이디어가 있어요</span><span class="sim-chipq">대본이 있어요</span><span class="sim-chipq">추천해 주세요</span></div>', 'Producer'))
+      add(log, msg('안녕하세요! 어떤 이야기를 만들어 볼까요?<br>한 줄이면 충분해요. 장르 · 길이 · 화면 비율은 같이 정해요.<div class="sim-qs"><span class="sim-chipq">아이디어가 있어요</span><span class="sim-chipq">대본이 있어요</span><span class="sim-chipq">파일을 올릴게요</span><span class="sim-chipq">예시를 보여 주세요</span></div>', true))
       await sleep(900); if (!alive()) return
-      await click(inp, 0.3); await type(inp, '우산 하나를 같이 쓴 두 사람', alive); if (!alive()) return
+      const line = '비 오는 버스 정류장, 우산 하나를 같이 쓰게 된 두 사람'
+      await click(inp, 0.3); await type(inp, line, alive); if (!alive()) return
       await click(inp.querySelector('.sim-input__send')); clearInput(inp)
-      add(log, `<p class="sim-me">우산 하나를 같이 쓴 두 사람</p>`)
-      await think(log); if (!alive()) return
-      const q = add(log, msg('좋아요! 글의 장르 · 분위기와 길이를 골라 주세요.<div class="sim-qs"><span class="sim-chipq">로맨틱 코미디 · 15초</span><span class="sim-chipq">잔잔한 드라마 · 1분</span><span class="sim-chipq">미스터리 · 30초</span></div>', 'Producer'))
+      add(log, `<p class="sim-me">${line}</p>`)
+      await think(log, 900, true); if (!alive()) return
+      ask('genre')
+      const q = add(log, msg('장르와 분위기는 어떻게 할까요?<div class="sim-qs"><span class="sim-chipq">코미디</span><span class="sim-chipq">드라마</span><span class="sim-chipq rec">로맨스<em>추천</em></span><span class="sim-chipq">스릴러</span><span class="sim-chipq">일상</span></div><p class="sim-why">✦ 비 오는 정류장에서 우산을 나눠 쓰는 건 전형적인 로맨스 분위기예요.</p>', true))
       await sleep(900); if (!alive()) return
-      const chip = q.querySelector('.sim-chipq'); await click(chip); chip.classList.add('pick'); q.querySelector('.sim-qs').classList.add('done')
-      $('[data-k="genre"]').textContent = '로맨틱 코미디'; $('[data-k="len"]').textContent = '15초'
-      add(log, `<p class="sim-me">로맨틱 코미디 · 15초</p>`)
-      await think(log); if (!alive()) return
-      const sum = add(log, msg('이렇게 시작해 볼게요.<div class="sim-sum"><div><span>장르</span>로맨틱 코미디</div><div><span>길이</span>15초 · 숏폼</div><div><span>화면 비율</span>9:16 🔒</div><div><span>인물</span>서윤 · 도현</div></div><div class="sim-sum-btns"><span class="sim-btn sim-btn--cream">좋아요, 산문 쓰기로</span><span class="sim-btn">아니요, 더 고칠래요</span></div>', 'Producer'))
-      $('[data-k="ratio"]').textContent = '9:16'
+      const chip = q.querySelector('.rec'); await click(chip); chip.classList.add('pick'); q.querySelector('.sim-qs').classList.add('done')
+      $('[data-k="genre"]').textContent = '로맨스'; $('[data-q="genre"]').classList.add('set')
+      ask('len')
+      const q2 = add(log, msg(`어느 정도 길이로 할까요?${pick([['15초 이하', '숏폼'], ['15–60초', '광고 · 티저', true], ['1–5분', '뮤비 · 웹드라마'], ['5–20분', '단편']])}`, true))
+      await sleep(800); if (!alive()) return
+      const c1 = q2.querySelector('.sim-pick__c'); await click(c1); c1.classList.add('pick'); q2.querySelector('.sim-pick').classList.add('done')
+      $('[data-k="len"]').textContent = '15초 이하'; $('[data-q="len"]').classList.add('set')
+      $('[data-k="lvl"]').textContent = '2 다듬기'; $('[data-q="lvl"]').classList.add('set')
+      ask('ratio')
+      const q3 = add(log, msg(`화면 비율을 골라 주세요.<p class="sim-lock">🔒 한 번 고르면 끝까지 바꿀 수 없어요.</p>${pick([['16:9', '가로'], ['9:16', '세로 · 숏폼', true], ['1:1', '정사각'], ['2.39:1', '시네마']])}`, true))
+      await sleep(800); if (!alive()) return
+      const c2 = q3.querySelector('.sim-pick__c'); await click(c2); c2.classList.add('pick'); q3.querySelector('.sim-pick').classList.add('done')
+      $('[data-k="ratio"]').textContent = '16:9'; $('[data-q="ratio"]').classList.add('set'); ask('')
+      await think(log, 700, true); if (!alive()) return
+      const sum = add(log, msg('이렇게 시작할게요.<div class="sim-sum"><div><span>🔒 화면 비율</span>16:9 · 시작하면 못 바꿔요</div><div><span>장르와 분위기</span>로맨스</div><div><span>길이</span>15초 이하</div><div><span>바꿀 정도</span>2 다듬기 · 재료는 두고 문장만 고쳐요</div></div><div class="sim-sum-btns"><span class="sim-btn sim-btn--cream">네, 산문 쓰기</span><span class="sim-btn">아니요, 더 고칠래요</span></div>', true))
       await sleep(1200); if (!alive()) return
       await click(sum.querySelector('.sim-btn--cream'))
       await sleep(400)
     },
     async writer(alive) {
       const log = $('.sim-chat__log'), inp = $('.sim-chat .sim-input')
-      for (const w of $$('.sim-para .w')) { if (!alive()) return; w.classList.add('on'); await sleep(45) }
-      add(log, msg('산문을 썼어요. 고치고 싶은 문단을 누르고 어떻게 고칠지 말해 주세요.<div class="sim-qs"><span class="sim-chipq">전부 다시 써 줘</span><span class="sim-chipq">대사를 늘려 줘</span><span class="sim-chipq">좋아요</span></div>', 'Writer'))
+      for (const w of $$('.sim-para .w')) { if (!alive()) return; w.classList.add('on'); await sleep(40) }
+      add(log, msg('산문을 장면 2개로 썼어요. 마음에 안 들면 "다시 써 줘"라고 하거나 조건을 바꿔 주세요.'))
       await sleep(800); if (!alive()) return
       const p2 = $('.sim-para[data-i="1"]'); await click(p2, 0.3, 0.5); p2.classList.add('sel')
-      await click(inp, 0.3); await type(inp, '이 문단을 조금 더 설레게', alive); if (!alive()) return
+      await click(inp, 0.3); await type(inp, '조금 더 설레게', alive); if (!alive()) return
       await click(inp.querySelector('.sim-input__send')); clearInput(inp)
-      add(log, `<p class="sim-me">02 · 이 문단을 조금 더 설레게</p>`)
+      add(log, `<p class="sim-me">S2 조금 더 설레게</p>`)
       await think(log, 1100); if (!alive()) return
       const fix = document.createElement('div'); fix.className = 'sim-fix'
-      fix.innerHTML = `<small>AI 수정안</small>${FIX}<div class="sim-sum-btns"><span class="sim-btn">되돌리기</span><span class="sim-btn sim-btn--cream">적용</span></div>`
-      p2.append(fix)
-      add(log, msg('2문단에 수정안을 붙였어요. 마음에 들면 적용해 주세요.', 'Writer'))
+      fix.innerHTML = `<small>✦ AI 수정안</small>${FIX}<div class="sim-sum-btns"><span class="sim-btn">버리기</span><span class="sim-btn sim-btn--cream">적용</span></div>`
+      p2.classList.remove('sel'); p2.classList.add('old'); p2.append(fix)
+      add(log, msg('S2를 고쳤어요. 바뀐 곳을 산문에 표시했어요. [적용]을 누르기 전까지 원문은 그대로예요.'))
       await sleep(900); if (!alive()) return
       await click(fix.querySelector('.sim-btn--cream'))
-      fix.remove(); p2.classList.remove('sel'); p2.querySelector('.sim-para__t').innerHTML = `<span class="w on">${FIX}</span>`
+      fix.remove(); p2.classList.remove('old'); p2.querySelector('.sim-para__t').innerHTML = `<span class="w on">${FIX}</span>`
       await sleep(600); if (!alive()) return
       await click($('[data-go]'))
     },
     async artist(alive) {
       const log = $('.sim-chat__log')
-      add(log, msg('산문에서 인물 2명, 배경 1곳을 뽑았어요. 어떤 스타일로 그릴까요?<div class="sim-qs"><span class="sim-chipq">실사</span><span class="sim-chipq">3D 애니메이션</span><span class="sim-chipq">2D 일러스트</span></div>', 'Artist'))
+      add(log, msg('확정한 산문에서 인물 2명, 배경 1곳을 골랐어요. 어떤 스타일로 그릴까요?'))
+      const modal = $('[data-modal="style"]'); modal.classList.add('on')
       await sleep(900); if (!alive()) return
-      const c = log.querySelector('.sim-chipq'); await click(c); c.classList.add('pick'); c.parentElement.classList.add('done')
+      const c = modal.querySelector('.first'); await click(c); c.classList.add('pick')
+      await sleep(300); await click(modal.querySelector('[data-draw]')); if (!alive()) return
+      modal.classList.remove('on')
       for (const card of $$('[data-scene="artist"] .sim-card')) { if (!alive()) return; await sleep(650); card.classList.add('on') }
-      add(log, msg('다 그렸어요. 얼굴은 모든 컷에서 이 모습으로 이어져요.', 'Artist'))
+      add(log, msg('다 그렸어요. 얼굴 · 옷은 모든 컷에서 이 시트대로 이어져요.'))
       await sleep(900); if (!alive()) return
       await click($('[data-go]'))
     },
     async storyboard(alive) {
       const log = $('.sim-chat__log')
-      add(log, msg('씬 · 샷을 나누고 러프를 그려요. 다 그린 샷부터 하나씩 나타나요.', 'Storyboard'))
+      add(log, msg('씬 2개, 샷 4개로 나누고 러프를 그려요. 다 그린 샷부터 하나씩 나타나요.'))
       for (const card of $$('[data-scene="storyboard"] .sim-card')) { if (!alive()) return; await sleep(420); card.classList.add('on') }
       await sleep(500); if (!alive()) return
       const redo = $('[data-scene="storyboard"] .sb-redo'); await move(redo, 0.5, 0.45); redo.classList.add('redo')
-      add(log, msg('샷 6개, 15초예요. 영상으로 만들기 전에 마음에 안 드는 컷은 다시 그려요. 무료예요.', 'Storyboard'))
-      await sleep(1300); if (!alive()) return
+      add(log, msg('샷 4개, 15초예요. 영상으로 만들기 전에 마음에 안 드는 컷은 다시 그려요. 러프는 무료예요.'))
+      await sleep(900); if (!alive()) return
+      await click(redo.querySelector('.sim-tag')); redo.classList.remove('redo'); redo.classList.add('drawing')
+      await sleep(1400); if (!alive()) return
+      redo.classList.remove('drawing')
+      await sleep(700); if (!alive()) return
       await click($('[data-go]'))
     },
     async director(alive) {
@@ -217,7 +265,7 @@ export function createSim(host, { loop = false, onStep, last = 'editor' } = {}) 
       for (const n of nodes.slice(0, 3)) { if (!alive()) return; n.classList.add('on'); await sleep(260) }
       for (const n of nodes.slice(3, 5)) { if (!alive()) return; n.classList.add('on', 'done'); await sleep(260) }
       paths.slice(0, 4).forEach((p) => p.classList.add('on'))
-      add(log, msg('샷마다 카메라 · 조명을 정했어요. 확정한 샷부터 하나씩 영상으로 만들게요.', 'Director'))
+      add(log, msg('샷마다 카메라 · 조명을 정했어요. 영상 4개에 Take가 얼마나 드는지 먼저 보여 드릴게요.'))
       await sleep(700); if (!alive()) return
       nodes[5].classList.add('on', 'done'); paths[4].classList.add('on'); await sleep(400)
       nodes[6].classList.add('on', 'hot'); nodes[7].classList.add('on'); paths[5].classList.add('on'); paths[6].classList.add('on')
@@ -226,7 +274,7 @@ export function createSim(host, { loop = false, onStep, last = 'editor' } = {}) 
       for (let p = 0; p <= 100 && alive(); p += 4) { bar.style.width = p + '%'; await sleep(70) }
       if (!alive()) return
       nodes[6].classList.remove('hot')
-      add(log, msg('샷 2 영상이 나왔어요. 생성 전에 보여 드린 대로 5 Take를 썼어요.', 'Director'))
+      add(log, msg('샷 3 영상이 나왔어요. 만들기 전에 보여 드린 Take만 썼어요.'))
       await sleep(1000); if (!alive()) return
       await click($('[data-go]'))
     },

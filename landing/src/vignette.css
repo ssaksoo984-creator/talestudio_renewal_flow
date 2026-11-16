@@ -1,8 +1,8 @@
-/* 여섯 단계 컴포넌트 애니메이션 (Figma 토큰) */
-.vg { --side: #1f1e1d; --bubble: #2a2927; --chip: #3a3936; --input: #30302e; --t1: #f5f4ee; --t2: #c2c0b6; --t3: #8e8b82; --lumi: #d6d3ca; --cream: #EDEAE0; --onc: #1f1e1d;
+/* 여섯 단계 컴포넌트 애니메이션 — 실제 앱 CSS 변수(reference-app/tokens.md) */
+.vg { --side: #1f1e1d; --bubble: #34332f; --raised: #2a2927; --chip: #45443f; --input: #30302e; --canvas: #1a1918; --t1: #f5f4ee; --t2: #c2c0b6; --t3: #8e8b82; --t4: #5c5a55; --lumi: #f5f4ee; --cream: #edeae0; --onc: #1f1e1d; --lock: #d9967c; --ok: #14ae5c;
   position: relative; width: 100%; aspect-ratio: 16 / 11; border-radius: 22px; background: #262624; overflow: hidden; color: var(--t1);
   font-family: 'Pretendard Variable', Pretendard, system-ui, sans-serif; box-shadow: 0 0 0 1px rgba(255, 255, 255, 0.06), 0 30px 70px -24px rgba(0, 0, 0, 0.5);
-  background-image: radial-gradient(rgba(255, 255, 255, 0.05) 1px, transparent 1.2px); background-size: 18px 18px; }
+  background-image: radial-gradient(rgba(194, 192, 182, 0.1) 1px, transparent 1.2px); background-size: 20px 20px; }
 .vg p { margin: 0; }
 .vg-view { position: absolute; inset: 0; display: flex; flex-direction: column; justify-content: center; align-items: center; gap: 16px; padding: 7% 9%;
   opacity: 0; transform: translateY(12px); transition: opacity 0.5s, transform 0.6s cubic-bezier(0.2, 0.7, 0.2, 1); pointer-events: none; }
@@ -11,19 +11,21 @@
 
 .vg-msg { display: grid; grid-template-columns: 30px 1fr; gap: 10px; align-items: start; }
 .vg-msg img { width: 28px; margin-top: 2px; }
-.vg-bub { padding: 12px 14px; border-radius: 4px 14px 14px 14px; background: var(--bubble); color: var(--lumi); font-size: 14px; line-height: 1.55; }
+.vg-bub { padding: 12px 16px; border-radius: 16px; background: var(--bubble); color: var(--lumi); font-size: 14px; line-height: 1.6; }
 .vg-chips { display: flex; flex-wrap: wrap; gap: 6px; padding-left: 40px; }
 .vg-view[data-v='artist'] .vg-chips { padding-left: 0; justify-content: center; }
-.vg-chip { padding: 8px 13px; border-radius: 999px; background: var(--chip); color: var(--t2); font-size: 13px; font-weight: 500; transition: box-shadow 0.3s, color 0.3s, opacity 0.3s, transform 0.15s; }
-.vg-chip.pick { box-shadow: inset 0 0 0 1.5px var(--c); color: var(--t1); }
+.vg-chip { display: inline-flex; align-items: center; gap: 6px; padding: 7px 13px; border-radius: 999px; background: var(--chip); color: var(--t1); font-size: 13px; font-weight: 500; transition: box-shadow 0.3s, background-color 0.3s, opacity 0.3s, transform 0.15s; }
+.vg-chip em { font-style: normal; padding: 1px 6px; border-radius: 999px; background: var(--c); color: var(--onc); font-size: 10.5px; font-weight: 600; }
+.vg-chip--rec { box-shadow: inset 0 0 0 1.5px var(--c); }
+.vg-chip.pick { box-shadow: inset 0 0 0 1.5px var(--c); background: color-mix(in srgb, var(--c) 18%, var(--chip)); }
 .vg-chips.done .vg-chip:not(.pick) { opacity: 0.4; }
 .vg-sum { padding: 4px 14px; border-radius: 12px; background: var(--side); margin-left: 40px; width: calc(100% - 40px) !important; }
-.vg-row { display: grid; grid-template-columns: 76px 1fr; padding: 8px 0; font-size: 13.5px; opacity: 0; transform: translateX(-6px); transition: opacity 0.4s, transform 0.4s; }
-.vg-row + .vg-row { border-top: 1px solid rgba(255, 255, 255, 0.07); }
+.vg-row { display: grid; grid-template-columns: 104px 1fr; padding: 8px 0; font-size: 13.5px; opacity: 0; transform: translateX(-6px); transition: opacity 0.4s, transform 0.4s; }
+.vg-row + .vg-row { border-top: 1px solid #2f2e2b; }
 .vg-row span { color: var(--t3); }
 .vg-row.on { opacity: 1; transform: none; }
 
-.vg-btn { width: auto !important; padding: 11px 18px; border-radius: 10px; font-size: 14px; font-weight: 600; transition: transform 0.15s, box-shadow 0.3s; }
+.vg-btn { width: auto !important; padding: 11px 18px; border-radius: 999px; font-size: 14px; font-weight: 600; transition: transform 0.15s, box-shadow 0.3s; }
 .vg-btn--cream { background: var(--cream); color: var(--onc); }
 .vg-btn--blue { background: color-mix(in srgb, #3E9BE0 30%, #262624); color: #d7ebff; box-shadow: inset 0 0 0 1px #3E9BE0; }
 .vg .press { transform: scale(0.94); }
@@ -32,6 +34,14 @@
 .vg-prose { position: relative; padding: 18px 20px 20px; min-height: 190px; }
 .vg-label { display: flex; align-items: center; gap: 8px; color: var(--t3); font-size: 12.5px; font-weight: 600; margin-bottom: 8px; }
 .vg-label i { width: 7px; height: 7px; border-radius: 50%; background: var(--c); }
+/* Artist: 스타일 고르기 4칸 */
+.vg-styles { display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; }
+.vg-style { display: grid; gap: 6px; font-size: 12px; font-weight: 500; color: var(--t1); transition: opacity 0.3s, transform 0.15s; }
+.vg-style i { position: relative; overflow: hidden; aspect-ratio: 4 / 2.8; border-radius: 9px; background: var(--raised); transition: box-shadow 0.3s; }
+.vg-style i svg { position: absolute; inset: 0; width: 100%; height: 100%; }
+.vg-style.pick i { box-shadow: 0 0 0 2px var(--c); }
+.vg-styles.done .vg-style:not(.pick) { opacity: 0.4; }
+.vg-note { font-size: 12px; color: var(--t2); text-align: center; }
 .vg-text { font-size: 15.5px; line-height: 1.85; color: var(--t1); }
 .vg-busy-dot, .busy .vg-text::after { content: ''; display: inline-block; width: 2px; height: 1.1em; margin-left: 2px; vertical-align: -0.15em; background: var(--c); animation: vgBlink 0.8s steps(1) infinite; }
 @keyframes vgBlink { 50% { opacity: 0; } }
@@ -52,35 +62,37 @@
 .vg-pic.on svg.flip { transform: scaleX(-1); }
 
 .vg-cuts { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
-.vg-cut { opacity: 0.25; transition: opacity 0.4s; }
+.vg-cut { padding: 8px; border-radius: 12px; background: var(--side); opacity: 0.25; transition: opacity 0.4s, box-shadow 0.3s; }
+.vg-cut small { display: block; margin-bottom: 6px; font-size: 11px; font-weight: 600; color: var(--t1); }
 .vg-cut.on { opacity: 1; }
 .vg-cut__img { position: relative; overflow: hidden; border-radius: 9px; aspect-ratio: 16 / 9; background: var(--bubble); }
-.vg-cut__img svg { position: absolute; inset: 0; width: 100%; height: 100%; opacity: 0; transition: opacity 0.6s; }
+.vg-cut__img svg { position: absolute; inset: 0; width: 100%; height: 100%; opacity: 0; transition: opacity 0.6s; filter: grayscale(1) contrast(1.25) brightness(1.5); }
 .vg-cut.on .vg-cut__img svg { opacity: 1; }
 .vg-cut p { margin-top: 6px; display: flex; gap: 6px; align-items: center; font-size: 12.5px; color: var(--t2); }
-.vg-cut em { font: 600 11px Inter, sans-serif; font-style: normal; padding: 2px 6px; border-radius: 5px; background: var(--chip); color: var(--t1); }
+.vg-cut em { font-size: 10.5px; font-weight: 500; font-style: normal; padding: 2px 7px; border-radius: 6px; background: #30302e; color: var(--t1); }
 .vg-tag { position: absolute; left: 6px; bottom: 6px; padding: 3px 8px; border-radius: 999px; background: var(--cream); color: var(--onc); font-size: 11px; font-weight: 700; opacity: 0; transition: opacity 0.3s; }
-.vg-cut.hot .vg-cut__img { box-shadow: 0 0 0 2px var(--c); }
+.vg-cut.hot { box-shadow: inset 0 0 0 1.5px var(--c); }
 .vg-cut.hot .vg-tag { opacity: 1; }
 
 .vg-nodes { position: relative; display: grid; grid-template-columns: 1fr 1fr; gap: 56px; }
 .vg-line { position: absolute; left: calc(50% - 56px); width: 56px !important; top: 50%; height: 40px; margin-top: -20px; overflow: visible; }
-.vg-line path { fill: none; stroke: #3E9BE0; stroke-width: 2.5; stroke-dasharray: 6 6; vector-effect: non-scaling-stroke; opacity: 0.4; }
+.vg-line path { fill: none; stroke: #3e9be0; stroke-width: 2; stroke-dasharray: 4 4; vector-effect: non-scaling-stroke; opacity: 0.5; }
 .go .vg-line path { opacity: 1; animation: vgFlow 0.8s linear infinite; }
 .fin .vg-line path { animation: none; stroke-dasharray: none; }
 @keyframes vgFlow { to { stroke-dashoffset: -24; } }
-.vg-node { padding: 10px; border-radius: 12px; background: var(--side); box-shadow: 0 0 0 1px rgba(255, 255, 255, 0.08); transition: box-shadow 0.4s; }
+.vg-node { padding: 10px; border-radius: 12px; background: #262624; box-shadow: 0 0 0 1px #3a3936; transition: box-shadow 0.4s; }
 .go .vg-node--vid { box-shadow: 0 0 0 1.5px #3E9BE0, 0 12px 30px -10px rgba(62, 155, 224, 0.6); }
-.fin .vg-node--vid { box-shadow: 0 0 0 1px rgba(255, 255, 255, 0.08); }
-.vg-node small { display: block; font-size: 11px; color: var(--t3); }
+.fin .vg-node--vid { box-shadow: 0 0 0 1px #3a3936; }
+.vg-node small { display: block; font-size: 10.5px; color: var(--t3); }
+.vg-node small::before { content: '● '; font-size: 7px; vertical-align: 2px; }
 .vg-node b { display: flex; gap: 6px; align-items: center; margin: 3px 0 8px; font-size: 13.5px; }
-.vg-node b em { font: 600 11px Inter, sans-serif; font-style: normal; padding: 2px 6px; border-radius: 5px; background: var(--chip); color: var(--t2); }
-.vg-node__img { position: relative; overflow: hidden; border-radius: 8px; aspect-ratio: 16 / 10; background: var(--bubble); }
+.vg-node b em { font-size: 10.5px; font-weight: 500; font-style: normal; padding: 2px 6px; border-radius: 5px; background: #30302e; color: var(--t2); }
+.vg-node__img { position: relative; overflow: hidden; border-radius: 8px; aspect-ratio: 16 / 9; background: var(--raised); }
 .vg-node__img svg { position: absolute; inset: 0; width: 100%; height: 100%; }
-.vg-ok { margin-top: 8px; font-size: 11.5px; font-weight: 600; color: #5fcf8f; }
-.vg-load { display: none; gap: 8px; align-content: center; aspect-ratio: 16 / 10; padding: 0 4px; text-align: center; font-size: 12.5px; }
+.vg-ok { margin-top: 8px; font-size: 11px; font-weight: 600; color: var(--ok); }
+.vg-load { display: none; gap: 8px; align-content: center; aspect-ratio: 16 / 9; padding: 0 4px; text-align: center; font-size: 12.5px; }
 .vg-load span { font-size: 11px; color: var(--t3); }
-.vg-prog { height: 4px; border-radius: 4px; background: var(--chip); overflow: hidden; }
+.vg-prog { height: 4px; border-radius: 4px; background: rgba(255, 255, 255, 0.08); overflow: hidden; }
 .vg-prog i { display: block; width: 0; height: 100%; background: #3E9BE0; }
 .vg-done { display: block; }
 .vg-view[data-v='director'] .vg-done { opacity: 0.25; }
@@ -91,11 +103,11 @@
 .vg-play { position: absolute; left: 50%; top: 50%; width: 34px; height: 34px; margin: -17px; border-radius: 50%; background: rgba(255, 255, 255, 0.9); }
 .vg-play::after { content: ''; position: absolute; left: 13px; top: 10px; border-left: 11px solid #141312; border-top: 7px solid transparent; border-bottom: 7px solid transparent; }
 
-.vg-player { position: relative; overflow: hidden; border-radius: 12px; aspect-ratio: 16 / 8.4; background: #0b0f1c; }
+.vg-player { position: relative; overflow: hidden; border-radius: 12px; aspect-ratio: 16 / 9; background: #0b0f1c; }
 .vg-player svg { position: absolute; inset: 0; width: 100%; height: 100%; }
 .vg-time { position: absolute; right: 10px; bottom: 8px; padding: 3px 8px; border-radius: 6px; background: rgba(0, 0, 0, 0.6); font: 600 11.5px Inter, sans-serif; }
 .vg-tl { position: relative; display: flex; gap: 4px; height: 48px; padding: 6px; border-radius: 10px; background: var(--side); }
-.vg-tl i { position: relative; overflow: hidden; border-radius: 6px; }
+.vg-tl i { position: relative; overflow: hidden; border-radius: 6px; background: color-mix(in srgb, #2db39a 30%, #30302e); }
 .vg-tl i svg { position: absolute; inset: 0; width: 100%; height: 100%; opacity: 0.7; }
 .vg-head { position: absolute; top: 2px; bottom: 2px; left: 6px; width: 2px; border-radius: 2px; background: var(--cream); box-shadow: 0 0 10px rgba(255, 255, 255, 0.6); }
 .vg-foot { display: flex; align-items: center; gap: 12px; }
@@ -125,7 +137,7 @@
 .vg-cmp__h { display: flex; justify-content: space-between; font-size: 13.5px; font-weight: 700; margin-bottom: 10px; }
 .vg-cmp__h span { color: var(--t3); font-weight: 500; font-size: 12px; }
 .vg-vids { display: grid; grid-template-columns: repeat(4, 1fr); gap: 6px; }
-.vg-vids i { position: relative; overflow: hidden; aspect-ratio: 16 / 10; border-radius: 7px; background: var(--bubble); opacity: .25; transition: opacity .3s; }
+.vg-vids i { position: relative; overflow: hidden; aspect-ratio: 16 / 9; border-radius: 7px; background: var(--bubble); opacity: .25; transition: opacity .3s; }
 .vg-vids i.on { opacity: 1; }
 .vg-vids i svg { position: absolute; inset: 0; width: 100%; height: 100%; }
 .vg-cmp--bad .vg-vids i.on::after { content: '다시'; position: absolute; left: 5px; bottom: 5px; padding: 1px 6px; border-radius: 999px; background: rgba(0, 0, 0, .6); font-size: 10.5px; font-weight: 600; }
@@ -134,4 +146,5 @@
 .vg-vids i.redo.on { box-shadow: 0 0 0 2px var(--c); }
 .vg-take { margin-top: 10px; font-size: 13px; color: var(--t2); }
 .vg-take b { font: 800 22px Inter, sans-serif; color: var(--t1); margin-right: 2px; }
-.x .vg-take b { color: var(--t3); text-decoration: line-through; text-decoration-color: #E8606F; text-decoration-thickness: 3px; }
+.x .vg-take b { color: var(--t3); text-decoration: line-through; text-decoration-color: #e8606f; text-decoration-thickness: 3px; }
+.vg-vids--sb i svg { filter: grayscale(1) contrast(1.25) brightness(1.5); }

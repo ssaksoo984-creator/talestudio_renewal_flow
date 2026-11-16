@@ -868,3 +868,10 @@ h2 { font-size: clamp(32px, 4.6vw, 48px); line-height: 1.2; font-weight: 700; le
 .glass.on i::after { content: ''; position: absolute; inset: 0; background: var(--c); transform-origin: left; animation: tabfill 9s linear forwards; }
 @media (max-width: 560px) { .glass { height: 50px; padding-right: 16px; } .glass small { display: none; } .glass img { width: 32px; } }
 .six--why .six__item h3 { font-family: var(--font); }
+/* 유리 버튼: 시뮬레이션 위, 한 줄 */
+.glass-tabs { margin: 0 0 20px; }
+.glass-row { flex-wrap: nowrap; gap: 8px; overflow-x: auto; scrollbar-width: none; max-width: 100%; padding: 4px; }
+.glass-row::-webkit-scrollbar { display: none; }
+.glass { height: 52px; padding: 0 20px 0 8px; flex: none; }
+.glass img { width: 36px; }
+@media (max-width: 760px) { .glass-row { justify-content: flex-start; } .glass { height: 46px; padding-right: 14px; } .glass img { width: 28px; } .glass b { font-size: 13px; } }

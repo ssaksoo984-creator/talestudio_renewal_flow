@@ -111,6 +111,7 @@ function template() {
   </section>
 
   <aside class="sim-chat"><div class="sim-chat__head"><img src="${lumiSrc}" alt="" /><b class="sim-chat__title">Lumi와 산문 쓰기</b><span>»</span></div><div class="sim-chat__log"></div>${input('예) 다시 써 줘, 결말을 더 웃기게')}<div class="sim-chat__foot"><span class="sim-chat__stage"></span></div></aside>
+  <div class="sim-busy"><div class="sim-busy__card"><img src="${lw}" alt="" /><p class="sim-busy__h">산문 초안을 쓰고 있어요</p><p class="sim-busy__s">AI가 작업하는 동안 화면과 채팅이 잠겨요. 끝나면 고칠 수 있어요.</p><ul><li>재료 정리하기</li><li>이야기 뼈대</li><li>장면별 이야기 쓰기</li></ul></div></div>
   <svg class="sim-cursor" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 2l16 9.5-7 1.6L9.5 20z" fill="#fff" stroke="#141312" stroke-width="1.4" stroke-linejoin="round"/></svg>
 </div>`
 }
@@ -134,8 +135,8 @@ export function createSim(host, { loop = false, onStep, last = 'editor' } = {}) 
   }
   const move = async (el, fx, fy) => { const [x, y] = pos(el, fx, fy); cursor.style.left = x + 'px'; cursor.style.top = y + 'px'; await sleep(750) }
   const click = async (el, fx, fy) => { await move(el, fx, fy); cursor.classList.add('press'); el.classList.add('press'); await sleep(160); cursor.classList.remove('press'); el.classList.remove('press'); await sleep(120) }
-  const type = async (inp, text, alive) => { const b = inp.querySelector('b'); inp.querySelector('.ph').hidden = true; inp.classList.add('ready'); for (let i = 1; i <= text.length && alive(); i++) { b.textContent = text.slice(0, i); await sleep(55) } }
-  const clearInput = (inp) => { inp.querySelector('b').textContent = ''; inp.querySelector('.ph').hidden = false; inp.classList.remove('ready') }
+  const type = async (inp, text, alive) => { const b = inp.querySelector(':scope > b'); inp.querySelector('.ph').hidden = true; inp.classList.add('ready'); for (let i = 1; i <= text.length && alive(); i++) { b.textContent = text.slice(0, i); await sleep(55) } }
+  const clearInput = (inp) => { inp.querySelector(':scope > b').textContent = ''; inp.querySelector('.ph').hidden = false; inp.classList.remove('ready') }
   const add = (log, html) => { log.insertAdjacentHTML('beforeend', html); return log.lastElementChild }
   const think = async (log, ms = 900, center) => { const d = add(log, `<div class="sim-msg${center ? ' sim-msg--c' : ''}"><span class="sim-msg__av"><img src="${lumiSrc}" alt="" /></span><div><span class="sim-dots"><i></i><i></i><i></i></span></div></div>`); await sleep(ms); d.remove() }
   const ask = (k) => $$('.sim-set span').forEach((s) => s.classList.toggle('ask', s.dataset.q === k))
@@ -172,6 +173,7 @@ export function createSim(host, { loop = false, onStep, last = 'editor' } = {}) 
     $$('.sim-card').forEach((c) => c.classList.remove('on', 'redo', 'drawing'))
     $$('.sim-styles__c').forEach((c) => c.classList.remove('pick'))
     $$('.sim-modal').forEach((m) => m.classList.remove('on'))
+    $$('.sim-attach').forEach((a) => a.remove()); $$('.has-attach').forEach((a) => a.classList.remove('has-attach')); $('.sim-busy').classList.remove('on')
     $$('.sim-node').forEach((n) => n.classList.remove('on', 'done', 'hot'))
     $$('.sim-board path').forEach((p) => p.classList.remove('on'))
     $('.sim-prog i').style.width = '0'
@@ -210,7 +212,11 @@ export function createSim(host, { loop = false, onStep, last = 'editor' } = {}) 
       const sum = add(log, msg('이렇게 시작할게요.<div class="sim-sum"><div><span>🔒 화면 비율</span>16:9 · 시작하면 못 바꿔요</div><div><span>장르와 분위기</span>로맨스</div><div><span>길이</span>15초 이하</div><div><span>바꿀 정도</span>2 다듬기 · 재료는 두고 문장만 고쳐요</div></div><div class="sim-sum-btns"><span class="sim-btn sim-btn--cream">네, 산문 쓰기</span><span class="sim-btn">아니요, 더 고칠래요</span></div>', true))
       await sleep(1200); if (!alive()) return
       await click(sum.querySelector('.sim-btn--cream'))
-      await sleep(400)
+      const busy = $('.sim-busy'); busy.classList.add('on')
+      for (const li of busy.querySelectorAll('li')) { await sleep(650); if (!alive()) return; li.classList.add('on') }
+      await sleep(500); busy.classList.remove('on')
+      busy.querySelectorAll('li').forEach((l) => l.classList.remove('on'))
+      await sleep(200)
     },
     async writer(alive) {
       const log = $('.sim-chat__log'), inp = $('.sim-chat .sim-input')
@@ -218,8 +224,11 @@ export function createSim(host, { loop = false, onStep, last = 'editor' } = {}) 
       add(log, msg('산문을 장면 2개로 썼어요. 마음에 안 들면 "다시 써 줘"라고 하거나 조건을 바꿔 주세요.'))
       await sleep(800); if (!alive()) return
       const p2 = $('.sim-para[data-i="1"]'); await click(p2, 0.3, 0.5); p2.classList.add('sel')
-      await click(inp, 0.3); await type(inp, '조금 더 설레게', alive); if (!alive()) return
-      await click(inp.querySelector('.sim-input__send')); clearInput(inp)
+      const att = document.createElement('span'); att.className = 'sim-attach'
+      att.innerHTML = `<b>S2</b>${p2.querySelector('.sim-para__t').textContent.trim().slice(0, 40)}…<i>✕</i>`
+      inp.prepend(att); inp.classList.add('has-attach')
+      await sleep(500); await click(inp, 0.4, 0.8); await type(inp, '조금 더 설레게', alive); if (!alive()) return
+      await click(inp.querySelector('.sim-input__send')); clearInput(inp); att.remove(); inp.classList.remove('has-attach')
       add(log, `<p class="sim-me">S2 조금 더 설레게</p>`)
       await think(log, 1100); if (!alive()) return
       const fix = document.createElement('div'); fix.className = 'sim-fix'

@@ -263,3 +263,23 @@
 @keyframes simRip { from { opacity: 1; transform: scale(.4); } to { opacity: 0; transform: scale(1.6); } }
 
 @media (prefers-reduced-motion: reduce) { .sim * { animation: none !important; transition: none !important; } }
+
+/* 산문 초안 로딩 (화면 잠금) */
+.sim-busy { position: absolute; inset: 0; z-index: 10; display: grid; place-items: center; background: rgba(20, 19, 18, .62); opacity: 0; transition: opacity .35s; pointer-events: none; }
+.sim-busy.on { opacity: 1; }
+.sim-busy__card { width: 360px; padding: 28px 30px 26px; border-radius: 22px; background: var(--side); box-shadow: 0 0 0 1px var(--line), 0 40px 90px -20px rgba(0, 0, 0, .8); text-align: center; transform: translateY(10px) scale(.98); transition: transform .4s; }
+.sim-busy.on .sim-busy__card { transform: none; }
+.sim-busy__card img { width: 96px; margin: 0 auto 12px; display: block; animation: lumiBob 2.6s ease-in-out infinite; }
+.sim-busy__h { font: 700 17px Pretendard, sans-serif; }
+.sim-busy__s { margin-top: 6px !important; font: 400 12.5px/1.5 Pretendard, sans-serif; color: var(--t2); }
+.sim-busy ul { margin: 18px 0 0; padding: 0 0 0 22px; list-style: none; text-align: left; display: grid; gap: 9px; }
+.sim-busy li { position: relative; font: 500 13px Pretendard, sans-serif; color: var(--t3); transition: color .3s; }
+.sim-busy li::before { content: ''; position: absolute; left: -20px; top: 4px; width: 10px; height: 10px; border-radius: 50%; box-shadow: inset 0 0 0 1.5px var(--t3); transition: background-color .3s, box-shadow .3s; }
+.sim-busy li.on { color: var(--t1); }
+.sim-busy li.on::before { background: var(--stage); box-shadow: none; }
+
+/* 고른 문단이 입력창에 붙어요 */
+.sim-input.has-attach { flex-wrap: wrap; height: auto; padding-top: 8px; padding-bottom: 8px; box-shadow: inset 0 0 0 1.5px var(--stage); }
+.sim-attach { flex-basis: 100%; display: flex; align-items: center; gap: 8px; padding: 8px 10px; border-radius: 10px; background: var(--chip); color: var(--t2); font: 400 12px/1.4 Pretendard, sans-serif; white-space: nowrap; overflow: hidden; animation: simIn .35s both; }
+.sim-attach b { color: var(--stage); font: 600 11.5px Inter, sans-serif; }
+.sim-attach i { margin-left: auto; font-style: normal; color: var(--t3); }

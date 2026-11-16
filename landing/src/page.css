@@ -875,3 +875,15 @@ h2 { font-size: clamp(32px, 4.6vw, 48px); line-height: 1.2; font-weight: 700; le
 .glass { height: 52px; padding: 0 20px 0 8px; flex: none; }
 .glass img { width: 36px; }
 @media (max-width: 760px) { .glass-row { justify-content: flex-start; } .glass { height: 46px; padding-right: 14px; } .glass img { width: 28px; } .glass b { font-size: 13px; } }
+
+/* 유리 버튼 v2: 양옆 여백 2배 · Lumi 0.7배 · 밑줄 없음 · 켜짐/꺼짐 대비 */
+.glass { padding: 0 40px 0 16px; gap: 8px; }
+.glass img { width: 25px; }
+.glass i { display: none; }
+.glass:not(.on) { opacity: .55; filter: saturate(.4); }
+.glass:not(.on) b { font-weight: 600; }
+.glass:not(.on):hover { opacity: .85; filter: none; }
+.glass.on { opacity: 1; filter: none; background: color-mix(in srgb, var(--c) 22%, rgba(255,255,255,.08)); }
+:root[data-theme='light'] .glass.on { background: color-mix(in srgb, var(--c) 16%, #fff); }
+.glass.on b { color: var(--text); }
+@media (max-width: 760px) { .glass { padding: 0 24px 0 12px; } .glass img { width: 22px; } }

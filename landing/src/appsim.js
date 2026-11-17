@@ -120,14 +120,8 @@ function template() {
       <span class="dn-bar__end"><span class="dn-toggle"><i></i>영상도 만들기</span><span class="dn-pill dn-pill--off">이미지 만들기 · 0</span><span class="dn-pill dn-pill--go" data-make>▶ 영상 만들기 · <span data-k="vids">4</span></span></span>
       <small class="dn-hint">모든 샷에 이미지가 있어요 · <span data-k="hint">영상을 만들 수 있어요</span></small></div>
     <div class="dn-board">
-      <svg class="dn-lines" viewBox="0 0 1316 640" preserveAspectRatio="none">
-        <path d="M200 70 C245 70 245 60 290 60"/><path d="M200 300 C245 300 245 90 290 90"/><path d="M200 520 C245 520 250 120 290 120"/>
-        <path d="M200 70 C245 70 245 370 290 370"/><path d="M200 300 C245 300 245 400 290 400"/><path d="M200 520 C245 520 245 430 290 430"/>
-        <path d="M520 60 C540 60 540 60 560 60"/><path d="M520 370 C540 370 540 370 560 370"/>
-        <path d="M760 60 C790 60 790 60 820 60"/><path d="M760 370 C790 370 790 370 820 370"/>
-        <path d="M1050 60 C1070 60 1070 60 1090 60"/><path d="M1050 370 C1070 370 1070 370 1090 370"/>
-      </svg>
-      ${[['서윤', '인물', '128 76 40 53', 0], ['도현', '인물', '150 72 40 53', 230], ['외곽 버스 정류장', '배경', '40 30 240 135', 460]].map(([n, k, vb, y]) => `<div class="dn-node dn-node--asset" style="left:10px;top:${y}px"><p class="dn-node__h"><i></i>이미지<span>⤢ 자세히 ···</span></p><b>${n}<em>${k}</em></b><div class="dn-img">${shot(vb)}</div><small>GPT Image 2</small></div>`).join('')}
+      <svg class="dn-lines"></svg>
+      ${[['서윤', '인물', 'sheet-seoyun', 0], ['도현', '인물', 'sheet-dohyun', 230], ['외곽 버스 정류장', '배경', '40 30 240 135', 460]].map(([n, k, vb, y]) => `<div class="dn-node dn-node--asset" style="left:10px;top:${y}px"><p class="dn-node__h"><i></i>이미지<span>⤢ 자세히 ···</span></p><b>${n}<em>${k}</em></b><div class="dn-img">${shot(vb)}</div><small>GPT Image 2</small></div>`).join('')}
       ${[[1, 'MS', '어두운 외곽 버스 정류장, 막차가 떠나고 서윤 혼자 지붕 끝에…', '0 0 320 180', 290, 560, 0, '0:04'], [3, 'CU', '같은 회사 신입이라는 걸 알아채는 서윤의 얼굴, 노란 가로등…', '128 79 46 25.9', 820, 1090, 0, '0:03'],
          [2, 'MS', '도현이 말없이 투명 비닐우산을 서윤 쪽으로 기울여 준다…', '112 66 96 54', 290, 560, 310, '0:04'], [4, '2S', '뒤에서 본 투샷, 우산 하나 아래 나란히 선 두 사람…', '118 58 120 67.5', 820, 1090, 310, '0:04']]
         .map(([n, t, d, vb, xi, xv, y, len]) => `<div class="dn-node dn-node--img" data-shot="${n}" style="left:${xi}px;top:${y}px"><p class="dn-node__h"><i></i>이미지<span>⤢ 자세히 ···</span></p><b>샷 ${n}<em>${t}</em></b><p class="dn-desc">${d}</p><div class="dn-img">${shot(vb)}<span class="dn-live">실사</span></div><p class="dn-state"><i></i><span>이미지 완료</span></p></div>
@@ -180,6 +174,28 @@ export function createSim(host, { loop = false, onStep, last = 'editor' } = {}) 
   const think = async (log, ms = 900, center) => { const d = add(log, `<div class="sim-msg${center ? ' sim-msg--c' : ''}"><span class="sim-msg__av"><img src="${stageLumi}" alt="" /></span><div><span class="sim-dots"><i></i><i></i><i></i></span></div></div>`); await sleep(ms); d.remove() }
   const ask = (k) => $$('.sim-set span').forEach((s) => s.classList.toggle('ask', s.dataset.q === k))
 
+
+  // Director 노드 연결선: 노드의 실제 자리를 재서 그려요 (끊기지 않게)
+  function drawDn() {
+    const board = $('.dn-board'), svg = $('.dn-lines')
+    if (!board || !svg) return
+    const W = board.offsetWidth, H = board.offsetHeight
+    svg.setAttribute('viewBox', `0 0 ${W} ${H}`)
+    const box = (el) => ({ l: el.offsetLeft, r: el.offsetLeft + el.offsetWidth, y: el.offsetTop + 48, t: el.offsetTop, h: el.offsetHeight })
+    const curve = (x1, y1, x2, y2, cls = '') => { const dx = Math.max(24, (x2 - x1) * 0.5); return `<path class="${cls}" d="M${x1} ${y1} C${x1 + dx} ${y1}, ${x2 - dx} ${y2}, ${x2} ${y2}"/>` }
+    const assets = $$('.dn-node--asset').map(box)
+    const img = (n) => box($(`[data-shot="${n}"]`)), vid = (n) => box($(`[data-vid="${n}"]`))
+    let d = ''
+    // 인물 · 배경 → 샷 1 · 2 이미지
+    for (const n of [1, 2]) { const i = img(n); assets.forEach((a, k) => { d += curve(a.r, a.t + a.h / 2, i.l, i.y + 10 + k * 14, 'a') }) }
+    // 이미지 → 영상
+    for (const n of [1, 2, 3, 4]) { const i = img(n), v = vid(n); d += curve(i.r, i.y, v.l, v.y, 'iv') }
+    // 영상 1 → 샷 3 이미지, 영상 2 → 샷 4 이미지 (이전 영상)
+    for (const [v, n] of [[1, 3], [2, 4]]) { const a = vid(v), b = img(n); d += curve(a.r, a.y, b.l, b.y, 'prev') }
+    // 인물 → 샷 3 · 4 이미지 (점선, 위로 지나가요)
+    for (const n of [3, 4]) { const i = img(n); assets.slice(0, 2).forEach((a, k) => { d += curve(a.r, a.t + a.h / 2, i.l, i.y + 24 + k * 14, 'a far') }) }
+    svg.innerHTML = d
+  }
   function setStep(s) {
     stageLumi = LUMI[s] || lumiSrc
     host.dataset.s = s
@@ -198,6 +214,7 @@ export function createSim(host, { loop = false, onStep, last = 'editor' } = {}) 
       editor: '<span class="sim-btn">마스터 시트</span><span class="sim-btn sim-btn--cream" data-go>내보내기</span>',
     }
     $('.sim-btns').innerHTML = btns[s] || '<span class="sim-seg sim-seg--top"><span>화면에서 고르기</span><span class="on">채팅으로 만들기</span></span>'
+    if (s === 'director') requestAnimationFrame(drawDn)
     onStep?.(s)
   }
 

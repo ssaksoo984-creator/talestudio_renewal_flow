@@ -30,6 +30,8 @@ const svg = (src, vb = `0 0 ${W} ${H}`) =>
 
 /** kind: 'real'(실사 컷, 기본) | 'rough'(러프 콘티) */
 export function shot(vb, flip, kind = 'real') {
+  if (vb === 'sheet-seoyun') return svg(a1)
+  if (vb === 'sheet-dohyun') return svg(a2)
   if (SHEET[vb]) {
     const [src, crop] = SHEET[vb]
     // 뒤집힌 쪽은 시트의 뒷모습 자리

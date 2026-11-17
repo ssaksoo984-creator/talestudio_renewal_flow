@@ -368,3 +368,11 @@
 .sim-modal--style .sim-styles__c:nth-child(n+9) { display: none; }
 .sim-modal--style .sim-modal__f { text-align: left; }
 .sim-modal__btns { display: flex; gap: 8px; }
+
+/* Director 연결선: 재서 그린 선 */
+.dn-lines { left: 0; top: 0; width: 100%; height: 100%; overflow: visible; pointer-events: none; }
+.dn-lines path { fill: none; stroke: rgba(255, 255, 255, .26); stroke-width: 1.3; stroke-dasharray: 3 4; }
+.dn-lines path.iv, .dn-lines path.prev { stroke: rgba(255, 255, 255, .34); }
+.dn-lines path.far { stroke: rgba(255, 255, 255, .14); }
+/* 서윤 · 도현: 인물 시트 전체가 보이게 */
+.dn-node--asset .dn-img { aspect-ratio: 16 / 9; background: #f4f3ef; }

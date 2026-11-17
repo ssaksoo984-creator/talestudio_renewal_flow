@@ -73,17 +73,17 @@ new IntersectionObserver((es) => es.forEach((e) => {
 const burst = document.getElementById('burst')
 const STAR = ['#F2A33A', '#E8606F', '#8B63E8', '#5A6AE6', '#3E9BE0', '#2DB39A']
 let bursting = 0
-const pop = (keep: boolean) => {
+const pop = () => {
   if (!burst) return
-  const s = document.createElement('span')
-  s.style.cssText = `left:${5 + Math.random() * 90}%;top:${8 + Math.random() * 84}%;--c:${STAR[Math.floor(Math.random() * 6)]};--z:${18 + Math.random() * 26};--d:${(2.2 + Math.random() * 1.6).toFixed(2)}s`
-  s.className = keep ? 'keep' : ''
-  burst.append(s)
-  if (!keep) setTimeout(() => s.remove(), 4200)
+  const c = STAR[Math.floor(Math.random() * 6)]
+  const fw = document.createElement('span')
+  fw.className = 'fw'
+  fw.style.cssText = `left:${8 + Math.random() * 84}%;top:${18 + Math.random() * 64}%;--c:${c};--s:${(0.7 + Math.random() * 0.6).toFixed(2)}`
+  fw.innerHTML = '<b></b>' + Array.from({ length: 10 }, (_, i) => `<i style="--a:${i * 36 + Math.random() * 14}deg;--d:${50 + Math.random() * 40}px"></i>`).join('')
+  burst.append(fw)
+  setTimeout(() => fw.remove(), 2600)
 }
 if (burst) new IntersectionObserver((es) => es.forEach((e) => {
-  if (e.isIntersecting && !bursting) {
-    if (!burst.childElementCount) for (let i = 0; i < 14; i++) setTimeout(() => pop(true), i * 160)
-    bursting = window.setInterval(() => pop(false), 700)
-  } else if (!e.isIntersecting && bursting) { clearInterval(bursting); bursting = 0 }
+  if (e.isIntersecting && !bursting) { pop(); bursting = window.setInterval(pop, 650) }
+  else if (!e.isIntersecting && bursting) { clearInterval(bursting); bursting = 0 }
 }), { threshold: 0.2 }).observe(burst.parentElement!)

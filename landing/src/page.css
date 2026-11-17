@@ -915,3 +915,20 @@ h2 { font-size: clamp(32px, 4.6vw, 48px); line-height: 1.2; font-weight: 700; le
 /* 유리 버튼: 양쪽 여백 같게 */
 .glass { padding: 0 28px 0 22px; }
 @media (max-width: 760px) { .glass { padding: 0 18px 0 14px; } }
+
+/* ===== v11: 마지막 구간 폭죽 (경계선 없음 · 터지고 사라짐 · 낮은 채도) ===== */
+.finale { overflow: visible; overflow-x: clip; }
+.burst { inset: -80px 0; -webkit-mask-image: linear-gradient(transparent, #000 22%, #000 78%, transparent); mask-image: linear-gradient(transparent, #000 22%, #000 78%, transparent); }
+.burst span.fw { position: absolute; width: 0; height: 0; animation: none; background: none; box-shadow: none; margin: 0; transform: scale(var(--s)); }
+.fw b { position: absolute; left: -110px; top: -110px; width: 220px; height: 220px; border-radius: 50%; background: radial-gradient(closest-side, color-mix(in srgb, var(--c) 70%, transparent), transparent); opacity: 0; animation: fwGlow 2.4s ease-out forwards; }
+.fw i { position: absolute; left: -2px; top: -2px; width: 4px; height: 4px; border-radius: 50%; background: var(--c); box-shadow: 0 0 6px var(--c); opacity: 0; transform: rotate(var(--a)) translateX(0); animation: fwSpark 1.6s cubic-bezier(.15, .7, .3, 1) .15s forwards; }
+@keyframes fwGlow { 0% { opacity: 0; transform: scale(.1); } 20% { opacity: var(--fw-o, .22); } 100% { opacity: 0; transform: scale(1.3); } }
+@keyframes fwSpark { 0% { opacity: 0; transform: rotate(var(--a)) translateX(0); } 15% { opacity: .9; } 100% { opacity: 0; transform: rotate(var(--a)) translateX(var(--d)); } }
+:root[data-theme='light'] .fw { --fw-o: .14; }
+:root[data-theme='light'] .fw i { box-shadow: none; opacity: 0; }
+@media (prefers-reduced-motion: reduce) { .fw { display: none; } }
+
+/* 첫 화면 입력창 (Figma 히어로 형식 아래) */
+.hero--v3 .prompt { margin-top: 40px; }
+.hero__link { margin-top: 22px; color: var(--text-3); font-size: 15px; font-weight: 600; }
+.hero__link:hover { color: var(--text); }

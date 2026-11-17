@@ -21,6 +21,8 @@ import st10 from '../assets/styles/style-10.webp'
 import st11 from '../assets/styles/style-11.webp'
 import st12 from '../assets/styles/style-12.webp'
 import laSrc from '../assets/lumi-artist.webp'
+import lcSrc from '../assets/lumi-complete.webp'
+let stageLumi = lumiSrc
 import icProducer from '../assets/icons/producer.svg'
 import icWriter from '../assets/icons/writer.svg'
 import icArtist from '../assets/icons/artist.svg'
@@ -59,7 +61,7 @@ const CUTS = [
   ['118 58 120 67.5', '2S', '씬 2 · 샷 4', 4, '우산 하나 아래 나란히, 뒤에서', true],
 ]
 
-const msg = (html, center) => `<div class="sim-msg${center ? ' sim-msg--c' : ''}"><span class="sim-msg__av"><img src="${lumiSrc}" alt="" /></span><div class="sim-bub"><p class="sim-msg__name">Lumi</p>${html}</div></div>`
+const msg = (html, center) => `<div class="sim-msg${center ? ' sim-msg--c' : ''}"><span class="sim-msg__av"><img src="${stageLumi}" alt="" /></span><div class="sim-bub"><p class="sim-msg__name">Lumi</p>${html}</div></div>`
 const input = (ph, plus) => `<div class="sim-input">${plus ? '<span class="sim-input__plus">+</span>' : ''}<span class="ph">${ph}</span><b></b><span class="sim-input__send">↑</span></div>`
 const pick = (cards) => `<div class="sim-pick">${cards.map(([t, d, rec]) => `<span class="sim-pick__c${rec ? ' rec' : ''}"><b>${t}</b><small>${d}</small>${rec ? '<em>추천</em>' : ''}</span>`).join('')}</div>`
 
@@ -147,7 +149,7 @@ function template() {
     </div>
   </section>
 
-  <aside class="sim-chat"><div class="sim-chat__head"><img src="${lumiSrc}" alt="" /><b class="sim-chat__title">Lumi와 산문 쓰기</b><span>»</span></div><div class="sim-chat__log"></div>${input('예) 다시 써 줘, 결말을 더 웃기게')}<div class="sim-chat__foot"><span class="sim-chat__stage"></span></div></aside>
+  <aside class="sim-chat"><div class="sim-chat__head"><img src="${lcSrc}" alt="" /><b class="sim-chat__title">Lumi와 산문 쓰기</b><span>»</span></div><div class="sim-chat__log"></div>${input('예) 다시 써 줘, 결말을 더 웃기게')}<div class="sim-chat__foot"><span class="sim-chat__stage"></span></div></aside>
   <div class="sim-busy"><div class="sim-busy__card"><img src="${lwLoad}" alt="" /><p class="sim-busy__h">산문 초안을 쓰고 있어요</p><p class="sim-busy__s">AI가 작업하는 동안 화면과 채팅이 잠겨요. 끝나면 고칠 수 있어요.</p><ul><li>재료 정리하기</li><li>이야기 뼈대</li><li>장면별 이야기 쓰기</li></ul></div></div>
   <svg class="sim-cursor" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 2l16 9.5-7 1.6L9.5 20z" fill="#fff" stroke="#141312" stroke-width="1.4" stroke-linejoin="round"/></svg>
 </div>`
@@ -175,10 +177,11 @@ export function createSim(host, { loop = false, onStep, last = 'editor' } = {}) 
   const type = async (inp, text, alive) => { const b = inp.querySelector(':scope > b'); inp.querySelector('.ph').hidden = true; inp.classList.add('ready'); for (let i = 1; i <= text.length && alive(); i++) { b.textContent = text.slice(0, i); await sleep(55) } }
   const clearInput = (inp) => { inp.querySelector(':scope > b').textContent = ''; inp.querySelector('.ph').hidden = false; inp.classList.remove('ready') }
   const add = (log, html) => { log.insertAdjacentHTML('beforeend', html); return log.lastElementChild }
-  const think = async (log, ms = 900, center) => { const d = add(log, `<div class="sim-msg${center ? ' sim-msg--c' : ''}"><span class="sim-msg__av"><img src="${lumiSrc}" alt="" /></span><div><span class="sim-dots"><i></i><i></i><i></i></span></div></div>`); await sleep(ms); d.remove() }
+  const think = async (log, ms = 900, center) => { const d = add(log, `<div class="sim-msg${center ? ' sim-msg--c' : ''}"><span class="sim-msg__av"><img src="${stageLumi}" alt="" /></span><div><span class="sim-dots"><i></i><i></i><i></i></span></div></div>`); await sleep(ms); d.remove() }
   const ask = (k) => $$('.sim-set span').forEach((s) => s.classList.toggle('ask', s.dataset.q === k))
 
   function setStep(s) {
+    stageLumi = LUMI[s] || lumiSrc
     host.dataset.s = s
     $('.sim-badge').textContent = NAMES[s]
     const at = STEPS.indexOf(s)

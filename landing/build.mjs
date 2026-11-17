@@ -9,7 +9,7 @@ const LINKS = {}
 const LUMI = readFileSync('vendor/lumi-persona.js', 'utf8').replace(/<\/script/gi, '<\\/script')
 
 for (const [page, out] of Object.entries(pages)) {
-  execSync('npx vite build', { stdio: 'inherit', env: { ...process.env, PAGE: page } })
+  execSync('npx vite build', { stdio: 'inherit', env: { ...process.env, PAGE: page, SINGLE: '1' } })
   const dir = `build/${page}`
   let html = readFileSync(join(dir, `${page}.html`), 'utf8')
   for (const f of readdirSync(join(dir, 'assets'))) {

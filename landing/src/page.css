@@ -1099,3 +1099,36 @@ main :where(p, li, small, summary, .sec-sub, .six__d):not(:where(.sim *, .vg *, 
 :root[data-theme='light'] .six__cmp .cmp { background: #fff; box-shadow: 0 1px 0 rgba(20, 19, 18, .04), 0 0 0 1px rgba(20, 19, 18, .06); }
 .six__cmp .cmp__note { display: none; }
 .six__cmp { gap: 8px; }
+/* ===== 서비스 · 채팅으로 기획: 실제 채팅 패널처럼 ===== */
+.cp { margin-top: auto; display: grid; gap: 12px; padding: 16px; border-radius: 20px; background: var(--bg-2); box-shadow: inset 0 0 0 1px var(--line, rgba(255,255,255,.06)); }
+:root[data-theme='light'] .cp { background: var(--bg); }
+.cp__log { display: grid; gap: 10px; }
+.cp-me { justify-self: end; max-width: 80%; padding: 9px 14px; border-radius: 16px 6px 16px 16px; background: var(--surface-2); font-size: 13.5px; line-height: 1.5; }
+:root[data-theme='light'] .cp-me { background: #141312; color: #fff; }
+.cp-lumi { display: grid; grid-template-columns: 26px minmax(0, 1fr); gap: 9px; align-items: start; max-width: 92%; }
+.cp-lumi img { width: 26px; height: 26px; object-fit: contain; }
+.cp-b { display: grid; gap: 8px; padding: 11px 14px; border-radius: 6px 16px 16px 16px; background: var(--surface); color: var(--text-2); font-size: 13.5px; line-height: 1.5; }
+:root[data-theme='light'] .cp-b { background: #fff; }
+.cp-b b { margin-bottom: -4px; font-size: 11.5px; color: #E8606F; }
+.cp-diff { display: inline-flex; align-items: center; gap: 8px; justify-self: start; padding: 6px 11px; border-radius: 10px; background: var(--surface-2); font: 600 12.5px var(--num, Inter, sans-serif); }
+:root[data-theme='light'] .cp-diff { background: var(--bg); }
+.cp-diff s { color: var(--text-3); }
+.cp-diff i { font-style: normal; color: var(--text-3); }
+.cp-diff em { font-style: normal; color: var(--text); }
+.cp-opt { padding: 9px 12px; border-radius: 12px; box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--text-3) 35%, transparent); color: var(--text-2); font-size: 12.5px; }
+.cp-opt--on { box-shadow: inset 0 0 0 1.5px var(--text); color: var(--text); font-weight: 600; }
+.cp__in { display: flex; align-items: center; justify-content: space-between; height: 46px; padding: 0 6px 0 16px; border-radius: 999px; background: var(--surface-2); color: var(--text-3); font-size: 13.5px; }
+:root[data-theme='light'] .cp__in { background: #fff; box-shadow: inset 0 0 0 1px rgba(20,19,18,.08); }
+.cp__in i { width: 34px; height: 34px; border-radius: 50%; background: #EDEAE0; position: relative; }
+.cp__in i::after { content: ''; position: absolute; left: 50%; top: 50%; width: 8px; height: 8px; border-left: 2px solid #1f1e1d; border-top: 2px solid #1f1e1d; transform: translate(-50%, -25%) rotate(45deg); }
+/* 들어올 때 대화가 차례로 */
+.tile--chat .cp__log > * { opacity: 0; transform: translateY(8px); }
+.tile--chat.in .cp__log > * { animation: cmpIn .45s cubic-bezier(.2, .8, .2, 1) forwards; }
+.tile--chat.in .cp__log > :nth-child(2) { animation-delay: .5s; }
+.tile--chat.in .cp__log > :nth-child(3) { animation-delay: 1.1s; }
+.tile--chat.in .cp__log > :nth-child(4) { animation-delay: 1.6s; }
+@media (prefers-reduced-motion: reduce) { .tile--chat .cp__log > * { opacity: 1; transform: none; animation: none !important; } }
+:root[data-theme='light'] .cp { background: #fff; }
+:root[data-theme='light'] .cp-b, :root[data-theme='light'] .cp-diff { background: #f3f2ec; }
+:root[data-theme='light'] .cp-diff { background: #fff; }
+:root[data-theme='light'] .cp__in { background: #f3f2ec; box-shadow: none; }

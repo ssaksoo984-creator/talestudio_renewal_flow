@@ -57,7 +57,9 @@ const activate = (el: HTMLElement) => {
   const order = sixItems.map((x) => x.dataset.p)
   const at = order.indexOf(p)
   void at
-  if (sim2Visible) sim2.play(p, true); else sim2.still(p)
+  card?.classList.toggle('is-cmp', p === 'board')
+  if (p === 'board') { sim2.stop(); const c = card?.querySelector('.six__cmp'); c?.classList.remove('go'); void (c as HTMLElement | null)?.offsetWidth; c?.classList.add('go') }
+  else if (sim2Visible) sim2.play(p, true); else sim2.still(p)
   if (nameEl) nameEl.textContent = el.querySelector('h3')!.textContent
   if (numEl) numEl.textContent = `${String(sixItems.indexOf(el) + 1).padStart(2, '0')} / 06`
 }
@@ -82,7 +84,7 @@ new IntersectionObserver((es) => es.forEach((e) => {
 sim.still('producer')
 new IntersectionObserver((es) => es.forEach((e) => {
   sim2Visible = e.isIntersecting
-  if (current) { if (sim2Visible) sim2.play(current, true); else sim2.stop() }
+  if (current && current !== 'board') { if (sim2Visible) sim2.play(current, true); else sim2.stop() }
 }), { threshold: 0.3 }).observe(document.getElementById('sim2')!)
 
 // 마지막 구간: 작은 별들이 그라데이션 빛으로 터지며 바탕이 돼요

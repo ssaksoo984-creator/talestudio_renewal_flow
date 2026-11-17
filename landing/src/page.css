@@ -1062,3 +1062,40 @@ main :where(p, li, small, summary, .sec-sub, .six__d):not(:where(.sim *, .vg *, 
 .hl-lumi.is-char .hl-lumi__t { opacity: 0; }
 @keyframes hlBob { 50% { translate: 0 -6px; } }
 .hero--v3 .hero__sub { font-size: clamp(15px, 1.3vw, 19px); line-height: 1.85; }
+
+/* ===== v16: 메인 세 번째 = 바로 영상 vs 콘티 먼저 비교 카드 · 인물 보드 한 장 ===== */
+.six__screens { position: relative; }
+.six__cmp { position: absolute; inset: 0; align-content: center; opacity: 0; pointer-events: none; transition: opacity .45s ease; }
+.six__card.is-cmp #sim2 { opacity: 0; transition: opacity .3s; }
+.six__card.is-cmp .six__cmp { opacity: 1; }
+.six__cmp .cmp { background: rgba(255, 255, 255, .045); }
+:root[data-theme='light'] .six__cmp .cmp { background: #f5f4ee; }
+.six__cmp .vid, .six__cmp .sb { opacity: 0; transform: translateY(8px) scale(.97); }
+.six__cmp.go .vid, .six__cmp.go .sb { animation: cmpIn .5s cubic-bezier(.2, .8, .2, 1) forwards; }
+.six__cmp.go .cmp--bad .vid:nth-child(1) { animation-delay: .1s; } .six__cmp.go .cmp--bad .vid:nth-child(2) { animation-delay: .35s; }
+.six__cmp.go .cmp--bad .vid:nth-child(3) { animation-delay: .6s; } .six__cmp.go .cmp--bad .vid:nth-child(4) { animation-delay: .85s; }
+.six__cmp.go .cmp--good .sb:nth-child(1) { animation-delay: 1.3s; } .six__cmp.go .cmp--good .sb:nth-child(2) { animation-delay: 1.45s; }
+.six__cmp.go .cmp--good .sb:nth-child(3) { animation-delay: 1.6s; } .six__cmp.go .cmp--good .sb:nth-child(4) { animation-delay: 1.75s; }
+.six__cmp .cmp__f, .six__cmp .cmp__note { opacity: 0; }
+.six__cmp.go .cmp--bad .cmp__f { animation: cmpIn .5s 1.05s forwards; }
+.six__cmp.go .cmp--good .cmp__f, .six__cmp.go .cmp__note { animation: cmpIn .5s 2s forwards; }
+@keyframes cmpIn { to { opacity: 1; transform: none; } }
+@media (prefers-reduced-motion: reduce) { .six__cmp .vid, .six__cmp .sb, .six__cmp .cmp__f, .six__cmp .cmp__note { opacity: 1; transform: none; animation: none !important; } }
+.cast-board { position: relative; margin-top: auto; aspect-ratio: 16 / 9; border-radius: 18px; overflow: hidden; background: #fff; }
+.cast-board img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; }
+.cast-board figcaption { position: absolute; left: 14px; bottom: 12px; padding: 5px 10px; border-radius: 999px; background: rgba(20, 19, 18, .72); color: #fff; font-size: 12.5px; font-weight: 600; }
+.ph.cast-board figcaption { left: 14px; right: auto; bottom: 12px; padding: 5px 11px; background: rgba(20, 19, 18, .72); color: #fff; }
+.cast-board img { object-fit: contain; }
+/* 메인 비교 카드: 카드 안에 다 들어오게 */
+.six__cmp { gap: 10px; }
+.six__cmp .cmp { padding: 13px 16px; }
+.six__cmp .cmp__h { margin-bottom: 9px; font-size: 14px; }
+.six__cmp .vid, .six__cmp .sb { aspect-ratio: 16 / 9; }
+.six__cmp .cmp__f { margin-top: 9px; font-size: 13px; }
+.six__cmp.cmp--good .cmp__row, .six__cmp .cmp--good .cmp__row { margin-bottom: 18px; }
+.six__cmp .sb--redo i { bottom: -20px; }
+.six__cmp { color: var(--text); }
+.six__cmp .cmp__h span { color: var(--text); }
+:root[data-theme='light'] .six__cmp .cmp { background: #fff; box-shadow: 0 1px 0 rgba(20, 19, 18, .04), 0 0 0 1px rgba(20, 19, 18, .06); }
+.six__cmp .cmp__note { display: none; }
+.six__cmp { gap: 8px; }

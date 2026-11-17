@@ -87,14 +87,20 @@ const pop = (burst: HTMLElement) => {
   const fw = document.createElement('span')
   fw.className = 'fw'
   fw.style.cssText = `left:${8 + Math.random() * 84}%;top:${18 + Math.random() * 64}%;--c:${c};--s:${(0.9 + Math.random() * 0.6).toFixed(2)}`
-  fw.innerHTML = '<b></b>' + Array.from({ length: 10 }, (_, i) => `<i style="--a:${i * 36 + Math.random() * 14}deg;--d:${95 + Math.random() * 70}px"></i>`).join('')
+  // 색종이 조각: 한 점에서 퍼졌다가 반짝이며 천천히 떨어져요
+  const bits = Array.from({ length: 38 }, () => {
+    const a = Math.random() * Math.PI * 2, r = 60 + Math.random() * 130
+    const col = Math.random() < 0.55 ? c : STAR[Math.floor(Math.random() * 6)]
+    return `<i style="--x:${(Math.cos(a) * r).toFixed(0)}px;--y:${(Math.sin(a) * r * 0.8 - 20).toFixed(0)}px;--f:${(50 + Math.random() * 70).toFixed(0)}px;--r:${(Math.random() * 720 - 360).toFixed(0)}deg;--w:${(2 + Math.random() * 2.5).toFixed(1)}px;--k:${col};--dl:${(Math.random() * 0.12).toFixed(2)}s;--tw:${(0.35 + Math.random() * 0.4).toFixed(2)}s"></i>`
+  }).join('')
+  fw.innerHTML = '<b></b>' + bits
   burst.append(fw)
-  setTimeout(() => fw.remove(), 2600)
+  setTimeout(() => fw.remove(), 4200)
 }
 document.querySelectorAll<HTMLElement>('.burst').forEach((burst) => {
   let timer = 0
   new IntersectionObserver((es) => es.forEach((e) => {
-    if (e.isIntersecting && !timer) { pop(burst); timer = window.setInterval(() => pop(burst), 650) }
+    if (e.isIntersecting && !timer) { pop(burst); timer = window.setInterval(() => pop(burst), 950) }
     else if (!e.isIntersecting && timer) { clearInterval(timer); timer = 0 }
   }), { threshold: 0.2 }).observe(burst.parentElement!)
 })

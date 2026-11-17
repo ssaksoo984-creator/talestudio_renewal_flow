@@ -997,3 +997,18 @@ main :where(p, li, small, summary, .sec-sub, .six__d):not(:where(.sim *, .vg *, 
 }
 @keyframes ptFlow { to { background-position: -300% 0; } }
 @media (prefers-reduced-motion: reduce) { .pt--flow { animation: none !important; } }
+
+/* 폭죽 v3: 색종이 조각이 퍼졌다가 반짝이며 천천히 떨어져요 · 그라데이션 빛은 그대로 */
+.fw b { animation-duration: 3.2s; }
+.fw i { width: var(--w); height: calc(var(--w) * 2.2); left: 0; top: 0; margin: calc(var(--w) * -1.1) 0 0 calc(var(--w) * -.5); border-radius: 1px; background: var(--k); box-shadow: none;
+  transform: none; opacity: 0; animation: fwBit 3.4s cubic-bezier(.12, .7, .3, 1) var(--dl) forwards, fwTwinkle var(--tw) steps(2) var(--dl) infinite; }
+@keyframes fwBit {
+  0% { opacity: 0; transform: translate(0, 0) rotate(0) scale(.6); }
+  8% { opacity: 1; }
+  35% { transform: translate(var(--x), var(--y)) rotate(calc(var(--r) * .4)) scale(1); }
+  80% { opacity: .85; }
+  100% { opacity: 0; transform: translate(calc(var(--x) * 1.15), calc(var(--y) + var(--f))) rotate(var(--r)) scale(.9); }
+}
+@keyframes fwTwinkle { 50% { filter: brightness(1.8) saturate(.6); } }
+:root[data-theme='light'] .fw i { box-shadow: none; filter: saturate(1.1); }
+@media (prefers-reduced-motion: reduce) { .fw i { animation: none; } }

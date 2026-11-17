@@ -21,7 +21,7 @@ import st10 from '../assets/styles/style-10.webp'
 import st11 from '../assets/styles/style-11.webp'
 import st12 from '../assets/styles/style-12.webp'
 import laSrc from '../assets/lumi-artist.webp'
-import lcSrc from '../assets/lumi-complete.webp'
+import lcSrc from '../assets/lumi-hd.webp'
 let stageLumi = lumiSrc
 import icProducer from '../assets/icons/producer.svg'
 import icWriter from '../assets/icons/writer.svg'

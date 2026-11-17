@@ -5,21 +5,31 @@ import { createSim } from './appsim.js'
 import { createVignettes } from './vignette.js'
 
 
-// Hero tabs
-const tabs = Array.from(document.querySelectorAll<HTMLButtonElement>('.prompt__tabs button'))
-const holders: Record<string, string> = {
-  아이디어로: '예) 비 오는 정류장, 우산 하나를 같이 쓰게 된 두 사람. 알고 보니 같은 회사 신입과 팀장이었다.',
-  대본으로: '예) S#1. 버스 정류장 / 밤 — 서윤, 지붕 끝에서 비를 피한다. 도현이 우산을 기울인다.',
-  파일로: '대본 · 시놉시스 파일(.docx · .pdf · .txt)을 끌어 놓거나 여기에 붙여 넣어 주세요.',
-}
-const idea = document.getElementById('idea') as HTMLTextAreaElement | null
-tabs.forEach((t) =>
-  t.addEventListener('click', () => {
-    tabs.forEach((x) => x.setAttribute('aria-selected', String(x === t)))
-    if (idea) idea.placeholder = holders[t.textContent!.trim()] ?? ''
-  }),
-)
-document.querySelectorAll('.prompt__opts .opt').forEach((o) => o.addEventListener('click', () => o.classList.toggle('opt--on')))
+// 첫 화면 입력창: 파일 첨부 · 카테고리 고르기
+const pform = document.querySelector<HTMLFormElement>('form.prompt')
+const fileIn = pform?.querySelector<HTMLInputElement>('.attach input')
+const fileRow = pform?.querySelector<HTMLElement>('.prompt__file')
+fileIn?.addEventListener('change', () => {
+  const f = fileIn.files?.[0]
+  if (!fileRow) return
+  fileRow.hidden = !f
+  fileRow.querySelector('span')!.textContent = f ? `📎 ${f.name}` : ''
+})
+fileRow?.querySelector('button')?.addEventListener('click', () => { if (fileIn) fileIn.value = ''; fileRow.hidden = true })
+const cats = Array.from(document.querySelectorAll<HTMLElement>('.cat'))
+const closeCats = (except?: HTMLElement) => cats.forEach((c) => { if (c !== except) { c.classList.remove('open'); c.querySelector('.cat__btn')!.setAttribute('aria-expanded', 'false') } })
+cats.forEach((c) => {
+  const btn = c.querySelector<HTMLButtonElement>('.cat__btn')!
+  btn.addEventListener('click', (e) => { e.stopPropagation(); const open = !c.classList.contains('open'); closeCats(c); c.classList.toggle('open', open); btn.setAttribute('aria-expanded', String(open)) })
+  c.querySelectorAll<HTMLButtonElement>('.cat__menu button').forEach((o) => o.addEventListener('click', (e) => {
+    e.stopPropagation()
+    c.querySelectorAll('.cat__menu button').forEach((x) => x.setAttribute('aria-selected', String(x === o)))
+    btn.querySelector('b')!.textContent = o.textContent
+    closeCats()
+  }))
+})
+document.addEventListener('click', () => closeCats())
+document.addEventListener('keydown', (e) => { if (e.key === 'Escape') closeCats() })
 
 // 작품 슬라이드: 끊김 없이 흐르도록 한 벌 더
 const track = document.querySelector('.carousel__track')
@@ -70,20 +80,21 @@ new IntersectionObserver((es) => es.forEach((e) => {
 }), { threshold: 0.3 }).observe(document.getElementById('sim2')!)
 
 // 마지막 구간: 작은 별들이 그라데이션 빛으로 터지며 바탕이 돼요
-const burst = document.getElementById('burst')
+// 마지막 구간들(메인 · Tale 서비스 · 요금): 별이 폭죽처럼 터져요
 const STAR = ['#F2A33A', '#E8606F', '#8B63E8', '#5A6AE6', '#3E9BE0', '#2DB39A']
-let bursting = 0
-const pop = () => {
-  if (!burst) return
+const pop = (burst: HTMLElement) => {
   const c = STAR[Math.floor(Math.random() * 6)]
   const fw = document.createElement('span')
   fw.className = 'fw'
-  fw.style.cssText = `left:${8 + Math.random() * 84}%;top:${18 + Math.random() * 64}%;--c:${c};--s:${(0.7 + Math.random() * 0.6).toFixed(2)}`
-  fw.innerHTML = '<b></b>' + Array.from({ length: 10 }, (_, i) => `<i style="--a:${i * 36 + Math.random() * 14}deg;--d:${50 + Math.random() * 40}px"></i>`).join('')
+  fw.style.cssText = `left:${8 + Math.random() * 84}%;top:${18 + Math.random() * 64}%;--c:${c};--s:${(0.9 + Math.random() * 0.6).toFixed(2)}`
+  fw.innerHTML = '<b></b>' + Array.from({ length: 10 }, (_, i) => `<i style="--a:${i * 36 + Math.random() * 14}deg;--d:${95 + Math.random() * 70}px"></i>`).join('')
   burst.append(fw)
   setTimeout(() => fw.remove(), 2600)
 }
-if (burst) new IntersectionObserver((es) => es.forEach((e) => {
-  if (e.isIntersecting && !bursting) { pop(); bursting = window.setInterval(pop, 650) }
-  else if (!e.isIntersecting && bursting) { clearInterval(bursting); bursting = 0 }
-}), { threshold: 0.2 }).observe(burst.parentElement!)
+document.querySelectorAll<HTMLElement>('.burst').forEach((burst) => {
+  let timer = 0
+  new IntersectionObserver((es) => es.forEach((e) => {
+    if (e.isIntersecting && !timer) { pop(burst); timer = window.setInterval(() => pop(burst), 650) }
+    else if (!e.isIntersecting && timer) { clearInterval(timer); timer = 0 }
+  }), { threshold: 0.2 }).observe(burst.parentElement!)
+})

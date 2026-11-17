@@ -1,7 +1,7 @@
 // 두 페이지 공통: 움직이는 배경 + 화이트 진주 Lumi 챗봇 (누르면 컬러 Lumi로 바뀌며 창이 열려요)
 import './lumi-chat.css'
 import whiteSrc from '../assets/lumi-white-pearl.webp'
-import colorSrc from '../assets/lumi@2x.webp'
+import colorSrc from '../assets/lumi-hd.webp'
 
 const reduce = matchMedia('(prefers-reduced-motion: reduce)').matches
 const sleep = (ms) => new Promise((r) => setTimeout(r, ms))

@@ -148,3 +148,11 @@
 .vg-take b { font: 800 22px Inter, sans-serif; color: var(--t1); margin-right: 2px; }
 .x .vg-take b { color: var(--t3); text-decoration: line-through; text-decoration-color: #e8606f; text-decoration-thickness: 3px; }
 .vg-vids--sb i svg { filter: grayscale(1) contrast(1.25) brightness(1.5); }
+
+/* 콘티 먼저 비교: 숫자 작게 · 간격 넓게 */
+.vg-view[data-v='board'] { gap: 18px; }
+.vg-cmp { padding: 16px 18px 18px; }
+.vg-cmp__h { margin-bottom: 12px; }
+.vg-vids { gap: 8px; }
+.vg-take { margin-top: 14px; font-size: 12.5px; line-height: 1.4; display: flex; align-items: baseline; gap: 4px; flex-wrap: wrap; }
+.vg-take b { font: 700 16px Inter, sans-serif; margin: 0 2px; }

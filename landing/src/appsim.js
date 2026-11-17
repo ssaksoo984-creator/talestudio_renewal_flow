@@ -8,6 +8,8 @@ import la from '../assets/lumi-artist.webp'
 import ls from '../assets/lumi-storyboard.webp'
 import ld from '../assets/lumi-director.webp'
 import le from '../assets/lumi-editor.webp'
+import edVideo from '../assets/gen/umbrella-15s.mp4'
+import edPoster from '../assets/gen/umbrella-poster.jpg'
 import st1 from '../assets/styles/style-1.webp'
 import st2 from '../assets/styles/style-2.webp'
 import st3 from '../assets/styles/style-3.webp'
@@ -136,10 +138,26 @@ function template() {
   </section>
 
   <section class="sim-scene" data-scene="editor">
-    <div class="sim-tool"><span class="sim-seg"><span class="on">편집</span><span>내보내기</span></span><b>Sequence 01</b><small>00:00:15:00 · 1280×720 · 30fps</small><span class="sim-pill">영상 4 · 20 Takes 사용</span></div>
-    <div class="sim-ed">
-      <div class="sim-player">${shot('0 0 320 180')}<span class="tri"></span></div>
-      <div class="sim-tl">${CUTS.map(([vb, , , sec, , fl]) => `<i style="flex:${sec}">${shot(vb, fl)}</i>`).join('')}<span class="sim-head"></span></div>
+    <div class="ed-top"><span class="sim-seg"><span class="on">편집</span><span>내보내기</span></span><b>Sequence 01</b><small>00:00:15:00 · 1280×720 · 30fps</small>
+      <span class="ed-top__end"><span class="dn-pill">↶ 되돌리기</span><span class="dn-pill">↷</span><span class="dn-pill">⌨ 단축키</span></span></div>
+    <div class="ed-grid">
+      <div class="ed-panel ed-src"><div class="ed-tabs"><span>소스</span><span class="on">효과 컨트롤</span></div>
+        <p class="ed-empty">타임라인에서 클립을 고르면 위치 · 크기 · 불투명도 · 속도 · 효과 · 전환 · 볼륨을 여기서 바꿔요.<small>컷 사이 빈 곳을 누르면 그 자리에서 '잔물결 삭제'를 할 수 있어요.</small></p></div>
+      <div class="ed-panel ed-prog"><div class="ed-tabs"><span class="on">프로그램: Sequence 01</span></div>
+        <div class="ed-screen"><video muted playsinline preload="auto" src="${edVideo}" poster="${edPoster}"></video><span class="ed-dur">4.1s</span></div>
+        <div class="ed-scrub"><i></i></div>
+        <div class="ed-ctrl"><b data-tc>00:00:00:00</b><span class="ed-btns"><i>⇤</i><i>⏮</i><i>‹</i><span class="ed-play" data-play>▶</span><i>›</i><i>⏭</i><i>⇥</i></span><span class="ed-end">00:00:15:00 <i class="ed-vol"></i></span></div></div>
+      <div class="ed-panel ed-proj"><div class="ed-tabs"><span class="on">프로젝트</span><span>효과</span></div>
+        <div class="ed-proj__btns"><span class="dn-pill">가져오기…</span><span class="dn-pill">새 항목 ▾</span></div>
+        <small class="ed-cap">Director 샷 · 4</small><div class="ed-row"><i>${shot('0 0 320 180')}</i><span>샷 1 · WS · 테이크 1</span><small>V · 04:00</small></div><div class="ed-row"><i>${shot('112 66 96 54')}</i><span>샷 2 · MS · 테이크 1</span><small>V · 04:00</small></div><div class="ed-row"><i>${shot('128 79 46 25.9')}</i><span>샷 3 · CU · 테이크 1</span><small>V · 03:00</small></div><div class="ed-row"><i>${shot('118 58 120 67.5')}</i><span>샷 4 · 2S · 테이크 1</span><small>V · 04:00</small></div><small class="ed-cap">내 파일 · 1</small></div>
+      <div class="ed-panel ed-tools"><i>➤</i><i class="on">✂</i><i>T</i></div>
+      <div class="ed-panel ed-tl"><div class="ed-tl__bar"><b>Sequence 01</b><b class="ed-tc2" data-tc2>00:00:00:00</b><span class="ed-snap">스냅 켜짐</span><span class="dn-pill">마커 추가</span><span class="dn-pill">+ V 트랙</span><span class="dn-pill">+ A 트랙</span><small>자르기 도구 · 클립을 누르면 그 자리에서 나눠요</small></div>
+        <div class="ed-ruler"><span>00:00:00:00</span><span>00:00:10:00</span></div>
+        <div class="ed-track"><b>V3</b></div><div class="ed-track"><b>V2</b></div>
+        <div class="ed-track ed-track--v1"><b>V1</b><div class="ed-clips"><i style="width:80px">${shot('0 0 320 180')}<b>WS</b><small>4s</small></i><i style="width:80px">${shot('112 66 96 54')}<b>MS</b><small>4s</small></i><i style="width:60px">${shot('128 79 46 25.9')}<b>CU</b><small>3s</small></i><i style="width:80px">${shot('118 58 120 67.5')}<b>2S</b><small>4s</small></i></div></div>
+        <div class="ed-track ed-track--a1"><b>A1</b><div class="ed-wave"></div></div>
+        <span class="ed-head" data-head></span></div>
+      <div class="ed-panel ed-meter"><i data-meter></i></div>
     </div>
   </section>
 
@@ -211,7 +229,7 @@ export function createSim(host, { loop = false, onStep, last = 'editor' } = {}) 
       artist: '<span class="sim-btn sim-btn--cream" data-go>완료 · Storyboard로 →</span>',
       storyboard: '<span class="sim-btn sim-btn--cream" data-go>다음: Director →</span>',
       director: '<span class="sim-btn sim-btn--cream" data-go>다음: Editor →</span>',
-      editor: '<span class="sim-btn">마스터 시트</span><span class="sim-btn sim-btn--cream" data-go>내보내기</span>',
+      editor: '<span class="sim-btn">← Director로</span><span class="sim-btn sim-btn--cream" data-go>내보내기</span>',
     }
     $('.sim-btns').innerHTML = btns[s] || '<span class="sim-seg sim-seg--top"><span>화면에서 고르기</span><span class="on">채팅으로 만들기</span></span>'
     if (s === 'director') requestAnimationFrame(drawDn)
@@ -231,12 +249,11 @@ export function createSim(host, { loop = false, onStep, last = 'editor' } = {}) 
     $$('.sim-styles__c').forEach((c) => c.classList.remove('pick'))
     $$('.sim-modal').forEach((m) => m.classList.remove('on'))
     $$('.sim-attach').forEach((a) => a.remove()); $$('.has-attach').forEach((a) => a.classList.remove('has-attach')); $('.sim-busy').classList.remove('on')
+    { const v = $('.ed-screen video'); if (v) { v.pause(); try { v.currentTime = 0 } catch (e) {} } const h = $('[data-head]'); if (h) h.style.left = '90px'; $$('[data-tc],[data-tc2]').forEach((e) => (e.textContent = '00:00:00:00')); const sc = $('.ed-scrub i'); if (sc) sc.style.width = '0'; const pl = $('[data-play]'); if (pl) pl.textContent = '▶' }
     $$('.dn-node--vid').forEach((n) => { n.classList.remove('loading', 'done'); n.querySelector('.sim-prog i').style.width = '0' })
     $$('.dn-node--img').forEach((n) => n.classList.remove('vdone'))
     $('[data-all]').classList.remove('on'); $('[data-make]').classList.remove('off')
     $('[data-k="vids"]').textContent = '4'; $('[data-k="hint"]').textContent = '영상을 만들 수 있어요'
-    $('.sim-head').style.left = '6px'
-    $('.sim-player').classList.remove('is-playing')
   }
 
   const SCENES = {
@@ -343,15 +360,27 @@ export function createSim(host, { loop = false, onStep, last = 'editor' } = {}) 
       await click($('[data-go]'))
     },
     async editor(alive) {
-      const head = $('.sim-head'), tl = $('.sim-tl'), player = $('.sim-player')
-      await click(player); player.classList.add('is-playing')
-      const w = tl.clientWidth - 14
-      for (let x = 0; x <= w && alive(); x += 8) { head.style.left = 6 + x + 'px'; await sleep(40) }
+      const v = $('.ed-screen video'), head = $('[data-head]'), meter = $('[data-meter]')
+      const tc = (s) => { const f = Math.floor((s % 1) * 30); const ss = Math.floor(s); return `00:00:${String(ss).padStart(2, '0')}:${String(f).padStart(2, '0')}` }
+      await sleep(500); if (!alive()) return
+      await click($('[data-play]')); $('[data-play]').textContent = '❚❚'
+      try { v.currentTime = 0; v.playbackRate = 1.25; await v.play() } catch (e) {}
+      const t0 = performance.now()
+      while (alive()) {
+        // 영상이 재생되지 않는 환경에서도 재생 헤드는 흐르게
+        const s = !v.paused && v.currentTime > 0 ? v.currentTime : Math.min(15, ((performance.now() - t0) / 1000) * 1.25)
+        head.style.left = `${90 + (s / 15) * 300}px`
+        $('[data-tc]').textContent = tc(s); $('[data-tc2]').textContent = tc(s)
+        $('.ed-scrub i').style.width = `${(s / 15) * 100}%`
+        meter.style.height = `${30 + Math.random() * 55}%`
+        if (s >= 14.9 || v.ended) break
+        await sleep(90)
+      }
+      v.pause(); $('[data-play]').textContent = '▶'
       if (!alive()) return
-      player.classList.remove('is-playing')
-      await sleep(600); if (!alive()) return
+      await sleep(700); if (!alive()) return
       await click($('[data-go]'))
-      await sleep(1200)
+      await sleep(1000)
     },
   }
 

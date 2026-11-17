@@ -5,7 +5,7 @@ const reduce = matchMedia('(prefers-reduced-motion: reduce)').matches
 document.querySelector('.theme-toggle')?.addEventListener('click', () => {
   const next = root.dataset.theme === 'dark' ? 'light' : 'dark'
   root.dataset.theme = next
-  try { localStorage.setItem('tale-theme', next) } catch {}
+  try { localStorage.setItem('tale-theme-v2', next) } catch {}
   dispatchEvent(new Event('tale-theme'))
 })
 

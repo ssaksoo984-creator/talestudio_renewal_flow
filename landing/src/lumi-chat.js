@@ -2,6 +2,8 @@
 import './lumi-chat.css'
 import whiteSrc from '../assets/lumi-white-pearl.webp'
 import colorSrc from '../assets/lumi-hd.webp'
+import icCollapse from '../assets/icons/collapse.svg'
+import icArrow from '../assets/icons/arrow.svg'
 
 const reduce = matchMedia('(prefers-reduced-motion: reduce)').matches
 const sleep = (ms) => new Promise((r) => setTimeout(r, ms))
@@ -48,10 +50,10 @@ const chat = document.createElement('section')
 chat.className = 'lumi-chat'
 chat.setAttribute('aria-label', 'Lumi 챗봇')
 chat.innerHTML = `
-  <header class="lc-head"><img src="${colorSrc}" alt="" /><div><b>Lumi</b><small>Tale의 AI 제작 친구</small></div><button type="button" class="lc-close" aria-label="닫기">✕</button></header>
+  <header class="lc-head"><img class="lc-head__lumi" src="${colorSrc}" alt="" /><b>Lumi와 이야기</b><button type="button" class="lc-close" aria-label="채팅 접기"><i style="--ico:url(&quot;${icCollapse.replace(/"/g, '%22')}&quot;)"></i></button></header>
   <div class="lc-log" aria-live="polite"></div>
   <div class="lc-chips">${CHIPS.map((c) => `<button type="button" class="lc-chip">${c}</button>`).join('')}</div>
-  <form class="lc-form"><label class="sr" for="lc-input">Lumi에게 보낼 말</label><input id="lc-input" autocomplete="off" placeholder="무엇이든 물어보세요" /><button type="submit" aria-label="보내기">↑</button></form>`
+  <form class="lc-form"><label class="sr" for="lc-input">Lumi에게 보낼 말</label><input id="lc-input" autocomplete="off" placeholder="무엇이든 물어보세요" /><button type="submit" aria-label="보내기"><i style="--ico:url(&quot;${icArrow.replace(/"/g, '%22')}&quot;)"></i></button></form>`
 document.body.append(chat, hint, fab)
 
 const root = document.documentElement
@@ -61,8 +63,14 @@ let greeted = false
 
 const add = (html, who) => {
   const m = document.createElement('div')
-  m.className = `lc-msg lc-msg--${who}`
-  m.innerHTML = html
+  if (who === 'lumi') {
+    // Figma Lumi Row: 28px 아바타 + 이름이 붙은 말풍선
+    m.className = 'lc-row'
+    m.innerHTML = `<img class="lc-av" src="${colorSrc}" alt="" /><div class="lc-msg lc-msg--lumi"><p class="lc-name">Lumi</p>${html}</div>`
+  } else {
+    m.className = `lc-msg lc-msg--${who}`
+    m.innerHTML = html
+  }
   log.append(m)
   log.scrollTop = log.scrollHeight
   return m
@@ -74,7 +82,6 @@ async function reply(text) {
   const hit = ANSWERS.find((x) => x.k.some((k) => t.includes(k)))
   setLumi('thinking')
   const typing = add('<span class="lc-typing"><i></i><i></i><i></i></span>', 'lumi')
-  typing.style.padding = '0'
   await sleep(reduce ? 100 : 700 + Math.random() * 500)
   typing.remove()
   setLumi('complete')

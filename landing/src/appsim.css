@@ -376,3 +376,61 @@
 .dn-lines path.far { stroke: rgba(255, 255, 255, .14); }
 /* 서윤 · 도현: 인물 시트 전체가 보이게 */
 .dn-node--asset .dn-img { aspect-ratio: 16 / 9; background: #f4f3ef; }
+
+/* ===== Editor: 실제 편집 화면 (프로그램 모니터 · 프로젝트 · 도구 · 타임라인 · 미터) ===== */
+.ed-top { display: flex; align-items: center; gap: 12px; height: 44px; padding: 0 16px; }
+.ed-top b { font: 700 16px Pretendard, sans-serif; }
+.ed-top small { font: 500 12.5px Inter, sans-serif; color: var(--t3); }
+.ed-top__end { margin-left: auto; display: flex; gap: 6px; }
+.ed-grid { position: absolute; left: 16px; right: 16px; top: 52px; bottom: 8px; display: grid; grid-template-columns: 260px 44px minmax(0, 1fr) 34px; grid-template-rows: 340px minmax(0, 1fr); gap: 10px; }
+.ed-panel { position: relative; border-radius: 14px; background: var(--side); overflow: hidden; }
+.ed-src { grid-column: 1 / 3; }
+.ed-prog { grid-column: 3 / 5; display: grid; grid-template-rows: auto 1fr auto auto; }
+.ed-proj { grid-column: 1; padding: 0 12px; }
+.ed-tools { grid-column: 2; display: grid; align-content: start; justify-items: center; gap: 10px; padding-top: 12px; }
+.ed-tools i { width: 30px; height: 30px; border-radius: 9px; display: grid; place-items: center; font-style: normal; color: var(--t2); font-size: 14px; }
+.ed-tools i.on { box-shadow: inset 0 0 0 1.5px #2DB39A; color: #6fe0c6; }
+.ed-tl { grid-column: 3; }
+.ed-meter { grid-column: 4; display: flex; align-items: flex-end; justify-content: center; padding: 10px 0; }
+.ed-meter i { width: 6px; height: 40%; border-radius: 3px; background: linear-gradient(#e8606f, #f2a33a 30%, #5fcf8f 60%); transition: height .09s; }
+.ed-tabs { display: flex; gap: 18px; padding: 12px 14px 0; font: 600 13px Pretendard, sans-serif; color: var(--t3); }
+.ed-tabs .on { color: var(--t1); box-shadow: inset 0 -2px 0 var(--t1); padding-bottom: 8px; }
+.ed-empty { position: absolute; inset: 44px 18px 18px; display: grid; place-content: center; text-align: center; gap: 8px; font: 400 13px/1.6 Pretendard, sans-serif; color: var(--t2); }
+.ed-empty small { font-size: 11.5px; color: var(--t3); }
+.ed-screen { position: relative; margin: 10px 0 0; background: #000; display: grid; place-items: center; overflow: hidden; }
+.ed-screen video { height: 100%; max-height: 220px; aspect-ratio: 16 / 9; object-fit: cover; display: block; background: #0b0f1c; }
+.ed-dur { position: absolute; right: 14px; top: 10px; font: 600 11.5px Inter, sans-serif; color: var(--t2); }
+.ed-scrub { height: 3px; margin: 10px 14px 0; border-radius: 3px; background: var(--raised); overflow: hidden; }
+.ed-scrub i { display: block; width: 0; height: 100%; background: var(--t1); }
+.ed-ctrl { display: flex; align-items: center; gap: 14px; padding: 10px 14px 12px; font: 600 12.5px Inter, sans-serif; }
+.ed-btns { flex: 1; display: flex; justify-content: center; align-items: center; gap: 14px; color: var(--t2); }
+.ed-btns i { font-style: normal; }
+.ed-play { width: 34px; height: 34px; border-radius: 50%; background: var(--raised); display: grid; place-items: center; color: var(--t1); font-size: 12px; transition: transform .15s; }
+.ed-play.press { transform: scale(.9); }
+.ed-end { display: flex; align-items: center; gap: 8px; color: var(--t3); font-weight: 500; }
+.ed-vol { width: 60px; height: 3px; border-radius: 3px; background: var(--t2); }
+.ed-proj__btns { display: flex; gap: 6px; margin: 12px 0 10px; }
+.ed-cap { display: block; margin: 6px 0; font: 500 11px Pretendard, sans-serif; color: var(--t3); }
+.ed-row { display: grid; grid-template-columns: 30px 1fr auto; align-items: center; gap: 10px; padding: 7px 0; font: 500 12.5px Pretendard, sans-serif; }
+.ed-row i { position: relative; width: 30px; height: 30px; border-radius: 6px; overflow: hidden; }
+.ed-row i svg { position: absolute; inset: 0; width: 100%; height: 100%; }
+.ed-row small { font: 500 11.5px Inter, sans-serif; color: var(--t3); }
+.ed-tl__bar { display: flex; align-items: center; gap: 8px; padding: 10px 12px; font: 700 13px Pretendard, sans-serif; white-space: nowrap; }
+.ed-tc2 { font-family: Inter, sans-serif; margin-right: 4px; }
+.ed-snap { padding: 6px 11px; border-radius: 999px; box-shadow: inset 0 0 0 1.5px #2DB39A; color: #8ff0d8; font: 600 12px Pretendard, sans-serif; }
+.ed-tl__bar small { margin-left: auto; font: 400 11px Pretendard, sans-serif; color: var(--t3); overflow: hidden; text-overflow: ellipsis; }
+.ed-ruler { position: relative; height: 18px; margin-left: 90px; border-bottom: 1px solid var(--line); font: 500 10px Inter, sans-serif; color: var(--t3); }
+.ed-ruler span { position: absolute; top: 2px; }
+.ed-ruler span:nth-child(2) { left: 200px; }
+.ed-track { position: relative; height: 48px; border-bottom: 1px solid var(--line); }
+.ed-track > b { position: absolute; left: 14px; top: 50%; transform: translateY(-50%); font: 700 12px Inter, sans-serif; color: var(--t2); }
+.ed-track--v1 { height: 72px; }
+.ed-clips { position: absolute; left: 90px; top: 8px; bottom: 8px; display: flex; gap: 2px; }
+.ed-clips i { position: relative; overflow: hidden; border-radius: 6px; background: #0b0f1c; }
+.ed-clips i svg { position: absolute; inset: 0; width: 100%; height: 100%; opacity: .85; }
+.ed-clips b { position: absolute; left: 5px; top: 4px; padding: 1px 5px; border-radius: 4px; background: rgba(0, 0, 0, .65); font: 700 9.5px Inter, sans-serif; color: #fff; }
+.ed-clips small { position: absolute; left: 5px; bottom: 3px; font: 600 9.5px Inter, sans-serif; color: rgba(255, 255, 255, .8); }
+.ed-track--a1 { height: 56px; }
+.ed-wave { position: absolute; left: 90px; top: 10px; bottom: 10px; width: 300px; border-radius: 6px; background: repeating-linear-gradient(90deg, rgba(255,255,255,.35) 0 2px, transparent 2px 5px); -webkit-mask-image: linear-gradient(transparent, #000 25%, #000 75%, transparent); mask-image: linear-gradient(transparent, #000 25%, #000 75%, transparent); opacity: .5; }
+.ed-head { position: absolute; left: 90px; top: 44px; bottom: 0; width: 2px; background: var(--t1); box-shadow: 0 0 8px rgba(255, 255, 255, .5); }
+.ed-head::before { content: ''; position: absolute; left: -5px; top: -2px; width: 12px; height: 12px; border-radius: 50%; background: var(--t1); }

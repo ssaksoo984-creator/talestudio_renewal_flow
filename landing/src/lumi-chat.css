@@ -96,3 +96,33 @@ main, .foot { position: relative; }
   .lumi-chat { bottom: calc(max(16px, env(safe-area-inset-bottom, 0px)) + 72px); right: 16px; height: min(520px, calc(100vh - 120px)); }
 }
 :root[data-theme='light'] .ambient__spark:nth-of-type(n+15) { display: none; }
+
+/* ===== 챗봇 v2: Figma Chat Panel 구성 + 유리 ===== */
+.lumi-chat { --lc-panel: rgba(31, 30, 29, .66); --lc-panel-2: rgba(255, 255, 255, .08); --lc-me: rgba(255, 255, 255, .14); --lc-line: rgba(255, 255, 255, .12);
+  background: var(--lc-panel); -webkit-backdrop-filter: blur(26px) saturate(1.5); backdrop-filter: blur(26px) saturate(1.5);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, .14), 0 0 0 1px var(--lc-line), 0 30px 80px -14px rgba(0, 0, 0, .55); }
+:root[data-theme='light'] .lumi-chat { --lc-panel: rgba(255, 255, 255, .62); --lc-panel-2: rgba(20, 19, 18, .06); --lc-me: #141312; --lc-line: rgba(255, 255, 255, .7);
+  box-shadow: inset 0 1px 0 #fff, 0 0 0 1px rgba(20, 19, 18, .08), 0 30px 80px -18px rgba(20, 19, 18, .3); }
+.lumi-chat::before { display: none; }
+.lc-head { display: flex; align-items: center; gap: 8px; padding: 16px 14px 12px 20px; }
+.lc-head__lumi { width: 30px !important; height: auto; flex: none; }
+.lc-head b { font: 600 13.5px/1.4 var(--font, system-ui); }
+.lc-close { margin-left: auto; display: grid; place-items: center; width: 28px; height: 28px; border-radius: 8px; background: var(--lc-panel-2); padding: 0; font-size: 0; }
+.lc-close i, .lc-form button i { width: 16px; height: 16px; background: currentColor; -webkit-mask: var(--ico) center / contain no-repeat; mask: var(--ico) center / contain no-repeat; }
+.lc-close i { transform: rotate(90deg); color: var(--lc-fg-2); }
+.lc-log { gap: 14px; padding: 8px 20px 12px; }
+.lc-row { display: grid; grid-template-columns: 28px minmax(0, 1fr); gap: 10px; align-items: start; animation: lcIn .35s cubic-bezier(.2, .8, .2, 1) both; }
+.lc-av { width: 28px; height: 28px; object-fit: contain; }
+.lc-row .lc-msg { max-width: 100%; animation: none; }
+.lc-msg--lumi { border-radius: 6px 16px 16px 16px; padding: 14px 16px; }
+.lc-name { margin: 0 0 4px; font: 600 11.5px/1.4 var(--font, system-ui); color: #E8606F; }
+.lc-msg--me { border-radius: 16px 6px 16px 16px; }
+:root[data-theme='light'] .lc-msg--me { color: #fff; }
+.lc-form { border-top: 0; padding: 6px 14px 16px; }
+.lc-form input { height: 52px; padding: 0 56px 0 18px; border-radius: 999px; }
+.lc-form { position: relative; }
+.lc-form button { position: absolute; right: 22px; top: 50%; margin-top: -23px; width: 36px; height: 36px; display: grid; place-items: center; background: #EDEAE0; color: #1f1e1d; }
+.lc-form button i { transform: rotate(-90deg); }
+.lc-chips { padding: 0 20px 8px; }
+.lumi-chat { grid-template-columns: minmax(0, 1fr); }
+.lc-row, .lc-row .lc-msg { min-width: 0; }

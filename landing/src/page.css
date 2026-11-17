@@ -1012,3 +1012,53 @@ main :where(p, li, small, summary, .sec-sub, .six__d):not(:where(.sim *, .vg *, 
 @keyframes fwTwinkle { 50% { filter: brightness(1.8) saturate(.6); } }
 :root[data-theme='light'] .fw i { box-shadow: none; filter: saturate(1.1); }
 @media (prefers-reduced-motion: reduce) { .fw i { animation: none; } }
+
+/* ===== v14: 섹션 간격 조금 줄임 (1.4배 → 약 1.2배) ===== */
+.hero--v3 { padding: 112px 0 136px; }
+.product { padding: 48px 0 136px; }
+.six { padding: 96px 0 136px; }
+.six__item { padding-top: 32px; padding-bottom: 32px; }
+.works { padding: 96px 0 136px; }
+.finale { padding: 160px 0 160px; }
+.finale--sm { padding: 116px 0 136px; }
+.faq { padding: 96px 0 136px; }
+.pricing { padding: 136px 0 116px; }
+.svc-hero { padding: 112px 0 28px; }
+.why { padding: 96px 0 136px; }
+.why__row { padding: 56px 0; }
+.bento-sec { padding: 136px 0 116px; }
+.trust { padding: 116px 0; }
+.sec-head { margin-bottom: 64px; }
+
+/* ===== 너비 통일: 모든 콘텐츠는 같은 폭(--wrap 1200 · 좌우 여백 --gut) ===== */
+.product__stage { max-width: var(--wrap); padding: 0 var(--gut); }
+.shots { max-width: none; padding: 0; }
+.finale__trust { max-width: none; }
+.finale .sec-sub, .hero--v3 .hero__sub { max-width: 720px; }
+.hero--v3 .prompt { max-width: 860px; }
+
+/* 서비스 화면: 실제 생성 이미지 */
+.ph > video { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; }
+.ph:has(> video)::after, .ph:has(> img)::after { display: none; }
+.ui--compare .vid, .ui--compare .sb { background-size: cover; background-position: center; }
+.ui--compare .vid:nth-child(1) { background-image: url('../assets/gen/dir-01.webp'); }
+.ui--compare .vid:nth-child(2) { background-image: url('../assets/gen/dir-02.webp'); }
+.ui--compare .vid:nth-child(3) { background-image: url('../assets/gen/dir-03.webp'); }
+.ui--compare .vid:nth-child(4) { background-image: url('../assets/gen/dir-04.webp'); }
+.ui--compare .sb:nth-child(1) { background-image: url('../assets/gen/sb-01.webp'); }
+.ui--compare .sb:nth-child(2) { background-image: url('../assets/gen/sb-02.webp'); }
+.ui--compare .sb:nth-child(3) { background-image: url('../assets/gen/sb-03.webp'); }
+.ui--compare .sb:nth-child(4) { background-image: url('../assets/gen/sb-04.webp'); }
+.ui--compare .sb { color: transparent; }
+
+/* ===== v15: 헤드라인 Lumi ↔ 캐릭터 · 소개 글 한 단계 작게 ===== */
+.hl-lumi { position: relative; display: inline-block; vertical-align: baseline; text-align: center; }
+.hl-lumi__t { display: inline-block; min-width: .2em; transition: opacity .2s; }
+.hl-lumi__t::after { content: ''; display: inline-block; width: 3px; height: .8em; margin-left: 3px; vertical-align: -.04em; background: linear-gradient(#B95BE0, #3E9BE0); border-radius: 2px; opacity: 0; }
+.hl-lumi.is-typing .hl-lumi__t::after { opacity: 1; }
+.hl-lumi__c { position: absolute; left: 50%; bottom: -.08em; height: 1.15em; width: auto; transform: translate(-50%, 0) scale(.4); opacity: 0; pointer-events: none;
+  transition: transform .45s cubic-bezier(.3, 1.6, .5, 1), opacity .25s; filter: drop-shadow(0 8px 18px rgba(0, 0, 0, .25)); }
+.hl-lumi.is-char .hl-lumi__c { opacity: 1; transform: translate(-50%, 0) scale(1); animation: hlBob 1.3s ease-in-out; }
+.hl-lumi.is-char .hl-lumi__t { opacity: 0; }
+@keyframes hlBob { 50% { translate: 0 -6px; } }
+.hero--v3 .hero__sub { font-size: clamp(15px, 1.3vw, 19px); line-height: 1.85; }

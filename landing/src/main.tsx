@@ -1,3 +1,9 @@
+import hlP from '../assets/lumi-producer.webp'
+import hlW from '../assets/lumi-writer.webp'
+import hlA from '../assets/lumi-artist.webp'
+import hlS from '../assets/lumi-storyboard.webp'
+import hlD from '../assets/lumi-director.webp'
+import hlE from '../assets/lumi-editor.webp'
 import './page.css'
 import './lumi-chat.js'
 import './common.js'
@@ -68,7 +74,7 @@ const sim = createSim(document.getElementById('sim')!, {
   onStep: (s: string) => stabs.forEach((b) => { const on = b.dataset.s === s; b.classList.toggle('on', on); b.setAttribute('aria-selected', String(on)) }),
 })
 let simStarted = false
-stabs.forEach((b) => b.addEventListener('click', () => sim.play(b.dataset.s!)))
+stabs.forEach((b) => b.addEventListener('click', () => { simStarted = true; sim.play(b.dataset.s!) }))
 new IntersectionObserver((es) => es.forEach((e) => {
   if (e.isIntersecting && !simStarted) { simStarted = true; sim.play('producer') }
   else if (!e.isIntersecting && simStarted) { simStarted = false; sim.stop(); sim.still('producer') }
@@ -100,7 +106,38 @@ const pop = (burst: HTMLElement) => {
 document.querySelectorAll<HTMLElement>('.burst').forEach((burst) => {
   let timer = 0
   new IntersectionObserver((es) => es.forEach((e) => {
-    if (e.isIntersecting && !timer) { pop(burst); timer = window.setInterval(() => pop(burst), 950) }
-    else if (!e.isIntersecting && timer) { clearInterval(timer); timer = 0 }
+    if (e.isIntersecting && !timer) {
+      // 처음에 세 개를 겹쳐 터뜨리고, 이후 비슷한 간격으로 계속 (앞의 것이 사라지기 전에 다음이 터져요)
+      [0, 380, 760].forEach((d) => setTimeout(() => pop(burst), d))
+      const next = () => { pop(burst); timer = window.setTimeout(next, 620 + Math.random() * 260) }
+      timer = window.setTimeout(next, 1100)
+    } else if (!e.isIntersecting && timer) { clearTimeout(timer); timer = 0 }
   }), { threshold: 0.2 }).observe(burst.parentElement!)
 })
+
+// 헤드라인: 'Lumi'를 지우고 → 캐릭터가 하나씩 나왔다가 → 다시 'Lumi'를 써요
+{
+  const box = document.querySelector<HTMLElement>('.hl-lumi')
+  const img = box?.querySelector<HTMLImageElement>('.hl-lumi__c')
+  const txt = box?.querySelector<HTMLElement>('.hl-lumi__t')
+  if (box && img && txt && !matchMedia('(prefers-reduced-motion: reduce)').matches) {
+    const chars = [hlP, hlW, hlA, hlS, hlD, hlE]
+    chars.forEach((s) => { const i = new Image(); i.src = s })
+    const wait = (ms: number) => new Promise((r) => setTimeout(r, ms))
+    const word = 'Lumi'
+    const fix = () => { box.style.minWidth = ''; box.style.minWidth = `${txt.offsetWidth}px` }
+    document.fonts?.ready.then(fix); addEventListener('resize', fix)
+    ;(async () => {
+      let k = 0
+      await wait(1800)
+      for (;;) {
+        for (let n = word.length - 1; n >= 0; n--) { txt.textContent = word.slice(0, n) || '\u200b'; await wait(90) }
+        img.src = chars[k]; box.classList.add('is-char'); await wait(1300)
+        box.classList.remove('is-char'); await wait(260)
+        for (let n = 1; n <= word.length; n++) { txt.textContent = word.slice(0, n); await wait(110) }
+        k = (k + 1) % chars.length
+        await wait(1900)
+      }
+    })()
+  }
+}

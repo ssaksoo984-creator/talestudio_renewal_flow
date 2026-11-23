@@ -1211,3 +1211,9 @@ main :where(p, li, small, summary, .sec-sub, .six__d):not(:where(.sim *, .vg *, 
 .pill .aio { font-size: inherit; }
 .aio-x { font-size: 1em; letter-spacing: .02em; }
 .pill .aio, .aio-x { font-family: var(--num); font-weight: 800; }
+/* 작품: 실제 영상 카드 (16:9) */
+.slide--video { width: clamp(300px, 34vw, 480px); aspect-ratio: 16 / 9; background: #111; }
+.slide--video video { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; }
+.slide--video::after { display: none; }
+.slide--video figcaption { z-index: 1; background: linear-gradient(to top, rgba(0, 0, 0, .7), transparent); color: rgba(255, 255, 255, .82); }
+.slide--video figcaption b { color: #fff; }

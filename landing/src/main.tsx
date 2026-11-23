@@ -40,6 +40,9 @@ document.addEventListener('keydown', (e) => { if (e.key === 'Escape') closeCats(
 // 작품 슬라이드: 끊김 없이 흐르도록 한 벌 더
 const track = document.querySelector('.carousel__track')
 if (track) Array.from(track.children).forEach((c) => { const d = c.cloneNode(true) as HTMLElement; d.setAttribute('aria-hidden', 'true'); track.append(d) })
+// 작품 영상: 작품 영역이 보일 때만 재생해요
+const works = document.querySelector('.works')
+if (works) new IntersectionObserver((es) => es.forEach((e) => works.querySelectorAll('video').forEach((v) => { if (e.isIntersecting) v.play().catch(() => {}); else v.pause() })), { threshold: 0.15 }).observe(works)
 
 // 여섯 단계: 보고 있는 단계로 오른쪽 Lumi가 옷을 갈아입어요
 const sixItems = Array.from(document.querySelectorAll<HTMLElement>('.six__item'))

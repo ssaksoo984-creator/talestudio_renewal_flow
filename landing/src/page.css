@@ -1217,3 +1217,17 @@ main :where(p, li, small, summary, .sec-sub, .six__d):not(:where(.sim *, .vg *, 
 .slide--video::after { display: none; }
 .slide--video figcaption { z-index: 1; background: linear-gradient(to top, rgba(0, 0, 0, .7), transparent); color: rgba(255, 255, 255, .82); }
 .slide--video figcaption b { color: #fff; }
+/* ===== 기능 · AI 모델 모음 (칩 구름) ===== */
+.explore { padding: 40px 0 120px; }
+.explore__in { display: grid; justify-items: center; text-align: center; }
+.explore h2 { margin-top: 12px; font: 800 clamp(32px, 4vw, 52px)/1.15 var(--font); letter-spacing: -0.03em; }
+.explore .sec-sub { margin-top: 16px; max-width: 640px; }
+.explore__cap { margin: 44px 0 14px; font: 600 13px/1 var(--font); color: var(--text-3); letter-spacing: .02em; }
+.explore__chips { display: flex; flex-wrap: wrap; justify-content: center; gap: 8px; max-width: 980px; }
+.explore__chips li { display: inline-flex; align-items: center; gap: 8px; padding: 10px 16px; border-radius: 12px; background: var(--surface); color: var(--text-2); font-size: 15px; font-weight: 500; line-height: 1.2; transition: background-color .2s, color .2s, transform .2s; }
+.explore__chips li::before { content: ''; width: 6px; height: 6px; border-radius: 50%; background: var(--c); }
+.explore__chips li:hover { color: var(--text); background: var(--surface-2); transform: translateY(-2px); }
+.explore__chips--model li { font-family: var(--num); font-weight: 600; }
+.explore__chips--model li::before { display: none; }
+.explore__chips--model small { padding: 2px 7px; border-radius: 6px; background: var(--chip); color: var(--text-3); font: 600 11px/1.4 var(--font); }
+@media (max-width: 560px) { .explore__chips li { padding: 8px 12px; font-size: 13.5px; } .explore { padding-bottom: 88px; } }

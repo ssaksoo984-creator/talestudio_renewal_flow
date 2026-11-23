@@ -292,7 +292,7 @@ export const TEXT = {
   '장르 · 길이 정하기': 'Set genre & length',
   '글': 'Write',
   '산문으로 풀기': 'Draft the story',
-  '인물·배경': 'Cast & locations',
+  '인물·배경': 'Casting',
   '템플릿 만들기': 'Build templates',
   '콘티': 'Storyboard',
   '컷 구도 확인': 'Check framing',

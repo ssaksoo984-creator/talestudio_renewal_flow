@@ -1296,3 +1296,7 @@ main :where(p, li, small, summary, .sec-sub, .six__d):not(:where(.sim *, .vg *, 
 .lang-pick__menu button[aria-checked='true'] { color: var(--text); font-weight: 700; }
 .lang-pick__menu button[aria-checked='true']::after { content: '✓'; font-size: 12px; }
 @media (max-width: 560px) { .lang-pick__btn { padding: 0 10px; gap: 4px; } .lang-pick__btn svg { display: none; } }
+/* 6단계 카드: 글자 줄간격을 좁혀 영어도 한 줄에 */
+.pf__grid li { align-content: center; row-gap: 2px; }
+.pf__grid b, .pf__grid small, .pf__grid em { line-height: 1.3; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; min-width: 0; }
+.pf__grid em { white-space: normal; }

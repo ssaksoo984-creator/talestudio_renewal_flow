@@ -1,3 +1,4 @@
+import { t } from './i18n.js'
 // 여섯 단계 오른쪽: 단계마다 컴포넌트 몇 개 + 한 가지 동작만 (실제 앱 토큰 · 문구, reference-app/)
 import './vignette.css'
 import lumiSrc from '../assets/lumi@2x.webp'
@@ -5,7 +6,7 @@ import lumiSrc from '../assets/lumi@2x.webp'
 const reduce = matchMedia('(prefers-reduced-motion: reduce)').matches
 const sleep = (ms) => new Promise((r) => setTimeout(r, reduce ? 0 : ms))
 import { shot } from './shots.js'
-const PROSE = '서윤은 정류장 지붕 끝에 서서 막차의 빨간 미등이 빗속으로 사라지는 걸 바라본다. 도현이 조용히 다가와 투명 비닐우산을 서윤의 머리 위로 기울인다.'
+const PROSE = t('서윤은 정류장 지붕 끝에 서서 막차의 빨간 미등이 빗속으로 사라지는 걸 바라본다. 도현이 조용히 다가와 투명 비닐우산을 서윤의 머리 위로 기울인다.')
 // 앱 Storyboard에서 정리한 4컷 (16:9 · 15초)
 const CUTS = [['0 0 320 180', 'WS', '씬 1 · 샷 1', 4, '막차가 떠나고'], ['112 66 96 54', 'MS', '씬 1 · 샷 2', 4, '우산을 기울여'], ['128 79 46 25.9', 'CU', '씬 2 · 샷 3', 3, '알아채는 순간'], ['118 58 120 67.5', '2S', '씬 2 · 샷 4', 4, '뒤에서 나란히', true]]
 const lumi = (text) => `<div class="vg-msg"><img src="${lumiSrc}" alt="" /><p class="vg-bub">${text}</p></div>`

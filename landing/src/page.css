@@ -1282,3 +1282,17 @@ main :where(p, li, small, summary, .sec-sub, .six__d):not(:where(.sim *, .vg *, 
 .legal__nav a, .legal__side .eyebrow { line-height: 1.4; }
 .legal__body { min-width: 0; }
 @media (max-width: 860px) { .legal__in { grid-template-columns: minmax(0, 1fr); } }
+
+/* ===== 언어 드롭다운 (상단) ===== */
+.lang-pick { position: relative; }
+.lang-pick__btn { display: inline-flex; align-items: center; gap: 6px; height: 40px; padding: 0 12px; border: 0; border-radius: 999px; background: var(--chip); color: var(--text-2); font: 600 13px/1 var(--num); cursor: pointer; transition: background-color .2s, color .2s; }
+.lang-pick__btn:hover, .lang-pick.open .lang-pick__btn { background: var(--surface-2); color: var(--text); }
+.lang-pick__btn i { font-style: normal; font-size: 9px; opacity: .7; transition: transform .2s; }
+.lang-pick.open .lang-pick__btn i { transform: rotate(180deg); }
+.lang-pick__menu { position: absolute; right: 0; top: calc(100% + 8px); min-width: 140px; display: grid; gap: 2px; padding: 6px; border-radius: 14px; background: var(--surface); box-shadow: 0 0 0 1px var(--line), var(--shadow-sm); opacity: 0; transform: translateY(-4px); pointer-events: none; transition: opacity .15s, transform .15s; z-index: 90; }
+.lang-pick.open .lang-pick__menu { opacity: 1; transform: none; pointer-events: auto; }
+.lang-pick__menu button { display: flex; justify-content: space-between; align-items: center; padding: 10px 12px; border: 0; border-radius: 9px; background: none; color: var(--text-2); font: 500 14px/1.2 var(--font); text-align: left; cursor: pointer; }
+.lang-pick__menu button:hover { background: var(--chip); color: var(--text); }
+.lang-pick__menu button[aria-checked='true'] { color: var(--text); font-weight: 700; }
+.lang-pick__menu button[aria-checked='true']::after { content: '✓'; font-size: 12px; }
+@media (max-width: 560px) { .lang-pick__btn { padding: 0 10px; gap: 4px; } .lang-pick__btn svg { display: none; } }

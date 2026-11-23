@@ -6,6 +6,7 @@ import hlD from '../assets/lumi-director.webp'
 import hlE from '../assets/lumi-editor.webp'
 import './page.css'
 import './lumi-chat.js'
+import { applyLanguage } from './i18n.js'
 import './legal.js'
 import './common.js'
 import { createSim } from './appsim.js'
@@ -150,3 +151,6 @@ document.querySelectorAll<HTMLElement>('.burst').forEach((burst) => {
     })()
   }
 }
+
+// 언어: 모든 화면을 만든 뒤 한 번에 바꿔요 (영어일 때)
+applyLanguage()

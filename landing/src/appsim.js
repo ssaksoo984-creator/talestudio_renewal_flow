@@ -1,3 +1,4 @@
+import { t } from './i18n.js'
 // Tale Studio 앱 시뮬레이션: 실제 앱(talestudio.art, 2026-11 캡처 · reference-app/)의 색 · 컴포넌트 · 배치 · 흐름
 import './appsim.css'
 import lumiSrc from '../assets/lumi@2x.webp'
@@ -49,12 +50,12 @@ const sleep = (ms) => new Promise((r) => setTimeout(r, reduce ? 0 : ms))
 import { shot } from './shots.js'
 
 // 실제로 만든 작품 '우산 하나 아래' (16:9 · 15초 · 4컷)
-const TITLE = '우산 하나 아래'
+const TITLE = t('우산 하나 아래')
 const PROSE = [
   '서윤은 정류장 지붕 끝에 서서, 비 오는 서울 외곽으로 사라지는 막차의 빨간 미등을 바라본다. 도현이 조용히 다가와 투명 비닐우산을 서윤의 머리 위로 기울인다.',
   '서윤이 고개를 돌려 노란 가로등 아래 도현과 눈이 마주친다. 같은 회사 신입이라는 걸 알아챈다.',
-]
-const FIX = '서윤이 천천히 고개를 돌리자 노란 가로등 아래 도현의 눈과 마주친다. 작게 숨을 삼키며 그를 알아본다. 도현이 수줍게 웃고, 빗소리가 두 사람만의 벽이 된다.'
+].map(t)
+const FIX = t('서윤이 천천히 고개를 돌리자 노란 가로등 아래 도현의 눈과 마주친다. 작게 숨을 삼키며 그를 알아본다. 도현이 수줍게 웃고, 빗소리가 두 사람만의 벽이 된다.')
 // 앱 Storyboard에서 정리한 4컷
 const CUTS = [
   ['0 0 320 180', 'WS', '씬 1 · 샷 1', 4, '막차가 떠나고, 서윤 혼자 지붕 끝에'],
@@ -261,7 +262,7 @@ export function createSim(host, { loop = false, onStep, last = 'editor' } = {}) 
       const log = $('.sim-pro__log'), inp = $('.sim-pro .sim-input')
       add(log, msg('안녕하세요! 어떤 이야기를 만들어 볼까요?<br>한 줄이면 충분해요. 장르 · 길이 · 화면 비율은 같이 정해요.<div class="sim-qs"><span class="sim-chipq">아이디어가 있어요</span><span class="sim-chipq">대본이 있어요</span><span class="sim-chipq">파일을 올릴게요</span><span class="sim-chipq">예시를 보여 주세요</span></div>', true))
       await sleep(900); if (!alive()) return
-      const line = '비 오는 버스 정류장, 우산 하나를 같이 쓰게 된 두 사람'
+      const line = t('비 오는 버스 정류장, 우산 하나를 같이 쓰게 된 두 사람')
       await click(inp, 0.3); await type(inp, line, alive); if (!alive()) return
       await click(inp.querySelector('.sim-input__send')); clearInput(inp)
       add(log, `<p class="sim-me">${line}</p>`)
@@ -301,7 +302,7 @@ export function createSim(host, { loop = false, onStep, last = 'editor' } = {}) 
       const att = document.createElement('span'); att.className = 'sim-attach'
       att.innerHTML = `<b>S2</b>${p2.querySelector('.sim-para__t').textContent.trim().slice(0, 40)}…<i>✕</i>`
       inp.prepend(att); inp.classList.add('has-attach')
-      await sleep(500); await click(inp, 0.4, 0.8); await type(inp, '조금 더 설레게', alive); if (!alive()) return
+      await sleep(500); await click(inp, 0.4, 0.8); await type(inp, t('조금 더 설레게'), alive); if (!alive()) return
       await click(inp.querySelector('.sim-input__send')); clearInput(inp); att.remove(); inp.classList.remove('has-attach')
       add(log, `<p class="sim-me">S2 조금 더 설레게</p>`)
       await think(log, 1100); if (!alive()) return

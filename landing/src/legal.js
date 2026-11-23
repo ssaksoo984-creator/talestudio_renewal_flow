@@ -7,19 +7,17 @@ import privacyKo from './legal/privacy.ko.html?raw'
 import privacyEn from './legal/privacy.en.html?raw'
 import aupKo from './legal/acceptable-use.ko.html?raw'
 import aupEn from './legal/acceptable-use.en.html?raw'
+import { lang } from './i18n.js'
 
 const DOCS = { terms: [termsKo, termsEn], refund: [refundKo, refundEn], privacy: [privacyKo, privacyEn], 'acceptable-use': [aupKo, aupEn] }
 const root = document.getElementById('legal')
 if (root) {
-  let lang = 'ko'
-  try { lang = localStorage.getItem('tale-legal-lang') || 'ko' } catch {}
   const render = () => {
     root.querySelectorAll('.legal__doc').forEach((a) => {
       const pair = DOCS[a.id]
       a.innerHTML = pair[lang === 'en' ? 1 : 0]
       a.lang = lang
     })
-    root.querySelectorAll('[data-lang]').forEach((b) => b.setAttribute('aria-pressed', String(b.dataset.lang === lang)))
     root.querySelectorAll('[data-ko]').forEach((e) => (e.textContent = lang === 'en' ? e.dataset.en : e.dataset.ko))
   }
   const show = () => {
@@ -29,11 +27,6 @@ if (root) {
     root.querySelectorAll('.legal__nav a').forEach((l) => l.setAttribute('aria-current', l.getAttribute('href') === '#' + id ? 'page' : 'false'))
     document.title = `${root.querySelector(`.legal__nav a[href="#${id}"]`)?.textContent} · Tale Studio`
   }
-  root.querySelectorAll('[data-lang]').forEach((b) => b.addEventListener('click', () => {
-    lang = b.dataset.lang
-    try { localStorage.setItem('tale-legal-lang', lang) } catch {}
-    render(); show()
-  }))
   render(); show()
   addEventListener('hashchange', show)
 }

@@ -1132,3 +1132,9 @@ main :where(p, li, small, summary, .sec-sub, .six__d):not(:where(.sim *, .vg *, 
 :root[data-theme='light'] .cp-b, :root[data-theme='light'] .cp-diff { background: #f3f2ec; }
 :root[data-theme='light'] .cp-diff { background: #fff; }
 :root[data-theme='light'] .cp__in { background: #f3f2ec; box-shadow: none; }
+/* All-in-one 표시: 배지 안의 작은 그라데이션 라벨 */
+.pill .aio { margin-right: 6px; padding: 2px 8px; border-radius: 999px; font: 700 11.5px/1.5 var(--num); letter-spacing: .02em; color: #fff; background: var(--brand-gradient); }
+.pill .aio { white-space: nowrap; flex: none; }
+.pill:has(.aio) .pill__dot { display: none; }
+.pill:has(.aio) { line-height: 1.4; }
+@media (max-width: 560px) { .pill:has(.aio) { font-size: 12.5px; padding-left: 10px; padding-right: 14px; text-align: left; } }

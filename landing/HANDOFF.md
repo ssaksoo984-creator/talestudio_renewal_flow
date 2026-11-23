@@ -107,6 +107,11 @@ npm run build:single   # 시안 한 파일 → ../dist/TaleStudio_메인.html
 ### 요금 (`#pricing`)
 - 요금제 3개, 자주 묻는 질문, 마지막 영역
 
+### 약관 및 정책 (`#terms` · `#refund` · `#privacy` · `#acceptable-use`)
+- 푸터 링크로 들어가요. 왼쪽에 문서 목록, 한국어 / English 전환 버튼이 있어요(선택한 언어는 `localStorage`의 `tale-legal-lang`에 저장, 기본 한국어).
+- 내용은 `src/legal/*.ko.html` · `*.en.html` 파일이고, `src/legal.js`가 화면에 넣어요. 문구를 고칠 때는 이 파일만 바꾸면 돼요.
+- 영문은 talestudio.art의 현재 원문 그대로, 한국어는 원문을 자연스럽게 옮긴 번역이에요. **법무 검토 후 게시해 주세요.**
+
 ## 5. 움직임 정리
 
 | 요소 | 동작 | 위치 |

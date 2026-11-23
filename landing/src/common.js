@@ -31,6 +31,7 @@ function route() {
   views.forEach((v) => (v.hidden = v !== view))
   document.querySelectorAll('.nav__links a').forEach((a) => a.classList.toggle('on', a.getAttribute('href') === '#' + view.id))
   if (view.id === 'home' && !view.contains(target)) target = null
+  if (view.id === 'legal') target = null // 약관 문서는 항상 맨 위부터
   if (target === view || !target) scrollTo({ top: 0, behavior: changed ? 'instant' : 'smooth' })
   else requestAnimationFrame(() => target.scrollIntoView({ behavior: changed ? 'instant' : 'smooth' }))
   if (changed) view.querySelectorAll('.reveal').forEach((e) => e.getBoundingClientRect().top < innerHeight && e.classList.add('in'))

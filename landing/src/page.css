@@ -1231,3 +1231,10 @@ main :where(p, li, small, summary, .sec-sub, .six__d):not(:where(.sim *, .vg *, 
 .explore__chips--model li::before { display: none; }
 .explore__chips--model small { padding: 2px 7px; border-radius: 6px; background: var(--chip); color: var(--text-3); font: 600 11px/1.4 var(--font); }
 @media (max-width: 560px) { .explore__chips li { padding: 8px 12px; font-size: 13.5px; } .explore { padding-bottom: 88px; } }
+/* AI 모델: 로고 + 이름 + 종류 */
+.explore__chips--model { margin-top: 44px; gap: 10px; }
+.explore__chips--model li { gap: 10px; padding: 12px 16px 12px 14px; font-size: 16px; }
+.explore__chips--model small { order: 3; }
+.ai-logo { display: grid; place-items: center; width: 24px; height: 24px; color: var(--text); }
+.ai-logo svg { width: 22px; height: 22px; display: block; }
+@media (max-width: 560px) { .explore__chips--model { gap: 8px; } .explore__chips--model li { padding: 9px 12px 9px 10px; font-size: 13.5px; gap: 7px; } .ai-logo, .ai-logo svg { width: 18px; height: 18px; } .explore__chips--model small { display: none; } }

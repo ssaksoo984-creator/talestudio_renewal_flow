@@ -1206,3 +1206,8 @@ main :where(p, li, small, summary, .sec-sub, .six__d):not(:where(.sim *, .vg *, 
 .pd.go .pd__a--1 { marker-end: url(#pdH1); }
 .pd.go .pd__a--2 { marker-end: url(#pdH2); }
 .six__head h2 { font-size: clamp(28px, 2.7vw, 36px); }
+/* All-in-one: 네모 상자 없이 2~3색 그라데이션 글씨로만 */
+.pill .aio, .aio-x { padding: 0; margin-right: 4px; border-radius: 0; background: linear-gradient(90deg, #E8606F, #8B63E8 55%, #3E9BE0); -webkit-background-clip: text; background-clip: text; color: transparent; font: 800 1em/inherit var(--num); letter-spacing: 0; }
+.pill .aio { font-size: inherit; }
+.aio-x { font-size: 1em; letter-spacing: .02em; }
+.pill .aio, .aio-x { font-family: var(--num); font-weight: 800; }
